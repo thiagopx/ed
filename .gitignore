@@ -1,0 +1,29 @@
+# Ignore compiled binaries and object files
+*.exe
+*.out
+*.o
+
+# Ignore build and output directories
+build/
+bin/
+out/
+
+# Ignore VSCode workspace settings
+.vscode/
+
+# Ignore Visual Studio Code user-specific settings
+.vscode/settings.json
+
+# Ignore temporary files
+*.swp
+*.swo
+*~
+
+# Ignore debugging files
+.vscodelaunch.json
+
+# Ignore compiled header files
+*.gch
+
+# Ignore dependency directories
+Dependencies/
