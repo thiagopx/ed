@@ -13,7 +13,7 @@ int main()
     int word_count = 0;
     char word[100]; // sequence of non-blank characters
 
-    while (fgets(word, 100, file) != NULL) // returns word or NULL (if reach the end of file)
+    while (fscanf(file, "%s", word) != EOF)
     {
         word_count++;
         printf("%s\n", word);

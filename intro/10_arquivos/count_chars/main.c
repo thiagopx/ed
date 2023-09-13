@@ -2,7 +2,8 @@
 
 int main()
 {
-    FILE *file = fopen(__FILE__, "r");
+    FILE *file = fopen("main.c", "r");
+    // FILE *file = fopen(__FILE__, "r");
 
     if (file == NULL)
     {
@@ -10,16 +11,18 @@ int main()
         return 1;
     }
 
-    int word_count = 0;
-    char word[100]; // sequence of non-blank characters
+    int char_count = 0;
+    char ch;
 
-    while (fscanf(file, "%s", word) != EOF)
+    while ((ch = fgetc(file)) != EOF) // EOF is typically -1
     {
-        word_count++;
-        printf("%s\n", word);
+        if (ch != ' ' && ch != '\n' && ch != '\t')
+        {
+            char_count++;
+        }
     }
 
-    printf("\nTotal words in the source code: %d\n", word_count);
+    printf("Total characters (excluding spaces, tabs, and newlines): %d\n", char_count);
 
     fclose(file);
     return 0;
