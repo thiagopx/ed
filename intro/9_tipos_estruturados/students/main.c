@@ -35,9 +35,10 @@ Student *read_students_from_file(const char *filename, int *num_students)
 
     for (int i = 0; i < *num_students; i++)
     {
-        if (fscanf(file, "%49[^\n]", students[i].name) != 1 ||
-            fscanf(file, "%d", &students[i].id) != 1 ||
-            fscanf(file, "%d", &students[i].age) != 1)
+        int num_scanned_items = fscanf(file, " %[^\n]", students[i].name);
+        num_scanned_items += fscanf(file, "%d", &students[i].id);
+        num_scanned_items += fscanf(file, "%d", &students[i].age);
+        if (num_scanned_items != 3)
         {
             perror("Error reading student data");
             fclose(file);
