@@ -1,9 +1,9 @@
 #include "dynvec.h" // Include the header file for the DynVec data structure
-#include <assert.h> // Include the assert library for runtime checks
-#include <stdio.h>  // Include the standard input/output library for file operations
-#include <stdlib.h> // Include the standard library for memory allocation
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-// Define the structure for the dynamic vector (TAD - Type Abstraction Data)
+// Define the structure for the dynamic vector
 struct dynvec
 {
   int n;     // number of elements
