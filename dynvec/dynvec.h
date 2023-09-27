@@ -31,7 +31,7 @@ void dv_free(DynVec *dv);
 void dv_print_values(DynVec *dv);
 
 // Write the contents of the dynamic vector to a file.
-void dv_write_to_file(DynVec *dv);
+void dv_write_to_file(DynVec *dv, const char *filename);
 
 // Concatenate two dynamic vectors and return a new dynamic vector.
 DynVec *dv_concatenate(DynVec *dv1, DynVec *dv2);
