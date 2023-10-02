@@ -18,21 +18,21 @@ struct list_node
 };
 
 // Function to create an empty linked list and return a pointer to it.
-List *ll_create()
+LinkedList *ll_create()
 {
-   List *l = (List *)malloc(sizeof(List)); // Allocate memory for the list structure.
-   l->first = NULL;                        // Initialize the 'first' pointer to NULL, indicating an empty list.
-   return l;                               // Return a pointer to the newly created list.
+   LinkedList *l = (LinkedList *)malloc(sizeof(LinkedList)); // Allocate memory for the list structure.
+   l->first = NULL;                                          // Initialize the 'first' pointer to NULL, indicating an empty list.
+   return l;                                                 // Return a pointer to the newly created list.
 }
 
 // Function to check whether the linked list is empty.
-int ll_is_empty(List *l)
+int ll_is_empty(LinkedList *l)
 {
    return l->first == NULL; // Check if the 'first' pointer is NULL, indicating an empty list.
 }
 
 // Function to insert an element at the beginning of the linked list.
-void ll_insert(List *l, int v)
+void ll_insert(LinkedList *l, int v)
 {
    ListNode *node = (ListNode *)malloc(sizeof(ListNode)); // Allocate memory for a new node.
    node->info = v;                                        // Set the 'info' field of the new node to the provided value.
@@ -41,7 +41,7 @@ void ll_insert(List *l, int v)
 }
 
 // Function to get the size (number of elements) of the linked list.
-int ll_size(List *l)
+int ll_size(LinkedList *l)
 {
    int cnt = 0; // Initialize a counter to zero.
    for (ListNode *p = l->first; p != NULL; p = p->next)
@@ -52,7 +52,7 @@ int ll_size(List *l)
 }
 
 // Function to verify if a value is in the list
-int ll_is_in(List *l, int val)
+int ll_is_in(LinkedList *l, int val)
 {
    ListNode *p = l->first;
    while (p != NULL)
@@ -65,7 +65,7 @@ int ll_is_in(List *l, int val)
 }
 
 // Function to remove nodes from the list by their value.
-void ll_remove(List *l, int val, char mode[])
+void ll_remove(LinkedList *l, int val, char mode[])
 {
    // Make sure mode is "first" or "all"
    assert(strcmp(mode, "first") == 0 || strcmp(mode, "all") == 0);
@@ -105,7 +105,7 @@ void ll_remove(List *l, int val, char mode[])
 }
 
 // Function to free the memory used by the linked list.
-void ll_free(List *l)
+void ll_free(LinkedList *l)
 {
    ListNode *p = l->first;
    while (p != NULL)
@@ -118,7 +118,7 @@ void ll_free(List *l)
 }
 
 // Function to display all elements of the linked list.
-void ll_print(List *l)
+void ll_print(LinkedList *l)
 {
    for (ListNode *p = l->first; p != NULL; p = p->next)
    {

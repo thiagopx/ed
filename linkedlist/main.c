@@ -3,7 +3,7 @@
 
 int main(void)
 {
-   List *l; // Declare a pointer to a linked list.
+   LinkedList *l; // Declare a pointer to a linked list.
 
    // Create a list with 10 elements
    printf("Create a list with 10 elements\n");
