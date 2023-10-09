@@ -13,9 +13,6 @@ LinkedList *ll_create();
 // Insert an element at the beginning of the linked list
 void ll_insert(LinkedList *l, int v);
 
-// Internal recursive function used by insert_sorted_into_the_list
-static void _insert_sorted(LinkedList *l, int v);
-
 // Insert an element into the linked list while keeping it sorted
 void ll_insert_sorted(LinkedList *l, int v);
 
