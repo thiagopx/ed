@@ -1,9 +1,9 @@
-#include "linkedlistrec.h" // Include the user-defined header file for the list data structure.
+#include "linkedlist.h" // Include the user-defined header file for the list data structure.
 #include <stdio.h>
 
 int main(void)
 {
-   LinkedListRec *l; // Declare a pointer to a linked list.
+   LinkedList *l; // Declare a pointer to a linked list.
 
    // Create a list with 10 elements
    printf("Create a list with 10 elements\n");
@@ -25,14 +25,9 @@ int main(void)
    for (int i = 0; i < 5; i++)
       ll_insert(l, 1); // Insert five occurrences of '1' into the list using ll_insert.
    ll_print(l);        // Show the elements of the updated list using ll_print.
-
-   printf("Sum\n");
-   int sum = ll_sum(l);
-   printf("sum=%d\n", sum);
-
-   // ll_remove(l, 1, "all"); // Remove all occurrences of '1' from the list using ll_remove.
+   // ll_remove_all(l, 1); // Remove all occurrences of '1' from the list using ll_remove.
    // ll_print(l);            // Show the elements of the updated list using ll_print.
-   // printf("------------\n\n");
+   printf("------------\n\n");
 
    // // Checking whether 4 and 10 are in the list
    // printf("Checking whether 4 and 10 are in the list\n");

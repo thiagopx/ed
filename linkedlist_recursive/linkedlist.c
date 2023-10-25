@@ -1,4 +1,4 @@
-#include "linkedlistrec.h" // Include the user-defined header file for the linked list data structure.
+#include "linkedlist.h" // Include the user-defined header file for the linked list data structure.
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,21 +18,21 @@ struct list_node
 };
 
 // Function to create an empty linked list and return a pointer to it.
-LinkedListRec *ll_create()
+LinkedList *ll_create()
 {
-   LinkedListRec *l = (LinkedListRec *)malloc(sizeof(LinkedListRec)); // Allocate memory for the list structure.
-   l->first = NULL;                                                   // Initialize the 'first' pointer to NULL, indicating an empty list.
-   return l;                                                          // Return a pointer to the newly created list.
+   LinkedList *l = (LinkedList *)malloc(sizeof(LinkedList)); // Allocate memory for the list structure.
+   l->first = NULL;                                          // Initialize the 'first' pointer to NULL, indicating an empty list.
+   return l;                                                 // Return a pointer to the newly created list.
 }
 
 // Function to check whether the linked list is empty.
-int ll_is_empty(LinkedListRec *l)
+int ll_is_empty(LinkedList *l)
 {
    return l->first == NULL; // Check if the 'first' pointer is NULL, indicating an empty list.
 }
 
 // Function to insert an element at the beginning of the linked list.
-void ll_insert(LinkedListRec *l, int v)
+void ll_insert(LinkedList *l, int v)
 {
    ListNode *node = (ListNode *)malloc(sizeof(ListNode)); // Allocate memory for a new node.
    node->info = v;                                        // Set the 'info' field of the new node to the provided value.
@@ -49,7 +49,7 @@ static int _ll_size(ListNode *p)
 }
 
 // Function to get the size (number of elements) of the linked list.
-int ll_size(LinkedListRec *l)
+int ll_size(LinkedList *l)
 {
    return _ll_size(l->first);
 }
@@ -62,7 +62,7 @@ static int _ll_sum(ListNode *p)
    return 0;
 }
 
-int ll_sum(LinkedListRec *l)
+int ll_sum(LinkedList *l)
 {
    return _ll_sum(l->first);
 }
@@ -84,7 +84,7 @@ static int _ll_is_in(ListNode *p, int val)
 }
 
 // Function to verify if a value is in the list
-int ll_is_in(LinkedListRec *l, int val)
+int ll_is_in(LinkedList *l, int val)
 {
    return _ll_is_in(l->first, val);
 }
@@ -119,7 +119,7 @@ static ListNode *_ll_remove(ListNode *p, int val)
 }
 
 // Function to remove nodes from the list by their value.
-void ll_remove(LinkedListRec *l, int val)
+void ll_remove(LinkedList *l, int val)
 {
    l->first = _ll_remove(l->first, val);
 }
@@ -134,7 +134,7 @@ static void _ll_free(ListNode *p)
 }
 
 // Function to free the memory used by the linked list.
-void ll_free(LinkedListRec *l)
+void ll_free(LinkedList *l)
 {
    _ll_free(l->first);
    free(l); // free the list structure
@@ -150,7 +150,7 @@ static void _ll_print(ListNode *p)
 }
 
 // Function to display all elements of the linked list.
-void ll_print(LinkedListRec *l)
+void ll_print(LinkedList *l)
 {
    _ll_print(l->first);
    printf("\n");
