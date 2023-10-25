@@ -4,8 +4,8 @@
 // Define an enumeration for different course types.
 typedef enum
 {
-   COURSE_BSI, // Bachelor of Science in Information Systems
-   COURSE_ECA, // School of Communication and Arts
+   COURSE_BSI,
+   COURSE_ECA,
 } Course;
 
 // Define a custom data type "Student" to represent student information.
