@@ -33,7 +33,7 @@ static void reallocate(Queue *q)
 }
 
 // Function to enqueue an element into the queue
-void q_enqueue(Queue *q, float x)
+void q_enqueue(Queue *q, float v)
 {
    if (q->n == q->n_max)
    {
@@ -51,17 +51,17 @@ void q_enqueue(Queue *q, float x)
       }
    }
    int rear = (q->front + q->n) % q->n_max;
-   q->v[rear] = x;
+   q->v[rear] = v;
    q->n++;
 }
 
 // Function to dequeue an element from the front of the queue
 float q_dequeue(Queue *q)
 {
-   float x = q->v[q->front];
+   float v = q->v[q->front];
    q->front = (q->front + 1) % q->n_max;
    q->n--;
-   return x;
+   return v;
 }
 
 // Function to check if the queue is empty

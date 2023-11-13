@@ -9,8 +9,8 @@ typedef struct queue Queue;
 // Creates a new empty queue and returns a pointer to it
 Queue *q_create();
 
-// Enqueues a float value x into the specified queue q
-void q_enqueue(Queue *q, float x);
+// Enqueues a float value v into the specified queue q
+void q_enqueue(Queue *q, float v);
 
 // Dequeues and returns a float value from the specified queue q
 float q_dequeue(Queue *q);
