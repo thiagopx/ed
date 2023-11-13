@@ -15,6 +15,8 @@ DynVec *dv_create_from_file(const char *filename);
 // Insert a float value into the dynamic vector.
 void dv_insert(DynVec *dv, float x);
 
+int dv_is_in(DynVec *dv, float x);
+
 // Get the value at a specific index 'i' in the dynamic vector.
 float dv_get(DynVec *dv, int i);
 
@@ -41,6 +43,9 @@ DynVec *dv_union(DynVec *dv1, DynVec *dv2);
 
 // Find the intersection of two dynamic vectors and return a new dynamic vector.
 DynVec *dv_intersection(DynVec *dv1, DynVec *dv2);
+
+// Return a new dynamic vector with a unique ocurrence or each element
+DynVec *dv_unique(DynVec *dv);
 
 // End of the conditional compilation directives.
 #endif

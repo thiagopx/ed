@@ -91,3 +91,22 @@ void dv_print_values(DynVec *dv)
       printf("%f ", dv_get(dv, i));
    printf("\n");
 }
+
+DynVec *dv_concatenate(DynVec *dv1, DynVec *dv2)
+{
+   DynVec *dv = dv_create();
+
+   for (int i = 0; i < dv_size(dv1); i++)
+   {
+      float v = dv_get(dv1, i);
+      dv_insert(dv, v);
+   }
+
+   for (int i = 0; i < dv_size(dv2); i++)
+   {
+      float v = dv_get(dv2, i);
+      dv_insert(dv, v);
+   }
+
+   return dv;
+}

@@ -64,44 +64,43 @@ int ll_is_in(LinkedList *l, int val)
    return 0;
 }
 
-// Function to remove nodes from the list by their value.
-void ll_remove(LinkedList *l, int val, char mode[])
+// Function to remove the first occurrence of a specific element from the linked list
+int ll_remove(LinkedList *l, int v)
 {
-   // Make sure mode is "first" or "all"
-   assert(strcmp(mode, "first") == 0 || strcmp(mode, "all") == 0);
-
-   ListNode *aux;          // Temporary pointer used to remove a record
-   ListNode *p = l->first; // Removal pointer
-   ListNode *prev = NULL;  // Previous pointer
-   int stop = 0;           // Stop flag related to mode
+   ListNode *p = l->first; // Pointer to the current node being examined
+   ListNode *prev = NULL;  // Pointer to the previous node
 
    // Traverse the list
-   while ((p != NULL) && (!stop))
+   while (p != NULL)
    {
-      // Found?
-      if (p->info == val)
+      // Check if the current node contains the element to be removed
+      if (p->info == v)
       {
-         // Beginning?
+         // If the element to be removed is at the beginning of the list
          if (prev == NULL)
-            l->first = p->next; // Update the 'first' pointer
-         // Middle or end?
+            l->first = p->next; // Update the 'first' pointer to skip the first node
+         // If the element to be removed is in the middle or end of the list
          else
-            prev->next = p->next;
+            prev->next = p->next; // Update the 'next' pointer of the previous node
 
-         aux = p;     // Store a reference to p
-         p = p->next; // Update p to the next node
-         free(aux);   // Release memory occupied by the removed node
-
-         // Ensure other elements will not be removed based on mode
-         if (strcmp(mode, "first") == 0)
-            stop = 1;
+         free(p);  // Deallocate memory occupied by the removed node
+         return 1; // Indicate success (element found and removed)
       }
       else
       {
-         prev = p;
-         p = p->next;
+         prev = p;    // Update the 'prev' pointer
+         p = p->next; // Move to the next node
       }
    }
+
+   return 0; // Indicate that the element was not found
+}
+
+// Remove all elements that match a specific value from the linked list
+void ll_remove_all(LinkedList *l, int v)
+{
+   while (ll_remove(l, v))
+      ;
 }
 
 // Function to free the memory used by the linked list.

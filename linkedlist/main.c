@@ -15,7 +15,7 @@ int main(void)
 
    // Remove zero
    printf("Removing the first zero\n");
-   ll_remove(l, 0, "first");                                   // Remove the first occurrence of zero from the list using ll_remove.
+   ll_remove(l, 0);                                            // Remove the first occurrence of zero from the list using ll_remove.
    ll_print(l);                                                // Show the elements of the updated list using ll_print.
    printf("There are %d elements in the list.\n", ll_size(l)); // Print the number of elements in the list using ll_size.
    printf("------------\n\n");
@@ -23,10 +23,10 @@ int main(void)
    // Add and remove 1's
    printf("Adding ones and removing ones\n");
    for (int i = 0; i < 5; i++)
-      ll_insert(l, 1);     // Insert five occurrences of '1' into the list using ll_insert.
-   ll_print(l);            // Show the elements of the updated list using ll_print.
-   ll_remove(l, 1, "all"); // Remove all occurrences of '1' from the list using ll_remove.
-   ll_print(l);            // Show the elements of the updated list using ll_print.
+      ll_insert(l, 1);  // Insert five occurrences of '1' into the list using ll_insert.
+   ll_print(l);         // Show the elements of the updated list using ll_print.
+   ll_remove_all(l, 1); // Remove all occurrences of '1' from the list using ll_remove.
+   ll_print(l);         // Show the elements of the updated list using ll_print.
    printf("------------\n\n");
 
    // Checking whether 4 and 10 are in the list
