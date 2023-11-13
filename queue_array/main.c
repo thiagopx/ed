@@ -27,6 +27,7 @@ int main()
   q_enqueue(q, 7);
   q_print(q);
   printf("\n");
+  printf("\n");
 
   q_free(q);
 
