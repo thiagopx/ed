@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int main() {
+int main()
+{
     float fahrenheit, celsius;
 
     // Input temperature in Fahrenheit
@@ -12,6 +13,16 @@ int main() {
 
     // Output temperature in Celsius
     printf("Temperature in Celsius: %.2f\n", celsius);
+
+    // Check if temperature is below freezing
+    if (celsius < 0)
+    {
+        printf("It's freezing outside!\n");
+    }
+    else
+    {
+        printf("It's not freezing outside.\n");
+    }
 
     return 0;
 }
