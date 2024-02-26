@@ -1,7 +1,8 @@
 #include <stdio.h>
 
 // Function to calculate sum and difference of two double values
-void calculate_sum_and_difference(double a, double b, double *sum, double *difference)
+void calculate_sum_and_difference(
+    double a, double b, double *sum, double *difference)
 {
     *sum = a + b;
     *difference = a - b;

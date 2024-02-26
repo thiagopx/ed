@@ -3,7 +3,8 @@
 // Define a macro to calculate the square of a number
 #define SQUARE(x) ((x) * (x))
 
-int main() {
+int main()
+{
     int num = 5;
     int squared = SQUARE(num);
 
