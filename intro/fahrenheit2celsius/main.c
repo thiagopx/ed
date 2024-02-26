@@ -16,13 +16,9 @@ int main()
 
     // Check if temperature is below freezing
     if (celsius < 0)
-    {
         printf("It's freezing outside!\n");
-    }
     else
-    {
         printf("It's not freezing outside.\n");
-    }
 
     return 0;
 }
