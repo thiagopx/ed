@@ -8,7 +8,8 @@ int main()
      * In Linux, the time() function returns the elapsed time in seconds from
      * January 1, 1970, 00:00:00 (UTC) to the present moment.
      */
-    // srand(time(NULL));
+    srand(time(NULL));
+    // srand(10);
 
     // Generate and display 5 random numbers
     printf("Random numbers generated:\n");
