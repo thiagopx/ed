@@ -15,9 +15,9 @@ int main(void)
     *u = 11;
     printf("v[3]=%d\n", v[3]);
 
-    // v: 4 bits * 10 = 40 bits
-    // u: 1 byte = 8 bits
-    printf("size(v)=%d, size(u)=%d\n", sizeof(v), sizeof(u));
+    // v: 4 bytes * 10 = 40 bits
+    // u: 8 bytes
+    printf("size(v)=%d bytes, size(u)=%d bytes\n", sizeof(v), sizeof(u));
     // try to change the v address (uncomment this)
     // v = w;
     return 0;

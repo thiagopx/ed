@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <math.h>
 
+#define MAX_SIZE 100
+
 int main()
 {
+    int values[MAX_SIZE];
     int n;
     printf("Enter the number of values: ");
     scanf("%d", &n);
@@ -13,7 +16,12 @@ int main()
         return 1;
     }
 
-    int values[n];
+    if (n > MAX_SIZE)
+    {
+        printf("Number of values must be fewer than %d.\n", MAX_SIZE);
+        return 1;
+    }
+
     float sum = 0.0f;
 
     // Input values and calculate sum
