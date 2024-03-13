@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int max(int *arr, int size)
+int max(int arr[], int size)
+// int max(int *arr, int size)
 {
     if (size == 1)
     {
