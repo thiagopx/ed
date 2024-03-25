@@ -3,21 +3,19 @@
 #include <string.h>
 
 // Function to duplicate a string
-char *duplicate(char *s)
+char *duplicate(char *src)
 {
-    int n = strlen(s) + 1; // Add one for the '\0' character
+    int n = strlen(src) + 1; // Add one for the '\0' character
+    char *dest = (char *)malloc(n * sizeof(char));
 
-    char *d = (char *)malloc(n * sizeof(char));
-
-    if (d == NULL)
+    if (dest == NULL)
     {
         perror("Memory allocation failed");
         exit(1);
     }
 
-    strcpy(d, s);
-
-    return d;
+    strcpy(dest, src);
+    return dest;
 }
 
 int main(void)

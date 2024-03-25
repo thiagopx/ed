@@ -1,10 +1,10 @@
 #include <stdio.h>
+#include <string.h>
 
 // Function to calculate the length of a string (analogous to strlen)
 int my_strlen(const char *str)
 {
     int length = 0;
-
     while (str[length] != '\0')
         length++;
 
@@ -15,7 +15,6 @@ int my_strlen(const char *str)
 void my_strcpy(char *dest, const char *src)
 {
     int i = 0;
-
     while (src[i] != '\0')
     {
         dest[i] = src[i];
@@ -44,11 +43,9 @@ void my_strcat(char *dest, const char *src)
 int my_strcmp(const char *str1, const char *str2)
 {
     int i;
-
     for (i = 0; str1[i] != '\0' && str2[i] != '\0'; ++i)
     {
         int d = str1[i] - str2[i];
-
         if (d != 0)
             return d;
     }
@@ -63,19 +60,23 @@ int main(void)
 
     // my_strlen
     int length = my_strlen(str1);
+    // int length = strlen(str1);
     printf("Length of str1: %d\n", length);
 
     // my_strcpy
     my_strcpy(str1, str2);
+    // strcpy(str1, str2);
     printf("Copied string: %s\n", str1);
 
     // my_strcat
     char str3[50] = "Hello, ";
     my_strcat(str3, str2);
+    // strcat(str3, str2);
     printf("Concatenated string: %s\n", str3);
 
     // my_strcmp
     int result = my_strcmp("apple", "banana");
+    // int result = strcmp("apple", "banana");
     if (result == 0)
         printf("Strings are equal\n");
     else if (result < 0)

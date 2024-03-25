@@ -31,7 +31,7 @@ int main()
         char input[MAX_NAME_LENGTH];
         printf("Student %d: ", i + 1);
 
-        if (scanf("%99[^\n]", input) != 1)
+        if (scanf(" %99[^\n]", input) != 1)
         {
             printf("error_reading_input\n");
             return 1;
