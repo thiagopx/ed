@@ -1,3 +1,11 @@
+/* How to run this code:
+ * gcc -lm main.c -o main
+ * ./main
+ *
+ * In this code, -lm is used to link the math library. The math library is not linked by default, so you need to specify it
+ * explicitly when using math functions like sqrt.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -18,7 +26,7 @@ Point2D *create_point()
     Point2D *point = (Point2D *)malloc(sizeof(Point2D));
     if (point == NULL)
     {
-        fprintf(stderr, "Memory allocation failed.\n");
+        printf("Memory allocation failed.\n");
         exit(1);
     }
     return point;

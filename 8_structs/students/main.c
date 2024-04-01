@@ -25,7 +25,7 @@ Student *read_students_from_file(const char *filename, int *num_students)
         return NULL;
     }
 
-    Student *students = (Student *)malloc(*num_students * sizeof(Student));
+    Student *students = (Student *)malloc((*num_students) * sizeof(Student));
     if (students == NULL)
     {
         perror("Memory allocation failed");

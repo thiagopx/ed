@@ -1,3 +1,10 @@
+/* How to run this code:
+ * gcc -lm main.c -o main
+ * ./main
+ *
+ * In this code, -lm is used to link the math library. The math library is not linked by default, so you need to specify it
+ * explicitly when using math functions like sqrt.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -17,10 +24,10 @@ typedef struct
 } Circle;
 
 // Function to calculate the Euclidean distance between two points
-double euclidean_distance(Point2D point1, Point2D point2)
+double euclidean_distance(Point2D *point1, Point2D *point2)
 {
-    double dx = point1.x - point2.x;
-    double dy = point1.y - point2.y;
+    double dx = point1->x - point2->x;
+    double dy = point1->y - point2->y;
     return sqrt(dx * dx + dy * dy);
 }
 
@@ -55,7 +62,7 @@ Circle *create_circle(double center_x, double center_y, double radius)
 // Function to check if a point is inside a circle
 int is_point_inside_circle(Point2D *point, Circle *circle)
 {
-    double distance = euclidean_distance(*point, *(circle->center));
+    double distance = euclidean_distance(point, circle->center);
 
     // If the distance is less than the radius, the point is inside the circle
     if (distance < circle->radius)

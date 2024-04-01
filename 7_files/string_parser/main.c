@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int main() {
+int main()
+{
     // Parsing values from a string using sscanf
     char input_string[] = "John 25 75.5";
     char name[50];
