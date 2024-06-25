@@ -93,7 +93,7 @@ int main()
     // Create a circle with center (0, 0) and radius 5
     Circle *my_circle = create_circle(0, 0, 5);
 
-    // Create a point with coordinates (3, 4)
+    // Create a point with coordinates (2, 1)
     Point2D *my_point = create_point(2, 1);
 
     // Check if the point is inside the circle
