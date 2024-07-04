@@ -15,6 +15,7 @@ DynVec *dv_create_from_file(const char *filename);
 // Insert a float value into the dynamic vector.
 void dv_insert(DynVec *dv, float x);
 
+// Verify if a value is in the dynamic vector.
 int dv_is_in(DynVec *dv, float x);
 
 // Get the value at a specific index 'i' in the dynamic vector.
