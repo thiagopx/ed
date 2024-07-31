@@ -4,8 +4,8 @@
 // Define an enumeration for different node types (e.g., Student or Professor).
 typedef enum
 {
-   TYPE_STUDENT,  // Indicates a node containing student data
-   TYPE_PROFESSOR // Indicates a node containing professor data
+    TYPE_STUDENT,  // Indicates a node containing student data
+    TYPE_PROFESSOR // Indicates a node containing professor data
 } NodeType;
 
 // Define the LinkedList and ListNode data structures
@@ -37,7 +37,7 @@ void ll_insert(LinkedList *l, void *data, NodeType type);
  * @param data - A pointer to the data to be appended.
  * @param type - The type of the data node (Student or Professor).
  */
-void ll_append(LinkedList *l, void *data, int type);
+void ll_append(LinkedList *l, void *data, NodeType type);
 
 /**
  * Remove the first occurrence of a specific element from the linked list.
