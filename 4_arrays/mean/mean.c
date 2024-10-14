@@ -1,8 +1,9 @@
 #include <stdio.h>
 
-float calculate_mean(float *ptr, int size)
+// float calculate_mean(float *ptr, int size)
+// {
+float calculate_mean(float ptr[], int size)
 {
-    // float calculate_mean(float ptr[], int size) {
     float sum = 0.0f;
     for (int i = 0; i < size; ++i)
     {

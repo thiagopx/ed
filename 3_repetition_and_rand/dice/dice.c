@@ -15,7 +15,8 @@ int main()
 
     printf("Welcome to the Virtual Dice Roll!\n");
     printf("Press Enter to roll the dice...");
-    getchar(); // Wait for Enter key press
+    getchar();
+    // Wait for Enter key press
     roll_dice();
 
     return 0;

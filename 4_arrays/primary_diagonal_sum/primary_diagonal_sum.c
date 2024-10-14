@@ -12,7 +12,7 @@ int primary_diagonal_sum(int matrix[][4], int size)
 
 int main()
 {
-    int matrix[4][4] = {
+    int matrix[][4] = {
         {1, 2, 3, 4},
         {5, 6, 7, 8},
         {9, 10, 11, 12},

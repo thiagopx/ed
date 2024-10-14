@@ -22,12 +22,12 @@ double calculate_variance(double *vector, int size, double mean)
         double diff = vector[i] - mean;
         sum_squared_diff += diff * diff;
     }
-    return sum_squared_diff / size;
+    return sum_squared_diff / (size - 1);
 }
 
 int main()
 {
-    int size;
+    int size; // Number of elements in the vector
     printf("Enter the size of the vector: ");
     scanf("%d", &size);
 
