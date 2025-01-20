@@ -1,6 +1,4 @@
 #include "my_string.h"
-#include <stdio.h>
-
 
 // Function to calculate the length of a string (analogous to strlen)
 int my_strlen(const char *str)

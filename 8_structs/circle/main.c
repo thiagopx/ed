@@ -1,5 +1,5 @@
 /* How to run this code:
- * gcc -lm main.c -o main
+ * gcc main.c -o main -lm
  * ./main
  *
  * In this code, -lm is used to link the math library. The math library is not linked by default, so you need to specify it

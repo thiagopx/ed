@@ -7,6 +7,11 @@ struct point2d
     float y;
 };
 
+void print_point(struct point2d *point_ptr)
+{
+    printf("x=%.2f y=%.2f\n", point_ptr->x, point_ptr->y);
+}
+
 int main()
 {
     // Declare a point2d variable
@@ -17,7 +22,8 @@ int main()
     scanf("%f %f", &point.x, &point.y);
 
     // Print the coordinates
-    printf("The 2D point has the following coordinates: (%.2f, %.2f)\n", point.x, point.y);
+    // printf("The 2D point has the following coordinates: (%.2f, %.2f)\n", point.x, point.y);
+    print_point(&point);
 
     // Declare a pointer to point2d and assign the address of point to it
     struct point2d *point_ptr = &point;

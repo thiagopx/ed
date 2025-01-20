@@ -1,7 +1,7 @@
 #include "my_string.h"
 #include <stdio.h>
 
-int main(void)
+int main()
 {
     char str1[50] = "Hello, ";
     char str2[] = "World!";

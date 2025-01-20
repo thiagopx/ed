@@ -37,6 +37,9 @@ int main()
             return 1;
         }
 
+        // // Read student name
+        // scanf(" %99[^\n]", input);
+
         // Duplicate and store the name
         student_names[i] = duplicate_string(input);
     }

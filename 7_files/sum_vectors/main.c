@@ -5,7 +5,7 @@ int main()
 {
     FILE *input_file_1 = fopen("vector_1.txt", "r");
     FILE *input_file_2 = fopen("vector_2.txt", "r");
-    FILE *output_file = fopen("sum_vector.txt", "w");
+    FILE *output_file = fopen("sum_vector.txt", "w"); // w means writting
 
     if (input_file_1 == NULL || input_file_2 == NULL || output_file == NULL)
     {

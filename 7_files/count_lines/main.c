@@ -11,9 +11,9 @@ int main()
     }
 
     int line_count = 0;
-    char line[100]; // sequence of non-blank characters
+    char line[200]; // sequence of non-blank characters
 
-    while (fgets(line, 100, file) != NULL) // returns line or NULL (if reach the end of file)
+    while (fgets(line, 200, file) != NULL) // returns line or NULL (if reach the end of file)
     {
         line_count++;
         printf("%s\n", line);

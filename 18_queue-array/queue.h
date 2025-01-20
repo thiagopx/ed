@@ -1,7 +1,14 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-// Declaration of an incomplete type "struct queue" with typedef name "Queue"
+/**
+ - Create an empty queue
+ - Insert an element at the end
+ - Remove the element from the beginning
+ - Check if the queue is empty
+ - Free the queue
+*/
+
 typedef struct queue Queue;
 
 // Function prototypes.

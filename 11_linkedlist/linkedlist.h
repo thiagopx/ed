@@ -34,6 +34,7 @@ int ll_is_in(LinkedList *l, int v);
 // Check whether the linked list is empty
 int ll_is_empty(LinkedList *l);
 
+// Check whether the linked list is sorted
 int ll_is_sorted(LinkedList *l);
 
 // Return a new linked list with the elements reversed

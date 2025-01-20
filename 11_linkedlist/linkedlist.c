@@ -52,12 +52,12 @@ int ll_size(LinkedList *l)
 }
 
 // Function to verify if a value is in the list
-int ll_is_in(LinkedList *l, int val)
+int ll_is_in(LinkedList *l, int v)
 {
     ListNode *p = l->first;
     while (p != NULL)
     {
-        if (p->info == val)
+        if (p->info == v)
             return 1;
         p = p->next;
     }
