@@ -14,10 +14,10 @@ typedef struct stack Stack;
 Stack *s_create();
 
 // Removes and returns the top element of the stack.
-float s_pop(Stack *q);
+float s_pop(Stack *s);
 
 // Returns the top element of the stack without removing it.
-float s_top(Stack *q);
+float s_top(Stack *s);
 
 // Pushes a new element onto the stack.
 void s_push(Stack *s, float v);
