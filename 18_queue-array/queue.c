@@ -42,11 +42,13 @@ void q_enqueue(Queue *q, float v)
         // Shift elements to make space for the new element
         if (q->front != 0)
         {
+            // Shifting
             memmove(
                 &q->v[q->n_max - q->n + q->front], // destination
                 &q->v[q->front],                   // source
                 (q->n - q->front) * sizeof(float)  // bytes to shift
             );
+            // Update the front index
             q->front = q->n_max - q->n + q->front;
         }
     }
