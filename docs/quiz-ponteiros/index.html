@@ -324,20 +324,20 @@ const questions = [
     diffLabel: "Básico",
     tag: "Ponteiros & Funções",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">dobra</span>(<span class="kw">int</span> *p) {
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *p) {
     *p = *p * 2;
 }
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> x = 7;
-    dobra(&amp;x);
+    f(&amp;x);
     printf(<span class="cmt">"%d"</span>, x);
     <span class="kw">return</span> 0;
 }`,
     options: ["7", "14", "Erro de compilação", "Endereço de memória de x"],
     correctIndex: 1,
     explainCorrect: 'Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x. Por isso x passa de 7 para 14, e é esse valor alterado que aparece no printf do main.',
-    explainIncorrect: 'A resposta certa é 14. Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x dentro de dobra(). Isso é passagem por referência: a alteração feita através do ponteiro persiste depois que a função retorna.'
+    explainIncorrect: 'A resposta certa é 14. Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x dentro de f(). Isso é passagem por referência: a alteração feita através do ponteiro persiste depois que a função retorna.'
   },
   {
     difficulty: "basico",
@@ -354,54 +354,54 @@ const questions = [
   {
     difficulty: "basico",
     diffLabel: "Básico",
-    tag: "Passagem por valor",
+    tag: "Parâmetros de função",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">incrementa</span>(<span class="kw">int</span> n) {
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> n) {
     n = n + 1;
 }
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> x = 5;
-    incrementa(x);
+    f(x);
     printf(<span class="cmt">"%d"</span>, x);
     <span class="kw">return</span> 0;
 }`,
     options: ["5", "6", "Erro de compilação", "Endereço de x"],
     correctIndex: 0,
-    explainCorrect: 'Como incrementa() recebe "n" por valor (uma cópia de x, não um ponteiro), qualquer alteração em n dentro da função não afeta x no main. Por isso x continua 5.',
+    explainCorrect: 'Como f() recebe "n" por valor (uma cópia de x, não um ponteiro), qualquer alteração em n dentro da função não afeta x no main. Por isso x continua 5.',
     explainIncorrect: 'A resposta certa é 5. A função recebe "n" por valor — ou seja, n é uma cópia de x. Alterar n dentro da função não muda x no main, pois não há ponteiro envolvido aqui.'
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
-    tag: "Valor vs. Referência",
-    text: "Compare as duas funções abaixo. Qual é a saída do programa?",
-    code: `<span class="kw">void</span> <span class="type">porValor</span>(<span class="kw">int</span> n) {
+    tag: "Parâmetros de função",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> n) {
     n = n * 10;
 }
 
-<span class="kw">void</span> <span class="type">porReferencia</span>(<span class="kw">int</span> *p) {
+<span class="kw">void</span> <span class="type">g</span>(<span class="kw">int</span> *p) {
     *p = *p * 10;
 }
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> a = 2, b = 2;
-    porValor(a);
-    porReferencia(&amp;b);
+    f(a);
+    g(&amp;b);
     printf(<span class="cmt">"%d %d"</span>, a, b);
     <span class="kw">return</span> 0;
 }`,
     options: ["2 2", "20 20", "2 20", "20 2"],
     correctIndex: 2,
-    explainCorrect: 'porValor(a) recebe uma cópia de a, então a alteração não sai da função — a continua 2. porReferencia(&b) recebe o endereço de b, então *p = *p * 10 altera diretamente b, que vira 20.',
-    explainIncorrect: 'A resposta certa é "2 20". porValor(a) trabalha sobre uma cópia de a, então a não muda. Já porReferencia(&b) recebe o endereço de b e altera o valor original através de *p, então b vira 20.'
+    explainCorrect: 'f(a) recebe uma cópia de a, então a alteração não sai da função — a continua 2. g(&b) recebe o endereço de b, então *p = *p * 10 altera diretamente b, que vira 20.',
+    explainIncorrect: 'A resposta certa é "2 20". f(a) trabalha sobre uma cópia de a, então a não muda. Já g(&b) recebe o endereço de b e altera o valor original através de *p, então b vira 20.'
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
-    tag: "Troca de valores",
+    tag: "Parâmetros por ponteiro",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">troca</span>(<span class="kw">int</span> *a, <span class="kw">int</span> *b) {
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *a, <span class="kw">int</span> *b) {
     <span class="kw">int</span> temp = *a;
     *a = *b;
     *b = temp;
@@ -409,21 +409,21 @@ const questions = [
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> x = 3, y = 8;
-    troca(&amp;x, &amp;y);
+    f(&amp;x, &amp;y);
     printf(<span class="cmt">"%d %d"</span>, x, y);
     <span class="kw">return</span> 0;
 }`,
     options: ["3 8", "8 3", "3 3", "8 8"],
     correctIndex: 1,
     explainCorrect: 'A função recebe os endereços de x e y. Usando um ponteiro auxiliar (temp), ela troca os valores apontados por a e b diretamente na memória original. Por isso x passa a valer 8 e y passa a valer 3.',
-    explainIncorrect: 'A resposta certa é "8 3". Como troca() recebe &x e &y, ela manipula os valores originais através dos ponteiros a e b, efetivamente trocando o conteúdo de x e y.'
+    explainIncorrect: 'A resposta certa é "8 3". Como f() recebe &x e &y, ela manipula os valores originais através dos ponteiros a e b, efetivamente trocando o conteúdo de x e y.'
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
-    tag: "Troca sem ponteiros",
-    text: "Esta é uma tentativa (com bug) de trocar dois valores. Qual é a saída?",
-    code: `<span class="kw">void</span> <span class="type">troca</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    tag: "Parâmetros de função",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
     <span class="kw">int</span> temp = a;
     a = b;
     b = temp;
@@ -431,13 +431,13 @@ const questions = [
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> x = 3, y = 8;
-    troca(x, y);
+    f(x, y);
     printf(<span class="cmt">"%d %d"</span>, x, y);
     <span class="kw">return</span> 0;
 }`,
     options: ["8 3", "3 8", "3 3", "Erro de compilação"],
     correctIndex: 1,
-    explainCorrect: 'Sem ponteiros, troca() recebe cópias de x e y (a e b). A troca acontece só entre essas cópias locais — x e y no main permanecem intocados. Este é o erro clássico de tentar trocar valores sem usar ponteiros.',
+    explainCorrect: 'Sem ponteiros, f() recebe cópias de x e y (a e b). A troca acontece só entre essas cópias locais — x e y no main permanecem intocados. Este é o erro clássico de tentar trocar valores sem usar ponteiros.',
     explainIncorrect: 'A resposta certa é "3 8" (inalterado). Como a e b são cópias de x e y, trocar seus valores dentro da função não tem efeito nenhum sobre as variáveis originais no main.'
   },
   {
@@ -445,21 +445,21 @@ const questions = [
     diffLabel: "Avançado",
     tag: "Chamadas sucessivas",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">soma</span>(<span class="kw">int</span> *p, <span class="kw">int</span> valor) {
-    *p = *p + valor;
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *p, <span class="kw">int</span> v) {
+    *p = *p + v;
 }
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> x = 10;
-    soma(&amp;x, 5);
-    soma(&amp;x, 3);
+    f(&amp;x, 5);
+    f(&amp;x, 3);
     printf(<span class="cmt">"%d"</span>, x);
     <span class="kw">return</span> 0;
 }`,
     options: ["10", "15", "18", "13"],
     correctIndex: 2,
-    explainCorrect: 'Cada chamada a soma() recebe o endereço de x e altera seu valor diretamente. Primeiro x vira 15 (10+5), depois 18 (15+3). Como as duas chamadas operam sobre o mesmo endereço, os efeitos se acumulam.',
-    explainIncorrect: 'A resposta certa é 18. A primeira chamada soma(&x, 5) leva x a 15. A segunda, soma(&x, 3), parte desse novo valor e leva x a 18 — as alterações via ponteiro se acumulam entre as chamadas.'
+    explainCorrect: 'Cada chamada a f() recebe o endereço de x e altera seu valor diretamente. Primeiro x vira 15 (10+5), depois 18 (15+3). Como as duas chamadas operam sobre o mesmo endereço, os efeitos se acumulam.',
+    explainIncorrect: 'A resposta certa é 18. A primeira chamada f(&x, 5) leva x a 15. A segunda, f(&x, 3), parte desse novo valor e leva x a 18 — as alterações via ponteiro se acumulam entre as chamadas.'
   },
   {
     difficulty: "avancado",
@@ -479,46 +479,46 @@ const questions = [
   {
     difficulty: "avancado",
     diffLabel: "Avançado",
-    tag: "Ponteiro entre funções",
+    tag: "Ponteiros entre funções",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">interna</span>(<span class="kw">int</span> *p) {
+    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *p) {
     *p = 100;
 }
 
-<span class="kw">void</span> <span class="type">externa</span>(<span class="kw">int</span> *p) {
-    interna(p);
+<span class="kw">void</span> <span class="type">g</span>(<span class="kw">int</span> *p) {
+    f(p);
 }
 
 <span class="kw">int</span> <span class="type">main</span>() {
     <span class="kw">int</span> x = 1;
-    externa(&amp;x);
+    g(&amp;x);
     printf(<span class="cmt">"%d"</span>, x);
     <span class="kw">return</span> 0;
 }`,
     options: ["1", "100", "Erro de compilação", "Endereço de x"],
     correctIndex: 1,
-    explainCorrect: 'O endereço de x é passado para externa(), que repassa esse mesmo endereço para interna() sem copiar o valor apontado. interna() então altera x diretamente através de p, resultando em 100.',
-    explainIncorrect: 'A resposta certa é 100. Mesmo passando por duas funções, o ponteiro p continua apontando para o endereço original de x em todas elas. Quando interna() faz *p = 100, é x no main que é alterado.'
+    explainCorrect: 'O endereço de x é passado para g(), que repassa esse mesmo endereço para f() sem copiar o valor apontado. f() então altera x diretamente através de p, resultando em 100.',
+    explainIncorrect: 'A resposta certa é 100. Mesmo passando por duas funções, o ponteiro p continua apontando para o endereço original de x em todas elas. Quando f() faz *p = 100, é x no main que é alterado.'
   },
   {
     difficulty: "avancado",
     diffLabel: "Avançado",
-    tag: "Ponteiro para variável local",
+    tag: "Retorno de ponteiro",
     text: "Qual é o problema com o código abaixo?",
-    code: `<span class="kw">int</span>* <span class="type">cria</span>() {
-    <span class="kw">int</span> local = 42;
-    <span class="kw">return</span> &amp;local;
+    code: `<span class="kw">int</span>* <span class="type">f</span>() {
+    <span class="kw">int</span> v = 42;
+    <span class="kw">return</span> &amp;v;
 }
 
 <span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> *p = cria();
+    <span class="kw">int</span> *p = f();
     printf(<span class="cmt">"%d"</span>, *p);
     <span class="kw">return</span> 0;
 }`,
-    options: ["Funciona normalmente e imprime 42", "Comportamento indefinido: 'local' deixa de existir quando cria() retorna", "Erro obrigatório de compilação", "Imprime o endereço de local, não seu valor"],
+    options: ["Funciona normalmente e imprime 42", "Comportamento indefinido: 'v' deixa de existir quando f() retorna", "Erro obrigatório de compilação", "Imprime o endereço de v, não seu valor"],
     correctIndex: 1,
-    explainCorrect: '"local" é uma variável automática (da pilha), que deixa de existir assim que cria() termina. O endereço retornado (um ponteiro pendente/dangling) pode até "parecer funcionar" às vezes, mas o comportamento é indefinido — a memória pode ser reaproveitada por outra coisa a qualquer momento.',
-    explainIncorrect: 'A resposta certa é que há comportamento indefinido. "local" existe apenas durante a execução de cria(); ao retornar, seu endereço se torna inválido (ponteiro pendente). O programa pode imprimir 42 por "sorte" em alguns testes, mas isso não é garantido.'
+    explainCorrect: '"v" é uma variável automática (da pilha), que deixa de existir assim que f() termina. O endereço retornado (um ponteiro pendente/dangling) pode até "parecer funcionar" às vezes, mas o comportamento é indefinido — a memória pode ser reaproveitada por outra coisa a qualquer momento.',
+    explainIncorrect: 'A resposta certa é que há comportamento indefinido. "v" existe apenas durante a execução de f(); ao retornar, seu endereço se torna inválido (ponteiro pendente). O programa pode imprimir 42 por "sorte" em alguns testes, mas isso não é garantido.'
   }
 ];
 
