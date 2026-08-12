@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Quiz — Ponteiros em C</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    margin-bottom: 10px;
+  }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  /* estados pós-verificação */
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>🧠 Quiz — Ponteiros em C</h2>
+    <span class="quiz-tag">Pergunta 1 de 1 · POC</span>
+  </div>
+
+  <div class="question-block">
+    <span class="q-label">Ponteiros &amp; Funções</span>
+    <p class="q-text">Qual é a saída do programa abaixo?</p>
+
+<pre class="code-block"><span class="kw">void</span> <span class="type">dobra</span>(<span class="kw">int</span> *p) {
+    *p = *p * 2;
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> x = 7;
+    dobra(&amp;x);
+    printf(<span class="cmt">"%d"</span>, x);
+    <span class="kw">return</span> 0;
+}</pre>
+
+    <ul class="options" id="options">
+      <li class="option" data-value="a" data-correct="false">
+        <span class="letter">A</span>
+        <span>7</span>
+      </li>
+      <li class="option" data-value="b" data-correct="true">
+        <span class="letter">B</span>
+        <span>14</span>
+      </li>
+      <li class="option" data-value="c" data-correct="false">
+        <span class="letter">C</span>
+        <span>Erro de compilação</span>
+      </li>
+      <li class="option" data-value="d" data-correct="false">
+        <span class="letter">D</span>
+        <span>Endereço de memória de x</span>
+      </li>
+    </ul>
+
+    <div class="feedback" id="feedback">
+      <strong class="title" id="feedback-title"></strong>
+      <span class="explain" id="feedback-explain"></span>
+    </div>
+
+    <div class="actions">
+      <span class="progress">Selecione uma alternativa</span>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" id="reset-btn" style="display:none;">Tentar novamente</button>
+        <button class="btn btn-primary" id="check-btn" disabled>Verificar resposta</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const options = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const resetBtn = document.getElementById('reset-btn');
+  const feedback = document.getElementById('feedback');
+  const feedbackTitle = document.getElementById('feedback-title');
+  const feedbackExplain = document.getElementById('feedback-explain');
+  const progress = document.querySelector('.progress');
+
+  let selected = null;
+  let answered = false;
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      options.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selected = opt;
+      checkBtn.disabled = false;
+      progress.textContent = 'Alternativa ' + opt.querySelector('.letter').textContent + ' selecionada';
+    });
+  });
+
+  checkBtn.addEventListener('click', () => {
+    if (!selected) return;
+    answered = true;
+    checkBtn.style.display = 'none';
+    resetBtn.style.display = 'inline-block';
+
+    const isCorrect = selected.dataset.correct === 'true';
+
+    options.forEach(o => {
+      o.classList.add('disabled');
+      if (o.dataset.correct === 'true') {
+        o.classList.add('correct');
+      } else if (o === selected) {
+        o.classList.add('incorrect');
+      }
+    });
+
+    feedback.classList.add('show');
+    if (isCorrect) {
+      feedback.classList.add('correct-box');
+      feedbackTitle.textContent = '✅ Correto!';
+      feedbackExplain.textContent = 'Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x. Por isso x passa de 7 para 14, e é esse valor alterado que aparece no printf do main.';
+    } else {
+      feedback.classList.add('incorrect-box');
+      feedbackTitle.textContent = '❌ Incorreto';
+      feedbackExplain.textContent = 'A resposta certa é 14. Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x dentro de dobra(). Isso é passagem por referência: a alteração feita através do ponteiro persiste depois que a função retorna.';
+    }
+
+    progress.textContent = isCorrect ? 'Resposta correta' : 'Resposta incorreta — veja a explicação';
+  });
+
+  resetBtn.addEventListener('click', () => {
+    answered = false;
+    selected = null;
+    options.forEach(o => {
+      o.classList.remove('selected', 'correct', 'incorrect', 'disabled');
+    });
+    feedback.classList.remove('show', 'correct-box', 'incorrect-box');
+    checkBtn.style.display = 'inline-block';
+    checkBtn.disabled = true;
+    resetBtn.style.display = 'none';
+    progress.textContent = 'Selecione uma alternativa';
+  });
+</script>
+
+</body>
+</html>
