@@ -27,7 +27,7 @@
   .quiz-header {
     border-bottom: 2px solid #0984e3;
     padding-bottom: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,6 +51,21 @@
     white-space: nowrap;
   }
 
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 10%;
+    transition: width 0.25s ease;
+  }
+
   .question-block {
     background-color: #fdfdfd;
     border: 1px solid #e0e0e0;
@@ -58,6 +73,14 @@
     border-radius: 6px;
     padding: 18px 20px;
     margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
   }
 
   .q-label {
@@ -67,8 +90,18 @@
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 0.75em;
-    margin-bottom: 10px;
   }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico     { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado   { background: #fadbd8; color: #a93226; }
 
   .q-text {
     font-size: 1em;
@@ -141,7 +174,6 @@
     color: #fff;
   }
 
-  /* estados pós-verificação */
   .option.correct {
     border-color: #00b894;
     background-color: #e8f8f5;
@@ -199,6 +231,10 @@
     color: #2c3e50;
     border: 1px solid #dcdde1;
   }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
   .feedback {
     display: none;
@@ -232,9 +268,28 @@
     color: #2c3e50;
   }
 
-  .progress {
+  .progress-text {
     font-size: 0.85em;
     color: #636e72;
+  }
+
+  /* tela final */
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
   }
 </style>
 </head>
@@ -244,14 +299,32 @@
 
   <div class="quiz-header">
     <h2>🧠 Quiz — Ponteiros em C</h2>
-    <span class="quiz-tag">Pergunta 1 de 1 · POC</span>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
   </div>
 
-  <div class="question-block">
-    <span class="q-label">Ponteiros &amp; Funções</span>
-    <p class="q-text">Qual é a saída do programa abaixo?</p>
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
 
-<pre class="code-block"><span class="kw">void</span> <span class="type">dobra</span>(<span class="kw">int</span> *p) {
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Ponteiros & Funções",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">dobra</span>(<span class="kw">int</span> *p) {
     *p = *p * 2;
 }
 
@@ -260,109 +333,351 @@
     dobra(&amp;x);
     printf(<span class="cmt">"%d"</span>, x);
     <span class="kw">return</span> 0;
-}</pre>
+}`,
+    options: ["7", "14", "Erro de compilação", "Endereço de memória de x"],
+    correctIndex: 1,
+    explainCorrect: 'Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x. Por isso x passa de 7 para 14, e é esse valor alterado que aparece no printf do main.',
+    explainIncorrect: 'A resposta certa é 14. Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x dentro de dobra(). Isso é passagem por referência: a alteração feita através do ponteiro persiste depois que a função retorna.'
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Ponteiros básicos",
+    text: "O que a variável p armazena após esse trecho de código?",
+    code: `<span class="kw">int</span> x = 10;
+<span class="kw">int</span> *p = &amp;x;`,
+    options: ["O valor de x (10)", "O endereço de memória de x", "Uma cópia de x", "O valor de p"],
+    correctIndex: 1,
+    explainCorrect: 'Um ponteiro não guarda o valor da variável, guarda o endereço de memória onde ela está armazenada. O operador & retorna justamente esse endereço.',
+    explainIncorrect: 'A resposta certa é "o endereço de memória de x". O operador & não copia o valor de x — ele retorna a posição na memória onde x está guardado, e é isso que p armazena.'
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Passagem por valor",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">incrementa</span>(<span class="kw">int</span> n) {
+    n = n + 1;
+}
 
-    <ul class="options" id="options">
-      <li class="option" data-value="a" data-correct="false">
-        <span class="letter">A</span>
-        <span>7</span>
-      </li>
-      <li class="option" data-value="b" data-correct="true">
-        <span class="letter">B</span>
-        <span>14</span>
-      </li>
-      <li class="option" data-value="c" data-correct="false">
-        <span class="letter">C</span>
-        <span>Erro de compilação</span>
-      </li>
-      <li class="option" data-value="d" data-correct="false">
-        <span class="letter">D</span>
-        <span>Endereço de memória de x</span>
-      </li>
-    </ul>
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> x = 5;
+    incrementa(x);
+    printf(<span class="cmt">"%d"</span>, x);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["5", "6", "Erro de compilação", "Endereço de x"],
+    correctIndex: 0,
+    explainCorrect: 'Como incrementa() recebe "n" por valor (uma cópia de x, não um ponteiro), qualquer alteração em n dentro da função não afeta x no main. Por isso x continua 5.',
+    explainIncorrect: 'A resposta certa é 5. A função recebe "n" por valor — ou seja, n é uma cópia de x. Alterar n dentro da função não muda x no main, pois não há ponteiro envolvido aqui.'
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Valor vs. Referência",
+    text: "Compare as duas funções abaixo. Qual é a saída do programa?",
+    code: `<span class="kw">void</span> <span class="type">porValor</span>(<span class="kw">int</span> n) {
+    n = n * 10;
+}
 
-    <div class="feedback" id="feedback">
-      <strong class="title" id="feedback-title"></strong>
-      <span class="explain" id="feedback-explain"></span>
-    </div>
+<span class="kw">void</span> <span class="type">porReferencia</span>(<span class="kw">int</span> *p) {
+    *p = *p * 10;
+}
 
-    <div class="actions">
-      <span class="progress">Selecione uma alternativa</span>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" id="reset-btn" style="display:none;">Tentar novamente</button>
-        <button class="btn btn-primary" id="check-btn" disabled>Verificar resposta</button>
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> a = 2, b = 2;
+    porValor(a);
+    porReferencia(&amp;b);
+    printf(<span class="cmt">"%d %d"</span>, a, b);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["2 2", "20 20", "2 20", "20 2"],
+    correctIndex: 2,
+    explainCorrect: 'porValor(a) recebe uma cópia de a, então a alteração não sai da função — a continua 2. porReferencia(&b) recebe o endereço de b, então *p = *p * 10 altera diretamente b, que vira 20.',
+    explainIncorrect: 'A resposta certa é "2 20". porValor(a) trabalha sobre uma cópia de a, então a não muda. Já porReferencia(&b) recebe o endereço de b e altera o valor original através de *p, então b vira 20.'
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Troca de valores",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">troca</span>(<span class="kw">int</span> *a, <span class="kw">int</span> *b) {
+    <span class="kw">int</span> temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> x = 3, y = 8;
+    troca(&amp;x, &amp;y);
+    printf(<span class="cmt">"%d %d"</span>, x, y);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["3 8", "8 3", "3 3", "8 8"],
+    correctIndex: 1,
+    explainCorrect: 'A função recebe os endereços de x e y. Usando um ponteiro auxiliar (temp), ela troca os valores apontados por a e b diretamente na memória original. Por isso x passa a valer 8 e y passa a valer 3.',
+    explainIncorrect: 'A resposta certa é "8 3". Como troca() recebe &x e &y, ela manipula os valores originais através dos ponteiros a e b, efetivamente trocando o conteúdo de x e y.'
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Troca sem ponteiros",
+    text: "Esta é uma tentativa (com bug) de trocar dois valores. Qual é a saída?",
+    code: `<span class="kw">void</span> <span class="type">troca</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="kw">int</span> temp = a;
+    a = b;
+    b = temp;
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> x = 3, y = 8;
+    troca(x, y);
+    printf(<span class="cmt">"%d %d"</span>, x, y);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["8 3", "3 8", "3 3", "Erro de compilação"],
+    correctIndex: 1,
+    explainCorrect: 'Sem ponteiros, troca() recebe cópias de x e y (a e b). A troca acontece só entre essas cópias locais — x e y no main permanecem intocados. Este é o erro clássico de tentar trocar valores sem usar ponteiros.',
+    explainIncorrect: 'A resposta certa é "3 8" (inalterado). Como a e b são cópias de x e y, trocar seus valores dentro da função não tem efeito nenhum sobre as variáveis originais no main.'
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Chamadas sucessivas",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">soma</span>(<span class="kw">int</span> *p, <span class="kw">int</span> valor) {
+    *p = *p + valor;
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> x = 10;
+    soma(&amp;x, 5);
+    soma(&amp;x, 3);
+    printf(<span class="cmt">"%d"</span>, x);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["10", "15", "18", "13"],
+    correctIndex: 2,
+    explainCorrect: 'Cada chamada a soma() recebe o endereço de x e altera seu valor diretamente. Primeiro x vira 15 (10+5), depois 18 (15+3). Como as duas chamadas operam sobre o mesmo endereço, os efeitos se acumulam.',
+    explainIncorrect: 'A resposta certa é 18. A primeira chamada soma(&x, 5) leva x a 15. A segunda, soma(&x, 3), parte desse novo valor e leva x a 18 — as alterações via ponteiro se acumulam entre as chamadas.'
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Ponteiro nulo",
+    text: "O que acontece ao executar o programa abaixo?",
+    code: `<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> *p = NULL;
+    printf(<span class="cmt">"%d"</span>, *p);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["Imprime 0", "Imprime o endereço nulo", "Comportamento indefinido (o programa pode falhar em tempo de execução)", "Erro obrigatório de compilação"],
+    correctIndex: 2,
+    explainCorrect: 'NULL representa "nenhum endereço válido". Tentar dereferenciar (*p) um ponteiro nulo não é um erro detectado em tempo de compilação — é comportamento indefinido, e na prática costuma causar uma falha em tempo de execução (segmentation fault).',
+    explainIncorrect: 'A resposta certa é "comportamento indefinido". O compilador aceita o código normalmente, mas em tempo de execução, acessar *p quando p é NULL não aponta para nenhuma variável válida — isso tipicamente derruba o programa.'
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Ponteiro entre funções",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> <span class="type">interna</span>(<span class="kw">int</span> *p) {
+    *p = 100;
+}
+
+<span class="kw">void</span> <span class="type">externa</span>(<span class="kw">int</span> *p) {
+    interna(p);
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> x = 1;
+    externa(&amp;x);
+    printf(<span class="cmt">"%d"</span>, x);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["1", "100", "Erro de compilação", "Endereço de x"],
+    correctIndex: 1,
+    explainCorrect: 'O endereço de x é passado para externa(), que repassa esse mesmo endereço para interna() sem copiar o valor apontado. interna() então altera x diretamente através de p, resultando em 100.',
+    explainIncorrect: 'A resposta certa é 100. Mesmo passando por duas funções, o ponteiro p continua apontando para o endereço original de x em todas elas. Quando interna() faz *p = 100, é x no main que é alterado.'
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Ponteiro para variável local",
+    text: "Qual é o problema com o código abaixo?",
+    code: `<span class="kw">int</span>* <span class="type">cria</span>() {
+    <span class="kw">int</span> local = 42;
+    <span class="kw">return</span> &amp;local;
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    <span class="kw">int</span> *p = cria();
+    printf(<span class="cmt">"%d"</span>, *p);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["Funciona normalmente e imprime 42", "Comportamento indefinido: 'local' deixa de existir quando cria() retorna", "Erro obrigatório de compilação", "Imprime o endereço de local, não seu valor"],
+    correctIndex: 1,
+    explainCorrect: '"local" é uma variável automática (da pilha), que deixa de existir assim que cria() termina. O endereço retornado (um ponteiro pendente/dangling) pode até "parecer funcionar" às vezes, mas o comportamento é indefinido — a memória pode ser reaproveitada por outra coisa a qualquer momento.',
+    explainIncorrect: 'A resposta certa é que há comportamento indefinido. "local" existe apenas durante a execução de cria(); ao retornar, seu endereço se torna inválido (ponteiro pendente). O programa pode imprimir 42 por "sorte" em alguns testes, mas isso não é garantido.'
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current) / questions.length) * 100 + (10)}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      <pre class="code-block">${q.code}</pre>
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
       </div>
     </div>
-  </div>
+  `;
 
-</div>
+  attachHandlers();
+}
 
-<script>
-  const options = document.querySelectorAll('.option');
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
   const checkBtn = document.getElementById('check-btn');
-  const resetBtn = document.getElementById('reset-btn');
-  const feedback = document.getElementById('feedback');
-  const feedbackTitle = document.getElementById('feedback-title');
-  const feedbackExplain = document.getElementById('feedback-explain');
-  const progress = document.querySelector('.progress');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
 
-  let selected = null;
-  let answered = false;
-
-  options.forEach(opt => {
+  optionEls.forEach(opt => {
     opt.addEventListener('click', () => {
       if (answered) return;
-      options.forEach(o => o.classList.remove('selected'));
+      optionEls.forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
-      selected = opt;
+      selectedIndex = parseInt(opt.dataset.index, 10);
       checkBtn.disabled = false;
-      progress.textContent = 'Alternativa ' + opt.querySelector('.letter').textContent + ' selecionada';
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
     });
   });
 
-  checkBtn.addEventListener('click', () => {
-    if (!selected) return;
-    answered = true;
-    checkBtn.style.display = 'none';
-    resetBtn.style.display = 'inline-block';
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
 
-    const isCorrect = selected.dataset.correct === 'true';
-
-    options.forEach(o => {
-      o.classList.add('disabled');
-      if (o.dataset.correct === 'true') {
-        o.classList.add('correct');
-      } else if (o === selected) {
-        o.classList.add('incorrect');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
       }
     });
+  }
 
-    feedback.classList.add('show');
-    if (isCorrect) {
-      feedback.classList.add('correct-box');
-      feedbackTitle.textContent = '✅ Correto!';
-      feedbackExplain.textContent = 'Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x. Por isso x passa de 7 para 14, e é esse valor alterado que aparece no printf do main.';
-    } else {
-      feedback.classList.add('incorrect-box');
-      feedbackTitle.textContent = '❌ Incorreto';
-      feedbackExplain.textContent = 'A resposta certa é 14. Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x dentro de dobra(). Isso é passagem por referência: a alteração feita através do ponteiro persiste depois que a função retorna.';
-    }
-
-    progress.textContent = isCorrect ? 'Resposta correta' : 'Resposta incorreta — veja a explicação';
-  });
-
-  resetBtn.addEventListener('click', () => {
-    answered = false;
-    selected = null;
-    options.forEach(o => {
-      o.classList.remove('selected', 'correct', 'incorrect', 'disabled');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
     });
-    feedback.classList.remove('show', 'correct-box', 'incorrect-box');
-    checkBtn.style.display = 'inline-block';
-    checkBtn.disabled = true;
-    resetBtn.style.display = 'none';
-    progress.textContent = 'Selecione uma alternativa';
-  });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou os conceitos básicos de ponteiros.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões erradas para fixar os detalhes.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale revisar os conceitos de referência e passagem por ponteiro.';
+  else msg = '🔁 Releia o material sobre ponteiros e tente novamente.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
 </script>
 
 </body>
