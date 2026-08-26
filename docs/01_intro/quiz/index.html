@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Introdução à Programação em C</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>💻 Quiz — Fundamentos da Linguagem C</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 20</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de fundamentos!</div>
+    <div class="result-score" id="result-score">0 / 20</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Declaração de Variáveis",
+    text: "Qual dos seguintes identificadores é INVÁLIDO para nomear uma variável em C?",
+    code: `<span class="type">int</span> 2nota;
+<span class="type">int</span> nota_2;
+<span class="type">int</span> _nota;
+<span class="type">int</span> notaFinal;`,
+    options: ["nota_2", "_nota", "2nota", "notaFinal"],
+    correctIndex: 2,
+    explainCorrect: "Em C, os nomes de identificadores não podem começar com dígitos numéricos (0-9). Eles devem iniciar com uma letra ou sublinhado (_).",
+    explainIncorrect: "A resposta correta é '2nota'. Identificadores em C não podem começar com números, apenas com letras ou sublinhado (_)."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "printf & Formatação",
+    text: "Qual especificador de formato é utilizado para ler ou imprimir um número de ponto flutuante do tipo double no scanf e printf, respectivamente?",
+    code: `<span class="type">double</span> x;
+scanf(<span class="str">"..."</span>, &amp;x);
+printf(<span class="str">"..."</span>, x);`,
+    options: ["%d no scanf e %f no printf", "%lf no scanf e %f (ou %lf) no printf", "%f no scanf e %d no printf", "%c no scanf e %s no printf"],
+    correctIndex: 1,
+    explainCorrect: "No scanf, é obrigatório o uso de %lf para double. No printf, %f e %lf são aceitos para formatar números reais.",
+    explainIncorrect: "A resposta correta é '%lf no scanf e %f (ou %lf) no printf'. O scanf precisa do especificador %lf para armazenar corretamente os 64 bits de precisão do double."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "scanf & Ponteiros",
+    text: "Qual é o erro comum presente no código abaixo ao tentar ler um valor inteiro?",
+    code: `<span class="type">int</span> idade;
+scanf(<span class="str">"%d"</span>, idade);`,
+    options: ["Falta incluir a biblioteca math.h", "Uso incorreto de %d para inteiros", "Falta o operador de endereço (&) antes da variável idade", "A variável idade deveria ser do tipo float"],
+    correctIndex: 2,
+    explainCorrect: "O scanf requer o endereço da variável na memória para poder sobrescrever seu valor, portanto a sintaxe correta é &idade.",
+    explainIncorrect: "A resposta correta é 'Falta o operador de endereço (&)'. Sem o &, passamos o valor contido na variável (lixo de memória) em vez do endereço, causando falha de segmentação."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Operadores Aritméticos",
+    text: "Qual é o resultado impresso pelo seguinte programa?",
+    code: `<span class="type">int</span> a = 7, b = 2;
+<span class="type">int</span> r = a / b;
+printf(<span class="str">"%d"</span>, r);`,
+    options: ["3.5", "3", "4", "3.0"],
+    correctIndex: 1,
+    explainCorrect: "A divisão entre dois operandos inteiros em C é uma divisão inteira truncada. 7 / 2 resulta em 3.",
+    explainIncorrect: "A resposta correta é 3. Como ambos os operandos (a e b) são inteiros, o operador / descarta a parte fracionária."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Operador Módulo (%)",
+    text: "Qual é o valor impresso pela operação de módulo (%) abaixo?",
+    code: `<span class="type">int</span> a = 14, b = 4;
+printf(<span class="str">"%d"</span>, a % b);`,
+    options: ["3", "2", "3.5", "0"],
+    correctIndex: 1,
+    explainCorrect: "O operador % retorna o resto da divisão inteira. 14 dividido por 4 é 3 com resto 2.",
+    explainIncorrect: "A resposta correta é 2. O operador % calcula o resto: 14 = 4 * 3 + 2."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Estruturas Condicionais (if)",
+    text: "O que será impresso após a execução do trecho abaixo?",
+    code: `<span class="type">int</span> x = 10;
+<span class="kw">if</span> (x > 5) {
+    printf(<span class="str">"A"</span>);
+}
+<span class="kw">if</span> (x > 8) {
+    printf(<span class="str">"B"</span>);
+}`,
+    options: ["A", "B", "AB", "Nenhuma saída"],
+    correctIndex: 2,
+    explainCorrect: "Como são dois comandos if independentes e ambas as condições (10 > 5 e 10 > 8) são verdadeiras, ambos os blocos são executados.",
+    explainIncorrect: "A resposta correta é 'AB'. Como não há cláusula else ligando os blocos, ambos os testes condicionais são avaliados e satisfeitos."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "if / else básico",
+    text: "Qual é a saída gerada pelo código a seguir?",
+    code: `<span class="type">int</span> x = 4;
+<span class="kw">if</span> (x % 2 == 0) {
+    printf(<span class="str">"Par"</span>);
+} <span class="kw">else</span> {
+    printf(<span class="str">"Impar"</span>);
+}`,
+    options: ["Par", "Impar", "ParImpar", "Erro de compilação"],
+    correctIndex: 0,
+    explainCorrect: "4 % 2 resulta em 0. Como 0 == 0 é verdadeiro, apenas o bloco do if é executado, imprimindo 'Par'.",
+    explainIncorrect: "A resposta correta é 'Par'. O resto da divisão de 4 por 2 é 0, satisfazendo o teste lógico do if."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Atribuição vs Igualdade",
+    text: "Qual é a saída do código a seguir? Preste muita atenção na condição do if.",
+    code: `<span class="type">int</span> x = 0;
+<span class="kw">if</span> (x = 5) {
+    printf(<span class="str">"Verdadeiro"</span>);
+} <span class="kw">else</span> {
+    printf(<span class="str">"Falso"</span>);
+}`,
+    options: ["Falso", "Verdadeiro", "Erro de compilação", "0"],
+    correctIndex: 1,
+    explainCorrect: "O operador usado foi de atribuição (=) e não de comparação (==). O valor 5 é atribuído a x, e a expressão avalia para 5 (diferente de zero), o que em C é considerado verdadeiro.",
+    explainIncorrect: "A resposta correta é 'Verdadeiro'. O comando (x = 5) atribui 5 a x. Como 5 é diferente de 0, a condição é avaliada como verdadeira."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Lógica Booleana em C",
+    text: "Em linguagem C, como qualquer expressão numérica é interpretada dentro de uma condição lógica?",
+    code: `<span class="kw">if</span> (-3) {
+    <span class="cmt">/* Executa ou não? */</span>
+}`,
+    options: ["Apenas valores positivos são verdadeiros", "Zero é falso; qualquer valor diferente de zero é verdadeiro", "1 é verdadeiro e todos os outros números são falsos", "Valores negativos geram erro de execução"],
+    correctIndex: 1,
+    explainCorrect: "Na convenção da linguagem C, 0 representa Falso e qualquer valor diferente de zero (incluindo negativos como -3) é avaliado como Verdadeiro.",
+    explainIncorrect: "A resposta correta é 'Zero é falso; qualquer valor diferente de zero é verdadeiro'. Portanto, expressões com -3 ou 100 entram no bloco if."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Operadores Lógicos (&& e ||)",
+    text: "Qual será a saída do código abaixo?",
+    code: `<span class="type">int</span> a = 3, b = 7;
+<span class="kw">if</span> (a > 5 || b > 5) {
+    printf(<span class="str">"SIM"</span>);
+} <span class="kw">else</span> {
+    printf(<span class="str">"NAO"</span>);
+}`,
+    options: ["NAO", "SIM", "Erro de sintaxe", "SIMNAO"],
+    correctIndex: 1,
+    explainCorrect: "O operador || (OU lógico) requer que apenas uma das condições seja verdadeira. Embora a > 5 seja falso, b > 5 (7 > 5) é verdadeiro.",
+    explainIncorrect: "A resposta correta é 'SIM'. No operador OU (||), basta que uma das proposições seja verdadeira para validar o bloco."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Curto-circuito Lógico",
+    text: "Qual o valor final da variável 'b' após a execução deste trecho?",
+    code: `<span class="type">int</span> a = 0, b = 10;
+<span class="kw">if</span> (a != 0 &amp;&amp; ++b > 10) {
+    printf(<span class="str">"OK"</span>);
+}
+printf(<span class="str">"%d"</span>, b);`,
+    options: ["11", "10", "0", "Erro de compilação"],
+    correctIndex: 1,
+    explainCorrect: "Devido à avaliação em curto-circuito do operador &&, como a != 0 é falso, a segunda parte (++b > 10) nem chega a ser executada. O valor de b permanece 10.",
+    explainIncorrect: "A resposta correta é 10. No operador &&, se o primeiro operando for falso, a linguagem C não avalia a segunda expressão, cancelando o incremento ++b."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "switch/case e break",
+    text: "Qual será a saída gerada pelo código abaixo?",
+    code: `<span class="type">int</span> op = 2;
+<span class="kw">switch</span>(op) {
+    <span class="kw">case</span> 1: printf(<span class="str">"A"</span>);
+    <span class="kw">case</span> 2: printf(<span class="str">"B"</span>);
+    <span class="kw">case</span> 3: printf(<span class="str">"C"</span>);
+    <span class="kw">default</span>: printf(<span class="str">"D"</span>);
+}`,
+    options: ["B", "BCD", "BC", "D"],
+    correctIndex: 1,
+    explainCorrect: "Como não há o comando 'break' após o case 2, ocorre o efeito 'fall-through': a execução continua sequencialmente pelos cases seguintes (3 e default), imprimindo BCD.",
+    explainIncorrect: "A resposta correta é 'BCD'. Sem a instrução break, o fluxo continua executando todos os cases abaixo daquele que casou."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "switch/case com break",
+    text: "Qual será a saída do programa com os devidos comandos break?",
+    code: `<span class="type">int</span> dia = 3;
+<span class="kw">switch</span>(dia) {
+    <span class="kw">case</span> 1: printf(<span class="str">"Seg "</span>); <span class="kw">break</span>;
+    <span class="kw">case</span> 2: printf(<span class="str">"Ter "</span>); <span class="kw">break</span>;
+    <span class="kw">case</span> 3: printf(<span class="str">"Qua "</span>); <span class="kw">break</span>;
+    <span class="kw">default</span>: printf(<span class="str">"Fim"</span>);
+}`,
+    options: ["Seg ", "Qua ", "Qua Fim", "Fim"],
+    correctIndex: 1,
+    explainCorrect: "O fluxo entra diretamente no case 3, imprime 'Qua ' e a instrução break interrompe o switch imediatamente.",
+    explainIncorrect: "A resposta correta é 'Qua '. O comando break garante que o controle do fluxo saia do bloco switch logo após a impressão."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Tipos válidos em switch",
+    text: "Qual dos seguintes tipos de variáveis NÃO pode ser utilizado na expressão de controle de um switch em C padrão?",
+    code: `<span class="kw">switch</span> (variavel) {
+    <span class="cmt">/* Qual tipo não é aceito? */</span>
+}`,
+    options: ["int", "char", "float", "short"],
+    correctIndex: 2,
+    explainCorrect: "O comando switch em C aceita apenas tipos inteiros ou enumerados (como int, char, short, long). Tipos de ponto flutuante (float, double) não são permitidos.",
+    explainIncorrect: "A resposta correta é 'float'. Em C, não é permitido avaliar variáveis em ponto flutuante em estruturas switch."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Operador Ternário",
+    text: "Qual é o valor final atribuído à variável 'res'?",
+    code: `<span class="type">int</span> a = 8, b = 12;
+<span class="type">int</span> res = (a > b) ? a - b : b - a;
+printf(<span class="str">"%d"</span>, res);`,
+    options: ["-4", "4", "8", "12"],
+    correctIndex: 1,
+    explainCorrect: "A condição (a > b) avalia 8 > 12 (falso). Logo, o operador ternário avalia a segunda expressão: b - a (12 - 8 = 4).",
+    explainIncorrect: "A resposta correta é 4. Como 8 > 12 é falso, a expressão após os dois-pontos (b - a) é selecionada e calculada."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Casting & Divisão Real",
+    text: "Como forçar que a divisão entre dois inteiros produza um resultado real (com casas decimais)?",
+    code: `<span class="type">int</span> a = 5, b = 2;
+<span class="type">float</span> r = <span class="cmt">/* ? */</span>;`,
+    options: ["float r = a / b;", "float r = (float)(a / b);", "float r = (float)a / b;", "float r = %(a / b);"],
+    correctIndex: 2,
+    explainCorrect: "Fazendo '(float)a / b', convertemos 'a' explicitamente para float antes da divisão ocorrer, promovendo 'b' para float e preservando a parte fracionária (2.5).",
+    explainIncorrect: "A resposta correta é 'float r = (float)a / b;'. Aplicar (float)(a/b) converte o resultado apenas depois que a divisão inteira (5/2 = 2) já foi truncada para 2.0."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Dangling Else (Else Ambíguo)",
+    text: "Qual será a saída produzida pelo código a seguir?",
+    code: `<span class="type">int</span> x = 5, y = 2;
+<span class="kw">if</span> (x > 10)
+    <span class="kw">if</span> (y > 1)
+        printf(<span class="str">"1"</span>);
+<span class="kw">else</span>
+    printf(<span class="str">"2"</span>);`,
+    options: ["1", "2", "Nenhuma saída", "Erro de compilação"],
+    correctIndex: 2,
+    explainCorrect: "Em C, a cláusula 'else' se associa ao 'if' mais próximo que não possua else. Como x > 10 é falso, o primeiro if não é satisfeito e nada é executado.",
+    explainIncorrect: "A resposta correta é 'Nenhuma saída'. Pela regra sintática de C, o else pertence ao `if (y > 1)`. Como o `if (x > 10)` é falso, todo o bloco interno é ignorado."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Incremento pós/pré-fixado",
+    text: "Qual será a saída do trecho abaixo?",
+    code: `<span class="type">int</span> x = 5;
+<span class="kw">if</span> (x++ == 5) {
+    printf(<span class="str">"A=%d"</span>, x);
+} <span class="kw">else</span> {
+    printf(<span class="str">"B=%d"</span>, x);
+}`,
+    options: ["A=5", "A=6", "B=6", "B=5"],
+    correctIndex: 1,
+    explainCorrect: "O pós-incremento (x++) avalia a comparação usando o valor atual (5 == 5, verdadeiro) e incrementa x logo em seguida. Dentro do bloco if, x já vale 6.",
+    explainIncorrect: "A resposta correta é 'A=6'. A comparação é satisfeita com o valor antigo de x (5), mas quando o printf dentro do if executa, x já foi incrementado para 6."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Buffer do scanf com %c",
+    text: "Ao realizar a leitura consecutiva de um número e um caractere, qual é a forma recomendada de evitar que o caractere leia a quebra de linha ('\\n') deixada no buffer?",
+    code: `<span class="type">int</span> n; <span class="type">char</span> c;
+scanf(<span class="str">"%d"</span>, &amp;n);
+scanf(<span class="str">"..."</span>, &amp;c);`,
+    options: ["scanf(\"%c\", &c);", "scanf(\" %c\", &c); (com espaço antes de %c)", "scanf(\"\\n%c\", c);", "fflush(stdin); como padrão ANSI garantido"],
+    correctIndex: 1,
+    explainCorrect: "Colocar um espaço antes de '%c' no scanf (ex: ' %c') instrui a função a ignorar todos os espaços em branco e quebras de linha que estiverem pendentes no buffer de entrada.",
+    explainIncorrect: "A resposta correta é 'scanf(\" %c\", &c);'. O espaço em branco na formatação consome caracteres de espaçamento anteriores como '\\n' e '\\t'."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Tabela ASCII & Caracteres",
+    text: "Qual é a saída gerada ao somar uma constante inteira a um caractere em C?",
+    code: `<span class="type">char</span> letra = <span class="str">'A'</span>;
+letra = letra + 2;
+printf(<span class="str">"%c"</span>, letra);`,
+    options: ["A2", "C", "67", "Erro de tipos incompatíveis"],
+    correctIndex: 1,
+    explainCorrect: "Em C, o tipo char é essencialmente um tipo inteiro que armazena códigos da tabela ASCII. 'A' (código 65) + 2 resulta em 67, que impresso com %c corresponde ao caractere 'C'.",
+    explainIncorrect: "A resposta correta é 'C'. Em C, caracteres possuem representação numérica na tabela ASCII ('A' + 2 = 'C')."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      <pre class="code-block">${q.code}</pre>
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou todos os fundamentos iniciais de C.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou para fixar os operadores e condicionais.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale a pena revisar expressões lógicas e controle de fluxo (if/switch).';
+  else msg = '🔁 Releia o material das primeiras aulas e tente novamente para reforçar os fundamentos.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
