@@ -1,0 +1,1045 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introdução à Linguagem C — Estruturas de Dados</title>
+<meta name="description" content="Material didático de introdução à linguagem C — primeiro programa, tipos de dados, operadores e estruturas de decisão. Código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #2F6FB1;
+    --accent-soft: #DCE7F4;
+    --wash: rgba(47, 111, 177, 0.06);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #6FA8FF;
+      --accent-soft: #1C2A3A;
+      --wash: rgba(111, 168, 255, 0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #6FA8FF;
+    --accent-soft: #1C2A3A;
+    --wash: rgba(111, 168, 255, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Introdução à linguagem C</div>
+    <h1>Primeiros programas em C</h1>
+    <p class="lede">
+      Todo programa em C segue o mesmo esqueleto: <code style="font-family:var(--font-mono)">#include</code>,
+      a função <code style="font-family:var(--font-mono)">main</code>, declarações, comandos executados em
+      sequência e um <code style="font-family:var(--font-mono)">return</code>. Escolha um exemplo abaixo:
+      para cada um você vê o código-fonte, uma explicação da mecânica central e a simulação da execução
+      passo a passo — sem precisar compilar nada.
+    </p>
+  </div>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="primeiro-programa" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Primeiro programa</span>
+      </div>
+      <p class="row-desc">Um primeiro exemplo de programa em C: leitura de um inteiro e impressão formatada com printf.</p>
+    </li>
+    <li class="example-row" data-target="tipos" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Tipos de dados</span>
+      </div>
+      <p class="row-desc">O operador sizeof revela quantos bytes cada tipo primitivo ocupa na memória.</p>
+    </li>
+    <li class="example-row" data-target="temperatura" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Fahrenheit para Celsius</span>
+      </div>
+      <p class="row-desc">Conversão de temperatura com operadores aritméticos e uma decisão simples (if/else).</p>
+    </li>
+    <li class="example-row" data-target="calculadora" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Calculadora</span>
+      </div>
+      <p class="row-desc">Uma calculadora de dois operandos que usa switch para escolher a operação.</p>
+    </li>
+  </ul>
+
+  <!-- ================= PRIMEIRO PROGRAMA ================= -->
+  <section class="detail" id="panel-primeiro-programa" data-panel>
+    <div class="detail-head">
+      <h2>Primeiro programa</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/first_program" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+
+    <span class="cmt">/* First C program */</span>
+
+    <span class="cmt">/* Declarations: All variables used need to be declared */</span>
+    <span class="kw">int</span> age;
+
+    <span class="cmt">/* Start of the program */</span>
+    <span class="fn">printf</span>(<span class="str">"How old are you?: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;age);
+
+    <span class="fn">printf</span>(<span class="str">"%d? Wow, you look like you're only %d years old!\n"</span>, age, age * <span class="num">2</span>);
+
+    <span class="cmt">/* End of the program */</span>
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o programa</h3>
+        <p>
+          Toda a execução começa em <code>main()</code>. A linha <code>int age;</code> apenas
+          <strong>declara</strong> a variável — reserva espaço na memória para um inteiro, mas
+          ainda sem valor. O programa lê um número com <code>scanf</code>, guarda em
+          <code>age</code> e depois usa esse valor duas vezes no mesmo <code>printf</code>: uma
+          vez sozinho, outra multiplicado por 2.
+        </p>
+
+        <h3>Execução passo a passo — age = 20</h3>
+        <div class="stepper" data-stepper="primeiro-programa">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">How old are you?: <span class="in">20</span>
+20? Wow, you look like you're only 40 years old!</pre>
+
+        <div class="callout">
+          Declarar (<code>int age;</code>) e atribuir um valor (via <code>scanf</code>) são passos
+          diferentes: logo após a declaração, <code>age</code> não tem nenhum valor definido — por
+          isso o chip da variável mostra “—” até o <code>scanf</code> ser executado.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TIPOS DE DADOS ================= -->
+  <section class="detail" id="panel-tipos" data-panel hidden>
+    <div class="detail-head">
+      <h2>Tipos de dados</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/types" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="fn">printf</span>(<span class="str">"Size of char: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">char</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of int: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">int</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of float: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">float</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of double: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">double</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of long: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">long</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of long long: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">long long</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of short: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">short</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of unsigned int: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">unsigned int</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of unsigned char: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">unsigned char</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of unsigned long: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">unsigned long</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of unsigned long long: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">unsigned long long</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of signed char: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">signed char</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of signed int: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">signed int</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of signed long: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">signed long</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of signed long long: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">signed long long</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of unsigned short: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">unsigned short</span>));
+    <span class="fn">printf</span>(<span class="str">"Size of signed short: %lu bytes\n"</span>, <span class="kw">sizeof</span>(<span class="type">signed short</span>));
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o operador sizeof</h3>
+        <p>
+          <code>sizeof(tipo)</code> é avaliado em tempo de compilação e devolve, em bytes, o
+          tamanho que aquele tipo ocupa na memória — um <code>unsigned long</code>, por isso o
+          formato <code>%lu</code>. Esses tamanhos não são fixos pela linguagem (exceto
+          <code>char</code>, que vale sempre 1): dependem do compilador e da plataforma. Os
+          valores abaixo foram obtidos compilando este código com <code>gcc</code> em Linux
+          64 bits.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="tipos">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <thead>
+              <tr><th>Tipo</th><th>Expressão</th><th>Tamanho</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Size of char: 1 bytes
+Size of int: 4 bytes
+Size of float: 4 bytes
+Size of double: 8 bytes
+Size of long: 8 bytes
+Size of long long: 8 bytes
+Size of short: 2 bytes
+Size of unsigned int: 4 bytes
+Size of unsigned char: 1 bytes
+Size of unsigned long: 8 bytes
+Size of unsigned long long: 8 bytes
+Size of signed char: 1 bytes
+Size of signed int: 4 bytes
+Size of signed long: 8 bytes
+Size of signed long long: 8 bytes
+Size of unsigned short: 2 bytes
+Size of signed short: 2 bytes</pre>
+
+        <div class="callout">
+          <code>signed</code> não é sempre redundante: para <code>int</code>, <code>long</code>
+          etc. o sinal padrão já é "com sinal", então <code>signed int</code> e <code>int</code>
+          dão o mesmo tamanho e comportamento. Mas para <code>char</code> a linguagem C
+          <strong>não</strong> define se o padrão é com ou sem sinal — isso fica a critério do
+          compilador/plataforma. Por isso <code>signed char</code> existe: garante o
+          comportamento mesmo em compiladores onde <code>char</code> puro seria
+          <code>unsigned</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAHRENHEIT PARA CELSIUS ================= -->
+  <section class="detail" id="panel-temperatura" data-panel hidden>
+    <div class="detail-head">
+      <h2>Fahrenheit para Celsius</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/fahrenheit2celsius" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">float</span> fahrenheit, celsius;
+
+    <span class="cmt">// Input temperature in Fahrenheit</span>
+    <span class="fn">printf</span>(<span class="str">"Enter temperature in Fahrenheit: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;fahrenheit);
+
+    <span class="cmt">// Convert Fahrenheit to Celsius</span>
+    celsius = (fahrenheit - <span class="num">32</span>) * <span class="num">5</span> / <span class="num">9</span>;
+
+    <span class="cmt">// Output temperature in Celsius</span>
+    <span class="fn">printf</span>(<span class="str">"Temperature in Celsius: %.2f\n"</span>, celsius);
+
+    <span class="cmt">// Check if temperature is below freezing</span>
+    <span class="kw">if</span> (celsius &lt; <span class="num">0</span>)
+        <span class="fn">printf</span>(<span class="str">"It's freezing outside!\n"</span>);
+    <span class="kw">else</span>
+        <span class="fn">printf</span>(<span class="str">"It's not freezing outside.\n"</span>);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona a conversão</h3>
+        <p>
+          A fórmula <code>(fahrenheit - 32) * 5 / 9</code> aplica a conversão padrão de
+          Fahrenheit para Celsius. Depois de calcular <code>celsius</code>, um único
+          <code>if</code>/<code>else</code> decide qual mensagem imprimir, comparando
+          <code>celsius</code> com 0 — o ponto de congelamento da água.
+        </p>
+
+        <h3>Execução passo a passo — fahrenheit = 14</h3>
+        <div class="stepper" data-stepper="temperatura">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter temperature in Fahrenheit: <span class="in">14</span>
+Temperature in Celsius: -10.00
+It's freezing outside!</pre>
+
+        <div class="callout">
+          Repare que não há parênteses envolvendo <code>5 / 9</code>. Se o código fosse escrito
+          como <code>(fahrenheit - 32) * (5 / 9)</code>, o resultado seria sempre 0: como
+          <code>5</code> e <code>9</code> são inteiros, <code>5 / 9</code> seria uma divisão
+          inteira que trunca para 0 <em>antes</em> de multiplicar por <code>fahrenheit - 32</code>.
+          Sem os parênteses extras, <code>* 5</code> primeiro promove a conta para
+          <code>float</code> (porque <code>fahrenheit - 32</code> já é <code>float</code>), e só
+          depois a divisão por <code>9</code> acontece em ponto flutuante.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CALCULADORA ================= -->
+  <section class="detail" id="panel-calculadora" data-panel hidden>
+    <div class="detail-head">
+      <h2>Calculadora</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/calculator" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">double</span> num1, num2, result;
+    <span class="kw">char</span> operator;
+
+    <span class="fn">printf</span>(<span class="str">"Enter first number: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;num1);
+
+    <span class="fn">printf</span>(<span class="str">"Enter operator (+, -, *, /): "</span>);
+    <span class="fn">scanf</span>(<span class="str">" %c"</span>, &amp;operator); <span class="cmt">// Notice the space before %c to consume the newline character.</span>
+
+    <span class="fn">printf</span>(<span class="str">"Enter second number: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;num2);
+
+    <span class="kw">switch</span> (operator)
+    {
+    <span class="kw">case</span> <span class="str">'+'</span>:
+        result = num1 + num2;
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="str">'-'</span>:
+        result = num1 - num2;
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="str">'*'</span>:
+        result = num1 * num2;
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="str">'/'</span>:
+        <span class="kw">if</span> (num2 != <span class="num">0</span>)
+            result = num1 / num2;
+        <span class="kw">else</span>
+        {
+            <span class="fn">printf</span>(<span class="str">"Error: Division by zero\n"</span>);
+            <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Exit with an error code</span>
+        }
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:
+        <span class="fn">printf</span>(<span class="str">"Error: Invalid operator\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Exit with an error code</span>
+    }
+
+    <span class="fn">printf</span>(<span class="str">"Result: %lf\n"</span>, result);
+
+    <span class="kw">return</span> <span class="num">0</span>; <span class="cmt">// Exit successfully</span>
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o switch</h3>
+        <p>
+          <code>switch (operator)</code> compara <code>operator</code> com cada <code>case</code>
+          até encontrar um que bata; a partir daí executa até achar um <code>break</code>. Sem o
+          <code>break</code>, a execução "cairia" para o próximo <code>case</code> (fall-through)
+          — por isso todo <code>case</code> aqui termina com <code>break</code>, exceto os que já
+          terminam com <code>return</code>.
+        </p>
+
+        <h3>Execução passo a passo — 10 / 4</h3>
+        <div class="stepper" data-stepper="calculadora">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter first number: <span class="in">10</span>
+Enter operator (+, -, *, /): <span class="in">/</span>
+Enter second number: <span class="in">4</span>
+Result: 2.500000</pre>
+
+        <div class="callout">
+          O espaço antes de <code>%c</code> em <code>scanf(" %c", &amp;operator)</code> não é
+          decoração — o comentário do próprio código já avisa: sem ele, <code>scanf</code> leria
+          o caractere de nova linha (<code>\n</code>) deixado no buffer pelo <code>scanf("%lf",
+          ...)</code> anterior, em vez do operador digitado. É uma pegadinha clássica de misturar
+          <code>%c</code> com outros formatos de <code>scanf</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="closing">
+    <strong>Para lembrar.</strong> Todo programa em C tem a mesma anatomia — includes, <em>main</em>,
+    declarações, comandos e <em>return</em>. Variáveis precisam ser declaradas com um tipo antes de
+    usadas, e esse tipo determina quantos bytes ela ocupa (<code>sizeof</code>) e como as operações
+    sobre ela se comportam (divisão inteira vs. divisão em ponto flutuante, <em>fall-through</em> em
+    <code>switch</code>, etc.).
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    "primeiro-programa": {
+      vars: ["age"],
+      steps: [
+        { line: 9, vars: {}, desc: "int age; declara uma variável chamada age, capaz de guardar um número inteiro. Ainda sem valor definido." },
+        { line: 12, vars: {}, desc: "printf exibe o prompt: “How old are you?: ” (sem quebra de linha — o cursor continua na mesma linha)." },
+        { line: 13, vars: { age: "20" }, desc: "scanf lê o valor digitado e guarda em age: age = 20." },
+        { line: 15, vars: {}, desc: "printf usa age duas vezes: “20? Wow, you look like you're only 40 years old!” (age * 2 = 40)." },
+        { line: 19, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    tipos: {
+      vars: ["tipo", "tamanho"],
+      steps: [
+        { line: 4, vars: { tipo: "char", tamanho: "1 byte" }, desc: "sizeof(char) vale sempre 1 byte — é a unidade de medida de todos os outros tamanhos, garantida pela linguagem.", row: ["char", "sizeof(char)", "1 byte"] },
+        { line: 5, vars: { tipo: "int", tamanho: "4 bytes" }, desc: "sizeof(int) = 4 bytes nesta plataforma.", row: ["int", "sizeof(int)", "4 bytes"] },
+        { line: 6, vars: { tipo: "float", tamanho: "4 bytes" }, desc: "sizeof(float) também dá 4 bytes — mesmo tamanho de int, mas os bits representam um número em ponto flutuante, não um inteiro.", row: ["float", "sizeof(float)", "4 bytes"] },
+        { line: 7, vars: { tipo: "double", tamanho: "8 bytes" }, desc: "sizeof(double) = 8 bytes — o dobro de float, para o dobro de precisão.", row: ["double", "sizeof(double)", "8 bytes"] },
+        { line: 8, vars: { tipo: "…" }, desc: "O padrão se repete para os demais tipos (long, long long, short e as variações unsigned/signed) — cada printf só muda o tipo passado para sizeof.", row: ["⋯", "⋯", "⋯"], skip: true },
+        { line: 20, vars: { tipo: "signed short", tamanho: "2 bytes" }, desc: "Último printf: sizeof(signed short) = 2 bytes — o mesmo que short e unsigned short.", row: ["signed short", "sizeof(signed short)", "2 bytes"] },
+        { line: 22, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    temperatura: {
+      vars: ["fahrenheit", "celsius"],
+      steps: [
+        { line: 8, vars: {}, desc: "printf exibe o prompt: “Enter temperature in Fahrenheit: ” (sem quebra de linha)." },
+        { line: 9, vars: { fahrenheit: "14.0" }, desc: "scanf lê o valor digitado: fahrenheit = 14." },
+        { line: 12, vars: { celsius: "-10.0" }, desc: "celsius = (14 − 32) × 5 / 9 = (−18 × 5) / 9 = −90 / 9 = −10.0." },
+        { line: 15, vars: {}, desc: "printf exibe: “Temperature in Celsius: -10.00”." },
+        { line: 18, vars: {}, desc: "if (celsius < 0) → −10 < 0 é verdadeiro." },
+        { line: 19, vars: {}, desc: "Executa o ramo do if: imprime “It's freezing outside!”." },
+        { line: 23, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    calculadora: {
+      vars: ["num1", "operator", "num2", "result"],
+      steps: [
+        { line: 8, vars: {}, desc: "printf exibe o prompt: “Enter first number: ”." },
+        { line: 9, vars: { num1: "10.0" }, desc: "scanf lê o primeiro número: num1 = 10." },
+        { line: 11, vars: {}, desc: "printf exibe o prompt: “Enter operator (+, -, *, /): ”." },
+        { line: 12, vars: { operator: "'/'" }, desc: "scanf lê o operador digitado: operator = '/'. O espaço antes de %c consome o \\n deixado pelo scanf anterior." },
+        { line: 14, vars: {}, desc: "printf exibe o prompt: “Enter second number: ”." },
+        { line: 15, vars: { num2: "4.0" }, desc: "scanf lê o segundo número: num2 = 4." },
+        { line: 17, vars: {}, desc: "switch (operator) compara operator com cada case, em ordem, até achar '/'." },
+        { line: 29, vars: {}, desc: "case '/': entra no if (num2 != 0) → 4 != 0 é verdadeiro (não é divisão por zero)." },
+        { line: 30, vars: { result: "2.5" }, desc: "result = num1 / num2 = 10 / 4 = 2.5." },
+        { line: 36, vars: {}, desc: "break; sai do switch, evitando cair no case seguinte (fall-through)." },
+        { line: 42, vars: {}, desc: "printf exibe: “Result: 2.500000”." },
+        { line: 44, vars: {}, desc: "return 0; — o programa termina com sucesso." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elLog = root.querySelector("[data-log]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      if (elLog) {
+        var rowsHtml = [];
+        for (var m = 0; m <= current; m++) {
+          if (steps[m].row) rowsHtml.push(steps[m]);
+        }
+        elLog.innerHTML = rowsHtml
+          .map(function (s) {
+            return (
+              "<tr" + (s.win ? ' class="win"' : "") + ">" +
+              s.row
+                .map(function (cell, idx) {
+                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
+                })
+                .join("") +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+</body>
+</html>
