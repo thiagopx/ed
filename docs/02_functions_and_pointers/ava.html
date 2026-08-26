@@ -1,0 +1,58 @@
+<div style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; width: 80%; max-width: 80%; margin: 15px auto; box-sizing: border-box; border: 1px solid #dfe6e9; border-radius: 12px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+
+    <!-- Tópicos Abordados -->
+    <p style="margin-top: 0; margin-bottom: 16px; color: #555;">
+        <strong>Conceitos abordados:</strong> Funções (parâmetros e valor de retorno), escopo de variáveis e pilha de execução, ponteiros (operadores <code>&amp;</code> e <code>*</code>), passagem de parâmetros por ponteiro, variáveis estáticas e macros com <code>#define</code>.
+    </p>
+
+    <!-- Botões de Acesso aos Exemplos e GitHub -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 20px;">
+        <a href="https://thiagopx.github.io/ed/02_functions_and_pointers" target="_blank" rel="noopener noreferrer" style="text-decoration: none; background: #2c3e50; color: white; padding: 12px 16px; border-radius: 8px; text-align: center; font-weight: bold; display: block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            💻 Ver Exemplos e Códigos Interativos
+        </a>
+        <a href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers" target="_blank" rel="noopener noreferrer" style="text-decoration: none; background: #f8f9fa; color: #2c3e50; border: 1px solid #dfe6e9; padding: 12px 16px; border-radius: 8px; text-align: center; font-weight: bold; display: block;">
+            📂 Baixar Códigos no GitHub (02_functions_and_pointers)
+        </a>
+    </div>
+
+    <!-- Card de Fixação / Quiz Interativo -->
+    <div style="background-color: #fdfdfd; border: 1px solid #e0e0e0; border-left: 5px solid #00b894; border-radius: 6px; padding: 18px; margin-bottom: 20px; box-sizing: border-box;">
+        <strong style="color: #00b894; font-size: 1em; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            🧠 Atividade de Autoavaliação &amp; Fixação
+        </strong>
+        <p style="font-size: 0.95em; color: #444; margin-bottom: 14px;">
+            Teste seus conhecimentos sobre parâmetros, retorno, ponteiros e variáveis estáticas respondendo ao quiz interativo da aula:
+        </p>
+
+        <a href="https://thiagopx.github.io/ed/02_functions_and_pointers/quiz" target="_blank" rel="noopener noreferrer" style="text-decoration: none; background: #00b894; color: white; padding: 12px 16px; border-radius: 8px; text-align: center; font-weight: bold; display: block; box-shadow: 0 2px 5px rgba(0, 184, 148, 0.2);">
+            🎯 Resolver Quiz: Funções e Ponteiros (10 Questões)
+        </a>
+    </div>
+
+    <!-- Card de Experimentação Prática -->
+    <div style="background-color: #fdfdfd; border: 1px solid #e0e0e0; border-left: 5px solid #6c5ce7; border-radius: 6px; padding: 18px; box-sizing: border-box;">
+        <strong style="color: #6c5ce7; font-size: 1em; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            🧪 Desafio Prático de Compilação
+        </strong>
+        <p style="font-size: 0.95em; color: #444; margin-bottom: 12px;">
+            Compile um dos exemplos (ex.: <code>pointer.c</code>) no terminal utilizando as duas abordagens a seguir:
+        </p>
+
+        <!-- Modo 1 -->
+        <div style="margin-bottom: 10px;">
+            <span style="font-size: 0.85em; color: #636e72; font-weight: bold;">1. Compilação direta:</span>
+            <pre style="background-color: #2d3436; color: #74b9ff; padding: 10px 14px; border-radius: 6px; font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 0.9em; margin: 5px 0; overflow-x: auto;">gcc pointer.c -o &lt;nome_do_programa&gt;</pre>
+        </div>
+
+        <!-- Modo 2 -->
+        <div style="margin-bottom: 14px;">
+            <span style="font-size: 0.85em; color: #636e72; font-weight: bold;">2. Compilação preservando arquivos intermediários:</span>
+            <pre style="background-color: #2d3436; color: #a29bfe; padding: 10px 14px; border-radius: 6px; font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 0.9em; margin: 5px 0; overflow-x: auto;">gcc --save-temps pointer.c -o &lt;nome_do_programa&gt;</pre>
+        </div>
+
+        <p style="font-size: 0.9em; color: #2d3436; margin: 0; background: #f1f2f6; padding: 10px; border-radius: 6px;">
+            🧐 <strong>Verifique:</strong> Quais novos arquivos foram gerados no seu diretório (<code>.i</code>, <code>.s</code>, <code>.o</code>)? Se compilar <code>cylinder.c</code> sem adicionar <code>-lm</code>, o que acontece?
+        </p>
+    </div>
+
+</div>

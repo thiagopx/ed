@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Funções e Ponteiros — Estruturas de Dados</title>
+<meta name="description" content="Material didático sobre funções e ponteiros em C — parâmetros, retorno, pilha de execução, ponteiros, variáveis estáticas e macros. Código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #6B46A8;
+    --accent-soft: #EAE1F5;
+    --wash: rgba(107, 70, 168, 0.06);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #B08FE0;
+      --accent-soft: #241B36;
+      --wash: rgba(176, 143, 224, 0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #B08FE0;
+    --accent-soft: #241B36;
+    --wash: rgba(176, 143, 224, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Funções e ponteiros</div>
+    <h1>Dividindo o programa em funções</h1>
+    <p class="lede">
+      Funções deixam um programa organizado em pedaços pequenos e reutilizáveis: cada uma recebe
+      <strong>parâmetros</strong> e pode devolver um <strong>valor de retorno</strong>. Já os
+      <strong>ponteiros</strong> guardam <em>endereços</em> de memória em vez de valores comuns —
+      com eles, uma função consegue alterar variáveis de quem a chamou, algo que só o retorno não
+      resolveria. Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da
+      mecânica central e a simulação da execução passo a passo — sem precisar compilar nada.
+    </p>
+  </div>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="cilindro" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Volume do cilindro</span>
+      </div>
+      <p class="row-desc">Uma função recebe parâmetros e devolve o volume calculado pelo return.</p>
+    </li>
+    <li class="example-row" data-target="ponteiro" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Ponteiros básicos</span>
+      </div>
+      <p class="row-desc">Os operadores & e * revelam e alteram o conteúdo de um endereço de memória.</p>
+    </li>
+    <li class="example-row" data-target="soma-diferenca" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Soma e diferença</span>
+      </div>
+      <p class="row-desc">Uma função sem retorno escreve dois resultados via ponteiros passados por parâmetro.</p>
+    </li>
+    <li class="example-row" data-target="contador-chamadas" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Contador de chamadas</span>
+      </div>
+      <p class="row-desc">Uma variável static preserva seu valor entre chamadas sucessivas da função.</p>
+    </li>
+    <li class="example-row" data-target="macro-quadrado" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Macro do quadrado</span>
+      </div>
+      <p class="row-desc">#define expande texto antes da compilação — não é uma chamada de função de verdade.</p>
+    </li>
+  </ul>
+
+  <!-- ================= CILINDRO ================= -->
+  <section class="detail" id="panel-cilindro" data-panel>
+    <div class="detail-head">
+      <h2>Volume do cilindro</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers/01_cylinder" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+
+<span class="cmt">// Function to calculate volume of a cylinder</span>
+<span class="kw">double</span> <span class="fn">cylinder_volume</span>(<span class="kw">double</span> radius, <span class="kw">double</span> height)
+{
+    <span class="kw">return</span> M_PI * <span class="fn">pow</span>(radius, <span class="num">2</span>) * height;
+    <span class="cmt">// return M_PI * radius * radius * height;</span>
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">double</span> radius, height;
+
+    <span class="fn">printf</span>(<span class="str">"Enter the radius of the cylinder: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;radius);
+
+    <span class="fn">printf</span>(<span class="str">"Enter the height of the cylinder: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;height);
+
+    <span class="kw">double</span> volume = <span class="fn">cylinder_volume</span>(radius, height);
+
+    <span class="fn">printf</span>(<span class="str">"\nCylinder Parameters:\n"</span>);
+    <span class="fn">printf</span>(<span class="str">"Radius: %.2lf\n"</span>, radius);
+    <span class="fn">printf</span>(<span class="str">"Height: %.2lf\n"</span>, height);
+    <span class="fn">printf</span>(<span class="str">"Volume: %.2lf\n"</span>, volume);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona a função</h3>
+        <p>
+          <code>cylinder_volume</code> é definida <em>antes</em> de <code>main</code>, com dois
+          parâmetros (<code>radius</code>, <code>height</code>) e retorno <code>double</code>. Ao
+          ser chamada em <code>cylinder_volume(radius, height)</code>, a execução salta para dentro
+          da função: os valores de <code>radius</code> e <code>height</code> de <code>main</code>
+          são <strong>copiados</strong> para os parâmetros locais da função. O <code>return</code>
+          calcula o volume e devolve esse valor para quem chamou — a expressão
+          <code>cylinder_volume(radius, height)</code> "vira" esse valor, que é atribuído a
+          <code>volume</code>.
+        </p>
+
+        <h3>Execução passo a passo — radius = 4, height = 2</h3>
+        <div class="stepper" data-stepper="cilindro">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the radius of the cylinder: <span class="in">4</span>
+Enter the height of the cylinder: <span class="in">2</span>
+
+Cylinder Parameters:
+Radius: 4.00
+Height: 2.00
+Volume: 100.53</pre>
+
+        <div class="callout">
+          <code>pow</code> e a constante <code>M_PI</code> vêm de <code>&lt;math.h&gt;</code>. Ao
+          compilar manualmente pelo terminal, isso exige linkar a biblioteca matemática:
+          <code>gcc cylinder.c -o cylinder -lm</code> — sem o <code>-lm</code> o compilador acusa
+          "undefined reference to <code>pow</code>".
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PONTEIRO ================= -->
+  <section class="detail" id="panel-ponteiro" data-panel hidden>
+    <div class="detail-head">
+      <h2>Ponteiros básicos</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers/02_pointer" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="cmt">// Declare an integer variable</span>
+    <span class="kw">int</span> num = <span class="num">42</span>;
+
+    <span class="cmt">// Declare a pointer to an integer</span>
+    <span class="kw">int</span> *ptr;
+
+    <span class="cmt">// Assign the address of 'num' to the pointer</span>
+    ptr = &amp;num;
+
+    <span class="cmt">// Display the original value of 'num', the address stored in 'ptr',</span>
+    <span class="cmt">// and the value pointed to by 'ptr'</span>
+    <span class="fn">printf</span>(<span class="str">"Original num value: %d\n"</span>, num);
+    <span class="fn">printf</span>(<span class="str">"Address stored in ptr: %p\n"</span>, (<span class="kw">void</span> *)ptr); <span class="cmt">// Note the typecast</span>
+    <span class="fn">printf</span>(<span class="str">"Value pointed to by ptr: %d\n"</span>, *ptr);
+
+    <span class="cmt">// Modify the value of 'num' through the pointer</span>
+    *ptr = <span class="num">100</span>;
+
+    <span class="cmt">// Display the updated value of 'num', the address stored in 'ptr',</span>
+    <span class="cmt">// and the value pointed to by 'ptr'</span>
+    <span class="fn">printf</span>(<span class="str">"Updated num value: %d\n"</span>, num);
+    <span class="fn">printf</span>(<span class="str">"Address stored in ptr: %p\n"</span>, (<span class="kw">void</span> *)ptr); <span class="cmt">// Note the typecast</span>
+    <span class="fn">printf</span>(<span class="str">"Value pointed to by ptr: %d\n"</span>, *ptr);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funcionam & e *</h3>
+        <p>
+          <code>&amp;num</code> ("endereço de") devolve a posição de memória onde <code>num</code>
+          está guardado; <code>ptr</code> armazena esse endereço. <code>*ptr</code> ("conteúdo de")
+          acessa o valor guardado <em>naquele</em> endereço — por isso <code>*ptr</code> e
+          <code>num</code> sempre têm o mesmo valor: são o mesmo espaço de memória visto de dois
+          jeitos diferentes. Alterar <code>*ptr</code> altera <code>num</code>, mesmo sem escrever
+          <code>num</code> diretamente.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="ponteiro">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Original num value: 42
+Address stored in ptr: 0x7fff736c8d1c
+Value pointed to by ptr: 42
+Updated num value: 100
+Address stored in ptr: 0x7fff736c8d1c
+Value pointed to by ptr: 100</pre>
+
+        <div class="callout">
+          O endereço acima (<code>0x7fff736c8d1c</code>) veio de uma execução real deste programa
+          — mas endereços de variáveis locais mudam a cada execução (o sistema operacional
+          embaralha a memória por segurança). Rode o programa você mesmo: o valor vai ser
+          diferente, e isso é esperado.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOMA E DIFERENÇA ================= -->
+  <section class="detail" id="panel-soma-diferenca" data-panel hidden>
+    <div class="detail-head">
+      <h2>Soma e diferença</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers/03_sum_and_difference" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="cmt">// Function to calculate sum and difference of two double values</span>
+<span class="kw">void</span> <span class="fn">calculate_sum_and_difference</span>(
+    <span class="kw">double</span> a, <span class="kw">double</span> b, <span class="kw">double</span> *sum, <span class="kw">double</span> *difference)
+{
+    *sum = a + b;
+    *difference = a - b;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">double</span> num1, num2, sum, difference;
+
+    <span class="fn">printf</span>(<span class="str">"Enter the first number: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;num1);
+
+    <span class="fn">printf</span>(<span class="str">"Enter the second number: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;num2);
+
+    <span class="fn">calculate_sum_and_difference</span>(num1, num2, &amp;sum, &amp;difference);
+
+    <span class="fn">printf</span>(<span class="str">"Sum: %.2lf\n"</span>, sum);
+    <span class="fn">printf</span>(<span class="str">"Difference: %.2lf\n"</span>, difference);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Por que ponteiros aqui</h3>
+        <p>
+          Uma função só consegue <code>return</code> um único valor — mas aqui precisamos de dois
+          resultados (soma e diferença). A saída é passar os <strong>endereços</strong> de
+          <code>sum</code> e <code>difference</code> (com <code>&amp;sum</code>,
+          <code>&amp;difference</code>): a função recebe esses endereços em
+          <code>double *sum, double *difference</code> e escreve diretamente neles com
+          <code>*sum = ...</code> e <code>*difference = ...</code>. Por isso a função nem precisa
+          de <code>return</code> — é declarada <code>void</code>.
+        </p>
+
+        <h3>Execução passo a passo — num1 = 10, num2 = 4</h3>
+        <div class="stepper" data-stepper="soma-diferenca">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the first number: <span class="in">10</span>
+Enter the second number: <span class="in">4</span>
+Sum: 14.00
+Difference: 6.00</pre>
+
+        <div class="callout">
+          É a mesma lógica de <code>scanf("%lf", &amp;num1)</code>: <code>scanf</code> também
+          "devolve" o valor lido escrevendo no endereço que você fornece com <code>&amp;</code>,
+          em vez de usar <code>return</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTADOR DE CHAMADAS ================= -->
+  <section class="detail" id="panel-contador-chamadas" data-panel hidden>
+    <div class="detail-head">
+      <h2>Contador de chamadas</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers/04_count_calls" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="cmt">// Function with a local static variable</span>
+<span class="kw">int</span> <span class="fn">count_calls</span>()
+{
+    <span class="kw">static</span> <span class="kw">int</span> counter = <span class="num">0</span>; <span class="cmt">// Local static variable</span>
+
+    counter++; <span class="cmt">// Increment the counter</span>
+    <span class="kw">return</span> counter;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="fn">printf</span>(<span class="str">"Function has been called %d times.\n"</span>, <span class="fn">count_calls</span>());
+    <span class="fn">printf</span>(<span class="str">"Function has been called %d times.\n"</span>, <span class="fn">count_calls</span>());
+    <span class="fn">printf</span>(<span class="str">"Function has been called %d times.\n"</span>, <span class="fn">count_calls</span>());
+    <span class="fn">printf</span>(<span class="str">"Function has been called %d times.\n"</span>, <span class="fn">count_calls</span>());
+    <span class="fn">printf</span>(<span class="str">"Function has been called %d times.\n"</span>, <span class="fn">count_calls</span>());
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona static aqui</h3>
+        <p>
+          Uma variável local comum nasce e morre a cada chamada da função. <code>static int
+          counter = 0;</code> é diferente: a inicialização com <code>0</code> só acontece
+          <strong>uma única vez</strong>, na primeira chamada — nas chamadas seguintes,
+          <code>counter</code> já existe e mantém o valor que tinha ao final da chamada anterior.
+          É assim que a função "lembra" quantas vezes já foi chamada.
+        </p>
+
+        <h3>Execução passo a passo — 5 chamadas</h3>
+        <div class="stepper" data-stepper="contador-chamadas">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Function has been called 1 times.
+Function has been called 2 times.
+Function has been called 3 times.
+Function has been called 4 times.
+Function has been called 5 times.</pre>
+
+        <div class="callout">
+          <code>static</code> não é a mesma coisa que variável global: <code>counter</code>
+          continua existindo entre chamadas (como uma global), mas só é <strong>visível</strong>
+          dentro de <code>count_calls</code> — nenhuma outra função enxerga ou altera esse
+          <code>counter</code> diretamente.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MACRO DO QUADRADO ================= -->
+  <section class="detail" id="panel-macro-quadrado" data-panel hidden>
+    <div class="detail-head">
+      <h2>Macro do quadrado</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers/05_square_macro" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="cmt">// Define a macro to calculate the square of a number</span>
+<span class="pp">#define SQUARE(x) ((x) * (x))</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> num = <span class="num">5</span>;
+    <span class="kw">int</span> squared = <span class="fn">SQUARE</span>(num);
+
+    <span class="fn">printf</span>(<span class="str">"The square of %d is %d\n"</span>, num, squared);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Macro não é função</h3>
+        <p>
+          <code>#define</code> é uma diretiva de <strong>pré-processador</strong>: antes mesmo da
+          compilação, todo texto <code>SQUARE(num)</code> é substituído, literalmente, por
+          <code>((num) * (num))</code>. Não existe chamada de função, parâmetro ou retorno — é
+          apenas troca de texto. Os parênteses em <code>((x) * (x))</code> não são um capricho:
+          protegem a expressão contra problemas de precedência quando o argumento não é um nome
+          simples (ex.: <code>SQUARE(1 + 2)</code> vira <code>((1 + 2) * (1 + 2))</code> = 9, e
+          não <code>1 + 2 * 1 + 2</code> = 5, se faltassem os parênteses).
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="macro-quadrado">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">The square of 5 is 25</pre>
+
+        <div class="callout">
+          Compile com <code>gcc square_macro.c -o square_macro -E</code> (ou
+          <code>--save-temps</code>) para ver o código já com a macro expandida, antes da
+          compilação de verdade — é uma boa forma de enxergar o que o pré-processador faz.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="closing">
+    <strong>Para lembrar.</strong> Funções recebem parâmetros por <em>cópia</em> e podem devolver
+    um único valor por <em>return</em>; para alterar variáveis de quem chamou — ou "retornar" mais
+    de um valor — passe <em>endereços</em> (ponteiros) como parâmetro. <code>static</code> preserva
+    o valor de uma variável local entre chamadas, mas continua visível só dentro da função. Uma
+    macro (<code>#define</code>) não é uma função: é texto substituído antes da compilação.
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    cilindro: {
+      vars: ["radius", "height", "volume"],
+      steps: [
+        { line: 15, vars: {}, desc: "printf exibe o prompt: “Enter the radius of the cylinder: ” (sem quebra de linha)." },
+        { line: 16, vars: { radius: "4.0" }, desc: "scanf lê o valor digitado: radius = 4." },
+        { line: 18, vars: {}, desc: "printf exibe o prompt: “Enter the height of the cylinder: ”." },
+        { line: 19, vars: { height: "2.0" }, desc: "scanf lê o valor digitado: height = 2." },
+        { line: 21, vars: {}, desc: "cylinder_volume(radius, height) é chamada: a execução salta para dentro da função (linha 7), com radius e height copiados para os parâmetros locais (mesmos nomes aqui)." },
+        { line: 7, vars: { volume: "100.53" }, desc: "Dentro da função: pow(radius, 2) eleva radius ao quadrado (4² = 16); M_PI × 16 × height (2) ≈ 100.53. A função retorna esse valor — a execução volta para main() e volume recebe o resultado." },
+        { line: 23, vars: {}, desc: "printf imprime o cabeçalho “Cylinder Parameters:” (precedido de uma linha em branco, por causa do \\n inicial)." },
+        { line: 24, vars: {}, desc: "printf imprime “Radius: 4.00”." },
+        { line: 25, vars: {}, desc: "printf imprime “Height: 2.00”." },
+        { line: 26, vars: {}, desc: "printf imprime “Volume: 100.53”." },
+        { line: 28, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    ponteiro: {
+      vars: ["num", "ptr", "*ptr"],
+      steps: [
+        { line: 6, vars: { num: "42" }, desc: "int num = 42; declara e inicializa num com o valor 42." },
+        { line: 9, vars: {}, desc: "int *ptr; declara ptr como um ponteiro para int — ele ainda não aponta para lugar nenhum (valor indefinido, “lixo”)." },
+        { line: 12, vars: { ptr: "0x7fff…8d1c", "*ptr": "42" }, desc: "ptr = &num; ptr passa a guardar o endereço de num. A partir daqui, *ptr (o conteúdo apontado por ptr) é o próprio num — por isso já mostra 42." },
+        { line: 16, vars: {}, desc: "printf imprime “Original num value: 42”." },
+        { line: 17, vars: {}, desc: "printf imprime o endereço guardado em ptr — o mesmo endereço de num." },
+        { line: 18, vars: {}, desc: "printf imprime “Value pointed to by ptr: 42” — *ptr, o conteúdo apontado." },
+        { line: 21, vars: { num: "100", "*ptr": "100" }, desc: "*ptr = 100; escreve 100 no endereço apontado por ptr — que é o endereço de num. Resultado: num também passa a valer 100, mesmo sem essa linha citar “num”." },
+        { line: 25, vars: {}, desc: "printf imprime “Updated num value: 100” — a alteração feita via ponteiro afetou num de verdade." },
+        { line: 26, vars: {}, desc: "printf imprime o endereço guardado em ptr — o mesmo de antes, ptr não mudou de endereço." },
+        { line: 27, vars: {}, desc: "printf imprime “Value pointed to by ptr: 100”." },
+        { line: 29, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "soma-diferenca": {
+      vars: ["num1", "num2", "sum", "difference"],
+      steps: [
+        { line: 15, vars: {}, desc: "printf exibe o prompt: “Enter the first number: ”." },
+        { line: 16, vars: { num1: "10.0" }, desc: "scanf lê o primeiro número: num1 = 10." },
+        { line: 18, vars: {}, desc: "printf exibe o prompt: “Enter the second number: ”." },
+        { line: 19, vars: { num2: "4.0" }, desc: "scanf lê o segundo número: num2 = 4." },
+        { line: 21, vars: {}, desc: "calculate_sum_and_difference(num1, num2, &sum, &difference) é chamada: recebe os valores de num1 e num2, e os endereços de sum e difference. A execução salta para dentro da função (linha 7)." },
+        { line: 7, vars: { sum: "14.0" }, desc: "Dentro da função: *sum = a + b escreve 10 + 4 = 14 diretamente no endereço de sum, que pertence a main()." },
+        { line: 8, vars: { difference: "6.0" }, desc: "*difference = a - b escreve 10 − 4 = 6 no endereço de difference. A função termina (é void, sem return) e a execução volta para main()." },
+        { line: 23, vars: {}, desc: "printf imprime “Sum: 14.00”." },
+        { line: 24, vars: {}, desc: "printf imprime “Difference: 6.00”." },
+        { line: 26, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "contador-chamadas": {
+      vars: ["counter"],
+      steps: [
+        { line: 14, vars: { counter: "1" }, desc: "1ª chamada de count_calls(): como é a primeira execução, static int counter = 0; é inicializada (isso só acontece uma vez em todo o programa); counter++ leva counter a 1; a função retorna 1 e o printf imprime “Function has been called 1 times.”" },
+        { line: 15, vars: { counter: "2" }, desc: "2ª chamada: a inicialização NÃO roda de novo — counter já valia 1, preservado da chamada anterior; counter++ → 2; imprime “...2 times.”" },
+        { line: 16, vars: { counter: "3" }, desc: "3ª chamada: counter++ → 3; imprime “...3 times.”" },
+        { line: 17, vars: { counter: "4" }, desc: "4ª chamada: counter++ → 4; imprime “...4 times.”" },
+        { line: 18, vars: { counter: "5" }, desc: "5ª chamada: counter++ → 5; imprime “...5 times.”" },
+        { line: 20, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "macro-quadrado": {
+      vars: ["num", "squared"],
+      steps: [
+        { line: 8, vars: { num: "5" }, desc: "int num = 5; declara e inicializa num." },
+        { line: 9, vars: { squared: "25" }, desc: "Antes da compilação, o pré-processador já trocou SQUARE(num) por ((num) * (num)) — a linha “virou” squared = ((num) * (num)); ou seja, 5 * 5 = 25." },
+        { line: 11, vars: {}, desc: "printf imprime “The square of 5 is 25”." },
+        { line: 13, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elLog = root.querySelector("[data-log]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      if (elLog) {
+        var rowsHtml = [];
+        for (var m = 0; m <= current; m++) {
+          if (steps[m].row) rowsHtml.push(steps[m]);
+        }
+        elLog.innerHTML = rowsHtml
+          .map(function (s) {
+            return (
+              "<tr" + (s.win ? ' class="win"' : "") + ">" +
+              s.row
+                .map(function (cell, idx) {
+                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
+                })
+                .join("") +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+</body>
+</html>

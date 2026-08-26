@@ -1,0 +1,64 @@
+<div
+  style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <div
+    style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: #2c3e50; margin: 0;">📐 EP 02: Geometria e Ponteiros</h2>
+    <span
+      style="background-color: #3498db; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
+      21 de Março</span>
+  </div>
+  <p><strong>O Objetivo:</strong> Desenvolver um programa que calcule as
+    propriedades de um retângulo. O foco deste exercício é o uso de
+    <strong>passagem de parâmetros por referência</strong> utilizando ponteiros
+    em C.</p>
+  <h3
+    style="color: #2980b9; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    📋 Especificações Técnicas</h3>
+  <div
+    style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <ul style="margin: 0; padding-left: 20px;">
+      <li style="margin-bottom: 10px;"><strong>Assinatura da Função:</strong>
+        Implemente a função <code>calc_info_retangulo</code>. Ela deve receber o
+        altura e largura (base), e "retornar" a área, o perímetro e a diagonal
+        via ponteiros.</li>
+      <li style="margin-bottom: 10px;"><strong>Tipagem:</strong> Todas as
+        dimensões e cálculos devem utilizar o tipo de ponto flutuante
+        (<code>float</code> ou <code>double</code>).</li>
+      <li style="margin-bottom: 10px;"><strong>Restrição:</strong> É
+        estritamente proibido o uso de variáveis globais. Toda a comunicação
+        entre <code>main</code> e a função deve ocorrer via parâmetros.</li>
+    </ul>
+  </div>
+  <h3
+    style="color: #2980b9; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    📐 Cálculos Necessários</h3>
+  <p>Sua função deve ser capaz de processar:</p>
+  <div
+    style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+    <div
+      style="padding: 10px; background: #e3f2fd; border-radius: 5px; font-size: 0.9em;">
+      <strong>Área</strong><br>base × altura</div>
+    <div
+      style="padding: 10px; background: #e3f2fd; border-radius: 5px; font-size: 0.9em;">
+      <strong>Perímetro</strong><br>2 × (base + altura)</div>
+    <div
+      style="padding: 10px; background: #e3f2fd; border-radius: 5px; font-size: 0.9em;">
+      <strong>Diagonal</strong><br>√(base² + altura²)</div>
+  </div>
+  <h3
+    style="color: #2980b9; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    🖥️ Fluxo do Programa</h3>
+  <ol style="padding-left: 20px; font-size: 0.95em;">
+    <li>Solicitar comprimento e largura ao usuário.</li>
+    <li>Declarar variáveis no <code>main</code> para armazenar os resultados.
+    </li>
+    <li>Chamar a função passando os <strong>endereços</strong> dessas variáveis.
+    </li>
+    <li>Exibir os resultados formatados na tela.</li>
+  </ol>
+  <div
+    style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
+    <strong>Dica Técnica:</strong> Para o cálculo da diagonal, utilize a função
+    <code>sqrt()</code> da biblioteca <code>math.h</code>. Lembre-se de compilar
+    usando a flag <code>-lm</code> no terminal, se necessário.</div>
+</div>
