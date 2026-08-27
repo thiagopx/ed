@@ -356,8 +356,11 @@ const questions = [
     difficulty: "basico",
     diffLabel: "Básico",
     tag: "Intervalo com rand()",
-    text: "Qual expressão gera um número aleatório entre 1 e 6 (simulando um dado), como no exemplo dice.c?",
-    code: `<span class="type">int</span> resultado = rand() % 6 + 1;`,
+    text: "No trecho de dice.c abaixo, qual expressão completa corretamente a lacuna, gerando um número entre 1 e 6 (simulando um dado)?",
+    code: `<span class="kw">void</span> roll_dice() {
+    <span class="type">int</span> result = <span class="cmt">/* ??? */</span>;
+    printf(<span class="str">"You rolled a %d!\\n"</span>, result);
+}`,
     options: ["rand() % 6", "rand() % 6 + 1", "rand() % 7", "rand() / 6 + 1"],
     correctIndex: 1,
     explainCorrect: "rand() % 6 produz valores de 0 a 5. Somando 1, o intervalo se desloca para 1 a 6.",
