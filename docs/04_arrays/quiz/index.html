@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Vetores e Matrizes</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>🧮 Quiz — Vetores e Matrizes</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de vetores e matrizes!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Declaração e indexação",
+    text: "Um vetor é declarado como abaixo. Qual é o índice do seu último elemento válido?",
+    code: `<span class="type">int</span> v[10];`,
+    options: ["10", "9", "0", "Depende do compilador"],
+    correctIndex: 1,
+    explainCorrect: "Em C a indexação começa em 0, então um vetor de 10 posições tem índices válidos de 0 a 9 — v[9] é o último elemento.",
+    explainIncorrect: "A resposta correta é 9. Um vetor de tamanho 10 tem índices de 0 a 9 (10 posições no total); v[10] já estaria fora dos limites."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Limites de um vetor",
+    text: "O que acontece ao compilar e executar o código abaixo?",
+    code: `<span class="type">int</span> v[10];
+v[15] = 99; <span class="cmt">// v só tem 10 posições (0 a 9)</span>`,
+    options: [
+      "Erro de compilação, porque o índice 15 não existe",
+      "Comportamento indefinido — o programa compila e roda, mas escreve fora da memória reservada para v",
+      "O compilador aumenta automaticamente o tamanho de v para caber o índice 15",
+      "v[15] é simplesmente ignorado, sem nenhum efeito"
+    ],
+    correctIndex: 1,
+    explainCorrect: "O C não verifica limites de índice em tempo de compilação nem de execução. v[15] escreve em memória que não pertence ao vetor — pode corromper outra variável ou travar o programa, dependendo do que estiver naquele endereço.",
+    explainIncorrect: "A resposta correta é a segunda: comportamento indefinido. O C confia no programador para respeitar os limites — não há verificação automática de índices."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "sizeof de vetor vs. ponteiro",
+    text: "No exemplo Vetor é ponteiro: sizeof, sizeof(v) vale 40 bytes e sizeof(u) vale 8 bytes, mesmo u apontando para dentro de v. Por quê?",
+    code: `<span class="type">int</span> v[10];
+<span class="type">int</span> *u = v;`,
+    options: [
+      "Porque u aponta só para metade do vetor",
+      "Porque sizeof(v) conhece o bloco inteiro do vetor (10 × sizeof(int)); sizeof(u) é sempre o tamanho de um ponteiro, não importa para onde ele aponte",
+      "Porque v e u têm tipos diferentes de dado (int vs. char)",
+      "É um erro do compilador — os dois deveriam dar o mesmo valor"
+    ],
+    correctIndex: 1,
+    explainCorrect: "sizeof aplicado a um vetor mede o bloco de memória inteiro que ele ocupa; sizeof aplicado a um ponteiro mede só o tamanho do próprio ponteiro (8 bytes em uma máquina de 64 bits) — o que está do outro lado dele não importa.",
+    explainIncorrect: "A resposta correta é a segunda opção: sizeof(v) mede o vetor inteiro, sizeof(u) mede só o ponteiro em si."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Índice é aritmética de ponteiro",
+    text: "Dado um vetor int numbers[] e um ponteiro int *ptr = numbers;, qual expressão é equivalente a numbers[i]?",
+    code: `<span class="type">int</span> numbers[] = {10, 20, 30};
+<span class="type">int</span> *ptr = numbers;`,
+    options: ["*(ptr + i)", "&ptr + i", "ptr * i", "i - ptr"],
+    correctIndex: 0,
+    explainCorrect: "A notação de colchetes é, por baixo dos panos, aritmética de ponteiro: numbers[i] e *(numbers + i) (ou *(ptr + i), já que ptr aponta para o início) significam exatamente a mesma coisa.",
+    explainIncorrect: "A resposta correta é *(ptr + i). numbers[i] é só uma forma mais conveniente de escrever *(numbers + i)."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Percorrendo com ponteiro",
+    text: "No exemplo Percorrendo um vetor com ponteiro, a versão 2 usa *ptr seguido de ptr++ dentro do laço, em vez de indexar com ptr[i]. O que ptr++ faz exatamente?",
+    code: `<span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; size; ++i) {
+    printf(<span class="str">"%d "</span>, *ptr);
+    ptr++;
+}`,
+    options: [
+      "Soma 1 ao valor apontado por ptr",
+      "Faz o próprio ptr avançar para o endereço do próximo elemento do vetor",
+      "Reinicia ptr para o começo do vetor",
+      "Não tem efeito, porque i já controla a posição"
+    ],
+    correctIndex: 1,
+    explainCorrect: "ptr++ incrementa o endereço guardado em ptr para o elemento seguinte (avança sizeof(int) bytes, no caso de um vetor de int) — é o próprio ponteiro que se move pelo vetor, sem depender de um índice.",
+    explainIncorrect: "A resposta correta é a segunda: ptr++ move o ponteiro para a próxima posição do vetor; *ptr, sim, é quem lê o valor apontado."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Vetor passado para função",
+    text: "A função abaixo dobra os valores do vetor recebido, e a alteração é vista pelo código que a chamou. Por que isso funciona, já que em C os parâmetros normalmente são passados por valor (como cópias)?",
+    code: `<span class="kw">void</span> dobra(<span class="type">int</span> v[], <span class="type">int</span> n) {
+    <span class="kw">for</span> (<span class="type">int</span> i = 0; i &lt; n; i++)
+        v[i] *= 2;
+}`,
+    options: [
+      "Porque vetores são um caso especial que o C sempre copia por referência",
+      "Porque o que é passado é o endereço do primeiro elemento do vetor original, não uma cópia dos valores",
+      "Porque a palavra void na assinatura ativa a passagem por referência",
+      "Na verdade não funciona — v dentro da função é sempre uma cópia isolada"
+    ],
+    correctIndex: 1,
+    explainCorrect: "O nome de um vetor já é um ponteiro para seu primeiro elemento; ao passar o vetor para a função, é esse ponteiro (o endereço) que é copiado. Como v e o vetor original apontam para o mesmo bloco de memória, alterações feitas através de v[i] afetam o vetor original.",
+    explainIncorrect: "A resposta correta é a segunda: o parâmetro v recebe o endereço do vetor original, não uma cópia dos valores — por isso as alterações são visíveis fora da função."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Assinaturas equivalentes",
+    text: "Três das assinaturas abaixo são formas equivalentes de uma função receber um vetor de floats. Qual delas NÃO recebe um vetor?",
+    options: [
+      "float f(float v[], int n)",
+      "float f(float v[10], int n)",
+      "float f(float *v, int n)",
+      "float f(float v, int n)"
+    ],
+    correctIndex: 3,
+    explainCorrect: "float v (sem colchetes nem asterisco) é um único float passado por valor — uma cópia de um único número, não um vetor. As outras três são formas equivalentes de declarar que v é um ponteiro para o primeiro elemento de um vetor de floats.",
+    explainIncorrect: "A resposta correta é 'float f(float v, int n)'. Sem [] ou *, v é um único float comum, não um vetor — as outras três opções são todas equivalentes entre si."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Caso base da recursão",
+    text: "No exemplo Máximo por recursão, o que caracteriza o caso base da função max, abaixo?",
+    code: `<span class="type">int</span> max(<span class="type">int</span> arr[], <span class="type">int</span> size) {
+    <span class="kw">if</span> (size == 1) {
+        <span class="kw">return</span> arr[0];
+    }
+    <span class="cmt">// ... caso recursivo</span>
+}`,
+    options: [
+      "size == 0",
+      "size == 1 — um vetor de um único elemento, que é seu próprio máximo",
+      "arr[0] == 0",
+      "A função max nunca tem caso base"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Quando o vetor (lógico) passado para a chamada recursiva tem um único elemento (size == 1), não há mais nada com que compará-lo — ele mesmo é o máximo, e a função retorna sem fazer nova chamada recursiva.",
+    explainIncorrect: "A resposta correta é size == 1. É o menor vetor possível de resolver diretamente, sem precisar de mais nenhuma chamada recursiva."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Matriz na memória",
+    text: "Uma matriz é declarada como abaixo. Como esses 12 floats ficam organizados na memória?",
+    code: `<span class="type">float</span> mat[3][4];`,
+    options: [
+      "Em um único bloco contíguo de 12 floats, na ordem linha por linha (row-major)",
+      "Em 3 blocos de memória separados, um para cada linha",
+      "Em um vetor de 3 ponteiros, cada um apontando para uma linha alocada à parte",
+      "A ordem na memória depende dos valores atribuídos a cada elemento"
+    ],
+    correctIndex: 0,
+    explainCorrect: "Apesar da notação mat[i][j] sugerir uma grade 2D, o C guarda a matriz como um único vetor contíguo: primeiro todos os elementos da linha 0, depois todos os da linha 1, e assim por diante (ordem row-major).",
+    explainIncorrect: "A resposta correta é a primeira: um único bloco contíguo, preenchido linha por linha. Não há blocos separados nem ponteiros para cada linha em uma matriz declarada dessa forma."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Matriz passada para função",
+    text: "Por que a assinatura abaixo precisa especificar o número de colunas (4), mas pode deixar o número de linhas em branco?",
+    code: `<span class="type">int</span> primary_diagonal_sum(<span class="type">int</span> matrix[][4], <span class="type">int</span> size);`,
+    options: [
+      "É só uma convenção de estilo, sem efeito no funcionamento",
+      "Porque o compilador precisa do número de colunas para calcular o deslocamento até matrix[i][j] dentro do bloco contíguo; o número de linhas não afeta esse cálculo",
+      "Porque toda função em C só pode processar matrizes com 4 colunas",
+      "Porque o número de linhas é sempre igual ao valor de size, então seria redundante"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Como a matriz é um único bloco contíguo (row-major), localizar matrix[i][j] exige saber quantos elementos cada linha tem, para pular i linhas inteiras e chegar à linha certa. O número de linhas em si não entra nesse cálculo, por isso pode ficar em branco.",
+    explainIncorrect: "A resposta correta é a segunda opção: o número de colunas é indispensável para calcular o endereço de matrix[i][j]; o de linhas, não."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${q.code ? `<pre class="code-block">${q.code}</pre>` : ''}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou vetores, ponteiros e matrizes.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou para fixar a relação entre vetores e ponteiros.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale a pena revisar como um vetor é passado para uma função.';
+  else msg = '🔁 Releia o material do módulo e tente novamente para reforçar vetores e matrizes.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>

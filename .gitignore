@@ -43,3 +43,10 @@ out/
 # Ignore dependency directories
 Dependencies/
 
+# Conteúdo de autoria assistida por IA — vive em ed-IA (repo irmão privado)
+/CLAUDE.md
+/*/figs/
+/*/CONTENT.md
+/docs/*/FIGS.md
+/docs/material-didático/
+/.claude/commands/gerar.md

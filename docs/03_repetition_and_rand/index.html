@@ -151,6 +151,66 @@
 
   .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
 
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 26rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
   .section-label {
     font-size: 0.78rem;
     letter-spacing: 0.08em;
@@ -486,12 +546,124 @@
     <div class="eyebrow">Comandos de repetição</div>
     <h1>Repetição e números aleatórios</h1>
     <p class="lede">
-      Os comandos <code style="font-family:var(--font-mono)">for</code> e
-      <code style="font-family:var(--font-mono)">while</code> repetem um bloco de código enquanto uma
-      condição é verdadeira. Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma
-      explicação do laço e a simulação da execução passo a passo — sem precisar compilar nada.
+      Estas são as notas da terceira aula: as três construções de repetição da linguagem C
+      (<code style="font-family:var(--font-mono)">while</code>, <code style="font-family:var(--font-mono)">for</code>
+      e <code style="font-family:var(--font-mono)">do-while</code>), os comandos <code style="font-family:var(--font-mono)">break</code>
+      e <code style="font-family:var(--font-mono)">continue</code> que alteram seu fluxo, e a geração de números
+      pseudoaleatórios com <code style="font-family:var(--font-mono)">rand()</code>. Os exemplos interativos logo
+      abaixo colocam parte dessa teoria em prática, passo a passo.
     </p>
   </div>
+
+  <div class="notes">
+
+    <h2>Repetições</h2>
+    <p>
+      Uma estrutura de repetição (ou <strong>laço</strong>) executa um bloco de comandos várias vezes, enquanto uma
+      condição permanecer verdadeira — em vez de copiar e colar o mesmo trecho de código a cada repetição
+      necessária. O C oferece três construções para isso: <code>while</code>, <code>for</code> e
+      <code>do-while</code>. As três são equivalentes entre si (qualquer uma pode ser reescrita nas outras duas) —
+      a escolha de qual usar é uma questão de qual delas deixa a intenção do código mais clara em cada situação.
+    </p>
+
+    <h3>Construção while</h3>
+    <p>
+      O <code>while</code> é a construção mais simples: <code>while (condição) { comandos; }</code> testa a
+      condição <em>antes</em> de cada repetição (por isso é chamado de laço de <strong>pré-teste</strong>) — se
+      ela já for falsa na primeira vez, o corpo do laço nunca chega a executar. Quando a condição é literalmente a
+      constante <code>1</code> (sempre verdadeira), o resultado é um <strong>laço infinito</strong>, que só
+      termina por um <code>break</code> em seu interior — é exatamente essa a estrutura do exemplo
+      <em>Adivinhe o número</em>: <code>while (1) { ... }</code> repete a leitura do palpite indefinidamente, e só
+      um acerto do usuário aciona o <code>break</code> que interrompe o laço.
+    </p>
+
+    <h3>Construção for</h3>
+    <p>
+      O <code>for</code> reúne em uma única linha as três partes que normalmente aparecem juntas em um laço
+      controlado por contador: <code>for (inicialização; condição; incremento) { comandos; }</code>. A
+      inicialização roda uma única vez, antes da primeira verificação da condição; a condição é testada antes de
+      cada repetição, como no <code>while</code>; e o incremento roda ao final de cada repetição, antes do
+      próximo teste da condição. O exemplo <em>Fatorial</em> usa exatamente esse padrão para multiplicar de
+      <code>1</code> até <code>n</code>: <code>for (int i = 1; i &lt;= n; ++i) factorial *= i;</code> — note que
+      <code>i</code> é declarado dentro do próprio <code>for</code>, existindo só enquanto o laço roda. O exemplo
+      <em>Potência</em> mostra dois <code>for</code>s alternativos, escolhidos por um <code>if</code>: um multiplica
+      a base <code>exponent</code> vezes (expoente positivo), o outro divide <code>-exponent</code> vezes (expoente
+      negativo) — a mesma construção sintática usada para duas lógicas diferentes.
+    </p>
+
+    <h3>Construção do-while</h3>
+    <p>
+      O <code>do-while</code> inverte a ordem do teste: <code>do { comandos; } while (condição);</code> executa o
+      corpo do laço primeiro e só então verifica a condição, repetindo enquanto ela for verdadeira. Por ser um
+      laço de <strong>pós-teste</strong>, ele garante que o corpo execute <em>pelo menos uma vez</em>, mesmo que a
+      condição já comece falsa — diferença que faz dele a escolha natural para validar uma entrada do usuário
+      (é preciso ler o valor pelo menos uma vez antes de poder testá-lo), como em
+      <code>do { printf("Escolha 1-3: "); scanf("%d", &amp;opcao); } while (opcao &lt; 1 || opcao &gt; 3);</code>.
+      Nenhum exemplo deste módulo usa <code>do-while</code>, mas o laço <code>while (1) { ... break; ... }</code>
+      de <em>Adivinhe o número</em> resolve o mesmo problema (repetir a leitura até um valor válido) com pré-teste
+      e uma saída manual, no lugar do pós-teste automático do <code>do-while</code>.
+    </p>
+
+    <h3>Interrupções com break e continue</h3>
+    <p>
+      Os comandos <code>break</code> e <code>continue</code> alteram o fluxo normal de um laço a partir de dentro
+      dele, tipicamente dentro de um <code>if</code> que testa alguma condição especial. O <code>break</code>
+      interrompe o laço imediatamente, pulando para a primeira linha depois dele — é o que o exemplo
+      <em>Adivinhe o número</em> faz assim que o palpite do usuário acerta o número sorteado, encerrando o
+      <code>while (1)</code> que, de outra forma, rodaria para sempre. Já o <code>continue</code> não encerra o
+      laço: ele pula direto para a próxima repetição (no <code>for</code>, isso inclui rodar o incremento antes do
+      próximo teste da condição), abandonando apenas o restante do corpo na iteração atual. Um uso típico é
+      descartar uma entrada inválida sem sair do laço: <code>if (opcao &lt; 1 || opcao &gt; 5) continue;</code>
+      volta ao início do laço para pedir uma nova entrada, sem executar o restante do corpo naquela repetição.
+    </p>
+
+    <h2>Números aleatórios</h2>
+    <p>
+      Gerar números "aleatórios" em um programa determinístico como um executável em C é, na prática, gerar
+      números <strong>pseudoaleatórios</strong>: uma sequência calculada por uma fórmula que parece aleatória, mas
+      é inteiramente determinada por um valor inicial chamado <strong>semente</strong>.
+    </p>
+
+    <h3>Função rand e a necessidade de uma semente</h3>
+    <p>
+      A função <code>rand()</code>, declarada em <code>stdlib.h</code>, devolve a cada chamada um inteiro
+      pseudoaleatório entre <code>0</code> e <code>RAND_MAX</code> (uma constante que depende da implementação,
+      tipicamente <code>INT_MAX</code>). Sem nenhuma configuração, a sequência de valores devolvida por
+      <code>rand()</code> é sempre a <em>mesma</em> a cada execução do programa — porque a semente usada
+      internamente começa sempre com o mesmo valor padrão. É a função <code>srand(semente)</code>, também de
+      <code>stdlib.h</code>, que define essa semente e, com ela, toda a sequência de números que
+      <code>rand()</code> vai gerar a partir dali.
+    </p>
+
+    <h3>srand(time(NULL)) vs. semente fixa</h3>
+    <p>
+      O exemplo <em>Rand</em> chama <code>srand(10)</code> — uma semente fixa, escolhida deliberadamente para que
+      a sequência gerada seja sempre a mesma a cada execução (útil para depurar ou reproduzir um resultado). Já os
+      exemplos <em>Dados</em> e <em>Adivinhe o número</em> chamam <code>srand(time(NULL))</code>, usando o instante
+      atual (em segundos desde 1970, devolvido por <code>time(NULL)</code>, de <code>time.h</code>) como semente —
+      como esse valor muda a cada segundo, a sequência de números sorteados também muda a cada execução, o que é
+      o comportamento esperado de um dado ou de um jogo de adivinhação.
+    </p>
+
+    <h3>Gerando números em um intervalo</h3>
+    <p>
+      Como <code>rand()</code> devolve um valor num intervalo fixo e tipicamente grande, obter um número num
+      intervalo menor exige alguma aritmética sobre o resultado bruto. Para um intervalo de inteiros
+      <code>[1, N]</code>, o padrão é <code>rand() % N + 1</code> — o resto da divisão por <code>N</code> cai
+      sempre entre <code>0</code> e <code>N - 1</code>, e somar <code>1</code> desloca para <code>[1, N]</code>; é
+      assim que o exemplo <em>Dados</em> sorteia um valor entre 1 e 6 (<code>rand() % 6 + 1</code>) e
+      <em>Adivinhe o número</em> um valor entre 1 e 100 (<code>rand() % 100 + 1</code>). Para um intervalo de ponto
+      flutuante, o exemplo <em>Rand</em> usa outra abordagem: divide o inteiro sorteado pelo maior valor possível
+      (<code>((double)rand()) / INT_MAX</code>, um valor entre 0 e 1) e multiplica pelo tamanho do intervalo
+      desejado (<code>* 10</code>), obtendo um <code>double</code> entre 0 e 10.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação do laço e a simulação da
+    execução passo a passo — sem precisar compilar nada.
+  </p>
 
   <p class="section-label">Exemplos</p>
   <ul class="example-list" id="exampleList">

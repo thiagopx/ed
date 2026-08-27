@@ -1,0 +1,120 @@
+<div
+  style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <div
+    style="border-bottom: 2px solid #d68910; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: #2c3e50; margin: 0;">🗺️ EP 04: Circuito entre Cidades Capixabas</h2>
+    <span
+      style="background-color: #d68910; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
+      09 de Setembro</span>
+  </div>
+  <p><strong>O Cenário:</strong> Uma tabela relaciona as distâncias rodoviárias entre 5 cidades
+    capixabas — Vitória, Vila Velha, Cariacica, Serra e Guarapari. Essa tabela pode ser modelada como
+    uma matriz 5×5, em que a posição <code>[i][j]</code> guarda a distância (em km) entre a cidade de
+    índice <code>i</code> e a cidade de índice <code>j</code>. Seu programa deve receber um
+    <strong>circuito</strong> — uma rota que passa por várias dessas cidades, uma após a outra — e
+    calcular a distância total percorrida.</p>
+
+  <h3
+    style="color: #b9770e; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    🏙️ A Tabela de Distâncias</h3>
+  <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">
+    Cada cidade tem um índice fixo, de 0 a 4, que também é a posição dela na matriz:
+    <strong>0 = Vitória</strong>, <strong>1 = Vila Velha</strong>, <strong>2 = Cariacica</strong>,
+    <strong>3 = Serra</strong>, <strong>4 = Guarapari</strong>.
+  </p>
+  <div style="overflow-x: auto; margin-bottom: 20px;">
+    <table style="border-collapse: collapse; width: 100%; font-size: 0.88em; text-align: center;">
+      <thead>
+        <tr style="background-color: #fdf2e3;">
+          <th style="border: 1px solid #eee; padding: 8px;">Distância (km)</th>
+          <th style="border: 1px solid #eee; padding: 8px;">Vitória (0)</th>
+          <th style="border: 1px solid #eee; padding: 8px;">Vila Velha (1)</th>
+          <th style="border: 1px solid #eee; padding: 8px;">Cariacica (2)</th>
+          <th style="border: 1px solid #eee; padding: 8px;">Serra (3)</th>
+          <th style="border: 1px solid #eee; padding: 8px;">Guarapari (4)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border: 1px solid #eee; padding: 8px; font-weight: bold; background-color: #fdf2e3;">Vitória (0)</td>
+          <td style="border: 1px solid #eee; padding: 8px;">–</td>
+          <td style="border: 1px solid #eee; padding: 8px;">10</td>
+          <td style="border: 1px solid #eee; padding: 8px;">7</td>
+          <td style="border: 1px solid #eee; padding: 8px;">15</td>
+          <td style="border: 1px solid #eee; padding: 8px;">50</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #eee; padding: 8px; font-weight: bold; background-color: #fdf2e3;">Vila Velha (1)</td>
+          <td style="border: 1px solid #eee; padding: 8px;">10</td>
+          <td style="border: 1px solid #eee; padding: 8px;">–</td>
+          <td style="border: 1px solid #eee; padding: 8px;">15</td>
+          <td style="border: 1px solid #eee; padding: 8px;">8</td>
+          <td style="border: 1px solid #eee; padding: 8px;">45</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #eee; padding: 8px; font-weight: bold; background-color: #fdf2e3;">Cariacica (2)</td>
+          <td style="border: 1px solid #eee; padding: 8px;">7</td>
+          <td style="border: 1px solid #eee; padding: 8px;">15</td>
+          <td style="border: 1px solid #eee; padding: 8px;">–</td>
+          <td style="border: 1px solid #eee; padding: 8px;">20</td>
+          <td style="border: 1px solid #eee; padding: 8px;">55</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #eee; padding: 8px; font-weight: bold; background-color: #fdf2e3;">Serra (3)</td>
+          <td style="border: 1px solid #eee; padding: 8px;">15</td>
+          <td style="border: 1px solid #eee; padding: 8px;">8</td>
+          <td style="border: 1px solid #eee; padding: 8px;">20</td>
+          <td style="border: 1px solid #eee; padding: 8px;">–</td>
+          <td style="border: 1px solid #eee; padding: 8px;">40</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #eee; padding: 8px; font-weight: bold; background-color: #fdf2e3;">Guarapari (4)</td>
+          <td style="border: 1px solid #eee; padding: 8px;">50</td>
+          <td style="border: 1px solid #eee; padding: 8px;">45</td>
+          <td style="border: 1px solid #eee; padding: 8px;">55</td>
+          <td style="border: 1px solid #eee; padding: 8px;">40</td>
+          <td style="border: 1px solid #eee; padding: 8px;">–</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3
+    style="color: #b9770e; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    📋 Requisitos Técnicos</h3>
+  <div
+    style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <ul style="margin: 0; padding-left: 20px;">
+      <li style="margin-bottom: 10px;"><strong>Matriz de distâncias:</strong> declare uma matriz
+        <code>int</code> 5×5 já inicializada com os valores da tabela acima (a diagonal, onde a cidade
+        "vai até ela mesma", pode valer <code>0</code>).</li>
+      <li style="margin-bottom: 10px;"><strong>Leitura do circuito:</strong> leia primeiro a
+        quantidade de cidades no circuito e, em seguida, um vetor com os índices das cidades visitadas,
+        na ordem — por exemplo, <code>0 3 2 1 4 0</code> representa Vitória → Serra → Cariacica → Vila
+        Velha → Guarapari → Vitória.</li>
+      <li style="margin-bottom: 10px;"><strong>Nomes das cidades:</strong> mantenha também um vetor de
+        strings com os nomes das 5 cidades, na mesma ordem dos índices da matriz, para poder exibir o
+        circuito por extenso.</li>
+      <li style="margin-bottom: 10px;"><strong>Cálculo:</strong> some a distância entre cada par de
+        cidades consecutivas do circuito lido, consultando a matriz de distâncias.</li>
+      <li style="margin-bottom: 10px;"><strong>Saída:</strong> exiba o circuito com os nomes das
+        cidades e a distância total percorrida, em km.</li>
+    </ul>
+  </div>
+  <h3
+    style="color: #b9770e; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    💻 Exemplo de Execução</h3>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em;">Digite o número de cidades no circuito: 6
+Digite o circuito como uma sequência de índices: 0 3 2 1 4 0
+
+Circuito: Vitória -> Serra -> Cariacica -> Vila Velha -> Guarapari -> Vitória
+Distância total percorrida: 145 km</pre>
+  <div
+    style="margin-top: 25px; padding: 15px; background-color: #fdf2e3; border-left: 5px solid #d68910; border-radius: 4px; font-size: 0.9em;">
+    <strong>Dica de Estudo:</strong> Para cada par de posições consecutivas do vetor do circuito
+    (digamos, as posições <code>k</code> e <code>k+1</code>), você tem dois índices de cidade — use-os
+    diretamente para acessar a matriz de distâncias, como em
+    <code>distancias[circuito[k]][circuito[k+1]]</code>, e acumule o resultado em um laço percorrendo
+    todo o vetor do circuito.</div>
+</div>

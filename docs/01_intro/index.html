@@ -151,6 +151,66 @@
 
   .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
 
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 26rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
   .section-label {
     font-size: 0.78rem;
     letter-spacing: 0.08em;
@@ -486,13 +546,244 @@
     <div class="eyebrow">Introdução à linguagem C</div>
     <h1>Primeiros programas em C</h1>
     <p class="lede">
-      Todo programa em C segue o mesmo esqueleto: <code style="font-family:var(--font-mono)">#include</code>,
-      a função <code style="font-family:var(--font-mono)">main</code>, declarações, comandos executados em
-      sequência e um <code style="font-family:var(--font-mono)">return</code>. Escolha um exemplo abaixo:
-      para cada um você vê o código-fonte, uma explicação da mecânica central e a simulação da execução
-      passo a passo — sem precisar compilar nada.
+      Estas são as notas da primeira aula: como um programa em C nasce e roda, os tipos de dado e operadores
+      que ele manipula, como ele conversa com quem o usa, e como ele toma decisões. Os exemplos interativos
+      logo abaixo colocam parte dessa teoria em prática, passo a passo.
     </p>
   </div>
+
+  <div class="notes">
+
+    <h2>Introdução à programação em C</h2>
+
+    <h3>Ciclo de desenvolvimento</h3>
+    <p>
+      Escrever um programa em C passa por três fases, que se repetem em ciclo até o programa funcionar
+      corretamente: primeiro o código é digitado num <strong>editor de texto</strong>; depois o
+      <strong>compilador</strong> traduz esse código-fonte para um programa executável, apontando um erro de
+      compilação sempre que a sintaxe está incorreta; por fim o programa executável roda e sua saída é
+      conferida contra o resultado esperado — um erro de execução (o programa compila e roda, mas produz um
+      resultado errado) manda o programador de volta ao editor para revisar a lógica, assim como um erro de
+      compilação manda de volta para corrigir a sintaxe.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig1-2.jpg" alt="Diagrama do ciclo de desenvolvimento de um programa em C: editor de texto produz o programa em C, que passa pelo compilador e vira um programa executável cuja execução gera uma saída; setas tracejadas retornam ao editor para corrigir erro de compilação ou erro de execução.">
+      <figcaption>O ciclo de desenvolvimento: editar, compilar e testar — com volta ao editor sempre que a compilação ou a saída revelam um erro.</figcaption>
+    </figure>
+    <p>
+      Nos bastidores, a compilação em si tem sub-etapas: o pré-processamento resolve diretivas como
+      <code>#include</code> e <code>#define</code>; a compilação propriamente dita traduz o código-fonte para
+      código objeto; e a linkagem junta esse código objeto com as bibliotecas usadas (como a
+      <code>stdio</code>), produzindo o executável final. Compilar com
+      <code>gcc --save-temps</code> (veja o desafio prático deste módulo) deixa os arquivos intermediários de
+      cada etapa visíveis no diretório.
+    </p>
+
+    <h3>Programando em C: estrutura básica de um programa</h3>
+    <p>
+      Todo programa em C segue o mesmo esqueleto, visível no exemplo <em>Primeiro programa</em>: a diretiva
+      <code>#include</code> traz as declarações de uma biblioteca (aqui, <code>stdio.h</code>, para entrada e
+      saída); a função <code>main()</code> é o ponto de entrada obrigatório — é dela que a execução começa; o
+      corpo de <code>main()</code> é delimitado por chaves <code>{ }</code> e contém uma sequência de
+      declarações e comandos executados em ordem, de cima para baixo; e o comando <code>return</code> encerra
+      a função, devolvendo um código de status ao sistema operacional (<code>0</code> indica sucesso).
+      Comentários (<code>/* ... */</code>, ou <code>//</code> até o fim da linha) documentam o código sem
+      afetar a compilação — o compilador simplesmente os ignora.
+    </p>
+
+    <h2>Variáveis e operadores</h2>
+
+    <h3>Variáveis</h3>
+    <p>
+      Uma variável é um espaço nomeado na memória que guarda um valor de um tipo específico — e que pode
+      mudar ao longo da execução do programa.
+    </p>
+
+    <h4>Tipos básicos</h4>
+    <p>
+      O C define cinco tipos de dado primitivos — <code>char</code>, <code>int</code>, <code>float</code>,
+      <code>double</code> e <code>void</code> —, cada um ocupando um número fixo de bytes na memória (que
+      pode variar entre plataformas). <code>char</code> guarda um caractere (ou um pequeno inteiro),
+      <code>int</code> um número inteiro, <code>float</code> e <code>double</code> números de ponto
+      flutuante (<code>double</code> com mais precisão), e <code>void</code> representa "nenhum tipo" — usado,
+      por exemplo, para indicar que uma função não retorna valor. Os modificadores <code>signed</code>,
+      <code>unsigned</code>, <code>short</code> e <code>long</code> ajustam a faixa de valores representável
+      por um tipo — um <code>unsigned int</code>, por exemplo, abre mão de representar negativos para dobrar
+      o maior valor positivo possível.
+    </p>
+
+    <h4>Declaração de variáveis</h4>
+    <p>
+      Toda variável precisa ser declarada antes de usada — a forma geral é <code>tipo nome;</code>, como em
+      <code>int age;</code> no exemplo <em>Primeiro programa</em>. É possível declarar várias variáveis do
+      mesmo tipo numa linha só, separadas por vírgula (<code>float base, altura;</code>), e também
+      inicializar no mesmo passo da declaração (<code>int contador = 0;</code>).
+    </p>
+
+    <h4>Valores constantes</h4>
+    <p>
+      Constantes são valores fixos escritos diretamente no código — <code>42</code> e <code>-7</code> são
+      constantes inteiras, <code>3.14</code> uma constante de ponto flutuante, <code>'a'</code> uma constante
+      de caractere (entre aspas simples) e <code>"Ola"</code> uma constante string (entre aspas duplas, e
+      sempre um vetor de caracteres terminado em <code>'\0'</code>). O C também aceita constantes
+      hexadecimais, prefixadas por <code>0x</code> (<code>0x1F</code>), e octais, prefixadas por um zero
+      (<code>013</code>).
+    </p>
+
+    <h4>Variáveis com valores indefinidos</h4>
+    <p>
+      Ao contrário do que se poderia esperar, o C não inicializa automaticamente uma variável recém-declarada
+      com zero: seu valor inicial é indefinido — o que estiver, por acaso, naquele endereço de memória. É o
+      caso de <code>age</code> no exemplo <em>Primeiro programa</em> entre a declaração
+      (<code>int age;</code>) e a leitura pelo <code>scanf</code>: usar seu valor nesse intervalo leria "lixo
+      de memória". Por isso a boa prática é nunca presumir um valor inicial e sempre inicializar
+      explicitamente uma variável antes de lê-la.
+    </p>
+
+    <h3>Operadores</h3>
+    <p>Operadores combinam e transformam os valores guardados nas variáveis.</p>
+
+    <h4>Operadores aritméticos</h4>
+    <p>
+      Os operadores <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> e <code>%</code> realizam
+      as operações aritméticas básicas — soma, subtração, multiplicação, divisão e resto da divisão inteira,
+      respectivamente. O exemplo <em>Fahrenheit para Celsius</em> usa vários deles na mesma expressão:
+      <code>celsius = (fahrenheit - 32) * 5 / 9;</code>. Um detalhe importante: quando os dois operandos de
+      <code>/</code> são inteiros, o resultado é uma divisão inteira, truncada (<code>7 / 2</code> vale
+      <code>3</code>, não <code>3.5</code>) — para obter o resultado real, pelo menos um dos operandos precisa
+      ser de ponto flutuante.
+    </p>
+
+    <h4>Operadores de atribuição</h4>
+    <p>
+      O operador <code>=</code> atribui o valor da direita à variável da esquerda (<code>x = 5;</code>). O C
+      também tem operadores de atribuição compostos, que combinam uma operação com a atribuição numa forma
+      mais curta — <code>x += 3;</code> equivale a <code>x = x + 3;</code>, e o mesmo padrão vale para
+      <code>-=</code>, <code>*=</code>, <code>/=</code> e <code>%=</code>.
+    </p>
+
+    <h4>Operadores de incremento e decremento</h4>
+    <p>
+      <code>++</code> e <code>--</code> incrementam ou decrementam uma variável em 1, e podem ser usados antes
+      (pré-fixado, <code>++x</code>) ou depois (pós-fixado, <code>x++</code>) da variável — a diferença
+      aparece quando o operador é usado dentro de uma expressão maior: no pré-fixado, a variável é
+      incrementada primeiro, e o novo valor é o que entra na expressão; no pós-fixado, o valor atual entra na
+      expressão, e só depois a variável é incrementada.
+    </p>
+
+    <h4>Operadores relacionais e lógicos</h4>
+    <p>
+      Os operadores relacionais (<code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>,
+      <code>==</code>, <code>!=</code>) comparam dois valores e retornam verdadeiro (<code>1</code>) ou falso
+      (<code>0</code>) — é assim que o exemplo <em>Fahrenheit para Celsius</em> decide se
+      <code>celsius &lt; 0</code>. Os operadores lógicos combinam expressões booleanas:
+      <code>&amp;&amp;</code> (E) só é verdadeiro se ambos os lados forem verdadeiros, <code>||</code> (OU) é
+      verdadeiro se pelo menos um lado for, e <code>!</code> (NÃO) inverte um valor lógico.
+    </p>
+
+    <h4>Operador sizeof</h4>
+    <p>
+      <code>sizeof</code> consulta, em tempo de compilação, quantos bytes um tipo ou uma variável ocupa na
+      memória — é exatamente o que o exemplo <em>Tipos de dados</em> usa para revelar o tamanho de cada tipo
+      primitivo (<code>sizeof(int)</code>, <code>sizeof(double)</code> etc.) na plataforma em que o programa
+      está rodando.
+    </p>
+
+    <h4>Conversão de tipo</h4>
+    <p>
+      Quando uma expressão mistura tipos diferentes, o C converte automaticamente os valores para um tipo
+      comum antes de operar (conversão implícita) — é por isso que, no exemplo <em>Calculadora</em>, ler os
+      operandos como <code>double</code> garante uma divisão com casas decimais, mesmo que o usuário digite
+      números inteiros. Também é possível forçar uma conversão explicitamente com um modelador
+      (<em>cast</em>): <code>(float)a / b</code> converte <code>a</code> para <code>float</code> antes da
+      divisão, garantindo um resultado com casas decimais mesmo que <code>a</code> e <code>b</code> sejam
+      <code>int</code>.
+    </p>
+
+    <h3>Entrada e saída básicas</h3>
+    <p>
+      Para interagir com quem usa o programa, o C conta com duas funções da biblioteca padrão declaradas em
+      <code>stdio.h</code>.
+    </p>
+
+    <h4>Função printf</h4>
+    <p>
+      <code>printf</code> formata e imprime valores na tela, usando especificadores de formato que indicam o
+      tipo e a formatação de cada valor — <code>%d</code> para inteiros, <code>%f</code> para ponto
+      flutuante, <code>%c</code> para caracteres, <code>%s</code> para strings. É possível controlar a
+      largura mínima do campo e, para pontos flutuantes, o número de casas decimais, como em
+      <code>%7.2f</code>.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig2-1.jpg" alt="Dois especificadores de formato do printf com largura de campo: %4d reserva 4 posições para o inteiro 23, alinhado à direita; %7.2f reserva 7 posições (2 delas para casas decimais) para o valor 5.30, também alinhado à direita.">
+      <figcaption><code>%4d</code> e <code>%7.2f</code>: a largura de campo reserva um número mínimo de posições, alinhando o valor à direita e completando com espaços à esquerda.</figcaption>
+    </figure>
+
+    <h4>Função scanf</h4>
+    <p>
+      <code>scanf</code> lê a entrada digitada pelo usuário e guarda o valor lido dentro de uma variável —
+      mas, diferente de <code>printf</code>, <code>scanf</code> sempre precisa do <strong>endereço</strong> da
+      variável, não do seu valor, por isso é quase sempre chamado com o operador <code>&amp;</code> antes do
+      nome da variável (<code>scanf("%d", &amp;idade);</code>). Um cuidado comum ao misturar leituras: o
+      exemplo <em>Calculadora</em> lê o operador com <code>scanf(" %c", &amp;operator)</code> — o espaço antes
+      de <code>%c</code> descarta qualquer espaço em branco ou quebra de linha deixada no buffer pela leitura
+      anterior.
+    </p>
+
+    <h2>Condicionais</h2>
+
+    <h3>Comando if</h3>
+    <p>
+      O comando <code>if</code> executa um bloco de comandos só quando uma condição é verdadeira, e o
+      <code>else</code>, opcional, executa um bloco alternativo quando ela é falsa — é assim que o exemplo
+      <em>Fahrenheit para Celsius</em> decide entre "congelando" e "não congelando".
+    </p>
+
+    <h4>Expressões booleanas</h4>
+    <p>
+      O C não tem um tipo booleano dedicado: qualquer expressão numérica pode ser usada como condição — zero
+      é considerado falso, e qualquer valor diferente de zero é considerado verdadeiro. É por isso que
+      <code>if (x)</code> e <code>if (x != 0)</code> são equivalentes, assim como <code>if (!x)</code> e
+      <code>if (x == 0)</code>.
+    </p>
+
+    <h4>Blocos de comandos</h4>
+    <p>
+      Quando um <code>if</code> precisa executar mais de um comando, os comandos são agrupados entre chaves
+      <code>{ }</code>, formando um bloco. Se o corpo do <code>if</code> tiver um único comando, as chaves
+      são opcionais — mas usá-las mesmo assim é uma prática recomendada, porque evita um erro comum:
+      adicionar uma segunda linha ao "corpo" do <code>if</code> sem perceber que, sem chaves, ela na verdade
+      já está fora dele.
+    </p>
+
+    <h4>Operador condicional</h4>
+    <p>
+      O operador ternário <code>?:</code> é uma forma compacta de escrever um <code>if-else</code> que só
+      decide qual de dois valores usar: <code>condição ? valor_se_verdadeiro : valor_se_falso</code>. Por
+      exemplo, <code>int maior = (a &gt; b) ? a : b;</code> guarda em <code>maior</code> o maior valor entre
+      <code>a</code> e <code>b</code>, substituindo um <code>if-else</code> de quatro linhas por uma única
+      expressão.
+    </p>
+
+    <h3>Seleção</h3>
+    <p>
+      O comando <code>switch</code> testa uma única variável (ou expressão) contra uma lista de valores
+      constantes, executando o <code>case</code> correspondente — uma alternativa mais legível a uma longa
+      cadeia de <code>if-else-if</code> quando há muitos valores possíveis para testar, como faz o exemplo
+      <em>Calculadora</em> ao escolher a operação aritmética a partir do caractere digitado. Cada
+      <code>case</code> termina, tipicamente, com um <code>break</code>, que interrompe o <code>switch</code>;
+      sem ele, a execução "cai" para o <code>case</code> seguinte (<em>fall-through</em>) mesmo que sua
+      condição não bata — um comportamento às vezes proposital, mas fonte comum de bugs quando esquecido. A
+      cláusula <code>default</code>, opcional, é executada quando nenhum <code>case</code> corresponde ao
+      valor testado.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a
+    simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
 
   <p class="section-label">Exemplos</p>
   <ul class="example-list" id="exampleList">
@@ -526,7 +817,7 @@
   <section class="detail" id="panel-primeiro-programa" data-panel>
     <div class="detail-head">
       <h2>Primeiro programa</h2>
-      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/first_program" target="_blank" rel="noopener">ver no GitHub ↗</a>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/01_first_program" target="_blank" rel="noopener">ver no GitHub ↗</a>
     </div>
     <div class="detail-grid">
       <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
@@ -589,7 +880,7 @@
   <section class="detail" id="panel-tipos" data-panel hidden>
     <div class="detail-head">
       <h2>Tipos de dados</h2>
-      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/types" target="_blank" rel="noopener">ver no GitHub ↗</a>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/02_types" target="_blank" rel="noopener">ver no GitHub ↗</a>
     </div>
     <div class="detail-grid">
       <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
@@ -681,7 +972,7 @@ Size of signed short: 2 bytes</pre>
   <section class="detail" id="panel-temperatura" data-panel hidden>
     <div class="detail-head">
       <h2>Fahrenheit para Celsius</h2>
-      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/fahrenheit2celsius" target="_blank" rel="noopener">ver no GitHub ↗</a>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/03_fahrenheit2celsius" target="_blank" rel="noopener">ver no GitHub ↗</a>
     </div>
     <div class="detail-grid">
       <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
@@ -752,7 +1043,7 @@ It's freezing outside!</pre>
   <section class="detail" id="panel-calculadora" data-panel hidden>
     <div class="detail-head">
       <h2>Calculadora</h2>
-      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/calculator" target="_blank" rel="noopener">ver no GitHub ↗</a>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/04_calculator" target="_blank" rel="noopener">ver no GitHub ↗</a>
     </div>
     <div class="detail-grid">
       <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>

@@ -1,0 +1,1654 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vetores e Matrizes — Estruturas de Dados</title>
+<meta name="description" content="Material didático sobre vetores, ponteiros e matrizes em C — código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #B1752F;
+    --accent-soft: #F1E3CC;
+    --wash: rgba(177, 117, 47, 0.07);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #E0A85F;
+      --accent-soft: #3A2C18;
+      --wash: rgba(224, 168, 95, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #E0A85F;
+    --accent-soft: #3A2C18;
+    --wash: rgba(224, 168, 95, 0.09);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 26rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Vetores e matrizes</div>
+    <h1>Vetores, ponteiros e matrizes</h1>
+    <p class="lede">
+      Estas são as notas da quarta aula: como declarar e percorrer vetores, a relação profunda entre
+      vetores e ponteiros, como passá-los para funções (inclusive recursivamente), e como estender
+      essas ideias para duas dimensões com matrizes. Os exemplos interativos logo abaixo colocam
+      parte dessa teoria em prática, passo a passo.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Vetores e Matrizes</h2>
+    <p>
+      Um <strong>vetor</strong> é uma coleção de valores do mesmo tipo, armazenados em posições
+      contíguas de memória e acessados por um índice numérico — em vez de declarar
+      <code>int nota0, nota1, nota2;</code> para guardar três notas, um único vetor
+      <code>int notas[3];</code> resolve o problema para 3, 300 ou 3000 valores, sempre com o mesmo
+      código de acesso. Uma <strong>matriz</strong> é a mesma ideia estendida para duas dimensões — uma
+      tabela de linhas e colunas, também de um único tipo. As duas estruturas guardam uma relação muito
+      próxima com <strong>ponteiros</strong>, que é o fio condutor desta aula.
+    </p>
+
+    <h3>Vetores</h3>
+    <p>
+      A forma geral de declaração é <code>tipo nome[tamanho];</code> — por exemplo,
+      <code>int v[10];</code> reserva, de uma só vez, espaço contíguo para 10 inteiros
+      (10 × <code>sizeof(int)</code> bytes). Os elementos são indexados de <code>0</code> a
+      <code>tamanho - 1</code>; em C, o índice <code>0</code> sempre se refere ao primeiro elemento,
+      nunca ao segundo. Um detalhe importante (e perigoso): o C <strong>não verifica</strong> se o
+      índice usado está dentro dos limites válidos do vetor — escrever em <code>v[30]</code> quando
+      <code>v</code> só tem 10 posições compila e roda, mas acessa memória que não pertence ao vetor,
+      um dos bugs mais comuns (e traiçoeiros) da linguagem. É por isso que o exemplo
+      <em>Média e valor mais distante</em> confere explicitamente se a quantidade de valores digitada
+      cabe no vetor (<code>if (n > MAX_SIZE)</code>) antes de usá-lo.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig6-1.jpg" alt="Duas visões de um vetor v de 10 inteiros: (a) a visão de memória, uma coluna de células de 4 bytes com endereços crescentes (104 a 144), v apontando para o endereço 104; (b) a visão abstrata usual, uma linha de 10 células indexadas de 0 a 9, com v apontando para a posição 0. Ambas mostram os mesmos valores nas posições 0, 1, 4 e 9: 5, 11, 0 e 3.">
+      <figcaption>Duas visões do mesmo vetor: a de memória (endereços contíguos crescentes) e a abstrata, mais comum (uma linha de células indexadas) — <code>v</code> aponta sempre para a posição 0.</figcaption>
+    </figure>
+    <p>
+      Quando o número de elementos é conhecido de antemão, o vetor pode ser inicializado já na
+      declaração, com os valores entre chaves: <code>int numbers[] = {10, 20, 30, 40, 50};</code>, como
+      fazem os exemplos <em>Percorrendo um vetor com ponteiro</em>, <em>Passagem de vetor para função</em>
+      e <em>Máximo por recursão</em>. Repare que o tamanho entre colchetes foi omitido — o compilador
+      conta os itens da lista e infere o tamanho sozinho. Como consequência, é comum calcular o número
+      de elementos de um vetor já declarado com <code>sizeof(vetor) / sizeof(vetor[0])</code>: o
+      tamanho total em bytes dividido pelo tamanho de um único elemento — um idioma que aparece em
+      quase todos os exemplos deste módulo.
+    </p>
+
+    <h3>Vetores e ponteiros</h3>
+    <p>
+      Em C, o nome de um vetor é, na prática, um <strong>ponteiro constante para o seu primeiro
+      elemento</strong> — é por isso que <code>nome[i]</code> e <code>*(nome + i)</code> significam
+      exatamente a mesma coisa: a notação de colchetes é, por baixo dos panos, aritmética de ponteiro.
+      O exemplo <em>Vetor é ponteiro: sizeof</em> expõe essa relação de forma direta: um ponteiro comum
+      <code>int *u;</code> pode receber o endereço de <code>v</code> (<code>u = v;</code>) ou de
+      qualquer posição dele (<code>u = &amp;v[3];</code>), e <code>*u</code> lê ou escreve o inteiro
+      apontado. Mas <code>sizeof(v)</code> (o vetor) e <code>sizeof(u)</code> (o ponteiro) dão resultados
+      completamente diferentes — 40 bytes contra 8 — porque só <code>v</code> "conhece" o tamanho do
+      bloco inteiro; <code>u</code> é só um endereço de 8 bytes, não importa para onde aponte. Essa
+      diferença também explica por que <code>v</code> não pode receber uma atribuição
+      (<code>v = w;</code> não compila): diferente de um ponteiro comum, o nome do vetor não é uma
+      variável que se possa redirecionar — é uma referência fixa ao bloco que foi alocado para ele.
+    </p>
+    <p>
+      Essa equivalência entre índice e aritmética de ponteiro abre duas formas de percorrer um vetor,
+      exploradas lado a lado no exemplo <em>Percorrendo um vetor com ponteiro</em>: manter um ponteiro
+      fixo no início e somar o deslocamento a cada acesso (<code>*(ptr + i)</code>, com <code>ptr</code>
+      sempre apontando para o elemento 0), ou mover o próprio ponteiro a cada repetição
+      (<code>*ptr; ptr++;</code>), sem nunca usar um índice explícito. As duas chegam ao mesmo lugar —
+      a escolha é de estilo, mas a segunda forma é a base de como o C original costumava varrer vetores
+      antes de a notação com colchetes se popularizar.
+    </p>
+
+    <h4>Passagem de vetores para funções</h4>
+    <p>
+      Como o nome de um vetor já é um ponteiro para seu primeiro elemento, é exatamente esse ponteiro
+      que é copiado quando um vetor é passado como argumento para uma função — nunca o vetor inteiro,
+      elemento a elemento. Por isso a assinatura de uma função que recebe um vetor pode ser escrita de
+      três formas equivalentes: <code>float calculate_mean(float ptr[], int size)</code> (a forma usada
+      no exemplo <em>Passagem de vetor para função</em>), <code>float calculate_mean(float ptr[5], int
+      size)</code> ou <code>float calculate_mean(float *ptr, int size)</code> — nos três casos, dentro
+      da função, <code>ptr</code> é um ponteiro comum. Essa é também a razão pela qual uma função pode
+      alterar os elementos de um vetor recebido como parâmetro e essa alteração "sobrevive" depois que
+      a função retorna: ao contrário dos demais parâmetros em C (passados por valor, como cópias), o
+      vetor passado é sempre o mesmo bloco de memória do vetor original — só o endereço é copiado, não
+      o conteúdo. Como o tamanho não viaja junto com o ponteiro, é comum (e necessário) passar também o
+      tamanho como um segundo parâmetro, como faz o exemplo.
+    </p>
+
+    <h4>Recursão com vetores</h4>
+    <p>
+      Uma função recursiva sobre um vetor costuma seguir o mesmo esqueleto: um caso base para o menor
+      vetor possível (tipicamente, um único elemento) e um caso recursivo que combina o primeiro
+      elemento com o resultado da mesma operação aplicada ao <em>restante</em> do vetor — um vetor
+      "menor", obtido avançando o ponteiro em uma posição e reduzindo o tamanho em uma unidade.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig6-2.jpg" alt="Esquema recursivo genérico: vetor(n, v) é igual a v[0] quando n = 1 (caso base); e igual a v[0] combinado com vetor(n - 1, &v[1]) quando n > 1 (caso recursivo).">
+      <figcaption>O padrão geral por trás de uma função recursiva sobre vetores: resolver para o primeiro elemento combinado (⊕) com o resultado do mesmo problema aplicado ao vetor restante, um elemento menor.</figcaption>
+    </figure>
+    <p>
+      É exatamente esse padrão que o exemplo <em>Máximo por recursão</em> implementa, com <code>⊕</code>
+      sendo "o maior entre dois valores": <code>max(arr, size)</code> devolve <code>arr[0]</code>
+      diretamente quando <code>size == 1</code> (caso base); caso contrário, calcula
+      <code>max_of_rest = max(&amp;arr[1], size - 1)</code> — a chamada recursiva recebe o endereço do
+      <em>segundo</em> elemento (<code>&amp;arr[1]</code>) como um novo vetor, um elemento menor que o
+      original — e devolve o maior entre <code>arr[0]</code> e <code>max_of_rest</code>. Cada chamada
+      "empilhada" espera a resposta da próxima, até o caso base; depois, as respostas voltam
+      "desempilhando", uma comparação de cada vez, até a chamada original.
+    </p>
+
+    <h3>Matrizes</h3>
+    <p>
+      Uma matriz é declarada com dois pares de colchetes — <code>tipo nome[linhas][colunas];</code>,
+      como em <code>float mat[3][4];</code>, uma tabela de 3 linhas por 4 colunas. Apesar da notação
+      sugerir uma grade bidimensional "de verdade", a memória do computador é sempre linear: por trás
+      dos panos, o C guarda uma matriz como um único bloco contíguo, preenchido <strong>linha por
+      linha</strong> (a chamada ordem <em>row-major</em>) — primeiro todos os elementos da linha 0, depois
+      todos os da linha 1, e assim por diante. A notação <code>mat[i][j]</code> (<code>i</code> para a
+      linha, <code>j</code> para a coluna) é só uma forma conveniente de calcular a posição certa nesse
+      bloco linear.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig6-3.jpg" alt="A mesma matriz 3x4 (linhas {1,5,2,0}, {8,2,3,1}, {1,6,7,2}) mostrada de duas formas: à esquerda, a grade lógica indexada por i (linha) e j (coluna); à direita, a visão de memória — um bloco contíguo de 12 células (endereços 104 a 148) com os elementos em ordem row-major: a linha 0 inteira, depois a linha 1, depois a linha 2.">
+      <figcaption>A visão lógica de uma matriz (uma grade 2D) e sua visão real em memória: um único vetor contíguo, preenchido linha por linha — exatamente os valores do exemplo <em>Matriz e laços aninhados</em>.</figcaption>
+    </figure>
+
+    <h3>Laços aninhados</h3>
+    <p>
+      Percorrer uma matriz por completo exige dois laços, um dentro do outro: o laço externo varia a
+      linha (<code>i</code>), e para cada linha, o laço interno varia todas as colunas
+      (<code>j</code>) antes de a linha externa avançar — é o que faz o exemplo
+      <em>Matriz e laços aninhados</em>, imprimindo <code>mat[i][j]</code> na ordem 0,0 · 0,1 · 0,2 ·
+      0,3 · 1,0 · 1,1 ... Nem sempre é preciso visitar todos os elementos, porém: o exemplo
+      <em>Passagem de matriz para função</em> soma apenas a <strong>diagonal principal</strong> (as
+      posições em que o índice de linha é igual ao de coluna, <code>matrix[i][i]</code>), e por isso
+      basta um único laço, sem aninhamento.
+    </p>
+
+    <h4>Passagem de matrizes para funções</h4>
+    <p>
+      Passar uma matriz para uma função segue a mesma lógica de um vetor — o que é copiado é apenas um
+      ponteiro para o primeiro elemento —, mas com uma exigência a mais: como o compilador precisa
+      calcular o deslocamento de cada linha dentro do bloco contíguo, o número de colunas
+      <strong>não pode</strong> ser omitido na assinatura da função. É por isso que o exemplo
+      <em>Passagem de matriz para função</em> declara <code>int primary_diagonal_sum(int matrix[][4],
+      int size)</code> — só a primeira dimensão (o número de linhas) fica em branco; a segunda
+      (<code>4</code>, o número de colunas) é obrigatória, porque é ela que diz à função "de quantos
+      inteiros em inteiros" pular para chegar à linha seguinte.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e
+    a simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="mediadistante" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Média e valor mais distante</span>
+      </div>
+      <p class="row-desc">Vetor de valores: calcula a média e encontra o valor mais distante dela.</p>
+    </li>
+    <li class="example-row" data-target="sizepointer" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Vetor é ponteiro: sizeof</span>
+      </div>
+      <p class="row-desc">Compara sizeof de um vetor com sizeof de um ponteiro que aponta para dentro dele.</p>
+    </li>
+    <li class="example-row" data-target="ponteiroarray" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Percorrendo um vetor com ponteiro</span>
+      </div>
+      <p class="row-desc">Duas formas de percorrer um vetor usando um ponteiro: indexação e aritmética de ponteiros.</p>
+    </li>
+    <li class="example-row" data-target="passagemvetor" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Passagem de vetor para função</span>
+      </div>
+      <p class="row-desc">Uma função recebe um vetor (na prática, um ponteiro) e calcula sua média.</p>
+    </li>
+    <li class="example-row" data-target="maxrec" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Máximo por recursão</span>
+      </div>
+      <p class="row-desc">Encontra o maior valor de um vetor chamando a própria função recursivamente.</p>
+    </li>
+    <li class="example-row" data-target="matriz" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Matriz e laços aninhados</span>
+      </div>
+      <p class="row-desc">Percorre uma matriz 3×4 com um laço for dentro de outro.</p>
+    </li>
+    <li class="example-row" data-target="diagonal" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Passagem de matriz para função</span>
+      </div>
+      <p class="row-desc">Uma função recebe uma matriz e soma os elementos da diagonal principal.</p>
+    </li>
+  </ul>
+
+  <!-- ================= MÉDIA E VALOR MAIS DISTANTE ================= -->
+  <section class="detail" id="panel-mediadistante" data-panel>
+    <div class="detail-head">
+      <h2>Média e valor mais distante</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/01_mean_farthest" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+
+<span class="pp">#define</span> MAX_SIZE <span class="num">100</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> values[MAX_SIZE];
+    <span class="kw">int</span> n;
+    <span class="fn">printf</span>(<span class="str">"Enter the number of values: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;n);
+
+    <span class="kw">if</span> (n &lt;= <span class="num">0</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Number of values must be positive.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">if</span> (n &gt; MAX_SIZE)
+    {
+        <span class="fn">printf</span>(<span class="str">"Number of values must be fewer than %d.\n"</span>, MAX_SIZE);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">float</span> sum = <span class="num">0.0f</span>;
+
+    <span class="cmt">// Input values and calculate sum</span>
+    <span class="fn">printf</span>(<span class="str">"Enter %d values:\n"</span>, n);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+    {
+        <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;values[i]);
+        sum += values[i];
+    }
+
+    <span class="kw">float</span> mean = sum / n;
+
+    <span class="kw">int</span> farthest = values[<span class="num">0</span>];
+    <span class="kw">float</span> max_distance = <span class="fn">fabs</span>(values[<span class="num">0</span>] - mean);
+
+    <span class="cmt">// Find the value farthest from the mean</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; n; i++)
+    {
+        <span class="kw">float</span> distance = <span class="fn">fabs</span>(values[i] - mean);
+        <span class="kw">if</span> (distance &gt; max_distance)
+        {
+            max_distance = distance;
+            farthest = values[i];
+        }
+    }
+
+    <span class="fn">printf</span>(<span class="str">"Mean: %.2f\n"</span>, mean);
+    <span class="fn">printf</span>(<span class="str">"Value Farthest from Mean: %d\n"</span>, farthest);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o laço</h3>
+        <p>
+          O primeiro <code>for</code> lê <code>n</code> valores e acumula a soma deles — o padrão de
+          "variável acumuladora" já visto em módulos anteriores. O segundo <code>for</code> é o mais
+          interessante: começa supondo que <code>values[0]</code> é o mais distante da média
+          (<code>farthest</code>) e, a cada volta, compara a distância do elemento atual com a maior
+          distância vista até agora, atualizando <code>farthest</code> sempre que encontra algo mais
+          longe.
+        </p>
+
+        <h3>Execução passo a passo — valores: 10 2 8 4 20</h3>
+        <div class="stepper" data-stepper="mediadistante">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <caption>Segundo laço — busca do valor mais distante da média (8.80)</caption>
+            <thead>
+              <tr><th>i</th><th>values[i]</th><th>distance</th><th>distance &gt; max_distance?</th><th>farthest</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the number of values: <span class="in">5</span>
+Enter 5 values:
+<span class="in">10 2 8 4 20</span>
+Mean: 8.80
+Value Farthest from Mean: 20</pre>
+
+        <div class="callout">
+          Este exemplo usa <code>fabs</code>, declarada em <code>math.h</code> — ao compilar
+          manualmente, é preciso linkar a biblioteca matemática:
+          <code>gcc mean_farthest.c -o prog -lm</code>. Sem o <code>-lm</code>, a linkagem pode falhar
+          em alguns sistemas.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VETOR É PONTEIRO: SIZEOF ================= -->
+  <section class="detail" id="panel-sizepointer" data-panel hidden>
+    <div class="detail-head">
+      <h2>Vetor é ponteiro: sizeof</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/02_size_pointer" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>)
+{
+    <span class="kw">int</span> v[<span class="num">10</span>];
+    <span class="kw">int</span> w[<span class="num">10</span>];
+    <span class="kw">int</span> *u;
+
+    u = v;
+    *u = <span class="num">4</span>;
+    <span class="fn">printf</span>(<span class="str">"v[0]=%d\n"</span>, v[<span class="num">0</span>]);
+
+    u = &amp;v[<span class="num">3</span>];
+    *u = <span class="num">11</span>;
+    <span class="fn">printf</span>(<span class="str">"v[3]=%d\n"</span>, v[<span class="num">3</span>]);
+
+    <span class="cmt">// v: 4 bytes * 10 = 40 bytes</span>
+    <span class="cmt">// u: 8 bytes</span>
+    <span class="fn">printf</span>(<span class="str">"size(v)=%d bytes, size(u)=%d bytes\n"</span>, <span class="kw">sizeof</span>(v), <span class="kw">sizeof</span>(u));
+    <span class="cmt">// try to change the v address (uncomment this)</span>
+    <span class="cmt">// v = w;</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona</h3>
+        <p>
+          <code>u = v;</code> guarda em <code>u</code> o endereço do primeiro elemento de
+          <code>v</code> — daí em diante, <code>*u</code> lê ou escreve exatamente o mesmo inteiro que
+          <code>v[0]</code>. Repare que <code>u</code> pode ser reapontado livremente
+          (<code>u = &amp;v[3];</code>), mas <code>v</code> nunca muda de endereço — é essa a diferença
+          entre um vetor e um ponteiro comum, apesar de ambos "apontarem" para memória.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="sizepointer">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">v[0]=4
+v[3]=11
+size(v)=40 bytes, size(u)=8 bytes</pre>
+
+        <div class="callout">
+          <code>sizeof</code> devolve um <code>size_t</code> (inteiro sem sinal), não um
+          <code>int</code> — usar <code>%d</code> no <code>printf</code> (como faz este exemplo) gera
+          um aviso do compilador (<em>"format '%d' expects 'int', but argument has type 'long unsigned
+          int'"</em>); o correto seria <code>%zu</code>. Ainda assim, note o resultado: 40 bytes para o
+          vetor inteiro contra 8 bytes para o ponteiro — <code>u</code> só guarda um endereço, não
+          importa o quão grande seja aquilo para onde ele aponta. Também tente descomentar
+          <code>v = w;</code>: o compilador recusa, porque <code>v</code> não é uma variável para a qual
+          se possa atribuir um novo endereço.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PERCORRENDO UM VETOR COM PONTEIRO ================= -->
+  <section class="detail" id="panel-ponteiroarray" data-panel hidden>
+    <div class="detail-head">
+      <h2>Percorrendo um vetor com ponteiro</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/03_pointer_to_array" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="cmt">// Try this code with the line below uncommented.</span>
+<span class="pp">#define</span> PRINT_ADDRESS
+
+<span class="cmt">// Compiling this code: gcc -o your_program_name your_source_file.c -DPRINT_ADDRESS</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> numbers[] = {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>};
+    <span class="kw">int</span> *ptr = numbers; <span class="cmt">// Pointer pointing to the first element</span>
+
+    <span class="kw">int</span> size =
+        <span class="kw">sizeof</span>(numbers) / <span class="kw">sizeof</span>(numbers[<span class="num">0</span>]); <span class="cmt">// Calculate the size of the array</span>
+
+    <span class="fn">printf</span>(<span class="str">"Array elements using pointer (version 1):\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; ++i)
+    {
+        <span class="cmt">// printf("%d ", ptr[i]); // Print the value pointed to by the pointer</span>
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, *(ptr + i)); <span class="cmt">// Print the value pointed to by the pointer</span>
+<span class="pp">#ifdef</span> PRINT_ADDRESS
+        <span class="fn">printf</span>(<span class="str">"(address stored in ptr: %p)\n"</span>, (<span class="kw">void</span> *)ptr);
+<span class="pp">#endif</span>
+    }
+
+    <span class="fn">printf</span>(<span class="str">"\n"</span>);
+    <span class="fn">printf</span>(<span class="str">"Array elements using pointer (version 2):\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; ++i)
+    {
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, *ptr); <span class="cmt">// Print the value pointed to by the pointer</span>
+        ptr++;               <span class="cmt">// Move the pointer to the next element</span>
+<span class="pp">#ifdef</span> PRINT_ADDRESS
+        <span class="fn">printf</span>(<span class="str">"(address stored in ptr: %p)\n"</span>, (<span class="kw">void</span> *)ptr);
+<span class="pp">#endif</span>
+    }
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona</h3>
+        <p>
+          As duas versões imprimem os mesmos 5 valores, mas de formas diferentes. Na
+          <strong>versão 1</strong>, <code>ptr</code> nunca muda — ele continua apontando para
+          <code>numbers[0]</code> do início ao fim, e é o deslocamento <code>+ i</code> que muda a cada
+          volta. Na <strong>versão 2</strong>, não há índice algum: é o próprio <code>ptr</code> que
+          avança uma posição a cada repetição (<code>ptr++</code>), sempre lendo o valor atual com
+          <code>*ptr</code>. A diretiva <code>#define PRINT_ADDRESS</code> já está ativa no topo do
+          arquivo, então os endereços aparecem sempre nesta versão — o comentário se refere a uma forma
+          alternativa (e também válida) de ativar a mesma coisa por fora, com a flag de compilação
+          <code>-DPRINT_ADDRESS</code>, sem tocar no código-fonte.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="ponteiroarray">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <thead>
+              <tr><th>versão</th><th>i</th><th>expressão</th><th>valor</th><th>ptr</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Array elements using pointer (version 1):
+10 (address stored in ptr: 0x7ffdaae94030)
+20 (address stored in ptr: 0x7ffdaae94030)
+30 (address stored in ptr: 0x7ffdaae94030)
+40 (address stored in ptr: 0x7ffdaae94030)
+50 (address stored in ptr: 0x7ffdaae94030)
+
+Array elements using pointer (version 2):
+10 (address stored in ptr: 0x7ffdaae94034)
+20 (address stored in ptr: 0x7ffdaae94038)
+30 (address stored in ptr: 0x7ffdaae9403c)
+40 (address stored in ptr: 0x7ffdaae94040)
+50 (address stored in ptr: 0x7ffdaae94044)</pre>
+
+        <div class="callout">
+          Os endereços acima são reais, de uma execução deste programa — mas mudarão a cada nova
+          execução, porque o sistema operacional randomiza onde a pilha é colocada na memória (ASLR).
+          O que não muda é o <em>padrão</em>: na versão 1, o endereço em <code>ptr</code> fica
+          constante; na versão 2, ele cresce 4 bytes (<code>sizeof(int)</code>) a cada
+          <code>ptr++</code>. Na simulação acima, por clareza, os endereços aparecem como
+          <code>&amp;numbers[i]</code> em vez do valor hexadecimal.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PASSAGEM DE VETOR PARA FUNÇÃO ================= -->
+  <section class="detail" id="panel-passagemvetor" data-panel hidden>
+    <div class="detail-head">
+      <h2>Passagem de vetor para função</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/04_mean" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="cmt">// float calculate_mean(float *ptr, int size)</span>
+<span class="cmt">// {</span>
+<span class="kw">float</span> <span class="fn">calculate_mean</span>(<span class="kw">float</span> ptr[], <span class="kw">int</span> size)
+{
+    <span class="kw">float</span> sum = <span class="num">0.0f</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; ++i)
+    {
+        sum += ptr[i];
+        <span class="cmt">// sum += *(ptr + i);</span>
+    }
+    <span class="kw">return</span> sum / size;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">float</span> values[] = {<span class="num">10.5</span>, <span class="num">20.0</span>, <span class="num">15.5</span>, <span class="num">7.2</span>, <span class="num">9.8</span>};
+    <span class="kw">int</span> size = <span class="kw">sizeof</span>(values) / <span class="kw">sizeof</span>(values[<span class="num">0</span>]);
+
+    <span class="cmt">// float *ptr = values; // Pointer pointing to the first element</span>
+
+    <span class="kw">float</span> mean = <span class="fn">calculate_mean</span>(values, size);
+
+    <span class="fn">printf</span>(<span class="str">"mean of the values: %f\n"</span>, mean);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona</h3>
+        <p>
+          <code>calculate_mean(float ptr[], int size)</code> recebe o vetor <code>values</code> como um
+          ponteiro <code>ptr</code> — nenhuma cópia de <code>values</code> é feita, só o endereço do seu
+          primeiro elemento. Dentro da função, <code>ptr[i]</code> acessa cada elemento normalmente
+          (a linha comentada mostra que <code>*(ptr + i)</code> faria exatamente a mesma coisa). Como o
+          tamanho não vem "junto" com o ponteiro, ele precisa ser passado à parte, no parâmetro
+          <code>size</code>.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="passagemvetor">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <thead>
+              <tr><th>i</th><th>ptr[i]</th><th>sum</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">mean of the values: 12.600000</pre>
+
+        <div class="callout">
+          A assinatura <code>float calculate_mean(float ptr[], int size)</code> poderia ter sido escrita
+          como <code>float calculate_mean(float ptr[5], int size)</code> ou
+          <code>float calculate_mean(float *ptr, int size)</code> — para o compilador, as três são
+          idênticas: em todas, <code>ptr</code> é só um ponteiro.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MÁXIMO POR RECURSÃO ================= -->
+  <section class="detail" id="panel-maxrec" data-panel hidden>
+    <div class="detail-head">
+      <h2>Máximo por recursão</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/05_max_arr_rec" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">max</span>(<span class="kw">int</span> arr[], <span class="kw">int</span> size)
+<span class="cmt">// int max(int *arr, int size)</span>
+{
+    <span class="kw">if</span> (size == <span class="num">1</span>)
+    {
+        <span class="kw">return</span> arr[<span class="num">0</span>]; <span class="cmt">// Base case: array with only one element</span>
+        <span class="cmt">// return *arr; // Base case: array with only one element</span>
+    }
+    <span class="kw">else</span>
+    {
+        <span class="kw">int</span> max_of_rest = <span class="fn">max</span>(&amp;arr[<span class="num">1</span>], size - <span class="num">1</span>); <span class="cmt">// Recursive call</span>
+        <span class="cmt">// int max_of_rest = max(arr + 1, size - 1); // Recursive call</span>
+        <span class="kw">return</span> (arr[<span class="num">0</span>] &gt; max_of_rest) ? arr[<span class="num">0</span>] : max_of_rest;
+        <span class="cmt">// return (*arr > max_of_rest) ? *arr : max_of_rest;</span>
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> numbers[] = {<span class="num">10</span>, <span class="num">24</span>, <span class="num">7</span>, <span class="num">42</span>, <span class="num">15</span>, <span class="num">30</span>, <span class="num">18</span>};
+    <span class="kw">int</span> size = <span class="kw">sizeof</span>(numbers) / <span class="kw">sizeof</span>(numbers[<span class="num">0</span>]);
+
+    <span class="kw">int</span> max_value = <span class="fn">max</span>(numbers, size);
+
+    <span class="fn">printf</span>(<span class="str">"Maximum value in the array: %d\n"</span>, max_value);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona a recursão</h3>
+        <p>
+          Cada chamada de <code>max</code> resolve um vetor um pouco menor que o anterior:
+          <code>&amp;arr[1]</code> é o endereço do segundo elemento, então <code>max(&amp;arr[1], size -
+          1)</code> "enxerga" só a partir dali em diante, como se fosse um vetor novo. Isso se repete até
+          sobrar um único elemento (<code>size == 1</code>) — o caso base, que não faz mais nenhuma
+          chamada. A partir daí, cada chamada pendente recebe a resposta da próxima e decide: o maior é
+          o meu primeiro elemento (<code>arr[0]</code>) ou o que veio do restante
+          (<code>max_of_rest</code>)?
+        </p>
+
+        <h3>Execução passo a passo — numbers = {10, 24, 7, 42, 15, 30, 18}</h3>
+        <div class="stepper" data-stepper="maxrec">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <caption>Retornos, do caso base de volta até a chamada original</caption>
+            <thead>
+              <tr><th>nível</th><th>arr[0]</th><th>size</th><th>resultado</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Maximum value in the array: 42</pre>
+
+        <div class="callout">
+          São 7 chamadas "descendo" (uma para cada elemento, até sobrar 1) e 7 retornos "subindo" — o
+          padrão geral está na figura <em>vetor(n, v)</em> das notas de aula: caso base
+          <code>v[0]</code> quando <code>n = 1</code>, ou <code>v[0]</code> combinado com
+          <code>vetor(n - 1, &amp;v[1])</code> quando <code>n &gt; 1</code>. Aqui, a combinação é "o
+          maior entre os dois".
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MATRIZ E LAÇOS ANINHADOS ================= -->
+  <section class="detail" id="panel-matriz" data-panel hidden>
+    <div class="detail-head">
+      <h2>Matriz e laços aninhados</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/06_print_matrix" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>)
+{
+
+    <span class="kw">float</span> mat[<span class="num">3</span>][<span class="num">4</span>] = {<span class="cmt">// The number of rows can be ommited</span>
+                       {<span class="num">1.0f</span>, <span class="num">5.0f</span>, <span class="num">2.0f</span>, <span class="num">0.0f</span>},
+                       {<span class="num">8.0f</span>, <span class="num">2.0f</span>, <span class="num">3.0f</span>, <span class="num">1.0f</span>},
+                       {<span class="num">1.0f</span>, <span class="num">6.0f</span>, <span class="num">7.0f</span>, <span class="num">2.0f</span>}};
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; <span class="num">4</span>; j++)
+        {
+            <span class="fn">printf</span>(<span class="str">"mat(%d, %d) = %.1f\n"</span>, i, j, mat[i][j]);
+        }
+    }
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o laço aninhado</h3>
+        <p>
+          Para cada valor de <code>i</code> (o laço externo, uma linha por vez), o laço interno percorre
+          <em>todos</em> os valores de <code>j</code> (0 a 3) antes de <code>i</code> avançar — é assim
+          que os 12 elementos da matriz (3 linhas × 4 colunas) são visitados um a um, na ordem em que
+          estão guardados na memória: linha 0 inteira, depois linha 1, depois linha 2.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="matriz">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <thead>
+              <tr><th>i</th><th>j</th><th>mat[i][j]</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">mat(0, 0) = 1.0
+mat(0, 1) = 5.0
+mat(0, 2) = 2.0
+mat(0, 3) = 0.0
+mat(1, 0) = 8.0
+mat(1, 1) = 2.0
+mat(1, 2) = 3.0
+mat(1, 3) = 1.0
+mat(2, 0) = 1.0
+mat(2, 1) = 6.0
+mat(2, 2) = 7.0
+mat(2, 3) = 2.0</pre>
+
+        <div class="callout">
+          Compare esta sequência de valores com a figura da matriz nas notas de aula: são exatamente os
+          mesmos 12 números, na mesma ordem em que aparecem na memória (<em>row-major</em>) — a prova de
+          que uma matriz 2D é, por baixo dos panos, um vetor 1D com uma notação mais conveniente.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PASSAGEM DE MATRIZ PARA FUNÇÃO ================= -->
+  <section class="detail" id="panel-diagonal" data-panel hidden>
+    <div class="detail-head">
+      <h2>Passagem de matriz para função</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/04_arrays/07_primary_diagonal_sum" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">primary_diagonal_sum</span>(<span class="kw">int</span> matrix[][<span class="num">4</span>], <span class="kw">int</span> size)
+{
+    <span class="kw">int</span> sum = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+    {
+        sum += matrix[i][i]; <span class="cmt">// Add the diagonal element at (i, i)</span>
+    }
+    <span class="kw">return</span> sum;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> matrix[][<span class="num">4</span>] = {
+        {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>},
+        {<span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>},
+        {<span class="num">9</span>, <span class="num">10</span>, <span class="num">11</span>, <span class="num">12</span>},
+        {<span class="num">13</span>, <span class="num">14</span>, <span class="num">15</span>, <span class="num">16</span>}};
+
+    <span class="kw">int</span> size = <span class="kw">sizeof</span>(matrix) / <span class="kw">sizeof</span>(matrix[<span class="num">0</span>]);
+
+    <span class="kw">int</span> sum = <span class="fn">primary_diagonal_sum</span>(matrix, size);
+
+    <span class="fn">printf</span>(<span class="str">"Sum of the primary diagonal: %d\n"</span>, sum);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona</h3>
+        <p>
+          A diagonal principal é formada pelas posições em que o índice de linha é igual ao de coluna —
+          <code>matrix[0][0]</code>, <code>matrix[1][1]</code>, <code>matrix[2][2]</code>,
+          <code>matrix[3][3]</code> — por isso um único laço (com <code>i</code> indo de 0 a
+          <code>size - 1</code>) já basta, sem precisar de um segundo laço aninhado. Repare na
+          assinatura da função: <code>int matrix[][4]</code> — o número de colunas (<code>4</code>)
+          precisa aparecer explicitamente, porque é ele que a função usa para calcular onde termina uma
+          linha e começa a próxima dentro do bloco contíguo de memória.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="diagonal">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <thead>
+              <tr><th>i</th><th>matrix[i][i]</th><th>sum</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Sum of the primary diagonal: 34</pre>
+
+        <div class="callout">
+          Ao contrário de um vetor passado para função (onde só a primeira, e única, dimensão pode ficar
+          em branco), numa matriz 2D <strong>apenas a primeira dimensão</strong> pode ser omitida —
+          <code>int matrix[][4]</code> é válido, mas <code>int matrix[][]</code> não compila.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="closing">
+    <strong>Para lembrar.</strong> O nome de um vetor é um ponteiro constante para o seu primeiro
+    elemento — é por isso que ele pode ser percorrido tanto por índice (<em>v[i]</em>) quanto por
+    aritmética de ponteiro (<em>*(v + i)</em>), e por isso que passá-lo para uma função nunca copia seu
+    conteúdo. Uma matriz é a mesma ideia em duas dimensões: por trás da notação <em>mat[i][j]</em>, a
+    memória continua sendo um único bloco contíguo, preenchido linha por linha.
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    mediadistante: {
+      vars: ["n", "i", "sum", "mean", "farthest", "max_distance"],
+      steps: [
+        { line: 11, vars: { n: "5" }, desc: "Lemos n = 5 (a quantidade de valores a digitar)." },
+        { line: 13, vars: {}, desc: "if (n <= 0) → 5 <= 0 é falso." },
+        { line: 19, vars: {}, desc: "if (n > MAX_SIZE) → 5 > 100 é falso." },
+        { line: 25, vars: { sum: "0.0" }, desc: "sum começa em 0." },
+        { line: 29, vars: { i: "0" }, desc: "Primeiro laço (leitura): para i de 0 a 4, lemos values[i] e acumulamos em sum. Ao final: values = {10, 2, 8, 4, 20} e sum = 10+2+8+4+20 = 44." },
+        { line: 35, vars: { sum: "44.0", mean: "8.80" }, desc: "mean = sum / n = 44 / 5 = 8.80." },
+        { line: 37, vars: { farthest: "10" }, desc: "farthest começa como values[0] = 10 — o primeiro candidato a “mais distante”." },
+        { line: 38, vars: { max_distance: "1.20" }, desc: "max_distance começa como |values[0] - mean| = |10 - 8.8| = 1.20." },
+        { line: 41, vars: { i: "1" }, desc: "Segundo laço (busca): i = 1, values[1] = 2, distance = |2 - 8.8| = 6.80. Como 6.80 > 1.20, atualizamos.", row: ["1", "2", "6.80", "6.80 > 1.20 ✓", "2"] },
+        { line: 47, vars: { farthest: "2", max_distance: "6.80" }, desc: "max_distance vira 6.80 e farthest vira 2." },
+        { line: 41, vars: { i: "2" }, desc: "i = 2, values[2] = 8, distance = |8 - 8.8| = 0.80. Não supera 6.80 — nada muda.", row: ["2", "8", "0.80", "0.80 > 6.80 ✗", "2"] },
+        { line: 41, vars: { i: "3" }, desc: "i = 3, values[3] = 4, distance = |4 - 8.8| = 4.80. Não supera 6.80 — nada muda.", row: ["3", "4", "4.80", "4.80 > 6.80 ✗", "2"] },
+        { line: 41, vars: { i: "4" }, desc: "i = 4, values[4] = 20, distance = |20 - 8.8| = 11.20. Como 11.20 > 6.80, atualizamos de novo.", row: ["4", "20", "11.20", "11.20 > 6.80 ✓", "20"] },
+        { line: 47, vars: { farthest: "20", max_distance: "11.20" }, desc: "max_distance vira 11.20 e farthest vira 20 — o valor mais distante da média." },
+        { line: 41, vars: { i: "5" }, desc: "i = 5: 5 < 5 é falso → o laço termina.", row: ["5", "—", "—", "laço termina", "20"], fail: true },
+        { line: 51, vars: {}, desc: "printf exibe: “Mean: 8.80”." },
+        { line: 52, vars: {}, desc: "printf exibe: “Value Farthest from Mean: 20”." },
+        { line: 54, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    sizepointer: {
+      vars: ["v[0]", "v[3]", "u", "sizeof(v)", "sizeof(u)"],
+      steps: [
+        { line: 10, vars: { u: "&v[0]" }, desc: "u = v; — v, o nome do vetor, vale o endereço do seu primeiro elemento; u passa a apontar para v[0]." },
+        { line: 11, vars: { "v[0]": "4" }, desc: "*u = 4; — escreve 4 no endereço apontado por u, ou seja, em v[0]." },
+        { line: 12, vars: {}, desc: "printf exibe: “v[0]=4”." },
+        { line: 14, vars: { u: "&v[3]" }, desc: "u = &v[3]; — agora u aponta para o quarto elemento do vetor (índice 3)." },
+        { line: 15, vars: { "v[3]": "11" }, desc: "*u = 11; — escreve 11 em v[3], através de u." },
+        { line: 16, vars: {}, desc: "printf exibe: “v[3]=11”." },
+        { line: 20, vars: { "sizeof(v)": "40", "sizeof(u)": "8" }, desc: "sizeof(v) = 10 × sizeof(int) = 40 bytes (o vetor inteiro); sizeof(u) = 8 bytes (o tamanho de um ponteiro nesta plataforma) — completamente diferentes, mesmo u apontando para dentro de v." },
+        { line: 23, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    ponteiroarray: {
+      vars: ["ptr", "i", "size"],
+      steps: [
+        { line: 10, vars: {}, desc: "numbers = {10, 20, 30, 40, 50} — um vetor de 5 inteiros." },
+        { line: 11, vars: { ptr: "&numbers[0]" }, desc: "ptr aponta para o primeiro elemento de numbers." },
+        { line: 14, vars: { size: "5" }, desc: "size = sizeof(numbers) / sizeof(numbers[0]) = 20 / 4 = 5." },
+        { line: 16, vars: {}, desc: "Exibimos o cabeçalho da versão 1." },
+        { line: 20, vars: { i: "0" }, desc: "Versão 1, i = 0: *(ptr + 0) equivale a ptr[0] — imprime 10. ptr continua em numbers[0] durante toda esta versão.", row: ["V1", "0", "*(ptr+0)", "10", "&numbers[0]"] },
+        { line: 20, vars: { i: "1" }, desc: "i = 1: *(ptr + 1) imprime 20.", row: ["V1", "1", "*(ptr+1)", "20", "&numbers[0]"] },
+        { line: 20, vars: { i: "2" }, desc: "i = 2: *(ptr + 2) imprime 30.", row: ["V1", "2", "*(ptr+2)", "30", "&numbers[0]"] },
+        { line: 20, vars: { i: "3" }, desc: "i = 3: *(ptr + 3) imprime 40.", row: ["V1", "3", "*(ptr+3)", "40", "&numbers[0]"] },
+        { line: 20, vars: { i: "4" }, desc: "i = 4: *(ptr + 4) imprime 50. A versão 1 usa a aritmética só para calcular o endereço — ptr em si nunca muda.", row: ["V1", "4", "*(ptr+4)", "50", "&numbers[0]"] },
+        { line: 27, vars: {}, desc: "Exibimos o cabeçalho da versão 2." },
+        { line: 30, vars: { i: "0", ptr: "&numbers[0]" }, desc: "Versão 2, i = 0: *ptr imprime o valor atual apontado — 10.", row: ["V2", "0", "*ptr", "10", "&numbers[0]"] },
+        { line: 31, vars: { ptr: "&numbers[1]" }, desc: "ptr++; — agora o próprio ptr avança para numbers[1]." },
+        { line: 30, vars: { i: "1" }, desc: "i = 1: *ptr imprime 20.", row: ["V2", "1", "*ptr", "20", "&numbers[1]"] },
+        { line: 31, vars: { ptr: "&numbers[2]" }, desc: "ptr++; avança para numbers[2]." },
+        { line: 30, vars: { i: "2" }, desc: "i = 2: *ptr imprime 30.", row: ["V2", "2", "*ptr", "30", "&numbers[2]"] },
+        { line: 31, vars: { ptr: "&numbers[3]" }, desc: "ptr++; avança para numbers[3]." },
+        { line: 30, vars: { i: "3" }, desc: "i = 3: *ptr imprime 40.", row: ["V2", "3", "*ptr", "40", "&numbers[3]"] },
+        { line: 31, vars: { ptr: "&numbers[4]" }, desc: "ptr++; avança para numbers[4]." },
+        { line: 30, vars: { i: "4" }, desc: "i = 4: *ptr imprime 50 — último elemento.", row: ["V2", "4", "*ptr", "50", "&numbers[4]"] },
+        { line: 31, vars: { ptr: "&numbers[5] (fora do vetor)" }, desc: "ptr++; avança uma posição além do último elemento válido — comum ao fim de uma varredura, mas *ptr aqui já seria um acesso inválido." },
+        { line: 37, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    passagemvetor: {
+      vars: ["size", "i", "sum", "mean"],
+      steps: [
+        { line: 18, vars: {}, desc: "values = {10.5, 20.0, 15.5, 7.2, 9.8} — um vetor de 5 floats." },
+        { line: 19, vars: { size: "5" }, desc: "size = sizeof(values) / sizeof(values[0]) = 20 / 4 = 5." },
+        { line: 23, vars: {}, desc: "Chamamos calculate_mean(values, size) — passamos o vetor e o tamanho. Dentro da função, ptr recebe o mesmo endereço de values, sem cópia elemento a elemento." },
+        { line: 7, vars: { sum: "0.0" }, desc: "Dentro da função: sum começa em 0." },
+        { line: 8, vars: { i: "0" }, desc: "i = 0: sum += ptr[0] = 0 + 10.5 = 10.5.", row: ["0", "10.5", "10.5"] },
+        { line: 8, vars: { i: "1" }, desc: "i = 1: sum += ptr[1] = 10.5 + 20.0 = 30.5.", row: ["1", "20.0", "30.5"] },
+        { line: 8, vars: { i: "2" }, desc: "i = 2: sum += ptr[2] = 30.5 + 15.5 = 46.0.", row: ["2", "15.5", "46.0"] },
+        { line: 8, vars: { i: "3" }, desc: "i = 3: sum += ptr[3] = 46.0 + 7.2 = 53.2.", row: ["3", "7.2", "53.2"] },
+        { line: 8, vars: { i: "4" }, desc: "i = 4: sum += ptr[4] = 53.2 + 9.8 = 63.0.", row: ["4", "9.8", "63.0"] },
+        { line: 8, vars: { i: "5" }, desc: "i = 5: 5 < 5 é falso → o laço termina.", row: ["5", "—", "63.0"], fail: true },
+        { line: 13, vars: {}, desc: "return sum / size = 63.0 / 5 = 12.6 — devolvido para quem chamou." },
+        { line: 23, vars: { mean: "12.6" }, desc: "De volta em main(): mean recebe 12.6." },
+        { line: 25, vars: {}, desc: "printf exibe: “mean of the values: 12.600000”." },
+        { line: 27, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    maxrec: {
+      vars: ["profundidade", "arr[0]", "size", "max_of_rest", "max_value"],
+      steps: [
+        { line: 25, vars: {}, desc: "Chamamos max(numbers, 7) em main() — a recursão começa." },
+        { line: 6, vars: { profundidade: "0", "arr[0]": "10", size: "7" }, desc: "Nível 0: arr aponta para numbers inteiro, size = 7. Como size ≠ 1, caímos no else." },
+        { line: 13, vars: { profundidade: "1", "arr[0]": "24", size: "6" }, desc: "Chamamos max(&arr[1], 6) — um novo vetor lógico começando em numbers[1], um elemento menor." },
+        { line: 13, vars: { profundidade: "2", "arr[0]": "7", size: "5" }, desc: "Nível 2: arr[0] = 7, size = 5. Chamamos max(&arr[1], 4)." },
+        { line: 13, vars: { profundidade: "3", "arr[0]": "42", size: "4" }, desc: "Nível 3: arr[0] = 42, size = 4. Chamamos max(&arr[1], 3)." },
+        { line: 13, vars: { profundidade: "4", "arr[0]": "15", size: "3" }, desc: "Nível 4: arr[0] = 15, size = 3. Chamamos max(&arr[1], 2)." },
+        { line: 13, vars: { profundidade: "5", "arr[0]": "30", size: "2" }, desc: "Nível 5: arr[0] = 30, size = 2. Chamamos max(&arr[1], 1)." },
+        { line: 6, vars: { profundidade: "6", "arr[0]": "18", size: "1" }, desc: "Nível 6: size = 1 — caso base! Não há mais chamada recursiva." },
+        { line: 8, vars: {}, desc: "return arr[0]; devolve 18 para quem chamou (nível 5).", row: ["6 (base)", "18", "1", "retorna 18"] },
+        { line: 15, vars: { profundidade: "5", max_of_rest: "18" }, desc: "De volta ao nível 5: max_of_rest = 18. arr[0] = 30 > 18 → verdadeiro → retorna 30.", row: ["5", "30", "2", "30 > 18 → retorna 30"] },
+        { line: 15, vars: { profundidade: "4", max_of_rest: "30" }, desc: "Nível 4: arr[0] = 15 > 30? Falso → retorna o próprio max_of_rest, 30.", row: ["4", "15", "3", "15 > 30? não → retorna 30"] },
+        { line: 15, vars: { profundidade: "3", max_of_rest: "30" }, desc: "Nível 3: arr[0] = 42 > 30? Verdadeiro → retorna 42.", row: ["3", "42", "4", "42 > 30 → retorna 42"] },
+        { line: 15, vars: { profundidade: "2", max_of_rest: "42" }, desc: "Nível 2: arr[0] = 7 > 42? Falso → retorna 42.", row: ["2", "7", "5", "7 > 42? não → retorna 42"] },
+        { line: 15, vars: { profundidade: "1", max_of_rest: "42" }, desc: "Nível 1: arr[0] = 24 > 42? Falso → retorna 42.", row: ["1", "24", "6", "24 > 42? não → retorna 42"] },
+        { line: 15, vars: { profundidade: "0", max_of_rest: "42" }, desc: "Nível 0: arr[0] = 10 > 42? Falso → retorna 42, o máximo do vetor inteiro.", row: ["0", "10", "7", "10 > 42? não → retorna 42"] },
+        { line: 25, vars: { profundidade: "—", max_value: "42" }, desc: "De volta em main(): max_value recebe 42." },
+        { line: 27, vars: {}, desc: "printf exibe: “Maximum value in the array: 42”." },
+        { line: 29, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    matriz: {
+      vars: ["i", "j", "mat[i][j]"],
+      steps: [
+        { line: 6, vars: {}, desc: "mat é uma matriz 3×4 (3 linhas, 4 colunas) de floats, inicializada linha por linha." },
+        { line: 11, vars: { i: "0" }, desc: "Laço externo, i = 0 (primeira linha). Para cada i, o laço interno percorre todas as colunas j." },
+        { line: 13, vars: { j: "0" }, desc: "Laço interno, j = 0: imprime mat(0,0) = 1.0.", row: ["0", "0", "1.0"] },
+        { line: 13, vars: { j: "1" }, desc: "j = 1: mat(0,1) = 5.0.", row: ["0", "1", "5.0"] },
+        { line: 13, vars: { j: "2" }, desc: "j = 2: mat(0,2) = 2.0.", row: ["0", "2", "2.0"] },
+        { line: 13, vars: { j: "3" }, desc: "j = 3: mat(0,3) = 0.0.", row: ["0", "3", "0.0"] },
+        { line: 11, vars: { i: "1" }, desc: "j = 4: 4 < 4 é falso — o laço interno termina; i avança para 1 e j recomeça do zero." },
+        { line: 13, vars: { j: "0" }, desc: "i = 1, j = 0: mat(1,0) = 8.0.", row: ["1", "0", "8.0"] },
+        { line: 13, vars: { j: "1" }, desc: "j = 1: mat(1,1) = 2.0.", row: ["1", "1", "2.0"] },
+        { line: 13, vars: { j: "2" }, desc: "j = 2: mat(1,2) = 3.0.", row: ["1", "2", "3.0"] },
+        { line: 13, vars: { j: "3" }, desc: "j = 3: mat(1,3) = 1.0.", row: ["1", "3", "1.0"] },
+        { line: 11, vars: { i: "2" }, desc: "i avança para 2 e j recomeça do zero." },
+        { line: 13, vars: { j: "0" }, desc: "i = 2, j = 0: mat(2,0) = 1.0.", row: ["2", "0", "1.0"] },
+        { line: 13, vars: { j: "1" }, desc: "j = 1: mat(2,1) = 6.0.", row: ["2", "1", "6.0"] },
+        { line: 13, vars: { j: "2" }, desc: "j = 2: mat(2,2) = 7.0.", row: ["2", "2", "7.0"] },
+        { line: 13, vars: { j: "3" }, desc: "j = 3: mat(2,3) = 2.0.", row: ["2", "3", "2.0"] },
+        { line: 11, vars: { i: "3" }, desc: "i = 3: 3 < 3 é falso → o laço externo também termina.", fail: true },
+        { line: 19, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    diagonal: {
+      vars: ["size", "i", "sum"],
+      steps: [
+        { line: 15, vars: {}, desc: "matrix é uma matriz 4×4 de inteiros." },
+        { line: 21, vars: { size: "4" }, desc: "size = sizeof(matrix) / sizeof(matrix[0]) = 64 / 16 = 4 — o número de linhas." },
+        { line: 23, vars: {}, desc: "Chamamos primary_diagonal_sum(matrix, 4). Na assinatura, int matrix[][4]: só a primeira dimensão pode ficar em branco — a segunda (4 colunas) é obrigatória." },
+        { line: 5, vars: { sum: "0" }, desc: "Dentro da função: sum começa em 0." },
+        { line: 6, vars: { i: "0" }, desc: "i = 0: sum += matrix[0][0] = 0 + 1 = 1.", row: ["0", "1", "1"] },
+        { line: 6, vars: { i: "1" }, desc: "i = 1: sum += matrix[1][1] = 1 + 6 = 7.", row: ["1", "6", "7"] },
+        { line: 6, vars: { i: "2" }, desc: "i = 2: sum += matrix[2][2] = 7 + 11 = 18.", row: ["2", "11", "18"] },
+        { line: 6, vars: { i: "3" }, desc: "i = 3: sum += matrix[3][3] = 18 + 16 = 34.", row: ["3", "16", "34"] },
+        { line: 6, vars: { i: "4" }, desc: "i = 4: 4 < 4 é falso → o laço termina.", row: ["4", "—", "34"], fail: true },
+        { line: 10, vars: {}, desc: "return sum; devolve 34 para main()." },
+        { line: 23, vars: {}, desc: "De volta em main(): sum (a variável local de main) recebe 34." },
+        { line: 25, vars: {}, desc: "printf exibe: “Sum of the primary diagonal: 34”." },
+        { line: 27, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elLog = root.querySelector("[data-log]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      if (elLog) {
+        var rowsHtml = [];
+        for (var m = 0; m <= current; m++) {
+          if (steps[m].row) rowsHtml.push(steps[m]);
+        }
+        elLog.innerHTML = rowsHtml
+          .map(function (s) {
+            return (
+              "<tr" + (s.win ? ' class="win"' : "") + ">" +
+              s.row
+                .map(function (cell, idx) {
+                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
+                })
+                .join("") +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+</body>
+</html>

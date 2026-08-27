@@ -151,6 +151,66 @@
 
   .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
 
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 26rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
   .section-label {
     font-size: 0.78rem;
     letter-spacing: 0.08em;
@@ -486,14 +546,147 @@
     <div class="eyebrow">Funções e ponteiros</div>
     <h1>Dividindo o programa em funções</h1>
     <p class="lede">
-      Funções deixam um programa organizado em pedaços pequenos e reutilizáveis: cada uma recebe
-      <strong>parâmetros</strong> e pode devolver um <strong>valor de retorno</strong>. Já os
-      <strong>ponteiros</strong> guardam <em>endereços</em> de memória em vez de valores comuns —
-      com eles, uma função consegue alterar variáveis de quem a chamou, algo que só o retorno não
-      resolveria. Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da
-      mecânica central e a simulação da execução passo a passo — sem precisar compilar nada.
+      Estas são as notas da aula sobre funções e ponteiros: como dividir um programa em blocos
+      reutilizáveis, o que acontece na memória a cada chamada, e como uma função pode alterar as
+      variáveis de quem a chamou. Os exemplos interativos logo abaixo colocam parte dessa teoria em
+      prática, passo a passo.
     </p>
   </div>
+
+  <div class="notes">
+
+    <h2>Funções e ponteiros</h2>
+    <p>
+      Duas ferramentas centrais para organizar um programa maior: dividir o código em funções
+      reutilizáveis, e usar ponteiros para que uma função consiga alterar dados de quem a chamou.
+    </p>
+
+    <h3>Criação de novas funções</h3>
+    <p>
+      Uma função é um bloco de código nomeado que pode ser chamado (invocado) de várias partes do
+      programa, evitando repetir a mesma lógica. Toda função tem uma assinatura — tipo de retorno,
+      nome e lista de parâmetros entre parênteses — seguida do corpo entre chaves. O exemplo
+      <em>Cilindro</em> define <code>cylinder_volume(double radius, double height)</code>, chamada a
+      partir de <code>main()</code> sempre que o volume precisa ser calculado.
+    </p>
+
+    <h3>Parâmetros e valor de retorno</h3>
+    <p>
+      Parâmetros são as variáveis que a função declara para receber os dados de que precisa
+      (<code>radius</code> e <code>height</code>, no exemplo <em>Cilindro</em>); os valores passados
+      na chamada — os <em>argumentos</em> — são copiados para esses parâmetros. O comando
+      <code>return</code> devolve um valor ao ponto onde a função foi chamada e encerra a execução da
+      função imediatamente; o tipo declarado antes do nome da função (<code>double</code>, no caso)
+      precisa bater com o tipo do valor retornado. Uma função também pode ser declarada
+      <code>void</code> quando não retorna valor algum — é o caso de
+      <code>calculate_sum_and_difference</code> no exemplo <em>Soma e diferença</em>, que devolve os
+      resultados por outro caminho: parâmetros que são ponteiros, como veremos adiante.
+    </p>
+
+    <h3>Escopo de variáveis</h3>
+    <p>
+      Cada variável só existe — só é visível — dentro de uma região do código, chamada seu
+      <em>escopo</em>. Uma variável declarada dentro de uma função (variável <em>local</em>) só existe
+      enquanto essa função está em execução, e é invisível para outras funções, mesmo que tenham o
+      mesmo nome. Isso permite que <code>main()</code> e <code>cylinder_volume()</code>, por exemplo,
+      usem nomes de variáveis parecidos sem qualquer conflito entre si.
+    </p>
+
+    <h4>Modelo de pilha</h4>
+    <p>
+      Cada chamada de função empilha uma nova <em>moldura</em> (frame) de memória, que guarda seus
+      parâmetros e variáveis locais; quando a função retorna, a moldura é desempilhada e toda a
+      memória que ela ocupava é liberada — é por isso que variáveis locais "somem" quando a função
+      termina. O exemplo <em>Cilindro</em> deixa esse ciclo bem visível: <code>radius</code> e
+      <code>height</code> vivem na moldura de <code>main()</code>; <code>radius</code> e
+      <code>height</code> são copiados para a nova moldura de <code>cylinder_volume()</code>, e assim
+      que a função retorna essa moldura desaparece, restando só o valor devolvido, agora guardado em
+      <code>volume</code>, na moldura de <code>main()</code>.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig4-1.jpg" alt="Seis painéis mostrando a pilha de execução durante a chamada volume = volume_cilindro(raio, altura): declaração das variáveis em main, leitura por scanf, empilhamento da moldura da função com os parâmetros, cálculo do resultado local, e desempilhamento com o valor retornado gravado em main.">
+      <figcaption>A pilha de execução ao chamar uma função: uma moldura nova é empilhada com os parâmetros e variáveis locais, e desempilhada ao retornar.</figcaption>
+    </figure>
+
+    <h3>Ponteiro de variáveis</h3>
+    <p>
+      Um ponteiro é uma variável cujo valor não é um dado comum, mas o <em>endereço</em> de memória de
+      outra variável.
+    </p>
+
+    <h4>Variáveis do tipo ponteiro</h4>
+    <p>
+      Um ponteiro é declarado com um asterisco antes do nome (<code>int *ptr;</code>), e guarda o
+      endereço de uma variável do tipo indicado. O operador <code>&amp;</code> obtém o endereço de uma
+      variável (<code>ptr = &amp;num;</code>), e o mesmo símbolo <code>*</code>, quando aplicado a um
+      ponteiro já existente, <em>dereferencia</em> — acessa o valor guardado naquele endereço
+      (<code>printf("%d", *ptr);</code>). Alterar <code>*ptr</code> também altera <code>num</code>,
+      porque os dois nomes se referem à mesma posição de memória: é exatamente o que o exemplo
+      <em>Ponteiro</em> faz ao executar <code>*ptr = 100;</code>.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig4-2.jpg" alt="Quatro painéis mostrando a mecânica de ponteiros: declaração de int a e int *p sem valor; a recebe 5; p recebe o endereço de a (p = &a); *p = 6 altera o conteúdo de a através do ponteiro.">
+      <figcaption>Um ponteiro guarda um endereço; atribuir através dele (<code>*p = 6;</code>) altera a variável apontada, não o ponteiro em si.</figcaption>
+    </figure>
+
+    <h4>Passando ponteiros para funções</h4>
+    <p>
+      Como os parâmetros de uma função são cópias (passagem por valor), uma função normalmente não
+      consegue alterar as variáveis de quem a chamou — só pode devolver um resultado através do
+      <code>return</code>, e só um. Passar um ponteiro como parâmetro contorna essa limitação: a
+      função recebe o endereço da variável do chamador, e pode escrever nela diretamente através do
+      operador <code>*</code>, mesmo depois de retornar. É assim que o exemplo
+      <em>Soma e diferença</em> "retorna" dois valores de uma vez —
+      <code>calculate_sum_and_difference(num1, num2, &amp;sum, &amp;difference)</code> recebe os
+      endereços de <code>sum</code> e <code>difference</code> e escreve os resultados diretamente ali.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig4-4.jpg" alt="Quatro painéis mostrando a pilha de execução de uma função que recebe ponteiros para dois parâmetros de saída: declaração das variáveis em main sem valor, chamada da função passando valores e endereços, escrita dos resultados diretamente nos endereços recebidos, e retorno com os resultados já presentes em main.">
+      <figcaption>Passando endereços como parâmetro, a função escreve diretamente nas variáveis de quem a chamou — os resultados já aparecem em <code>main</code> antes mesmo do retorno.</figcaption>
+    </figure>
+
+    <h3>Variáveis globais e estáticas</h3>
+    <p>
+      Uma variável <em>global</em> é declarada fora de qualquer função e existe durante todo o
+      programa, visível (e alterável) por qualquer função — útil às vezes, mas também uma fonte comum
+      de bugs difíceis de rastrear, por isso deve ser usada com moderação. Uma variável local declarada
+      como <code>static</code>, por outro lado, continua local a uma única função, mas seu valor é
+      preservado entre chamadas, em vez de ser recriado do zero a cada vez: é o que o exemplo
+      <em>Contador de chamadas</em> faz com <code>static int counter = 0;</code>, para lembrar quantas
+      vezes a função já foi chamada.
+    </p>
+
+    <h3>Recursão</h3>
+    <p>
+      Uma função recursiva é uma função que chama a si mesma, geralmente para resolver um problema
+      dividindo-o em uma versão menor do mesmo problema, até alcançar um <em>caso-base</em> que
+      interrompe as chamadas. Cada chamada recursiva empilha sua própria moldura na pilha de execução —
+      a mesma pilha do modelo visto acima — por isso uma recursão sem caso-base, ou com um caso-base
+      que nunca é alcançado, esgota a memória disponível e trava o programa.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig4-5.jpg" alt="Quatro painéis mostrando a pilha de execução de uma função recursiva func(n): pilha após a chamada func(4); nova moldura empilhada em func(3); pilha na profundidade máxima com uma moldura para cada chamada até o caso-base func(0); desempilhamento de func(0) de volta ao contexto de func(1).">
+      <figcaption>Cada chamada recursiva empilha uma nova moldura; elas são desempilhadas em ordem inversa conforme cada chamada retorna, a partir do caso-base.</figcaption>
+    </figure>
+
+    <h3>Pré-processador e macros</h3>
+    <p>
+      Antes mesmo da compilação começar, o pré-processador do C resolve as diretivas que começam com
+      <code>#</code>, como <code>#include</code> e <code>#define</code>. Uma macro criada com
+      <code>#define</code> funciona como uma substituição textual: onde quer que
+      <code>SQUARE(x)</code> apareça no código, o pré-processador troca pelo texto
+      <code>((x) * (x))</code> antes de compilar — é o que o exemplo <em>Macro quadrado</em> faz. Por
+      isso os parênteses em volta de cada parâmetro da macro são importantes: sem eles, uma chamada
+      como <code>SQUARE(a + b)</code> se expandiria para <code>a + b * a + b</code>, um resultado bem
+      diferente do esperado.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central
+    e a simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
 
   <p class="section-label">Exemplos</p>
   <ul class="example-list" id="exampleList">
