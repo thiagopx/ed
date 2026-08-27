@@ -557,7 +557,7 @@
 
   <div class="notes">
 
-    <h2>Repetições</h2>
+    <h2>Repetições e geração de números (pseudo)aleatórios</h2>
     <p>
       Uma estrutura de repetição (ou <strong>laço</strong>) executa um bloco de comandos várias vezes, enquanto uma
       condição permanecer verdadeira — em vez de copiar e colar o mesmo trecho de código a cada repetição
@@ -617,14 +617,14 @@
       volta ao início do laço para pedir uma nova entrada, sem executar o restante do corpo naquela repetição.
     </p>
 
-    <h2>Números aleatórios</h2>
+    <h3>Geração de números (pseudo)aleatórios</h3>
     <p>
       Gerar números "aleatórios" em um programa determinístico como um executável em C é, na prática, gerar
       números <strong>pseudoaleatórios</strong>: uma sequência calculada por uma fórmula que parece aleatória, mas
       é inteiramente determinada por um valor inicial chamado <strong>semente</strong>.
     </p>
 
-    <h3>Função rand e a necessidade de uma semente</h3>
+    <h4>Funções rand(), srand() e time()</h4>
     <p>
       A função <code>rand()</code>, declarada em <code>stdlib.h</code>, devolve a cada chamada um inteiro
       pseudoaleatório entre <code>0</code> e <code>RAND_MAX</code> (uma constante que depende da implementação,
@@ -634,8 +634,6 @@
       <code>stdlib.h</code>, que define essa semente e, com ela, toda a sequência de números que
       <code>rand()</code> vai gerar a partir dali.
     </p>
-
-    <h3>srand(time(NULL)) vs. semente fixa</h3>
     <p>
       O exemplo <em>Rand</em> chama <code>srand(10)</code> — uma semente fixa, escolhida deliberadamente para que
       a sequência gerada seja sempre a mesma a cada execução (útil para depurar ou reproduzir um resultado). Já os
@@ -645,7 +643,7 @@
       o comportamento esperado de um dado ou de um jogo de adivinhação.
     </p>
 
-    <h3>Gerando números em um intervalo</h3>
+    <h4>Gerando números aleatórios em intervalos específicos</h4>
     <p>
       Como <code>rand()</code> devolve um valor num intervalo fixo e tipicamente grande, obter um número num
       intervalo menor exige alguma aritmética sobre o resultado bruto. Para um intervalo de inteiros
