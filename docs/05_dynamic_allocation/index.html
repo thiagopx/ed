@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alocação Dinâmica — Estruturas de Dados</title>
+<meta name="description" content="Material didático sobre alocação dinâmica de memória em C — malloc, free, vetores e matrizes dinâmicos — código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #1D7A82;
+    --accent-soft: #D2EEEF;
+    --wash: rgba(29, 122, 130, 0.07);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #52C7D1;
+      --accent-soft: #163538;
+      --wash: rgba(82, 199, 209, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #52C7D1;
+    --accent-soft: #163538;
+    --wash: rgba(82, 199, 209, 0.09);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 26rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Alocação dinâmica</div>
+    <h1>Alocação dinâmica de memória</h1>
+    <p class="lede">
+      Estas são as notas da quinta aula: como um programa organiza sua memória em regiões (pilha, heap
+      e as demais), como pedir e devolver blocos de memória em tempo de execução com <code>malloc</code>
+      e <code>free</code>, e como aplicar essas ideias a vetores e matrizes cujo tamanho só é conhecido
+      quando o programa já está rodando. Os exemplos interativos logo abaixo colocam parte dessa teoria
+      em prática, passo a passo.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Alocação dinâmica</h2>
+    <p>
+      Até aqui, todo vetor ou matriz deste curso teve um tamanho fixo, decidido em tempo de compilação:
+      <code>int v[10];</code> reserva exatamente 10 posições, nem uma a mais, seja qual for a necessidade
+      real de cada execução do programa. A <strong>alocação dinâmica</strong> resolve essa rigidez: em
+      vez de declarar um vetor de tamanho fixo, o programa pede ao sistema, durante a execução, exatamente
+      a quantidade de memória de que precisa naquele momento — e devolve essa memória quando não precisa
+      mais dela. É o C oferecendo, através de duas funções da biblioteca padrão (<code>malloc</code> e
+      <code>free</code>, declaradas em <code>stdlib.h</code>), controle explícito sobre um tipo de memória
+      que os vetores comuns não alcançam.
+    </p>
+
+    <h3>Uso da memória</h3>
+    <p>
+      Um programa em execução organiza sua memória em regiões distintas: o código do programa (fixo),
+      as variáveis globais e estáticas, a região de alocação dinâmica — o <strong>heap</strong> — e a
+      <strong>pilha</strong> (stack), onde vivem as variáveis locais e o quadro de cada chamada de função
+      (o "modelo de pilha" já visto no módulo de funções e ponteiros). Heap e pilha crescem em direções
+      opostas, uma em direção à outra, dividindo entre si a memória livre restante — por isso alocar
+      memória demais, ou nunca liberar o que já não é mais necessário, pode no limite colidir com a pilha
+      e esgotar a memória disponível.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig7-1.jpg" alt="Diagrama do layout de memória de um processo: código do programa, variáveis globais e estáticas, memória alocada dinamicamente (heap, crescendo para baixo) e pilha (crescendo para cima), com a memória livre entre as duas últimas.">
+      <figcaption>As regiões de memória de um processo: heap e pilha crescem em direções opostas, dividindo a memória livre entre si.</figcaption>
+    </figure>
+    <p>
+      A função <code>malloc(tamanho_em_bytes)</code> pede ao sistema um bloco contíguo de memória do heap
+      com o tamanho pedido e devolve um <strong>ponteiro genérico</strong> (<code>void *</code>) para o
+      início desse bloco — ou <code>NULL</code>, se não houver memória disponível para atender o pedido;
+      por isso todo <code>malloc</code> deveria ser seguido por uma verificação
+      <code>if (ponteiro == NULL)</code>, como fazem todos os exemplos deste módulo. O tamanho quase
+      sempre é escrito como <code>quantidade * sizeof(tipo)</code>, para que o cálculo funcione em
+      qualquer plataforma, independentemente de quantos bytes cada tipo realmente ocupa ali. Memória
+      alocada dessa forma não desaparece sozinha ao fim de uma função, como uma variável local: ela
+      continua reservada até ser devolvida explicitamente com <code>free(ponteiro)</code> — esquecer de
+      chamar <code>free</code> é um <strong>vazamento de memória</strong> (memory leak): a memória fica
+      presa, inacessível, até o programa terminar.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig7-2.jpg" alt="O mesmo diagrama de layout de memória, com um bloco de 40 bytes destacado no topo do heap, no endereço 504, e uma variável ponteiro V na pilha guardando esse mesmo endereço 504.">
+      <figcaption>O que <code>malloc</code> devolve na prática: o endereço inicial do bloco alocado (aqui, <code>504</code>), guardado numa variável ponteiro comum.</figcaption>
+    </figure>
+
+    <h3>Alocação de vetores</h3>
+    <p>
+      Alocar um vetor dinamicamente segue sempre o mesmo padrão: <code>tipo *v = malloc(n *
+      sizeof(tipo));</code>, onde <code>n</code> — ao contrário do tamanho de um vetor comum — pode ser
+      uma variável, lida do usuário em tempo de execução, como fazem os exemplos <em>Média e
+      variância</em> e <em>Soma elemento a elemento</em>. Uma vez alocado, o vetor dinâmico se comporta
+      como um vetor comum: <code>v[i]</code> acessa o elemento <code>i</code> normalmente, porque, como
+      já visto no módulo de vetores, o nome de um vetor e a notação de colchetes são só formas
+      convenientes de fazer aritmética de ponteiro. A diferença é de onde a memória vem (heap, não pilha)
+      e de quem é responsável por devolvê-la (o programador, com <code>free</code>, não o sistema
+      automaticamente).
+    </p>
+
+    <h4>Vetores locais a funções</h4>
+    <p>
+      Essa diferença de origem tem uma consequência importante: um vetor comum declarado dentro de uma
+      função (<code>int v[10];</code>, na pilha) deixa de existir assim que a função retorna — devolver
+      um ponteiro para ele produziria um <strong>ponteiro pendurado</strong> (dangling pointer), apontando
+      para memória que já não pertence a ninguém. Um vetor alocado dinamicamente dentro da mesma função,
+      porém, mora no heap: sobrevive normalmente ao retorno da função, e é perfeitamente seguro devolver
+      seu endereço para quem chamou. É exatamente esse padrão que o exemplo <em>Transposta de matriz</em>
+      usa: a função <code>transpose</code> aloca a matriz transposta internamente e devolve o ponteiro
+      para ela — a memória continua válida em <code>main</code>, muito depois de <code>transpose</code>
+      já ter retornado.
+    </p>
+
+    <h3>Alocação de matrizes</h3>
+    <p>
+      Uma matriz alocada dinamicamente pode ser representada de duas formas diferentes — e a escolha
+      entre elas aparece nos próprios exemplos deste módulo.
+    </p>
+
+    <h4>Matriz representada por um vetor simples</h4>
+    <p>
+      A primeira forma reaproveita a ideia de matriz como vetor único e contíguo (<em>row-major</em>), já
+      vista no módulo de vetores e matrizes — só que agora o bloco inteiro é alocado de uma vez, com
+      <code>malloc(linhas * colunas * sizeof(tipo))</code>, como faz o exemplo <em>Transposta de
+      matriz</em>: <code>float *trp = malloc(cols * rows * sizeof(float));</code>. Sem os dois pares de
+      colchetes de uma matriz estática, o acesso a <code>mat[i][j]</code> precisa ser feito manualmente,
+      com a mesma fórmula de índice linear do módulo anterior: <code>mat[i * colunas + j]</code>.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig7-3.jpg" alt="Matriz 3x4 (elementos a a l) representada como um único vetor contíguo de 12 posições, em ordem row-major; o elemento g, na linha i=1 e coluna j=2, corresponde à posição k = 1*4+2 = 6 do vetor.">
+      <figcaption>Matriz como vetor único: o elemento na linha <code>i</code>, coluna <code>j</code> de uma matriz com <code>N</code> colunas está na posição <code>i * N + j</code> do vetor.</figcaption>
+    </figure>
+    <p>
+      Essa forma tem uma vantagem prática direta: como é um único bloco contíguo, um único
+      <code>free</code> libera a matriz inteira de uma vez.
+    </p>
+
+    <h4>Matriz representada por um vetor de ponteiros</h4>
+    <p>
+      A segunda forma — usada pelos exemplos <em>Soma de matrizes</em> e <em>Alocar e desalocar
+      matriz</em> — representa a matriz como um vetor de ponteiros: primeiro aloca-se um vetor de
+      <code>linhas</code> ponteiros (<code>int **matrix = malloc(linhas * sizeof(int *));</code>), e
+      depois, em um laço, aloca-se separadamente cada linha
+      (<code>matrix[i] = malloc(colunas * sizeof(int));</code>). O resultado pode ser acessado com a
+      notação familiar <code>matrix[i][j]</code>, sem precisar calcular índice linear algum — só que
+      agora são <code>linhas + 1</code> blocos de memória independentes (o vetor de ponteiros mais uma
+      linha para cada ponteiro), não um só.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig7-4.jpg" alt="A mesma matriz 3x4 representada como um vetor de 3 ponteiros, cada um apontando para um vetor separado de 4 elementos: a linha i=1 aponta para um vetor e f g h, onde g está na posição j=2.">
+      <figcaption>Matriz como vetor de ponteiros: cada linha é um bloco de memória independente, e um vetor de ponteiros guarda o endereço de cada uma.</figcaption>
+    </figure>
+    <p>
+      Essa independência entre as linhas tem um custo na hora de liberar a memória: é preciso desalocar
+      cada linha individualmente, num laço, <em>antes</em> de desalocar o vetor de ponteiros — na ordem
+      inversa da alocação, como fazem <code>deallocate_matrix</code> (no exemplo <em>Soma de
+      matrizes</em>) e o laço final de <em>Alocar e desalocar matriz</em>. Esquecer de liberar alguma
+      linha, ou liberar o vetor de ponteiros antes das linhas (perdendo os endereços delas no processo),
+      são as duas formas mais comuns de vazamento de memória com esse padrão.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e
+    a simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="meanvar" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Média e variância</span>
+      </div>
+      <p class="row-desc">Vetor alocado dinamicamente: calcula a média e a variância dos valores lidos.</p>
+    </li>
+    <li class="example-row" data-target="elementwise" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Soma elemento a elemento</span>
+      </div>
+      <p class="row-desc">Dois vetores alocados dinamicamente, somados posição a posição num terceiro vetor.</p>
+    </li>
+    <li class="example-row" data-target="transpose" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Transposta de matriz</span>
+      </div>
+      <p class="row-desc">Matriz alocada como vetor único; uma função aloca e devolve a matriz transposta.</p>
+    </li>
+    <li class="example-row" data-target="matrixsum" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Soma de matrizes</span>
+      </div>
+      <p class="row-desc">Duas matrizes alocadas como vetor de ponteiros, somadas numa terceira.</p>
+    </li>
+    <li class="example-row" data-target="matrixalloc" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Alocar e desalocar matriz</span>
+      </div>
+      <p class="row-desc">Só o esqueleto de alocação e liberação de uma matriz como vetor de ponteiros.</p>
+    </li>
+  </ul>
+
+  <!-- ================= MÉDIA E VARIÂNCIA ================= -->
+  <section class="detail" id="panel-meanvar" data-panel>
+    <div class="detail-head">
+      <h2>Média e variância</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/05_dynamic_allocation/01_mean_var" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+
+<span class="cmt">// Function to calculate the mean of a vector</span>
+<span class="kw">double</span> <span class="fn">calculate_mean</span>(<span class="kw">double</span> *vector, <span class="kw">int</span> size)
+{
+    <span class="kw">double</span> sum = <span class="num">0.0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+    {
+        sum += vector[i];
+    }
+    <span class="kw">return</span> sum / size;
+}
+
+<span class="cmt">// Function to calculate the variance of a vector</span>
+<span class="kw">double</span> <span class="fn">calculate_variance</span>(<span class="kw">double</span> *vector, <span class="kw">int</span> size, <span class="kw">double</span> mean)
+{
+    <span class="kw">double</span> sum_squared_diff = <span class="num">0.0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+    {
+        <span class="kw">double</span> diff = vector[i] - mean;
+        sum_squared_diff += diff * diff;
+    }
+    <span class="kw">return</span> sum_squared_diff / (size - <span class="num">1</span>);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> size; <span class="cmt">// Number of elements in the vector</span>
+    <span class="fn">printf</span>(<span class="str">"Enter the size of the vector: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;size);
+
+    <span class="cmt">// Dynamically allocate memory for the vector</span>
+    <span class="kw">double</span> *vector = (<span class="kw">double</span> *)<span class="fn">malloc</span>(size * <span class="kw">sizeof</span>(<span class="kw">double</span>));
+    <span class="kw">if</span> (vector == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Memory allocation failed.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="cmt">// Input the vector elements</span>
+    <span class="fn">printf</span>(<span class="str">"Enter the vector elements:\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+    {
+        <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;vector[i]);
+    }
+
+    <span class="cmt">// Calculate mean and variance</span>
+    <span class="kw">double</span> mean = <span class="fn">calculate_mean</span>(vector, size);
+    <span class="kw">double</span> variance = <span class="fn">calculate_variance</span>(vector, size, mean);
+
+    <span class="fn">printf</span>(<span class="str">"Mean: %.2lf\n"</span>, mean);
+    <span class="fn">printf</span>(<span class="str">"Variance: %.2lf\n"</span>, variance);
+
+    <span class="cmt">// Free the dynamically allocated memory</span>
+    <span class="fn">free</span>(vector);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona a alocação</h3>
+        <p>
+          O tamanho do vetor (<code>size</code>) é lido do usuário, então <code>malloc(size *
+          sizeof(double))</code> só pode acontecer depois disso — é o próprio valor lido que decide
+          quantos bytes pedir. A verificação <code>if (vector == NULL)</code> trata o caso (raro, mas
+          possível) de o sistema não ter memória livre suficiente para atender o pedido.
+        </p>
+
+        <h3>Execução passo a passo — size = 5, valores 4 8 6 5 3</h3>
+        <div class="stepper" data-stepper="meanvar">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the size of the vector: <span class="in">5</span>
+Enter the vector elements:
+<span class="in">4 8 6 5 3</span>
+Mean: 5.20
+Variance: 3.70</pre>
+
+        <div class="callout">
+          Depois de <code>free(vector);</code>, a variável <code>vector</code> continua existindo e ainda
+          guarda o mesmo endereço, mas esse endereço não pertence mais ao programa — ler ou escrever
+          nele (<em>use-after-free</em>) é um bug clássico e um comportamento indefinido. Por segurança,
+          é comum atribuir <code>vector = NULL;</code> logo após o <code>free</code>, para que um uso
+          acidental subsequente falhe de forma óbvia em vez de silenciosamente.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOMA ELEMENTO A ELEMENTO ================= -->
+  <section class="detail" id="panel-elementwise" data-panel hidden>
+    <div class="detail-head">
+      <h2>Soma elemento a elemento</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/05_dynamic_allocation/02_elementwise_sum" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="cmt">// Function to calculate the cross product of two 3D vectors</span>
+<span class="kw">void</span> <span class="fn">calculate_elementwise_sum</span>(<span class="kw">double</span> *vector1, <span class="kw">double</span> *vector2, <span class="kw">double</span> *result, <span class="kw">int</span> size)
+{
+    <span class="kw">int</span> sum = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+        result[i] += vector1[i] + vector2[i];
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">double</span> *vector1, *vector2, *sum;
+    <span class="kw">int</span> size = <span class="num">5</span>;
+
+    <span class="cmt">// Dynamically allocate memory for the vectors and cross product</span>
+    vector1 = (<span class="kw">double</span> *)<span class="fn">malloc</span>(size * <span class="kw">sizeof</span>(<span class="kw">double</span>));
+    vector2 = (<span class="kw">double</span> *)<span class="fn">malloc</span>(size * <span class="kw">sizeof</span>(<span class="kw">double</span>));
+    sum = (<span class="kw">double</span> *)<span class="fn">malloc</span>(size * <span class="kw">sizeof</span>(<span class="kw">double</span>));
+
+    <span class="kw">if</span> (vector1 == <span class="kw">NULL</span> || vector2 == <span class="kw">NULL</span> || sum == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Memory allocation failed.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="fn">printf</span>(<span class="str">"Enter the elements of vector1: "</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+    {
+        <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;vector1[i]);
+    }
+
+    <span class="fn">printf</span>(<span class="str">"Enter the elements of vector2: "</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+    {
+        <span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;vector2[i]);
+    }
+
+    <span class="cmt">// Calculate the cross product</span>
+    <span class="fn">calculate_elementwise_sum</span>(vector1, vector2, sum, size);
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; size; i++)
+        <span class="fn">printf</span>(<span class="str">"sum[%d] = %lf\n"</span>, i, sum[i]);
+
+    <span class="cmt">// Free the dynamically allocated memory</span>
+    <span class="fn">free</span>(vector1);
+    <span class="fn">free</span>(vector2);
+    <span class="fn">free</span>(sum);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Três blocos independentes</h3>
+        <p>
+          <code>vector1</code>, <code>vector2</code> e <code>sum</code> são três ponteiros, cada um
+          apontando para seu próprio bloco de 40 bytes no heap — alocar um não tem nenhuma relação com
+          alocar os outros dois. Repare que <code>size</code> aqui é fixo em <code>5</code>, não lido do
+          usuário como no exemplo anterior: a alocação dinâmica não exige uma leitura de tamanho, só
+          permite que ele seja decidido em tempo de execução quando fizer sentido.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="elementwise">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the elements of vector1: <span class="in">1 2 3 4 5</span>
+Enter the elements of vector2: <span class="in">10 20 30 40 50</span>
+sum[0] = 11.000000
+sum[1] = 22.000000
+sum[2] = 33.000000
+sum[3] = 44.000000
+sum[4] = 55.000000</pre>
+
+        <div class="callout">
+          Dois detalhes valem atenção aqui. Primeiro, o comentário da função diz "cross product"
+          (produto vetorial), mas o código calcula uma soma elemento a elemento — comentários podem ficar
+          errados ou desatualizados; quem manda é o código. Segundo, e mais sério: <code>result[i] +=
+          ...</code> usa <code>+=</code>, não <code>=</code>, mas <code>sum</code> foi criado com
+          <code>malloc</code>, que <strong>não</strong> zera a memória (ao contrário de <code>calloc</code>).
+          Somar a um valor inicial "de lixo" é comportamento indefinido — nesta execução, por sorte, o
+          bloco recém-alocado veio zerado do sistema operacional e o resultado saiu certo, mas isso não é
+          garantido: ferramentas como o <code>valgrind</code> acusam claramente essa leitura de memória
+          não inicializada. O correto seria <code>result[i] = vector1[i] + vector2[i];</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TRANSPOSTA DE MATRIZ ================= -->
+  <section class="detail" id="panel-transpose" data-panel hidden>
+    <div class="detail-head">
+      <h2>Transposta de matriz</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/05_dynamic_allocation/03_transpose" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kw">float</span> *<span class="fn">transpose</span>(<span class="kw">int</span> rows, <span class="kw">int</span> cols, <span class="kw">float</span> *mat)
+{
+    <span class="cmt">// Allocate memory for the transposed matrix</span>
+    <span class="kw">float</span> *trp = (<span class="kw">float</span> *)<span class="fn">malloc</span>(cols * rows * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+
+    <span class="cmt">// Fill the transposed matrix</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; cols; j++)
+        {
+            trp[j * rows + i] = mat[i * cols + j];
+        }
+    }
+
+    <span class="kw">return</span> trp;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> rows, cols;
+
+    <span class="fn">printf</span>(<span class="str">"Enter the number of rows: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;rows);
+
+    <span class="fn">printf</span>(<span class="str">"Enter the number of columns: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;cols);
+
+    <span class="cmt">// Dynamically allocate memory for the original matrix</span>
+    <span class="kw">float</span> *matrix = (<span class="kw">float</span> *)<span class="fn">malloc</span>(rows * cols * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+
+    <span class="kw">if</span> (matrix == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Memory allocation failed.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="cmt">// Input the elements of the original matrix</span>
+    <span class="fn">printf</span>(<span class="str">"Enter the elements of the matrix (%d x %d):\n"</span>, rows, cols);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; cols; j++)
+        {
+            <span class="fn">printf</span>(<span class="str">"matrix[%d,%d]="</span>, i, j);
+            <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;matrix[i * cols + j]);
+        }
+    }
+
+    <span class="cmt">// Calculate the transposed matrix</span>
+    <span class="kw">float</span> *transposed_matrix = <span class="fn">transpose</span>(rows, cols, matrix);
+
+    <span class="cmt">// Print the transposed matrix</span>
+    <span class="fn">printf</span>(<span class="str">"Transposed Matrix:\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; cols; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; rows; j++)
+        {
+            <span class="fn">printf</span>(<span class="str">"%.2f "</span>, transposed_matrix[i * rows + j]);
+        }
+        <span class="fn">printf</span>(<span class="str">"\n"</span>);
+    }
+
+    <span class="cmt">// Free the dynamically allocated memory</span>
+    <span class="fn">free</span>(matrix);
+    <span class="fn">free</span>(transposed_matrix);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Um vetor alocado dentro da função</h3>
+        <p>
+          <code>trp</code> é alocado <em>dentro</em> de <code>transpose</code>, mas como vive no heap
+          (não na pilha da função), continua válido depois que <code>transpose</code> retorna — é o
+          padrão descrito nas notas: uma função pode alocar memória e devolver o ponteiro com segurança
+          para quem a chamou.
+        </p>
+
+        <h3>Execução passo a passo — matriz 2×3</h3>
+        <div class="stepper" data-stepper="transpose">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the number of rows: <span class="in">2</span>
+Enter the number of columns: <span class="in">3</span>
+Enter the elements of the matrix (2 x 3):
+matrix[0,0]=<span class="in">1</span>
+matrix[0,1]=<span class="in">2</span>
+matrix[0,2]=<span class="in">3</span>
+matrix[1,0]=<span class="in">4</span>
+matrix[1,1]=<span class="in">5</span>
+matrix[1,2]=<span class="in">6</span>
+Transposed Matrix:
+1.00 4.00
+2.00 5.00
+3.00 6.00 </pre>
+
+        <div class="callout">
+          Se <code>trp</code> fosse declarado como um vetor comum (<code>float trp[rows * cols];</code>,
+          na pilha) em vez de alocado com <code>malloc</code>, o <code>return trp;</code> devolveria um
+          ponteiro pendurado — a memória seria desfeita assim que <code>transpose</code> retornasse, e
+          usá-la em <code>main</code> seria comportamento indefinido, mesmo compilando sem erro.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOMA DE MATRIZES ================= -->
+  <section class="detail" id="panel-matrixsum" data-panel hidden>
+    <div class="detail-head">
+      <h2>Soma de matrizes</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/05_dynamic_allocation/04_matrix_sum" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="cmt">// Function to allocate memory for a matrix</span>
+<span class="kw">int</span> **<span class="fn">allocate_matrix</span>(<span class="kw">int</span> rows, <span class="kw">int</span> cols)
+{
+    <span class="kw">int</span> **matrix = (<span class="kw">int</span> **)<span class="fn">malloc</span>(rows * <span class="kw">sizeof</span>(<span class="kw">int</span> *));
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        matrix[i] = (<span class="kw">int</span> *)<span class="fn">malloc</span>(cols * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+    }
+    <span class="kw">return</span> matrix;
+}
+
+<span class="cmt">// Function to deallocate memory for a matrix</span>
+<span class="kw">void</span> <span class="fn">deallocate_matrix</span>(<span class="kw">int</span> **matrix, <span class="kw">int</span> rows)
+{
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        <span class="fn">free</span>(matrix[i]);
+    }
+    <span class="fn">free</span>(matrix);
+}
+
+<span class="cmt">// Function to read values for a matrix</span>
+<span class="kw">void</span> <span class="fn">read_matrix_values</span>(<span class="kw">int</span> rows, <span class="kw">int</span> cols, <span class="kw">int</span> **matrix)
+{
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; cols; j++)
+        {
+            <span class="fn">printf</span>(<span class="str">"matrix[%d,%d]="</span>, i, j);
+            <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;matrix[i][j]);
+        }
+    }
+}
+
+<span class="kw">void</span> <span class="fn">matrix_sum</span>(<span class="kw">int</span> rows, <span class="kw">int</span> cols, <span class="kw">int</span> **mat1, <span class="kw">int</span> **mat2, <span class="kw">int</span> **result)
+{
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; cols; j++)
+        {
+            result[i][j] = mat1[i][j] + mat2[i][j];
+        }
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> rows, cols;
+
+    <span class="fn">printf</span>(<span class="str">"Enter the number of rows: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;rows);
+
+    <span class="fn">printf</span>(<span class="str">"Enter the number of columns: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;cols);
+
+    <span class="cmt">// Allocate memory for matrices</span>
+    <span class="kw">int</span> **matrix1 = <span class="fn">allocate_matrix</span>(rows, cols);
+    <span class="kw">int</span> **matrix2 = <span class="fn">allocate_matrix</span>(rows, cols);
+    <span class="kw">int</span> **result = <span class="fn">allocate_matrix</span>(rows, cols);
+
+    <span class="cmt">// Input elements for matrix1</span>
+    <span class="fn">printf</span>(<span class="str">"Enter elements for matrix 1:\n"</span>);
+    <span class="fn">read_matrix_values</span>(rows, cols, matrix1);
+
+    <span class="cmt">// Input elements for matrix2</span>
+    <span class="fn">printf</span>(<span class="str">"Enter elements for matrix 2:\n"</span>);
+    <span class="fn">read_matrix_values</span>(rows, cols, matrix2);
+
+    <span class="cmt">// Calculate the sum of matrices</span>
+    <span class="fn">matrix_sum</span>(rows, cols, matrix1, matrix2, result);
+
+    <span class="cmt">// Print the result matrix</span>
+    <span class="fn">printf</span>(<span class="str">"Sum of Matrices:\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+    {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; cols; j++)
+        {
+            <span class="fn">printf</span>(<span class="str">"%d "</span>, result[i][j]);
+        }
+        <span class="fn">printf</span>(<span class="str">"\n"</span>);
+    }
+
+    <span class="cmt">// Deallocate memory for matrices</span>
+    <span class="fn">deallocate_matrix</span>(matrix1, rows);
+    <span class="fn">deallocate_matrix</span>(matrix2, rows);
+    <span class="fn">deallocate_matrix</span>(result, rows);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Alocação e liberação em funções auxiliares</h3>
+        <p>
+          Este exemplo isola o padrão "vetor de ponteiros" em duas funções reutilizáveis:
+          <code>allocate_matrix</code> aloca o vetor de ponteiros e cada linha, e
+          <code>deallocate_matrix</code> desfaz exatamente isso, na ordem inversa — libera cada linha
+          primeiro, e só depois o vetor de ponteiros.
+        </p>
+
+        <h3>Execução passo a passo — matrizes 2×2</h3>
+        <div class="stepper" data-stepper="matrixsum">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the number of rows: <span class="in">2</span>
+Enter the number of columns: <span class="in">2</span>
+Enter elements for matrix 1:
+matrix[0,0]=<span class="in">1</span>
+matrix[0,1]=<span class="in">2</span>
+matrix[1,0]=<span class="in">3</span>
+matrix[1,1]=<span class="in">4</span>
+Enter elements for matrix 2:
+matrix[0,0]=<span class="in">5</span>
+matrix[0,1]=<span class="in">6</span>
+matrix[1,0]=<span class="in">7</span>
+matrix[1,1]=<span class="in">8</span>
+Sum of Matrices:
+6 8
+10 12 </pre>
+
+        <div class="callout">
+          A ordem de <code>deallocate_matrix</code> importa: se <code>free(matrix);</code> (o vetor de
+          ponteiros) rodasse antes do laço que libera cada <code>matrix[i]</code>, os endereços das
+          linhas seriam perdidos para sempre — cada linha viraria um vazamento de memória permanente,
+          já que nada mais no programa saberia onde ela está.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ALOCAR E DESALOCAR MATRIZ ================= -->
+  <section class="detail" id="panel-matrixalloc" data-panel hidden>
+    <div class="detail-head">
+      <h2>Alocar e desalocar matriz</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/05_dynamic_allocation/05_matrix_alloc" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>  <span class="cmt">// For standard input/output</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span> <span class="cmt">// For malloc and free</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> rows, cols;
+
+    <span class="fn">printf</span>(<span class="str">"Enter the number of rows: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;rows);
+
+    <span class="fn">printf</span>(<span class="str">"Enter the number of columns: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;cols);
+
+    <span class="kw">int</span> **matrix = (<span class="kw">int</span> **)<span class="fn">malloc</span>(rows * <span class="kw">sizeof</span>(<span class="kw">int</span> *));
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+        matrix[i] = (<span class="kw">int</span> *)<span class="fn">malloc</span>(cols * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+    <span class="cmt">// Deallocate memory for the matrix</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; rows; i++)
+        <span class="fn">free</span>(matrix[i]);
+    <span class="fn">free</span>(matrix);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Só o esqueleto, sem processamento</h3>
+        <p>
+          Este exemplo não lê valores para dentro da matriz nem imprime nada — de propósito. Ele existe
+          só para isolar, sem distrações, o padrão de alocação e liberação de uma matriz representada
+          como vetor de ponteiros: útil como referência mínima, e um bom candidato para testar com
+          <code>valgrind ./programa</code> e confirmar visualmente "zero vazamentos".
+        </p>
+
+        <h3>Execução passo a passo — matriz 3×2</h3>
+        <div class="stepper" data-stepper="matrixalloc">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the number of rows: <span class="in">3</span>
+Enter the number of columns: <span class="in">2</span></pre>
+
+        <div class="callout">
+          Se o laço de <code>free</code> das linhas (ou o <code>free(matrix)</code> final) fosse removido,
+          o programa continuaria rodando e terminando normalmente — o vazamento de memória não é um erro
+          que trava o programa, é memória que fica presa até o processo terminar. É por isso que
+          vazamentos são silenciosos e fáceis de não perceber sem uma ferramenta como o
+          <code>valgrind</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="closing">
+    <strong>Para lembrar.</strong> <code>malloc</code> pede memória ao heap e devolve um ponteiro (ou
+    <code>NULL</code>, em caso de falha); <code>free</code> devolve essa memória quando ela não é mais
+    necessária. Ao contrário de uma variável local, memória alocada dinamicamente sobrevive ao retorno da
+    função que a criou — por isso pode ser devolvida com segurança de dentro de uma função. Uma matriz
+    dinâmica pode ser um único bloco contíguo (mais simples de liberar) ou um vetor de ponteiros, um por
+    linha (mais flexível, mas exige liberar cada linha antes do vetor de ponteiros).
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    meanvar: {
+      vars: ["size", "vector", "sum", "mean", "variance"],
+      steps: [
+        { line: 32, vars: { size: "5" }, desc: "Lemos size = 5 — o tamanho do vetor, decidido em tempo de execução." },
+        { line: 35, vars: { vector: "malloc(5×8) → 40 bytes" }, desc: "malloc(size * sizeof(double)) pede 5 × 8 = 40 bytes ao heap; vector guarda o endereço do bloco alocado." },
+        { line: 36, vars: {}, desc: "if (vector == NULL) → o malloc não falhou (havia memória livre suficiente), a condição é falsa." },
+        { line: 46, vars: {}, desc: "Laço de leitura: para i de 0 a 4, lemos vector[i]. Ao final: vector = {4.0, 8.0, 6.0, 5.0, 3.0}." },
+        { line: 50, vars: {}, desc: "Chamamos calculate_mean(vector, 5) — passamos o ponteiro e o tamanho, como um vetor comum." },
+        { line: 8, vars: { sum: "0.0" }, desc: "Dentro de calculate_mean: sum começa em 0." },
+        { line: 11, vars: { sum: "26.0" }, desc: "O laço soma os 5 elementos: sum = 4 + 8 + 6 + 5 + 3 = 26.0." },
+        { line: 13, vars: { mean: "5.20" }, desc: "return sum / size = 26.0 / 5 = 5.20 — devolvido para mean, em main." },
+        { line: 51, vars: {}, desc: "Chamamos calculate_variance(vector, 5, 5.20)." },
+        { line: 19, vars: {}, desc: "Dentro de calculate_variance: sum_squared_diff começa em 0." },
+        { line: 23, vars: { sum: "14.80" }, desc: "O laço acumula (vector[i] - mean)² para cada elemento: 1.44 + 7.84 + 0.64 + 0.04 + 4.84 = 14.80." },
+        { line: 25, vars: { variance: "3.70" }, desc: "return sum_squared_diff / (size - 1) = 14.80 / 4 = 3.70 — a variância amostral, devolvida para variance." },
+        { line: 53, vars: {}, desc: "printf exibe: “Mean: 5.20”." },
+        { line: 54, vars: {}, desc: "printf exibe: “Variance: 3.70”." },
+        { line: 57, vars: {}, desc: "free(vector); — devolve os 40 bytes ao sistema. vector continua com o mesmo endereço, mas ele não pertence mais ao programa." },
+        { line: 59, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    elementwise: {
+      vars: ["size", "vector1", "vector2", "sum"],
+      steps: [
+        { line: 16, vars: { size: "5" }, desc: "size é fixo em 5 no código — não é lido do usuário, ao contrário do exemplo anterior." },
+        { line: 19, vars: { vector1: "malloc(5×8)" }, desc: "vector1 = malloc(5 * sizeof(double)) — aloca 40 bytes para o primeiro vetor." },
+        { line: 20, vars: { vector2: "malloc(5×8)" }, desc: "vector2 = malloc(5 * sizeof(double)) — mais 40 bytes, um bloco independente do primeiro." },
+        { line: 21, vars: { sum: "malloc(5×8)" }, desc: "sum = malloc(5 * sizeof(double)) — um terceiro bloco, para o resultado. malloc não inicializa a memória: o conteúdo inicial desses 40 bytes é, a princípio, indefinido." },
+        { line: 23, vars: {}, desc: "if (vector1 == NULL || vector2 == NULL || sum == NULL) → nenhuma das três alocações falhou, a condição é falsa." },
+        { line: 32, vars: { vector1: "{1, 2, 3, 4, 5}" }, desc: "Laço de leitura: vector1 recebe {1.0, 2.0, 3.0, 4.0, 5.0}." },
+        { line: 38, vars: { vector2: "{10, 20, 30, 40, 50}" }, desc: "Laço de leitura: vector2 recebe {10.0, 20.0, 30.0, 40.0, 50.0}." },
+        { line: 42, vars: {}, desc: "Chamamos calculate_elementwise_sum(vector1, vector2, sum, 5)." },
+        { line: 10, vars: {}, desc: "Dentro da função, result aponta para o mesmo bloco de sum em main. O laço faz result[i] += vector1[i] + vector2[i] para cada i — repare o += (soma ao que já estava em result[i]), não um = simples." },
+        { line: 45, vars: { sum: "{11, 22, 33, 44, 55}" }, desc: "De volta em main: o laço imprime sum[i] para cada i — 11, 22, 33, 44, 55." },
+        { line: 48, vars: {}, desc: "free(vector1);" },
+        { line: 49, vars: {}, desc: "free(vector2);" },
+        { line: 50, vars: {}, desc: "free(sum); — os três blocos são devolvidos, na mesma ordem em que foram alocados." },
+        { line: 52, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    transpose: {
+      vars: ["rows", "cols", "matrix", "trp"],
+      steps: [
+        { line: 26, vars: { rows: "2" }, desc: "Lemos rows = 2." },
+        { line: 29, vars: { cols: "3" }, desc: "Lemos cols = 3." },
+        { line: 32, vars: { matrix: "malloc(2×3×4) → 24 bytes" }, desc: "malloc(rows * cols * sizeof(float)) aloca 2 × 3 × 4 = 24 bytes para a matriz original, como um único vetor contíguo." },
+        { line: 34, vars: {}, desc: "if (matrix == NULL) → alocação bem-sucedida, condição falsa." },
+        { line: 47, vars: {}, desc: "Laço duplo de leitura: matrix[i*3+j] recebe, em ordem row-major, 1 2 3 4 5 6 — a matriz lógica 1 2 3 / 4 5 6." },
+        { line: 52, vars: {}, desc: "Chamamos transpose(2, 3, matrix)." },
+        { line: 7, vars: { trp: "malloc(3×2×4) → 24 bytes" }, desc: "Dentro de transpose: trp = malloc(cols * rows * sizeof(float)) — um novo bloco de 24 bytes (3×2), agora para a matriz transposta. Por estar no heap, esse bloco continua válido depois que transpose retornar." },
+        { line: 14, vars: { trp: "{1, 4, 2, 5, 3, 6}" }, desc: "O laço duplo copia trp[j*rows+i] = mat[i*cols+j] para cada (i, j) — por exemplo, mat[0*3+1] = 2 (linha 0, coluna 1) vai para trp[1*2+0], posição 2: trp = {1, 4, 2, 5, 3, 6}." },
+        { line: 18, vars: {}, desc: "return trp; — o ponteiro para a matriz transposta, alocada no heap, é devolvido com segurança para main." },
+        { line: 52, vars: {}, desc: "De volta em main: transposed_matrix recebe o endereço devolvido por transpose." },
+        { line: 60, vars: {}, desc: "O laço de impressão lê transposed_matrix[i*rows+j] (agora com rows=2 colunas por linha) e imprime a matriz transposta: 1.00 4.00 / 2.00 5.00 / 3.00 6.00." },
+        { line: 66, vars: {}, desc: "free(matrix); — libera a matriz original." },
+        { line: 67, vars: {}, desc: "free(transposed_matrix); — libera a matriz transposta." },
+        { line: 69, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    matrixsum: {
+      vars: ["rows", "cols", "matrix1", "matrix2", "result"],
+      steps: [
+        { line: 54, vars: { rows: "2" }, desc: "Lemos rows = 2." },
+        { line: 57, vars: { cols: "2" }, desc: "Lemos cols = 2." },
+        { line: 60, vars: { matrix1: "allocate_matrix(2,2)" }, desc: "matrix1 = allocate_matrix(2, 2) — aloca a primeira matriz como vetor de ponteiros." },
+        { line: 7, vars: {}, desc: "Dentro de allocate_matrix: matrix = malloc(2 * sizeof(int *)) — um vetor de 2 ponteiros (as 2 linhas), ainda sem apontar para lugar algum." },
+        { line: 10, vars: {}, desc: "O laço aloca cada linha separadamente: matrix[0] = malloc(2 * sizeof(int)) e matrix[1] = malloc(2 * sizeof(int)) — dois blocos de 8 bytes, independentes entre si e do vetor de ponteiros." },
+        { line: 12, vars: {}, desc: "return matrix; — o vetor de ponteiros, já com as duas linhas alocadas, volta para main." },
+        { line: 61, vars: { matrix2: "allocate_matrix(2,2)" }, desc: "matrix2 = allocate_matrix(2, 2) — o mesmo processo se repete, gerando uma segunda matriz totalmente independente da primeira." },
+        { line: 62, vars: { result: "allocate_matrix(2,2)" }, desc: "result = allocate_matrix(2, 2) — e uma terceira, para guardar a soma." },
+        { line: 66, vars: { matrix1: "{{1,2},{3,4}}" }, desc: "read_matrix_values(2, 2, matrix1) lê matrix1 = {{1, 2}, {3, 4}}." },
+        { line: 70, vars: { matrix2: "{{5,6},{7,8}}" }, desc: "read_matrix_values(2, 2, matrix2) lê matrix2 = {{5, 6}, {7, 8}}." },
+        { line: 73, vars: { result: "{{6,8},{10,12}}" }, desc: "matrix_sum(2, 2, matrix1, matrix2, result) — o laço duplo calcula result[i][j] = matrix1[i][j] + matrix2[i][j]: result = {{6, 8}, {10, 12}}." },
+        { line: 81, vars: {}, desc: "O laço de impressão exibe result: 6 8 / 10 12." },
+        { line: 87, vars: {}, desc: "deallocate_matrix(matrix1, 2) — libera cada linha de matrix1 e depois o próprio vetor de ponteiros." },
+        { line: 20, vars: {}, desc: "Dentro de deallocate_matrix: o laço libera matrix[0] e matrix[1], uma linha de cada vez..." },
+        { line: 22, vars: {}, desc: "...e só depois free(matrix); libera o vetor de ponteiros — nessa ordem, nunca ao contrário." },
+        { line: 88, vars: {}, desc: "deallocate_matrix(matrix2, 2) — mesmo processo para a segunda matriz." },
+        { line: 89, vars: {}, desc: "deallocate_matrix(result, 2) — e para a matriz resultado." },
+        { line: 91, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    matrixalloc: {
+      vars: ["rows", "cols", "matrix"],
+      steps: [
+        { line: 9, vars: { rows: "3" }, desc: "Lemos rows = 3." },
+        { line: 12, vars: { cols: "2" }, desc: "Lemos cols = 2." },
+        { line: 14, vars: { matrix: "malloc(3×8) → vetor de 3 ponteiros" }, desc: "matrix = malloc(rows * sizeof(int *)) — um vetor de 3 ponteiros (um por linha); nenhuma linha existe ainda." },
+        { line: 16, vars: {}, desc: "i = 0: matrix[0] = malloc(2 * sizeof(int)) — primeira linha alocada." },
+        { line: 16, vars: {}, desc: "i = 1: matrix[1] = malloc(2 * sizeof(int)) — segunda linha, um bloco independente do primeiro." },
+        { line: 16, vars: {}, desc: "i = 2: matrix[2] = malloc(2 * sizeof(int)) — terceira e última linha. Agora existem 4 blocos no heap: o vetor de ponteiros e as 3 linhas." },
+        { line: 20, vars: {}, desc: "O laço de liberação desfaz cada linha: free(matrix[0]), free(matrix[1]), free(matrix[2])." },
+        { line: 21, vars: {}, desc: "free(matrix); — só depois de liberar as 3 linhas é que o vetor de ponteiros em si é liberado." },
+        { line: 23, vars: {}, desc: "return 0; — o programa termina (sem imprimir nada além dos prompts de entrada)." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elLog = root.querySelector("[data-log]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      if (elLog) {
+        var rowsHtml = [];
+        for (var m = 0; m <= current; m++) {
+          if (steps[m].row) rowsHtml.push(steps[m]);
+        }
+        elLog.innerHTML = rowsHtml
+          .map(function (s) {
+            return (
+              "<tr" + (s.win ? ' class="win"' : "") + ">" +
+              s.row
+                .map(function (cell, idx) {
+                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
+                })
+                .join("") +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Alocação Dinâmica</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>💾 Quiz — Alocação Dinâmica</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de alocação dinâmica!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Regiões de memória",
+    text: "Qual alternativa descreve corretamente a relação entre a pilha (stack) e o heap na memória de um processo em execução?",
+    options: [
+      "Crescem na mesma direção, uma logo acima da outra",
+      "Crescem em direções opostas, dividindo entre si a memória livre restante",
+      "O heap é sempre menor que a pilha, em qualquer programa",
+      "A pilha é usada só para variáveis globais e estáticas"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Heap e pilha ficam em extremos opostos da memória livre e crescem um em direção ao outro — o heap conforme mais memória é alocada dinamicamente, a pilha conforme mais funções são chamadas.",
+    explainIncorrect: "A resposta correta é: crescem em direções opostas, dividindo a memória livre entre si. É por isso que alocar memória demais (ou nunca liberá-la) pode, no limite, colidir com a pilha."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "malloc — o básico",
+    text: "O que a linha abaixo faz?",
+    code: `<span class="type">int</span> *v = malloc(<span class="kw">10</span> * <span class="kw">sizeof</span>(<span class="type">int</span>));`,
+    options: [
+      "Aloca dinamicamente memória para 10 inteiros e guarda o endereço do bloco em v",
+      "Declara um vetor estático de 10 inteiros, como int v[10];",
+      "Aloca memória para um único inteiro de valor 10",
+      "Libera a memória previamente apontada por v"
+    ],
+    correctIndex: 0,
+    explainCorrect: "malloc(10 * sizeof(int)) pede ao heap um bloco contíguo do tamanho de 10 inteiros e devolve o endereço desse bloco, guardado no ponteiro v.",
+    explainIncorrect: "A resposta correta é a primeira opção. malloc aloca dinamicamente um bloco de memória do tamanho pedido (aqui, 10 × sizeof(int) bytes) e devolve seu endereço — não declara um vetor estático nem libera memória."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Verificação de NULL",
+    text: "Por que praticamente todo malloc neste módulo é seguido de um if (ponteiro == NULL)?",
+    code: `<span class="type">int</span> *v = malloc(n * <span class="kw">sizeof</span>(<span class="type">int</span>));
+<span class="kw">if</span> (v == NULL) { <span class="cmt">/* ... */</span> }`,
+    options: [
+      "Porque malloc sempre falha na primeira chamada de um programa",
+      "Porque, se não houver memória disponível, malloc devolve NULL em vez de um endereço válido, e usar esse ponteiro seria um erro",
+      "Porque a linguagem C exige essa verificação para o programa compilar",
+      "Porque NULL indica que o vetor alocado está vazio (sem elementos)"
+    ],
+    correctIndex: 1,
+    explainCorrect: "malloc pode falhar (memória insuficiente) e, nesse caso, devolve NULL. Sem essa verificação, o programa tentaria usar um ponteiro inválido, travando ou corrompendo memória.",
+    explainIncorrect: "A resposta correta é a segunda opção. A verificação existe porque malloc pode devolver NULL quando não há memória disponível — não é uma exigência de compilação, e NULL não significa 'vetor vazio'."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Depois do free",
+    text: "O que acontece com o valor guardado numa variável ponteiro logo depois de free(ponteiro)?",
+    options: [
+      "A variável é automaticamente zerada para NULL pelo free",
+      "A variável continua guardando o mesmo endereço, mas ele não pertence mais ao programa — usá-lo depois é um erro (use-after-free)",
+      "O compilador impede qualquer uso posterior dessa variável",
+      "O endereço é reaproveitado imediatamente por outra variável do mesmo programa"
+    ],
+    correctIndex: 1,
+    explainCorrect: "free não altera o valor do ponteiro — só devolve a memória ao sistema. A variável continua com o mesmo endereço, agora inválido; por segurança, é comum atribuir NULL manualmente depois do free.",
+    explainIncorrect: "A resposta correta é a segunda opção. free() libera a memória apontada, mas não zera a variável ponteiro automaticamente — usá-la depois (sem reatribuir) é um bug clássico chamado use-after-free."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Vazamento de memória",
+    text: "O que é um vazamento de memória (memory leak)?",
+    options: [
+      "Um erro de compilação causado pelo uso de malloc",
+      "Um ponteiro que aponta para NULL",
+      "Uma variável que ultrapassa os limites de um vetor comum",
+      "Memória alocada dinamicamente que nunca é liberada com free, ficando presa e inacessível até o programa terminar"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Sem um free correspondente, o bloco alocado continua reservado, mas o programa perde a referência a ele (ou nunca a devolve) — memória presa até o processo terminar.",
+    explainIncorrect: "A resposta correta é: memória alocada dinamicamente que nunca é liberada com free, ficando presa e inacessível até o programa terminar."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Matriz como vetor único",
+    text: "Qual a principal vantagem prática de representar uma matriz dinâmica como um único vetor contíguo (como no exemplo Transposta de matriz), em vez de um vetor de ponteiros?",
+    options: [
+      "Permite usar a notação matrix[i][j] sem nenhum cálculo de índice",
+      "Um único free libera a matriz inteira, já que ela é um só bloco de memória",
+      "Ocupa menos memória por elemento armazenado",
+      "Evita a necessidade de usar sizeof no malloc"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Como toda a matriz é um único bloco alocado com um malloc, basta um único free(bloco) para liberá-la inteira — ao contrário do vetor de ponteiros, que exige liberar cada linha separadamente.",
+    explainIncorrect: "A resposta correta é a segunda opção. A vantagem prática é a liberação: um único free basta. Essa forma, aliás, exige calcular o índice manualmente (mat[i * cols + j]), não dispensa esse cálculo."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Ordem de liberação",
+    text: "No exemplo Soma de matrizes, deallocate_matrix libera cada matrix[i] antes de liberar matrix. Por que essa ordem importa?",
+    code: `<span class="kw">for</span> (<span class="type">int</span> i = <span class="kw">0</span>; i &lt; rows; i++)
+    free(matrix[i]);
+free(matrix);`,
+    options: [
+      "Não importa; é só uma questão de estilo de código",
+      "O compilador C exige essa ordem específica para todo laço de free",
+      "Se matrix fosse liberado primeiro, os endereços de cada linha seriam perdidos, tornando-as inacessíveis e causando vazamento de memória",
+      "free(matrix[i]) já libera matrix automaticamente, tornando a última linha redundante"
+    ],
+    correctIndex: 2,
+    explainCorrect: "matrix é o vetor de ponteiros que guarda o endereço de cada linha. Liberá-lo antes das linhas apagaria essas referências — as linhas ficariam alocadas, mas inacessíveis: um vazamento de memória.",
+    explainIncorrect: "A resposta correta é: se matrix fosse liberado primeiro, os endereços de cada linha seriam perdidos, tornando-as inacessíveis e causando vazamento de memória."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Vetores locais a funções",
+    text: "No exemplo Transposta de matriz, a função transpose aloca trp com malloc e devolve esse ponteiro com return trp;. Por que isso é seguro?",
+    code: `<span class="type">float</span> *transpose(<span class="type">int</span> rows, <span class="type">int</span> cols, <span class="type">float</span> *mat)
+{
+    <span class="type">float</span> *trp = malloc(cols * rows * <span class="kw">sizeof</span>(<span class="type">float</span>));
+    <span class="cmt">/* ... preenche trp ... */</span>
+    <span class="kw">return</span> trp;
+}`,
+    options: [
+      "Porque trp foi declarado como um vetor comum, float trp[rows * cols];",
+      "Porque a memória alocada com malloc vive no heap, não na pilha da função, e por isso sobrevive ao retorno da função",
+      "Porque o C copia automaticamente o conteúdo de trp para dentro de quem chamou a função",
+      "Não é seguro — esse código tem um bug de ponteiro pendurado"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Memória alocada com malloc pertence ao heap, uma região independente da pilha de chamadas. Ela continua válida mesmo depois que a função que a alocou retorna — por isso é seguro devolver o ponteiro.",
+    explainIncorrect: "A resposta correta é a segunda opção. É seguro justamente porque trp está no heap (via malloc), não na pilha — se fosse um vetor local comum, devolver seu endereço criaria um ponteiro pendurado."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "malloc não zera memória",
+    text: "No exemplo Soma elemento a elemento, result é alocado com malloc (não calloc) e o laço faz result[i] += vector1[i] + vector2[i];, sem nunca ter inicializado result antes. Qual o problema?",
+    code: `result = malloc(size * <span class="kw">sizeof</span>(<span class="type">double</span>));
+<span class="cmt">/* ... */</span>
+result[i] += vector1[i] + vector2[i];`,
+    options: [
+      "result[i] += soma a um valor inicial indefinido (lixo de memória) — comportamento indefinido, mesmo que o resultado às vezes saia correto na prática",
+      "Nenhum: malloc sempre zera a memória que aloca, como calloc",
+      "O operador += não existe para acessos por ponteiro em C",
+      "O erro só ocorre se size for maior que 1000"
+    ],
+    correctIndex: 0,
+    explainCorrect: "Diferente de calloc, malloc não garante memória zerada. Usar += sobre memória não inicializada é comportamento indefinido — pode até 'funcionar' por acaso (como observado com valgrind), mas não é garantido.",
+    explainIncorrect: "A resposta correta é a primeira opção. malloc não zera a memória alocada; somar (+=) a um conteúdo inicial indefinido é um bug real, ainda que o resultado observado pareça correto nesta execução."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "sizeof no malloc",
+    text: "Por que malloc(n * sizeof(int)) é uma prática melhor do que, por exemplo, malloc(n * 4) para alocar um vetor de n inteiros?",
+    options: [
+      "Porque sizeof é calculado mais rapidamente em tempo de execução do que uma constante",
+      "Porque sizeof(int) garante o tamanho correto do tipo em qualquer plataforma — nem todo sistema usa 4 bytes para int",
+      "Porque a função malloc só aceita sizeof como argumento válido",
+      "Não há diferença nenhuma entre as duas formas em C"
+    ],
+    correctIndex: 1,
+    explainCorrect: "sizeof(tipo) é resolvido em tempo de compilação e reflete o tamanho real do tipo na plataforma-alvo — um número mágico como 4 pode estar errado em outra arquitetura ou compilador.",
+    explainIncorrect: "A resposta correta é a segunda opção. sizeof(int) torna o código portável, sempre pedindo a quantidade certa de bytes por elemento, independentemente da plataforma — um número fixo como 4 pode não ser válido em todo lugar."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${q.code ? `<pre class="code-block">${q.code}</pre>` : ''}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou a alocação dinâmica de memória.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou para fixar malloc/free e as duas formas de matriz dinâmica.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale a pena revisar a diferença entre pilha e heap.';
+  else msg = '🔁 Releia o material do módulo e tente novamente para reforçar a alocação dinâmica.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
