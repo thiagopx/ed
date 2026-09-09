@@ -2,75 +2,71 @@
   style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
   <div
     style="border-bottom: 2px solid #b1305f; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-    <h2 style="color: #2c3e50; margin: 0;">🔐 EP 06: Cifra de César</h2>
+    <h2 style="color: #2c3e50; margin: 0;">✂️ EP 06: Tokenizando à Mão</h2>
     <span
       style="background-color: #b1305f; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
       16 de Setembro</span>
   </div>
-  <p><strong>O Cenário:</strong> A Cifra de César é uma das criptografias mais antigas que se conhece:
-    cada letra da mensagem é substituída pela letra que está N posições adiante no alfabeto (voltando ao
-    início depois do Z), onde N é o deslocamento, combinado previamente entre quem envia e quem recebe a
-    mensagem. Você foi encarregado de escrever um programa que cifra (e decifra) frases usando essa
-    técnica.</p>
-  <h3
-    style="color: #b1305f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
-    🔡 Como o Deslocamento Funciona</h3>
-  <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-    <div
-      style="flex: 1; min-width: 200px; background: #fce4ec; padding: 10px; border-radius: 5px; border-left: 4px solid #b1305f;">
-      <strong>Letras</strong><br><small>Deslocadas N posições no alfabeto, preservando maiúscula/minúscula</small>
-    </div>
-    <div
-      style="flex: 1; min-width: 200px; background: #fce4ec; padding: 10px; border-radius: 5px; border-left: 4px solid #b1305f;">
-      <strong>Fim do alfabeto</strong><br><small>Depois de Z (ou z) o deslocamento volta para A (ou a)</small>
-    </div>
-    <div
-      style="flex: 1; min-width: 200px; background: #fce4ec; padding: 10px; border-radius: 5px; border-left: 4px solid #b1305f;">
-      <strong>Outros caracteres</strong><br><small>Espaços, pontuação e números não são alterados</small>
-    </div>
-  </div>
+  <p><strong>O Cenário:</strong> Muitas ferramentas de texto precisam separar uma mensagem em partes —
+    um comando do seu argumento, um nome do seu sobrenome. Você foi encarregado de desenvolver, na mão
+    (sem usar <code>strtok</code>), uma função capaz de "tokenizar" uma string: dado um texto qualquer,
+    ela deve encontrar o primeiro espaço em branco e separar a mensagem em duas partes distintas,
+    devolvendo cada uma através de um parâmetro ponteiro.</p>
   <h3
     style="color: #b1305f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
     📋 Requisitos Técnicos</h3>
   <div
     style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
     <ul style="margin: 0; padding-left: 20px;">
-      <li style="margin-bottom: 10px;"><strong>Leitura da frase:</strong> a frase pode conter espaços —
-        leia com um formato que capture a linha inteira (ex.: <code>scanf(" %199[^\n]", frase)</code>),
-        nunca com <code>%s</code>.</li>
-      <li style="margin-bottom: 10px;"><strong>Função dedicada:</strong> implemente uma função
-        <code>char *caesar_cipher(const char *texto, int deslocamento)</code> que
-        <strong>aloca e devolve</strong> (com <code>malloc</code> e <code>return</code>) uma nova string
-        com o resultado, sem alterar a string original — o mesmo padrão do exemplo
-        <em>Duplicar uma string</em> deste módulo, agora combinado com a lógica de deslocamento.</li>
-      <li style="margin-bottom: 10px;"><strong>Preservação:</strong> letras minúsculas continuam
-        minúsculas, maiúsculas continuam maiúsculas; qualquer caractere que não seja letra (espaço,
-        pontuação, dígito) é copiado sem alteração.</li>
-      <li style="margin-bottom: 10px;"><strong>Cifrar e decifrar:</strong> o programa deve perguntar se a
-        operação é para cifrar ou decifrar — decifrar é equivalente a cifrar com o deslocamento
-        <strong>negativo</strong> do mesmo valor.</li>
-      <li style="margin-bottom: 10px;"><strong>Liberação de memória:</strong> libere com <code>free</code>
-        a string devolvida por <code>caesar_cipher</code> antes do programa terminar.</li>
+      <li style="margin-bottom: 10px;"><strong>Assinatura da Função:</strong> implemente a função com esta
+        assinatura: <code>int split_text(char *text, char *part1, char *part2);</code> —
+        <code>part1</code> e <code>part2</code> já chegam alocados (veja o código base), sua função só
+        precisa preenchê-los.</li>
+      <li style="margin-bottom: 10px;"><strong>Sucesso (retorno 1):</strong> se <code>text</code> contiver
+        pelo menos um espaço em branco, preencha <code>part1</code> com tudo antes do primeiro espaço e
+        <code>part2</code> com tudo depois dele, e devolva <code>1</code>.</li>
+      <li style="margin-bottom: 10px;"><strong>Falha (retorno 0):</strong> se não existir nenhum espaço em
+        <code>text</code>, devolva <code>0</code> sem alterar <code>part1</code>/<code>part2</code>.</li>
+      <li style="margin-bottom: 10px;"><strong>Terminação:</strong> tanto <code>part1</code> quanto
+        <code>part2</code> precisam terminar com <code>'\0'</code> — sem ele, <code>%s</code> não sabe
+        onde parar de imprimir.</li>
     </ul>
   </div>
   <h3
     style="color: #b1305f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
     💻 Exemplo de Execução</h3>
   <pre
-    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em;">Digite a frase: Ataque ao amanhecer!
-Digite o deslocamento: 3
-Cifrar ou decifrar? (C/D): C
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em;">Entrada: "Bom dia"
 
-===== Resultado =====
-Frase original: Ataque ao amanhecer!
-Frase cifrada:  Dwdtxh dr dpdqkhfhu!</pre>
+Parte 1: Bom
+Parte 2: dia</pre>
+  <h3
+    style="color: #b1305f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    🧩 Código Base</h3>
+  <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">Parta deste esqueleto — só a função
+    <code>split_text</code> precisa ser implementada:</p>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int split_text(char *text, char *part1, char *part2) {
+    // Implemente sua lógica aqui
+}
+
+int main() {
+    char text[] = "Bom dia";
+    char part1[20], part2[20];
+
+    if (split_text(text, part1, part2)) {
+        printf("Parte 1: %s\nParte 2: %s\n", part1, part2);
+    }
+    return 0;
+}</pre>
   <div
     style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
-    <strong>Dica de Estudo:</strong> Para deslocar uma letra, pense na posição dela dentro do próprio
-    alfabeto — algo como <code>letra - 'a'</code> (ou <code>'A'</code>, para maiúsculas) dá um número de
-    0 a 25, sobre o qual dá pra somar o deslocamento e aplicar um módulo 26 antes de somar
-    <code>'a'</code> de volta. Cuidado com deslocamentos negativos (para decifrar): o operador
-    <code>%</code> em C pode devolver um resultado negativo quando o número da esquerda é negativo — some
-    26 ao resultado do módulo antes de usá-lo, se ele vier negativo, para manter o índice dentro da faixa
-    0-25.</div>
+    <strong>Dica de Estudo:</strong> Você pode percorrer <code>text</code> caractere por caractere até
+    encontrar o espaço (<code>' '</code>), copiando cada caractere visitado para <code>part1</code> — ou
+    usar <code>strchr(text, ' ')</code> da <code>string.h</code> para localizar de uma vez a posição do
+    separador. De qualquer forma, não esqueça: se não houver espaço, <code>text</code> inteiro fica sem
+    ser dividido, e a função deve devolver <code>0</code> em vez de inventar um resultado.</div>
 </div>

@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Cadeias de Caracteres</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --accent: #B1305F;
+    --accent-soft: #F5DCE4;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-str: #E29A4E;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    min-font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- title / closing slide ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  .string-strip {
+    display: flex;
+    gap: 0.6vw;
+    margin-top: 3vw;
+  }
+  .string-strip .chip {
+    font-family: var(--font-mono);
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.6vw 1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .string-strip .chip.is-null { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.4vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- flow (aritmética de char) ---- */
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6vw;
+    flex-wrap: wrap;
+  }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(2rem, 4.5vw, 3.6rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.2vw 1.8vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.4vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .flow .arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
+  .flow .op {
+    font-family: var(--font-mono);
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+    color: var(--ink-soft);
+  }
+
+  /* ---- figura em tela cheia ---- */
+
+  .fig-slide { padding: 0; }
+  .fig-slide .fig-head {
+    padding: 2.4vw 4.4vw 1.2vw;
+  }
+  .fig-slide .fig-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4.4vw 3vw;
+    min-height: 0;
+  }
+  .fig-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 1.4vw;
+  }
+
+  /* ---- cadeia de caracteres (boxes) ---- */
+
+  .chain { display: flex; flex-direction: column; align-items: center; gap: 1.4vw; }
+  .chain .strip { display: flex; gap: 0.7vw; }
+  .chain .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.4vw, 2.8rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    width: clamp(3rem, 6vw, 5rem);
+    height: clamp(3rem, 6vw, 5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chain .cell.is-null { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .chain .label { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--ink-soft); }
+  .chain .label strong { color: var(--ink); }
+
+  /* ---- comparação 3 colunas ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col.is-bad { border-color: var(--accent); }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.8vw; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.4vw;
+    padding: 0.5vw 0.7vw;
+    display: block;
+  }
+  .compare .col .cap .kept { color: #7fd99a; }
+  .compare .col .cap .lost { color: var(--ink-faint); text-decoration: line-through; }
+
+  /* ---- leituras em cascata (buffer) ---- */
+
+  .cascade { display: flex; gap: 2.2vw; width: 100%; justify-content: center; }
+  .cascade .card {
+    flex: 1;
+    max-width: 27vw;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.6vw;
+  }
+  .cascade .card.is-bad { border-color: var(--accent); }
+  .cascade .card.is-good { border-color: #1e8449; }
+  .cascade .card .lines {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.5vw;
+    padding: 0.8vw 1vw;
+    margin-bottom: 1.2vw;
+    line-height: 1.6;
+  }
+  .cascade .card .lines .hl { color: var(--code-str); font-weight: 700; }
+  .cascade .buf-label { font-size: clamp(0.75rem, 1.1vw, 0.95rem); color: var(--ink-faint); margin-bottom: 0.5vw; text-transform: uppercase; letter-spacing: 0.05em; }
+  .cascade .buf { display: flex; gap: 0.4vw; margin-bottom: 1.2vw; }
+  .cascade .buf .bit {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    width: clamp(2rem, 3.2vw, 2.7rem);
+    height: clamp(2rem, 3.2vw, 2.7rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    border-radius: 0.4vw;
+  }
+  .cascade .buf .bit.is-flag { background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent); }
+  .cascade .buf .bit.is-skip { background: var(--surface-2); color: var(--ink-faint); border: 2px dashed var(--ink-faint); text-decoration: line-through; }
+  .cascade .verdict { font-size: clamp(0.95rem, 1.5vw, 1.2rem); font-weight: 700; }
+  .cascade .verdict.is-bad { color: var(--accent); }
+  .cascade .verdict.is-good { color: #1e8449; }
+
+  /* ---- cards de funções ---- */
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4vw; width: 100%; }
+  .cards .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw 1.2vw;
+    text-align: center;
+  }
+  .cards .card .fn {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 1.9vw, 1.5rem);
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.6vw;
+  }
+  .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
+
+  /* ---- recursão ---- */
+
+  .nest { display: flex; align-items: center; justify-content: center; }
+  .nest .ring {
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.6vw;
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    background: var(--surface);
+  }
+  .nest .ring .head {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+  }
+  .nest .ring.is-accent { border-color: var(--accent); background: var(--accent-soft); }
+  .nest .ring.is-accent .head { color: var(--accent); }
+
+  /* ---- char vs string ---- */
+
+  .duel { display: flex; align-items: center; justify-content: center; gap: 4vw; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 1vw; }
+  .duel .item .demo { display: flex; gap: 0.6vw; }
+  .duel .item .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    width: clamp(2.6rem, 5vw, 4rem);
+    height: clamp(2.6rem, 5vw, 4rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .duel .item .cell.is-null { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .duel .item .tag { font-family: var(--font-mono); font-size: clamp(1.1rem, 1.9vw, 1.6rem); color: var(--ink-soft); }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); }
+
+  /* ---- vetor de ponteiros ---- */
+
+  .ptrgrid { display: flex; align-items: flex-start; justify-content: center; gap: 3vw; width: 100%; }
+  .ptrgrid .col-ptrs { display: flex; flex-direction: column; gap: 0.5vw; }
+  .ptrgrid .ptr {
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.5vw, 1.25rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.4vw;
+    padding: 0.5vw 0.9vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+  }
+  .ptrgrid .ptr .idx { color: var(--ink-faint); }
+  .ptrgrid .col-strs { display: flex; flex-direction: column; gap: 0.5vw; justify-content: space-between; }
+  .ptrgrid .str-blob {
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.5vw, 1.25rem);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 0.5vw 1.1vw;
+  }
+
+  /* ---- terminal / argv ---- */
+
+  .term {
+    font-family: var(--font-mono);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.7vw;
+    padding: 1.6vw 2vw;
+    font-size: clamp(1.1rem, 2.1vw, 1.7rem);
+    width: 100%;
+    max-width: 50vw;
+  }
+  .argv-row { display: flex; gap: 0.5vw; margin-top: 2.2vw; flex-wrap: wrap; }
+  .argv-row .tok { display: flex; flex-direction: column; align-items: center; gap: 0.5vw; }
+  .argv-row .tok .word {
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 1.8vw, 1.5rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.5vw 0.9vw;
+  }
+  .argv-row .tok.is-0 .word { border-color: var(--accent); color: var(--accent); }
+  .argv-row .tok .idx { font-family: var(--font-mono); font-size: clamp(0.8rem, 1.2vw, 1rem); color: var(--ink-faint); }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    min-font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .compare { grid-template-columns: 1fr; }
+    .duel { flex-direction: column; gap: 1.5vw; }
+    .ptrgrid { flex-direction: column; align-items: center; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulo 8</div>
+    <h1>Cadeias de caracteres</h1>
+    <p class="sub">Como o C representa texto sem ter um tipo <code>string</code> dedicado — e o que isso muda na forma de ler, comparar e guardar palavras.</p>
+    <div class="string-strip">
+      <div class="chip">R</div>
+      <div class="chip">i</div>
+      <div class="chip">o</div>
+      <div class="chip is-null">\0</div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">Caracteres</div><div class="d">char é um número — a tabela ASCII por trás de cada letra</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Cadeias de caracteres</div><div class="d">o papel do '\0', como ler e como manipular uma string</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Vetor de strings</div><div class="d">um vetor de ponteiros, não uma grade fixa de caracteres</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Parâmetros de main</div><div class="d">como um programa lê o que foi digitado depois do seu nome</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. CHAR É UM NÚMERO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Caracteres</div>
+    <h1>Um char é só um número pequeno</h1>
+    <p class="sub">Escrever <code>'a'</code> no código é uma forma legível de escrever 97 — por isso dá pra somar, comparar, ordenar.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">'a'<span class="tag">char</span></div>
+        <div class="arrow">≡</div>
+        <div class="box">97<span class="tag">código ASCII</span></div>
+        <div class="op">+ 1</div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">'b'<span class="tag">98</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. TABELA ASCII -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Caracteres</div>
+      <h1>A tabela ASCII</h1>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig8-1.png" alt="Tabela de códigos ASCII de caracteres imprimíveis">
+    </div>
+  </section>
+
+  <!-- 5. CARACTERES DE CONTROLE -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Caracteres</div>
+      <h1>Nem todo código desenha algo</h1>
+      <p class="sub">Caracteres de controle comandam — <code>'\0'</code> marca o fim de uma string, <code>'\n'</code> pula de linha.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig8-2.png" alt="Tabela de códigos ASCII de caracteres de controle">
+    </div>
+  </section>
+
+  <!-- 6. STRING = VETOR + '\0' -->
+  <section class="slide" data-slide>
+    <div class="kicker">Cadeias de caracteres</div>
+    <h1>Um vetor de char, mais uma convenção</h1>
+    <div class="body">
+      <div class="chain">
+        <div class="strip">
+          <div class="cell">R</div>
+          <div class="cell">i</div>
+          <div class="cell">o</div>
+          <div class="cell is-null">\0</div>
+        </div>
+        <div class="label">É o <strong>'\0'</strong> — não o tamanho do vetor — que diz onde a string termina.</div>
+      </div>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. CUIDADO AO LER -->
+  <section class="slide" data-slide>
+    <div class="kicker">Cadeias de caracteres</div>
+    <h1>Nem todo scanf lê o que parece</h1>
+    <p class="sub">Entrada digitada: <code>Hello World</code></p>
+    <div class="body">
+      <div class="compare">
+        <div class="col is-bad">
+          <h3>"%s"</h3>
+          <p>Para no primeiro espaço em branco.</p>
+          <span class="cap"><span class="kept">Hello</span><span class="lost"> World</span></span>
+        </div>
+        <div class="col">
+          <h3>"%c"</h3>
+          <p>Lê um único caractere — útil só quando é isso mesmo que se quer.</p>
+          <span class="cap"><span class="kept">H</span><span class="lost">ello World</span></span>
+        </div>
+        <div class="col">
+          <h3>" %99[^\n]"</h3>
+          <p>Lê a linha inteira, espaços incluídos, até o Enter.</p>
+          <span class="cap"><span class="kept">Hello World</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7b. LEITURAS EM CASCATA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Cadeias de caracteres</div>
+    <h1>O buffer lembra o que sobrou</h1>
+    <p class="sub">Usuário digita <code>20</code> e pressiona Enter — <code>scanf("%d", ...)</code> lê o número, mas não o Enter.</p>
+    <div class="body">
+      <div class="cascade">
+        <div class="card is-bad">
+          <div class="lines">scanf("%d", &amp;idade);<br>scanf(<span class="hl">"%c"</span>, &amp;letra);</div>
+          <div class="buf-label">Sobrou no buffer</div>
+          <div class="buf"><span class="bit is-flag">\n</span></div>
+          <div class="verdict is-bad">✗ letra = '\n' — não esperou o usuário digitar nada</div>
+        </div>
+        <div class="card is-good">
+          <div class="lines">scanf("%d", &amp;idade);<br>scanf(<span class="hl">" %c"</span>, &amp;letra);</div>
+          <div class="buf-label">Sobrou no buffer</div>
+          <div class="buf"><span class="bit is-skip">\n</span></div>
+          <div class="verdict is-good">✓ o espaço descarta o '\n' e espera um novo caractere</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. FUNÇÕES CLÁSSICAS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Cadeias de caracteres</div>
+    <h1>O mesmo laço, quatro tarefas</h1>
+    <p class="sub">Todas varrem um vetor de <code>char</code> até encontrar o <code>'\0'</code>.</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card"><span class="fn">strlen</span><p>quantos caracteres antes do '\0'</p></div>
+        <div class="card"><span class="fn">strcpy</span><p>copia até o '\0' (inclusive)</p></div>
+        <div class="card"><span class="fn">strcat</span><p>anexa uma string ao fim de outra</p></div>
+        <div class="card"><span class="fn">strcmp</span><p>compara caractere a caractere</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. STRING RECURSIVA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Cadeias de caracteres</div>
+    <h1>Uma outra forma de enxergar</h1>
+    <p class="sub">Uma string é a string vazia, ou um caractere seguido de uma string (o resto).</p>
+    <div class="body">
+      <div class="nest">
+        <div class="ring">
+          <span class="head">'R'</span>
+          <div class="ring">
+            <span class="head">'i'</span>
+            <div class="ring">
+              <span class="head">'o'</span>
+              <div class="ring is-accent"><span class="head">'\0'</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 10. 'R' vs "R" -->
+  <section class="slide" data-slide>
+    <div class="kicker">Cadeias de caracteres</div>
+    <h1>Aspas simples ≠ aspas duplas</h1>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="demo"><div class="cell">R</div></div>
+          <div class="tag">'R' — 1 byte, tipo char</div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="item">
+          <div class="demo"><div class="cell">R</div><div class="cell is-null">\0</div></div>
+          <div class="tag">"R" — 2 bytes, tipo string</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Cadeias de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. VETOR DE PONTEIROS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetor de cadeia de caracteres</div>
+    <h1>Vetor de strings = vetor de ponteiros</h1>
+    <p class="sub">Cada string pode ter um tamanho diferente — cada posição só guarda o endereço da sua.</p>
+    <div class="body">
+      <div class="ptrgrid">
+        <div class="col-ptrs">
+          <div class="ptr"><span class="idx">[0]</span> nomes[0] →</div>
+          <div class="ptr"><span class="idx">[1]</span> nomes[1] →</div>
+          <div class="ptr"><span class="idx">[2]</span> nomes[2] →</div>
+        </div>
+        <div class="col-strs">
+          <div class="str-blob">"Ana"</div>
+          <div class="str-blob">"Bruno"</div>
+          <div class="str-blob">"Carla"</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetor de cadeia de caracteres</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. ARGC/ARGV -->
+  <section class="slide" data-slide>
+    <div class="kicker">Parâmetros da função main</div>
+    <h1>main também recebe argumentos</h1>
+    <div class="body">
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <div class="term">./programa entrada.txt saida.txt</div>
+        <div class="argv-row">
+          <div class="tok is-0"><span class="word">./programa</span><span class="idx">argv[0]</span></div>
+          <div class="tok"><span class="word">entrada.txt</span><span class="idx">argv[1]</span></div>
+          <div class="tok"><span class="word">saida.txt</span><span class="idx">argv[2]</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Parâmetros da função main</span><span>argc = 3</span></div>
+  </section>
+
+  <!-- 13. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, explicação linha a linha e simulação da execução passo a passo — sem precisar compilar nada. Depois, teste o que aprendeu no quiz.</p>
+    <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/06_strings</span></div>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -600,12 +600,31 @@
 
     <h4>Leitura de caracteres e cadeias de caracteres</h4>
     <p>
-      Ler um único caractere com <code>scanf("%c", ...)</code> lê literalmente o próximo caractere do
-      buffer de entrada — inclusive um espaço ou quebra de linha deixados por uma leitura anterior; por
-      isso é comum escrever <code>" %c"</code> (com um espaço antes de <code>%c</code>), que descarta
-      qualquer espaço em branco pendente antes de ler o caractere de interesse. Ler uma string inteira tem
-      uma armadilha parecida: <code>%s</code> para no primeiro espaço em branco, então não serve para ler
-      uma frase; o formato <code>%[^\n]</code> — normalmente escrito como
+      <code>scanf("%c", ...)</code> é diferente da maioria dos outros formatos: ele lê literalmente o
+      próximo caractere do buffer de entrada, sem pular espaços, tabulações ou quebras de linha antes
+      disso. Formatos como <code>%d</code>, <code>%f</code> e <code>%s</code> descartam automaticamente
+      qualquer espaço em branco pendente antes de começar a ler; <code>%c</code> (e <code>%[...]</code>,
+      usado mais abaixo) não — por isso <strong>o único formato recomendado neste curso para ler
+      caractere a caractere é <code>" %c"</code></strong>, com um espaço explícito antes do
+      <code>%c</code>, nunca <code>"%c"</code> sozinho.
+    </p>
+    <p>
+      Essa diferença aparece com força em <strong>leituras em cascata</strong> — quando um
+      <code>scanf</code> vem logo depois de outro. O caso clássico:
+      <code>scanf("%d", &amp;idade);</code> lê o número digitado, mas deixa no buffer o <code>'\n'</code>
+      correspondente à tecla Enter que o usuário apertou para confirmar — <code>%d</code> não consome
+      esse <code>'\n'</code>, só o número antes dele. Se a próxima leitura for
+      <code>scanf("%c", &amp;letra);</code>, ela não espera um novo caractere: captura imediatamente esse
+      <code>'\n'</code> que já estava esperando no buffer, e o programa segue com
+      <code>letra = '\n'</code>, não com o que o usuário pretendia digitar em seguida. O espaço em
+      <code>" %c"</code> resolve exatamente isso: instrui o <code>scanf</code> a descartar toda a
+      sequência de espaços em branco pendente — <code>'\n'</code> incluso — antes de ler o caractere de
+      verdade. É a mesma lógica que o exemplo <em>Cuidado com a quebra de linha</em> usa entre a leitura
+      do caractere e a leitura da string seguinte.
+    </p>
+    <p>
+      Ler uma string inteira tem uma armadilha parecida: <code>%s</code> para no primeiro espaço em
+      branco, então não serve para ler uma frase; o formato <code>%[^\n]</code> — normalmente escrito como
       <code>" %99[^\n]"</code>, com um espaço antes e um limite de tamanho — lê tudo (inclusive espaços)
       até o próximo <code>'\n'</code>, sem incluí-lo.
     </p>
