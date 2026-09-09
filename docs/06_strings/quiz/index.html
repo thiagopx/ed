@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Cadeias de Caracteres</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>🔤 Quiz — Cadeias de Caracteres</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de cadeias de caracteres!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Caracteres como números",
+    text: "Qual é a saída do trecho abaixo?",
+    code: `<span class="type">char</span> c = <span class="str">'a'</span>;
+c = c + <span class="str">1</span>;
+printf(<span class="str">"%c"</span>, c);`,
+    options: ["98", "Erro de compilação", "a", "b"],
+    correctIndex: 3,
+    explainCorrect: "'a' é o código ASCII 97; somar 1 resulta em 98, que corresponde a 'b'. Como char é essencialmente um pequeno inteiro, a aritmética funciona normalmente sobre ele.",
+    explainIncorrect: "A resposta correta é 'b'. 'a' vale 97 na tabela ASCII; c + 1 vale 98, que %c imprime como o caractere 'b'."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Terminador de string",
+    text: "O que faz printf(\"%s\", str) saber onde uma string termina?",
+    options: [
+      "O tamanho do vetor onde str foi declarado",
+      "Um contador de caracteres guardado separadamente",
+      "Um caractere especial '\\0' ao final da sequência de caracteres",
+      "O tipo char sempre ocupa exatamente o tamanho da string"
+    ],
+    correctIndex: 2,
+    explainCorrect: "printf com %s varre o vetor byte a byte até encontrar o caractere nulo '\\0', que marca o fim da string — não importa o tamanho real do vetor onde ela foi declarada.",
+    explainIncorrect: "A resposta correta é o caractere '\\0'. É essa convenção, e não o tamanho do vetor, que define onde uma string termina em C."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Leitura de caractere",
+    text: "Qual a função do espaço em scanf(\" %c\", &c); (antes do %c)?",
+    options: [
+      "Descarta espaços em branco e quebras de linha pendentes no buffer antes de ler o próximo caractere",
+      "Não tem efeito nenhum, é só estilo",
+      "Faz o scanf ler duas vezes",
+      "É obrigatório em todo scanf, mesmo sem outro motivo"
+    ],
+    correctIndex: 0,
+    explainCorrect: "Sem o espaço, um '\\n' deixado no buffer por uma leitura anterior seria capturado por %c em vez de esperar um novo caractere digitado pelo usuário.",
+    explainIncorrect: "A resposta correta é: descarta espaços em branco e quebras de linha pendentes. É um cuidado comum quando um scanf de caractere vem depois de outra leitura."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Leitura de frases",
+    text: "Um usuário digita \"Hello World\" e pressiona Enter. Qual das leituras abaixo captura a frase inteira, incluindo o espaço?",
+    code: `<span class="type">char</span> buf[<span class="str">100</span>];
+scanf(<span class="cmt">/* ??? */</span>, buf);`,
+    options: ["\"%s\"", "\"%c\"", "\" %99[^\\n]\"", "\"%d\""],
+    correctIndex: 2,
+    explainCorrect: "%[^\\n] lê tudo até encontrar uma quebra de linha, incluindo espaços internos; %s, ao contrário, para no primeiro espaço em branco e só capturaria \"Hello\".",
+    explainIncorrect: "A resposta correta é \" %99[^\\n]\". %s para no primeiro espaço (capturaria só \"Hello\"); %[^\\n] lê a linha inteira, espaços incluídos."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Percorrendo uma string",
+    text: "Complete a lacuna para que a função abaixo calcule corretamente o tamanho de uma string (sem usar a strlen pronta):",
+    code: `<span class="type">int</span> my_strlen(<span class="kw">const</span> <span class="type">char</span> *str) {
+    <span class="type">int</span> length = <span class="str">0</span>;
+    <span class="kw">while</span> (<span class="cmt">/* ??? */</span>)
+        length++;
+    <span class="kw">return</span> length;
+}`,
+    options: [
+      "str[length] != '\\0'",
+      "length < 100",
+      "str[length] == '\\0'",
+      "str != NULL"
+    ],
+    correctIndex: 0,
+    explainCorrect: "O laço deve avançar enquanto o caractere na posição atual ainda não for o terminador — parando exatamente quando str[length] for '\\0'.",
+    explainIncorrect: "A resposta correta é 'str[length] != \\'\\\\0\\''. Usar == pararia imediatamente (contando 0), e um limite fixo (100) não reflete o tamanho real da string."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Comparando strings",
+    text: "O que significa strcmp(a, b) retornar um valor negativo?",
+    options: [
+      "a e b são strings iguais",
+      "a é mais curta que b em número de caracteres",
+      "Houve um erro na comparação",
+      "a viria antes de b em ordem alfabética (o primeiro caractere diferente de a tem código menor)"
+    ],
+    correctIndex: 3,
+    explainCorrect: "strcmp devolve a diferença entre os códigos dos primeiros caracteres que divergem; um valor negativo indica que, nessa posição, o caractere de a tem código menor — ou seja, a vem antes de b alfabeticamente.",
+    explainIncorrect: "A resposta correta é: a viria antes de b. O valor exato retornado não importa, só o sinal — negativo significa que a precede b na ordem alfabética."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Alocando uma cópia",
+    text: "Por que a função abaixo aloca strlen(src) + 1 bytes, e não apenas strlen(src)?",
+    code: `<span class="type">char</span> *duplicate(<span class="type">char</span> *src) {
+    <span class="type">int</span> n = strlen(src) + <span class="str">1</span>;
+    <span class="type">char</span> *dest = malloc(n * <span class="kw">sizeof</span>(<span class="type">char</span>));
+    strcpy(dest, src);
+    <span class="kw">return</span> dest;
+}`,
+    options: [
+      "Por segurança, sem motivo técnico específico",
+      "malloc sempre aloca um byte a mais do que o pedido",
+      "strlen não conta o caractere '\\0' final, que também precisa de espaço no bloco alocado",
+      "É um erro comum no código; o certo seria só strlen(src)"
+    ],
+    correctIndex: 2,
+    explainCorrect: "strlen conta só os caracteres visíveis, sem o terminador; o +1 garante espaço para o '\\0' que strcpy também vai copiar.",
+    explainIncorrect: "A resposta correta é: strlen não conta o '\\0'. Sem o +1, strcpy escreveria o terminador um byte além do bloco alocado."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Vetor de strings",
+    text: "Qual declaração representa um vetor de 5 ponteiros para string (cada um podendo apontar para uma string de tamanho independente, não uma grade de tamanho fixo)?",
+    options: ["char names[5];", "char *names[5];", "char names[5][100];", "char **names = 5;"],
+    correctIndex: 1,
+    explainCorrect: "char *names[5] declara um vetor de 5 elementos, cada um do tipo char* — cada posição pode apontar para uma string alocada sob medida, de tamanho independente das demais.",
+    explainIncorrect: "A resposta correta é 'char *names[5];'. char names[5][100] também guardaria 5 strings, mas como uma grade de tamanho fixo (100 bytes por linha), não como ponteiros independentes."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Char vs string constante",
+    text: "Qual a diferença entre as constantes 'R' e \"R\" em C?",
+    options: [
+      "Não há diferença, são a mesma coisa",
+      "'R' é uma constante char (1 byte); \"R\" é uma constante string, um vetor de 2 bytes ('R' e '\\0')",
+      "'R' é uma string; \"R\" é um char",
+      "'R' só pode ser usado em atribuições, \"R\" só em printf"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Aspas simples definem uma constante do tipo char, um único byte; aspas duplas definem uma constante string, que ganha automaticamente um '\\0' no final — por isso \"R\" ocupa 2 bytes, não 1.",
+    explainIncorrect: "A resposta correta é a segunda opção. 'R' é um único byte (tipo char); \"R\" é um vetor de 2 bytes, porque toda constante string recebe um '\\0' automático no final."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Parâmetros de main",
+    text: "Um programa é executado no terminal como ./programa entrada.txt saida.txt. Com main declarada como int main(int argc, char *argv[]), quais são os valores de argc e argv[1]?",
+    options: [
+      "argc = 2; argv[1] = \"entrada.txt\"",
+      "argc = 3; argv[1] = \"entrada.txt\"",
+      "argc = 3; argv[1] = \"./programa\"",
+      "argc = 2; argv[1] = \"saida.txt\""
+    ],
+    correctIndex: 1,
+    explainCorrect: "argc conta todos os argumentos, incluindo o nome do programa: \"./programa\", \"entrada.txt\" e \"saida.txt\" somam 3. argv[0] é o nome do programa, então argv[1] é o primeiro argumento depois dele: \"entrada.txt\".",
+    explainIncorrect: "A resposta correta é argc = 3, argv[1] = \"entrada.txt\". argc inclui o nome do programa (argv[0]) na contagem; argv[1] é o primeiro argumento digitado depois do nome do programa."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  const codeHtml = q.code ? `<pre class="code-block">${q.code}</pre>` : '';
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${codeHtml}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou cadeias de caracteres em C.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou para fixar leitura e manipulação de strings.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale a pena revisar o papel do \\0 e as funções de string.h.';
+  else msg = '🔁 Releia as notas do módulo e tente novamente para reforçar os fundamentos.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>

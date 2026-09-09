@@ -1,0 +1,1393 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cadeias de Caracteres — Estruturas de Dados</title>
+<meta name="description" content="Material didático sobre cadeias de caracteres (strings) em C — caracteres, leitura, manipulação, vetores de strings e parâmetros de main — código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #B1305F;
+    --accent-soft: #F5DCE4;
+    --wash: rgba(177, 48, 95, 0.07);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #E68FAE;
+      --accent-soft: #3A1B26;
+      --wash: rgba(230, 143, 174, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #E68FAE;
+    --accent-soft: #3A1B26;
+    --wash: rgba(230, 143, 174, 0.09);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 26rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 46rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Cadeias de caracteres</div>
+    <h1>Cadeias de caracteres em C</h1>
+    <p class="lede">
+      Estas são as notas da sexta aula: como o C representa texto sem ter um tipo string dedicado, como
+      ler e manipular essas cadeias de caracteres, e como organizá-las em vetores. Os exemplos interativos
+      logo abaixo colocam parte dessa teoria em prática, passo a passo.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Cadeias de caracteres</h2>
+    <p>
+      O C não tem um tipo dedicado para texto. Em vez disso, uma <strong>cadeia de caracteres</strong>
+      (string) é construída a partir de duas peças já conhecidas — o tipo <code>char</code> e o vetor — mais
+      uma convenção: uma sequência de caracteres guardada num vetor, terminada por um caractere especial que
+      marca onde o texto acaba. É essa convenção, mais do que qualquer palavra-chave da linguagem, que
+      define o que é uma string em C.
+    </p>
+
+    <h3>Caracteres</h3>
+    <p>
+      Um <code>char</code> ocupa 1 byte e guarda, na prática, um pequeno número inteiro — o
+      <strong>código</strong> de um caractere numa tabela padronizada, quase sempre a tabela ASCII. Escrever
+      <code>'A'</code> no código é só uma forma legível de escrever o número 65; por isso operações
+      aritméticas funcionam normalmente sobre caracteres: <code>'a' + 1</code> vale <code>'b'</code>
+      (código 98), e comparar caracteres com <code>&lt;</code> ou <code>&gt;</code> compara seus códigos,
+      o que coincide com a ordem alfabética para letras da mesma caixa.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig8-1.png" alt="Tabela de códigos ASCII de caracteres imprimíveis, de 32 a 126, organizada em linhas de dezena (30 a 120) e colunas de unidade (0 a 9): espaço, pontuação, dígitos 0-9, letras maiúsculas A-Z e minúsculas a-z.">
+      <figcaption>Figura 8.1: códigos ASCII de alguns caracteres imprimíveis — dígitos, pontuação e as letras de A-Z/a-z.</figcaption>
+    </figure>
+    <p>
+      Além dos caracteres imprimíveis, a tabela ASCII reserva códigos para <strong>caracteres de
+      controle</strong>, que não desenham nada na tela, mas comandam algo — o mais comum no dia a dia é o
+      <code>'\n'</code> (código 10, <em>newline</em>), que já apareceu em quase todo <code>printf</code>
+      deste curso.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig8-2.png" alt="Tabela de códigos ASCII de caracteres de controle: 0 null, 7 bell, 8 backspace, 9 tab, 10 newline/line feed, 13 carriage return, 127 delete.">
+      <figcaption>Figura 8.2: alguns caracteres de controle e seus códigos ASCII — entre eles, o <code>'\0'</code> (nulo) e o <code>'\n'</code> (nova linha).</figcaption>
+    </figure>
+
+    <h3>Cadeias de caracteres (strings)</h3>
+    <p>
+      Uma string em C é um vetor de <code>char</code> onde o último caractere de interesse é seguido por um
+      byte especial, o <strong>caractere nulo</strong> <code>'\0'</code> (código 0, visto na Figura 8.2) —
+      não um caractere visível, apenas uma marca de "fim da string". Toda função da biblioteca padrão que
+      trabalha com strings (<code>printf</code> com <code>%s</code>, <code>strlen</code>,
+      <code>strcpy</code>, e assim por diante) depende dessa convenção: ela varre o vetor byte a byte até
+      encontrar o <code>'\0'</code>, e é isso, não o tamanho do vetor em si, que define onde a string
+      termina.
+    </p>
+
+    <h4>Leitura de caracteres e cadeias de caracteres</h4>
+    <p>
+      Ler um único caractere com <code>scanf("%c", ...)</code> lê literalmente o próximo caractere do
+      buffer de entrada — inclusive um espaço ou quebra de linha deixados por uma leitura anterior; por
+      isso é comum escrever <code>" %c"</code> (com um espaço antes de <code>%c</code>), que descarta
+      qualquer espaço em branco pendente antes de ler o caractere de interesse. Ler uma string inteira tem
+      uma armadilha parecida: <code>%s</code> para no primeiro espaço em branco, então não serve para ler
+      uma frase; o formato <code>%[^\n]</code> — normalmente escrito como
+      <code>" %99[^\n]"</code>, com um espaço antes e um limite de tamanho — lê tudo (inclusive espaços)
+      até o próximo <code>'\n'</code>, sem incluí-lo.
+    </p>
+
+    <h4>Exemplos que manipulam cadeias de caracteres</h4>
+    <p>
+      A biblioteca <code>string.h</code> oferece funções prontas para as operações mais comuns:
+      <code>strlen</code> (tamanho, sem contar o <code>'\0'</code>), <code>strcpy</code> (copiar),
+      <code>strcat</code> (concatenar) e <code>strcmp</code> (comparar, caractere a caractere, devolvendo a
+      diferença entre os primeiros códigos que não coincidem — negativo, zero ou positivo). Todas elas
+      seguem a mesma ideia por baixo: um laço que avança por um vetor de <code>char</code> até encontrar o
+      <code>'\0'</code>, fazendo algo a cada posição visitada — copiar, comparar, contar.
+    </p>
+
+    <h4>Cadeia de caracteres como estrutura recursiva</h4>
+    <p>
+      Há uma outra forma, equivalente, de enxergar uma string: recursivamente. Uma string é, ou a string
+      vazia (só o <code>'\0'</code>), ou um caractere seguido por uma string (o resto). É exatamente essa
+      ideia que um laço como <code>while (str[length] != '\0') length++;</code> expressa de forma
+      iterativa — a cada volta, o problema "qual o tamanho desta string?" vira "qual o tamanho do que
+      sobra depois deste caractere?", até sobrar só o <code>'\0'</code>.
+    </p>
+
+    <h4>Constante cadeia de caracteres</h4>
+    <p>
+      Um literal como <code>"Rio"</code> já é, por si só, uma constante do tipo vetor de <code>char</code>,
+      terminada em <code>'\0'</code> automaticamente pelo compilador — <code>"Rio"</code> ocupa 4 bytes
+      (<code>'R'</code>, <code>'i'</code>, <code>'o'</code>, <code>'\0'</code>), não 3. Vale notar a
+      diferença de aspas: <code>'R'</code> (aspas simples) é uma constante <code>char</code>, um único
+      byte; <code>"R"</code> (aspas duplas) é uma constante string, um vetor de 2 bytes
+      (<code>'R'</code> e <code>'\0'</code>) — dois valores de tipos diferentes, apesar da aparência
+      parecida.
+    </p>
+
+    <h3>Vetor de cadeia de caracteres</h3>
+    <p>
+      Como cada string pode ter um tamanho diferente, um vetor de strings normalmente não é uma grade fixa
+      de caracteres, mas um <strong>vetor de ponteiros para <code>char</code></strong>
+      (<code>char *nomes[N];</code>): cada posição do vetor guarda o endereço de uma string, e cada string
+      pode ter sido alocada de forma independente, com o tamanho exato de que precisa — é o padrão que o
+      exemplo <em>Vetor de nomes de alunos</em> usa, alocando dinamicamente uma cópia de cada nome lido e
+      guardando o ponteiro correspondente numa posição do vetor.
+    </p>
+
+    <h3>Parâmetros da função main</h3>
+    <p>
+      Até aqui, <code>main</code> sempre apareceu sem parâmetros — mas ela também pode ser declarada como
+      <code>int main(int argc, char *argv[])</code>, para receber o que foi digitado na linha de comando
+      junto com o nome do programa. <code>argc</code> (<em>argument count</em>) é a quantidade de
+      argumentos, incluindo o próprio nome do programa; <code>argv</code> (<em>argument vector</em>) é
+      exatamente um vetor de strings, uma para cada argumento — <code>argv[0]</code> é o nome do programa,
+      <code>argv[1]</code> o primeiro argumento digitado depois dele, e assim por diante. É assim que um
+      programa chamado como <code>./programa entrada.txt</code> consegue descobrir, dentro de si mesmo,
+      que o texto <code>"entrada.txt"</code> foi passado como argumento.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a
+    simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="cidade" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Cidade</span>
+      </div>
+      <p class="row-desc">Três formas equivalentes de construir a mesma string: atribuição caractere a caractere, lista de inicialização e literal.</p>
+    </li>
+    <li class="example-row" data-target="quebra-linha" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Cuidado com a quebra de linha</span>
+      </div>
+      <p class="row-desc">Por que ler um caractere e depois uma string exige um espaço antes do especificador de formato.</p>
+    </li>
+    <li class="example-row" data-target="funcoes-string" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Reimplementando funções de string</span>
+      </div>
+      <p class="row-desc">Versões próprias de strlen, strcpy, strcat e strcmp, para ver como cada uma varre a string até o '\0'.</p>
+    </li>
+    <li class="example-row" data-target="duplicar" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Duplicar uma string</span>
+      </div>
+      <p class="row-desc">Aloca dinamicamente uma cópia independente de uma string, usando strlen e strcpy.</p>
+    </li>
+    <li class="example-row" data-target="alunos" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Vetor de nomes de alunos</span>
+      </div>
+      <p class="row-desc">Um vetor de ponteiros para string, cada nome alocado dinamicamente conforme é lido.</p>
+    </li>
+  </ul>
+
+  <!-- ================= CIDADE ================= -->
+  <section class="detail" id="panel-cidade" data-panel>
+    <div class="detail-head">
+      <h2>Cidade</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/06_strings/01_city" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">char</span> city[<span class="num">4</span>];
+    city[<span class="num">0</span>] = <span class="str">'R'</span>;
+    city[<span class="num">1</span>] = <span class="str">'i'</span>;
+    city[<span class="num">2</span>] = <span class="str">'o'</span>;
+    city[<span class="num">3</span>] = <span class="str">'\0'</span>;
+
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, city);
+
+    <span class="kw">char</span> city2[] = {<span class="str">'R'</span>, <span class="str">'i'</span>, <span class="str">'o'</span>, <span class="str">'\0'</span>};
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, city2);
+
+    <span class="kw">char</span> city3[] = <span class="str">"Rio"</span>;
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, city3);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Três formas, mesmo resultado</h3>
+        <p>
+          <code>city</code>, <code>city2</code> e <code>city3</code> chegam ao mesmo conteúdo — a string
+          <code>"Rio"</code> — por três caminhos diferentes: atribuição campo a campo, lista de
+          inicialização explícita, e um literal de string. Nos três casos, o que realmente importa não é
+          como o vetor foi preenchido, mas que ele termine em <code>'\0'</code>.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="cidade">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Rio
+Rio
+Rio</pre>
+
+        <div class="callout">
+          <code>city</code> tem exatamente 4 bytes — o mínimo necessário para "Rio" mais o
+          <code>'\0'</code>. Se o código tentasse escrever um quinto caractere (por exemplo,
+          <code>city[4] = '!';</code>), isso escreveria fora dos limites do vetor: um comportamento
+          indefinido que pode corromper outra variável ou travar o programa, sem que o compilador avise.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CUIDADO COM A QUEBRA DE LINHA ================= -->
+  <section class="detail" id="panel-quebra-linha" data-panel hidden>
+    <div class="detail-head">
+      <h2>Cuidado com a quebra de linha</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/06_strings/02_newline_issue" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">char</span> user_char;
+    <span class="fn">printf</span>(<span class="str">"Please enter a character: "</span>);
+    <span class="fn">scanf</span>(<span class="str">" %c"</span>, &amp;user_char);
+    <span class="fn">printf</span>(<span class="str">"You entered: %c\n"</span>, user_char);
+
+    <span class="kw">char</span> user_string[<span class="num">100</span>];
+    <span class="fn">printf</span>(<span class="str">"Please enter a string: "</span>);
+    <span class="fn">scanf</span>(<span class="str">" %99[^\n]"</span>, user_string);
+    <span class="fn">printf</span>(<span class="str">"You entered: %s\n"</span>, user_string);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>O espaço que evita o problema</h3>
+        <p>
+          Quando o usuário digita um caractere e pressiona Enter, o <code>'\n'</code> do Enter fica
+          esperando no buffer de entrada. Sem o espaço antes de <code>%c</code> ou de
+          <code>%[^\n]</code>, uma leitura seguinte capturaria esse <code>'\n'</code> pendente em vez de
+          esperar por uma nova entrada. O espaço em ambos os <code>scanf</code> deste exemplo instrui a
+          função a descartar qualquer espaço em branco (incluindo quebras de linha) antes de ler o que
+          interessa.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="quebra-linha">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Please enter a character: <span class="in">A</span>
+You entered: A
+Please enter a string: <span class="in">Hello World</span>
+You entered: Hello World</pre>
+
+        <div class="callout">
+          Se a segunda leitura fosse <code>scanf("%s", user_string);</code> em vez de
+          <code>%[^\n]</code>, o resultado seria diferente mesmo com o espaço: <code>%s</code> sempre para
+          no primeiro espaço em branco, então uma entrada como <code>"Hello World"</code> só capturaria
+          <code>"Hello"</code> — o <code>%[^\n]</code> é o que permite ler uma frase inteira, com espaços
+          internos.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REIMPLEMENTANDO FUNÇÕES DE STRING ================= -->
+  <section class="detail" id="panel-funcoes-string" data-panel hidden>
+    <div class="detail-head">
+      <h2>Reimplementando funções de string</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/06_strings/03_functions" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;string.h&gt;</span>
+
+<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
+<span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str)
+{
+    <span class="kw">int</span> length = <span class="num">0</span>;
+    <span class="kw">while</span> (str[length] != <span class="str">'\0'</span>)
+        length++;
+
+    <span class="kw">return</span> length;
+}
+
+<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
+<span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src)
+{
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (src[i] != <span class="str">'\0'</span>)
+    {
+        dest[i] = src[i];
+        i++;
+    }
+
+    dest[i] = <span class="str">'\0'</span>; <span class="cmt">// Null-terminate the destination string</span>
+}
+
+<span class="cmt">// Function to concatenate two strings (analogous to strcat)</span>
+<span class="kw">void</span> <span class="fn">my_strcat</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src)
+{
+    <span class="kw">int</span> dest_len = <span class="fn">my_strlen</span>(dest);
+    <span class="kw">int</span> i = <span class="num">0</span>;
+
+    <span class="kw">while</span> (src[i] != <span class="str">'\0'</span>)
+    {
+        dest[dest_len + i] = src[i];
+        i++;
+    }
+
+    dest[dest_len + i] = <span class="str">'\0'</span>; <span class="cmt">// Null-terminate the concatenated string</span>
+}
+
+<span class="cmt">// Function to compare two strings (analogous to strcmp)</span>
+<span class="kw">int</span> <span class="fn">my_strcmp</span>(<span class="kw">const</span> <span class="kw">char</span> *str1, <span class="kw">const</span> <span class="kw">char</span> *str2)
+{
+    <span class="kw">int</span> i;
+    <span class="kw">for</span> (i = <span class="num">0</span>; str1[i] != <span class="str">'\0'</span> &amp;&amp; str2[i] != <span class="str">'\0'</span>; ++i)
+    {
+        <span class="kw">int</span> d = str1[i] - str2[i];
+        <span class="kw">if</span> (d != <span class="num">0</span>)
+            <span class="kw">return</span> d;
+    }
+
+    <span class="kw">return</span> (str1[i] - str2[i]);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>)
+{
+    <span class="kw">char</span> str1[<span class="num">50</span>] = <span class="str">"Hello, "</span>;
+    <span class="kw">char</span> str2[] = <span class="str">"World!"</span>;
+
+    <span class="cmt">// my_strlen</span>
+    <span class="kw">int</span> length = <span class="fn">my_strlen</span>(str1);
+    <span class="cmt">// int length = strlen(str1);</span>
+    <span class="fn">printf</span>(<span class="str">"Length of str1: %d\n"</span>, length);
+
+    <span class="cmt">// my_strcpy</span>
+    <span class="fn">my_strcpy</span>(str1, str2);
+    <span class="cmt">// strcpy(str1, str2);</span>
+    <span class="fn">printf</span>(<span class="str">"Copied string: %s\n"</span>, str1);
+
+    <span class="cmt">// my_strcat</span>
+    <span class="kw">char</span> str3[<span class="num">50</span>] = <span class="str">"Hello, "</span>;
+    <span class="fn">my_strcat</span>(str3, str2);
+    <span class="cmt">// strcat(str3, str2);</span>
+    <span class="fn">printf</span>(<span class="str">"Concatenated string: %s\n"</span>, str3);
+
+    <span class="cmt">// my_strcmp</span>
+    <span class="kw">int</span> result = <span class="fn">my_strcmp</span>(<span class="str">"apple"</span>, <span class="str">"banana"</span>);
+    <span class="cmt">// int result = strcmp("apple", "banana");</span>
+    <span class="kw">if</span> (result == <span class="num">0</span>)
+        <span class="fn">printf</span>(<span class="str">"Strings are equal\n"</span>);
+    <span class="kw">else if</span> (result &lt; <span class="num">0</span>)
+        <span class="fn">printf</span>(<span class="str">"str1 is less than str2\n"</span>);
+    <span class="kw">else</span>
+        <span class="fn">printf</span>(<span class="str">"str1 is greater than str2\n"</span>);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>O mesmo padrão, quatro vezes</h3>
+        <p>
+          <code>my_strlen</code>, <code>my_strcpy</code>, <code>my_strcat</code> e <code>my_strcmp</code>
+          reimplementam, de propósito, quatro funções que já existem prontas em <code>string.h</code> — a
+          ideia não é substituí-las, mas expor o mecanismo comum por trás delas: um laço que varre um
+          vetor de <code>char</code> posição a posição, parando quando encontra <code>'\0'</code>.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="funcoes-string">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Length of str1: 7
+Copied string: World!
+Concatenated string: Hello, World!
+str1 is less than str2</pre>
+
+        <div class="callout">
+          <code>my_strcmp</code> devolve a diferença bruta entre os dois códigos ASCII que primeiro
+          divergem (aqui, <code>'a' - 'b' = -1</code>), não um valor fixo como <code>-1</code>,
+          <code>0</code> ou <code>1</code> — é exatamente assim que a <code>strcmp</code> real da
+          biblioteca padrão se comporta. O que importa para quem chama é só o <strong>sinal</strong> do
+          resultado, não seu valor exato.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DUPLICAR UMA STRING ================= -->
+  <section class="detail" id="panel-duplicar" data-panel hidden>
+    <div class="detail-head">
+      <h2>Duplicar uma string</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/06_strings/04_duplicate" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;string.h&gt;</span>
+
+<span class="cmt">// Function to duplicate a string</span>
+<span class="kw">char</span> *<span class="fn">duplicate</span>(<span class="kw">char</span> *src)
+{
+    <span class="kw">int</span> n = <span class="fn">strlen</span>(src) + <span class="num">1</span>; <span class="cmt">// Add one for the '\0' character</span>
+    <span class="kw">char</span> *dest = (<span class="kw">char</span> *)<span class="fn">malloc</span>(n * <span class="kw">sizeof</span>(<span class="kw">char</span>));
+
+    <span class="kw">if</span> (dest == <span class="kw">NULL</span>)
+    {
+        <span class="fn">perror</span>(<span class="str">"Memory allocation failed"</span>);
+        <span class="fn">exit</span>(<span class="num">1</span>);
+    }
+
+    <span class="fn">strcpy</span>(dest, src);
+    <span class="kw">return</span> dest;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>)
+{
+    <span class="kw">char</span> original[] = <span class="str">"Hello, World!"</span>;
+    <span class="kw">char</span> *copied;
+
+    <span class="cmt">// Duplicate the string</span>
+    copied = <span class="fn">duplicate</span>(original);
+
+    <span class="cmt">// Print the original and copied strings</span>
+    <span class="fn">printf</span>(<span class="str">"Original string: %s\n"</span>, original);
+    <span class="fn">printf</span>(<span class="str">"Copied string: %s\n"</span>, copied);
+
+    <span class="cmt">// Remember to free the memory allocated by duplicate</span>
+    <span class="fn">free</span>(copied);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>strlen decide o tamanho do malloc</h3>
+        <p>
+          <code>n = strlen(src) + 1</code> é o padrão de sempre para alocar uma string: <code>strlen</code>
+          não conta o <code>'\0'</code>, então o <code>+1</code> reserva espaço para ele.
+          <code>strcpy(dest, src)</code> então copia os caracteres, incluindo o <code>'\0'</code> final,
+          para o bloco recém-alocado.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="duplicar">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Original string: Hello, World!
+Copied string: Hello, World!</pre>
+
+        <div class="callout">
+          Como <code>duplicate</code> aloca memória com <code>malloc</code> mas não a libera antes de
+          retornar, a responsabilidade de chamar <code>free</code> passa para quem usa o valor devolvido —
+          é <code>main</code>, não <code>duplicate</code>, quem libera <code>copied</code>. Esquecer essa
+          responsabilidade é a forma mais comum de vazamento de memória com esse padrão.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VETOR DE NOMES DE ALUNOS ================= -->
+  <section class="detail" id="panel-alunos" data-panel hidden>
+    <div class="detail-head">
+      <h2>Vetor de nomes de alunos</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/06_strings/05_students" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;string.h&gt;</span>
+
+<span class="pp">#define</span> MAX_NAME_LENGTH <span class="num">100</span>
+<span class="pp">#define</span> NUM_STUDENTS <span class="num">5</span>
+
+<span class="cmt">// Function to duplicate a string</span>
+<span class="kw">char</span> *<span class="fn">duplicate_string</span>(<span class="kw">const</span> <span class="kw">char</span> *s)
+{
+    <span class="kw">char</span> *d = (<span class="kw">char</span> *)<span class="fn">malloc</span>(<span class="fn">strlen</span>(s) + <span class="num">1</span>);
+
+    <span class="kw">if</span> (d == <span class="kw">NULL</span>)
+    {
+        <span class="fn">perror</span>(<span class="str">"memory_allocation_failed"</span>);
+        <span class="fn">exit</span>(EXIT_FAILURE);
+    }
+
+    <span class="fn">strcpy</span>(d, s);
+    <span class="kw">return</span> d;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">char</span> *student_names[NUM_STUDENTS];
+
+    <span class="fn">printf</span>(<span class="str">"Enter names of %d students:\n"</span>, NUM_STUDENTS);
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; NUM_STUDENTS; i++)
+    {
+        <span class="kw">char</span> input[MAX_NAME_LENGTH];
+        <span class="fn">printf</span>(<span class="str">"Student %d: "</span>, i + <span class="num">1</span>);
+
+        <span class="kw">if</span> (<span class="fn">scanf</span>(<span class="str">" %99[^\n]"</span>, input) != <span class="num">1</span>)
+        {
+            <span class="fn">printf</span>(<span class="str">"error_reading_input\n"</span>);
+            <span class="kw">return</span> <span class="num">1</span>;
+        }
+
+        <span class="cmt">// // Read student name</span>
+        <span class="cmt">// scanf(" %99[^\n]", input);</span>
+
+        <span class="cmt">// Duplicate and store the name</span>
+        student_names[i] = <span class="fn">duplicate_string</span>(input);
+    }
+
+    <span class="fn">printf</span>(<span class="str">"\nEntered names of students:\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; NUM_STUDENTS; i++)
+    {
+        <span class="fn">printf</span>(<span class="str">"Student_%d: %s\n"</span>, i + <span class="num">1</span>, student_names[i]);
+        <span class="fn">free</span>(student_names[i]); <span class="cmt">// Free memory for each name</span>
+    }
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Um vetor de ponteiros, não de caracteres</h3>
+        <p>
+          <code>student_names</code> é um vetor de 5 <em>ponteiros</em> para <code>char</code> — não uma
+          grade fixa de caracteres. Cada posição é preenchida separadamente, com
+          <code>duplicate_string</code> alocando exatamente o espaço necessário para aquele nome em
+          particular, nem mais nem menos.
+        </p>
+
+        <h3>Execução passo a passo — Ana, Bruno, Carla, Diego, Elisa</h3>
+        <div class="stepper" data-stepper="alunos">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter names of 5 students:
+Student 1: <span class="in">Ana</span>
+Student 2: <span class="in">Bruno</span>
+Student 3: <span class="in">Carla</span>
+Student 4: <span class="in">Diego</span>
+Student 5: <span class="in">Elisa</span>
+
+Entered names of students:
+Student_1: Ana
+Student_2: Bruno
+Student_3: Carla
+Student_4: Diego
+Student_5: Elisa</pre>
+
+        <div class="callout">
+          A estrutura é híbrida: o vetor <code>student_names</code> em si tem tamanho fixo (5) e vive na
+          pilha, mas cada uma das 5 strings que ele aponta foi alocada individualmente no heap, em tempos
+          diferentes. Por isso o laço final precisa liberar cada nome com <code>free(student_names[i]);</code>
+          — liberar só o vetor de ponteiros (que nem foi alocado dinamicamente) não devolveria a memória
+          das strings.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    cidade: {
+      vars: ["city", "city2", "city3"],
+      steps: [
+        { line: 5, vars: {}, desc: "char city[4]; reserva 4 bytes contíguos, sem inicializar — o conteúdo inicial dos 4 bytes é indefinido." },
+        { line: 6, vars: { city: "'R' ? ? ?" }, desc: "city[0] = 'R'; grava o código ASCII de 'R' no primeiro byte." },
+        { line: 7, vars: { city: "'R' 'i' ? ?" }, desc: "city[1] = 'i';" },
+        { line: 8, vars: { city: "'R' 'i' 'o' ?" }, desc: "city[2] = 'o'; — os 3 caracteres de \"Rio\" já estão lá, mas ainda sem terminador." },
+        { line: 9, vars: { city: "\"Rio\"" }, desc: "city[3] = '\\0'; — o quarto e último byte recebe o terminador nulo, fechando a string \"Rio\". Sem esse passo, printf(\"%s\", city) leria memória além do vetor, procurando um '\\0' que não está lá." },
+        { line: 11, vars: {}, desc: "printf(\"%s\\n\", city); imprime Rio — %s lê byte a byte a partir de city até encontrar o '\\0'." },
+        { line: 13, vars: { city2: "\"Rio\"" }, desc: "char city2[] = {'R','i','o','\\0'}; — mesma string, construída de uma vez com uma lista de inicialização que inclui o '\\0' manualmente." },
+        { line: 14, vars: {}, desc: "printf(\"%s\\n\", city2); imprime Rio de novo." },
+        { line: 16, vars: { city3: "\"Rio\"" }, desc: "char city3[] = \"Rio\"; — a forma mais comum: um literal de string já é, por si só, um vetor de char terminado em '\\0' automaticamente pelo compilador." },
+        { line: 17, vars: {}, desc: "printf(\"%s\\n\", city3); imprime Rio pela terceira vez — as três formas produzem exatamente o mesmo resultado." },
+        { line: 19, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "quebra-linha": {
+      vars: ["user_char", "user_string"],
+      steps: [
+        { line: 6, vars: {}, desc: "printf exibe o prompt: “Please enter a character: ”." },
+        { line: 7, vars: { user_char: "'A'" }, desc: "scanf(\" %c\", &user_char); — o espaço antes de %c descarta qualquer espaço em branco pendente no buffer antes de ler o próximo caractere; aqui lê 'A'." },
+        { line: 8, vars: {}, desc: "printf exibe: “You entered: A”." },
+        { line: 11, vars: {}, desc: "printf exibe o prompt: “Please enter a string: ”." },
+        { line: 12, vars: { user_string: "\"Hello World\"" }, desc: "scanf(\" %99[^\\n]\", user_string); — o espaço inicial descarta o '\\n' deixado pela leitura anterior; %[^\\n] então lê tudo (inclusive espaços internos) até o próximo '\\n', no máximo 99 caracteres." },
+        { line: 13, vars: {}, desc: "printf exibe: “You entered: Hello World”." },
+        { line: 15, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "funcoes-string": {
+      vars: ["str1", "str2", "str3", "length", "result"],
+      steps: [
+        { line: 58, vars: { str1: "\"Hello, \"" }, desc: "char str1[50] = \"Hello, \"; — vetor de 50 bytes, mas só os 8 primeiros (\"Hello, \" + '\\0') estão em uso." },
+        { line: 59, vars: { str2: "\"World!\"" }, desc: "char str2[] = \"World!\";" },
+        { line: 62, vars: {}, desc: "Chamamos my_strlen(str1)." },
+        { line: 8, vars: {}, desc: "Dentro de my_strlen: o while avança length enquanto str[length] != '\\0' — para \"Hello, \" (7 caracteres), o laço para quando length chega a 7." },
+        { line: 11, vars: { length: "7" }, desc: "return length; → 7, devolvido para length em main." },
+        { line: 64, vars: {}, desc: "printf exibe: “Length of str1: 7”." },
+        { line: 67, vars: {}, desc: "Chamamos my_strcpy(str1, str2)." },
+        { line: 18, vars: {}, desc: "Dentro de my_strcpy: o while copia src[i] para dest[i] enquanto src[i] != '\\0' — copia 'W','o','r','l','d','!' de str2 para str1." },
+        { line: 24, vars: { str1: "\"World!\"" }, desc: "dest[i] = '\\0'; fecha a cópia. str1 agora é \"World!\" — o conteúdo antigo (\"Hello, \") foi sobrescrito." },
+        { line: 69, vars: {}, desc: "printf exibe: “Copied string: World!”." },
+        { line: 72, vars: { str3: "\"Hello, \"" }, desc: "char str3[50] = \"Hello, \"; — uma variável nova; str1 não é reaproveitado aqui." },
+        { line: 73, vars: {}, desc: "Chamamos my_strcat(str3, str2)." },
+        { line: 30, vars: {}, desc: "Dentro de my_strcat: dest_len = my_strlen(dest) = 7 — o ponto a partir do qual src será anexado." },
+        { line: 33, vars: {}, desc: "O while copia src[i] para dest[dest_len + i] enquanto src[i] != '\\0' — anexa \"World!\" a partir da posição 7 de str3." },
+        { line: 39, vars: { str3: "\"Hello, World!\"" }, desc: "dest[dest_len + i] = '\\0'; fecha a nova string concatenada." },
+        { line: 75, vars: {}, desc: "printf exibe: “Concatenated string: Hello, World!”." },
+        { line: 78, vars: {}, desc: "Chamamos my_strcmp(\"apple\", \"banana\")." },
+        { line: 46, vars: {}, desc: "O for compara caractere a caractere enquanto ambos forem diferentes de '\\0': str1[0]='a' e str2[0]='b' já diferem (d = 'a' - 'b' = -1 ≠ 0)." },
+        { line: 50, vars: { result: "-1" }, desc: "return d; → -1, devolvido para result. Um valor negativo indica que a primeira string é \"menor\" (vem antes) que a segunda, na ordem alfabética." },
+        { line: 82, vars: {}, desc: "else if (result < 0) é verdadeiro: printf exibe “str1 is less than str2”." },
+        { line: 87, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    duplicar: {
+      vars: ["original", "n", "dest", "copied"],
+      steps: [
+        { line: 23, vars: { original: "\"Hello, World!\"" }, desc: "char original[] = \"Hello, World!\"; — 14 bytes (13 caracteres + '\\0')." },
+        { line: 27, vars: {}, desc: "Chamamos duplicate(original)." },
+        { line: 8, vars: { n: "14" }, desc: "Dentro de duplicate: n = strlen(src) + 1 = 13 + 1 = 14 — o +1 reserva espaço para o '\\0', que strlen não conta." },
+        { line: 9, vars: { dest: "malloc(14) → novo bloco" }, desc: "dest = malloc(14 * sizeof(char)); — um novo bloco de 14 bytes no heap, totalmente independente de original." },
+        { line: 11, vars: {}, desc: "if (dest == NULL) → alocação bem-sucedida, condição falsa." },
+        { line: 17, vars: { dest: "\"Hello, World!\"" }, desc: "strcpy(dest, src); copia os 13 caracteres de src mais o '\\0' para dest — agora dest é uma cópia completa e independente de original." },
+        { line: 18, vars: {}, desc: "return dest; — o ponteiro para a cópia, alocada no heap, é devolvido para main." },
+        { line: 27, vars: { copied: "\"Hello, World!\"" }, desc: "De volta em main: copied recebe o endereço devolvido por duplicate." },
+        { line: 30, vars: {}, desc: "printf exibe: “Original string: Hello, World!”." },
+        { line: 31, vars: {}, desc: "printf exibe: “Copied string: Hello, World!” — mesmo conteúdo, mas original e copied apontam para blocos de memória diferentes." },
+        { line: 34, vars: {}, desc: "free(copied); — libera os 14 bytes alocados por duplicate. original não é afetado, porque é um vetor comum, não alocado dinamicamente." },
+        { line: 36, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    alunos: {
+      vars: ["student_names"],
+      steps: [
+        { line: 25, vars: {}, desc: "char *student_names[NUM_STUDENTS]; declara um vetor de 5 ponteiros para char — cada posição vai apontar para uma string alocada separadamente; nenhuma delas existe ainda." },
+        { line: 27, vars: {}, desc: "printf exibe: “Enter names of 5 students:”." },
+        { line: 34, vars: {}, desc: "i=0: scanf(\" %99[^\\n]\", input); lê \"Ana\" para o vetor local input." },
+        { line: 44, vars: { student_names: "[0]=\"Ana\"" }, desc: "student_names[0] = duplicate_string(input); — aloca uma nova string no heap com uma cópia de \"Ana\" e guarda o endereço na posição 0." },
+        { line: 34, vars: {}, desc: "i=1: lê \"Bruno\" para input (o mesmo vetor local, reaproveitado)." },
+        { line: 44, vars: { student_names: "[0]=\"Ana\", [1]=\"Bruno\"" }, desc: "student_names[1] = duplicate_string(input); — um novo bloco no heap, independente do anterior." },
+        { line: 34, vars: {}, desc: "i=2: lê \"Carla\"." },
+        { line: 44, vars: { student_names: "..., [2]=\"Carla\"" }, desc: "student_names[2] = duplicate_string(input);" },
+        { line: 34, vars: {}, desc: "i=3: lê \"Diego\"." },
+        { line: 44, vars: { student_names: "..., [3]=\"Diego\"" }, desc: "student_names[3] = duplicate_string(input);" },
+        { line: 34, vars: {}, desc: "i=4: lê \"Elisa\"." },
+        { line: 44, vars: { student_names: "[Ana, Bruno, Carla, Diego, Elisa]" }, desc: "student_names[4] = duplicate_string(input); — as 5 posições agora apontam para 5 blocos de memória independentes no heap." },
+        { line: 47, vars: {}, desc: "printf exibe: “Entered names of students:”." },
+        { line: 50, vars: {}, desc: "O laço final imprime cada nome — Student_1: Ana, Student_2: Bruno, ... —" },
+        { line: 51, vars: {}, desc: "— e, logo em seguida a cada impressão, free(student_names[i]); libera a string daquela posição, uma de cada vez." },
+        { line: 54, vars: {}, desc: "return 0; — o programa termina, com as 5 strings já devidamente liberadas." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elLog = root.querySelector("[data-log]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      if (elLog) {
+        var rowsHtml = [];
+        for (var m = 0; m <= current; m++) {
+          if (steps[m].row) rowsHtml.push(steps[m]);
+        }
+        elLog.innerHTML = rowsHtml
+          .map(function (s) {
+            return (
+              "<tr" + (s.win ? ' class="win"' : "") + ">" +
+              s.row
+                .map(function (cell, idx) {
+                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
+                })
+                .join("") +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+</body>
+</html>
