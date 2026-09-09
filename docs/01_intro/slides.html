@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Primeiros programas em C</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --accent: #2F6FB1;
+    --accent-soft: #DCE7F4;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-str: #E29A4E;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    min-font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 9vw;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- title / closing slide ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  /* ---- pipeline de compilação (assinatura da capa) ---- */
+
+  .pipeline-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.9vw;
+    margin-top: 3vw;
+  }
+  .pipeline-strip .chip {
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 2.1vw, 1.6rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.6vw 1.1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .pipeline-strip .chip.is-accent { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .pipeline-strip .arrow { font-size: clamp(1.2rem, 2.2vw, 1.7rem); color: var(--ink-faint); }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.4vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- flow (transformação em passos) ---- */
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6vw;
+    flex-wrap: wrap;
+  }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.6vw, 2.8rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.2vw 1.8vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.4vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .flow .arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
+  .flow .op {
+    font-family: var(--font-mono);
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+    color: var(--ink-soft);
+  }
+
+  /* ---- figura em tela cheia ---- */
+
+  .fig-slide { padding: 0; }
+  .fig-slide .fig-head {
+    padding: 2.4vw 4.4vw 1.2vw;
+  }
+  .fig-slide .fig-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4.4vw 3vw;
+    min-height: 0;
+  }
+  .fig-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 1.4vw;
+  }
+
+  /* ---- comparação 2/3 colunas ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col.is-bad { border-color: var(--accent); }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.8vw; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.4vw;
+    padding: 0.5vw 0.7vw;
+    display: block;
+  }
+
+  /* ---- cards paralelos ---- */
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4vw; width: 100%; }
+  .cards .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw 1.2vw;
+    text-align: center;
+  }
+  .cards .card .fn {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.6vw;
+  }
+  .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
+
+  /* ---- tamanho dos tipos primitivos ---- */
+
+  .sizes { display: flex; flex-direction: column; gap: 1.3vw; width: 100%; max-width: 54vw; margin: 0 auto; }
+  .sizes .row { display: flex; align-items: center; gap: 1.2vw; }
+  .sizes .row .type {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+    width: 8vw;
+    flex: none;
+  }
+  .sizes .row .units { display: flex; gap: 0.4vw; flex-wrap: wrap; }
+  .sizes .row .unit {
+    width: clamp(1.5rem, 2.4vw, 2.1rem);
+    height: clamp(1.5rem, 2.4vw, 2.1rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.3vw;
+  }
+  .sizes .row.is-accent .type { color: var(--accent); }
+  .sizes .row.is-accent .unit { border-color: var(--accent); background: var(--accent-soft); }
+  .sizes .row .bytes {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
+    color: var(--ink-faint);
+    margin-left: 0.6vw;
+    white-space: nowrap;
+  }
+
+  /* ---- switch: decisão em cascata ---- */
+
+  .caseflow { display: flex; flex-direction: column; gap: 0.75vw; align-items: flex-start; margin: 0 auto; }
+  .caseflow .case {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.7vw 1.4vw;
+    opacity: 0.5;
+  }
+  .caseflow .case.is-match {
+    opacity: 1;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    box-shadow: 0 0.35vw 0 var(--accent);
+  }
+  .caseflow .case .note {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+    color: var(--ink-soft);
+  }
+  .caseflow .case.is-match .note { color: var(--accent); }
+  .caseflow .case.is-default { border-style: dashed; }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  .cta-row { display: flex; flex-direction: column; gap: 1vw; align-items: flex-start; }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    min-font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .compare { grid-template-columns: 1fr; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulos 1–3</div>
+    <h1>Primeiros programas em C</h1>
+    <p class="sub">Como um programa nasce, compila e roda — os tipos e operadores que ele manipula, e como ele toma decisões.</p>
+    <div class="pipeline-strip">
+      <div class="chip">code.c</div>
+      <div class="arrow">→</div>
+      <div class="chip is-accent">gcc</div>
+      <div class="arrow">→</div>
+      <div class="chip">./programa</div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">Do código ao executável</div><div class="d">como um programa em C nasce, compila e roda</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Variáveis e tipos</div><div class="d">onde os dados moram na memória e quanto espaço ocupam</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Operadores e E/S</div><div class="d">como transformar valores e conversar com quem usa o programa</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Decisões</div><div class="d">como o programa escolhe o que fazer com if e switch</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Primeiros programas em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. CICLO DE DESENVOLVIMENTO -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Do código ao executável</div>
+      <h1>Editar, compilar, testar — em ciclo</h1>
+      <p class="sub">Um erro de compilação ou de execução manda de volta para o editor.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig1-2.jpg" alt="Diagrama do ciclo de desenvolvimento de um programa em C: editor de texto produz o programa em C, que passa pelo compilador e vira um programa executável cuja execução gera uma saída; setas tracejadas retornam ao editor para corrigir erro de compilação ou erro de execução.">
+    </div>
+  </section>
+
+  <!-- 4. ANATOMIA DE UM PROGRAMA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Do código ao executável</div>
+    <h1>A mesma anatomia, sempre</h1>
+    <p class="sub">Todo programa em C segue este esqueleto.</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card"><span class="fn">#include</span><p>traz as declarações de uma biblioteca (ex.: stdio.h)</p></div>
+        <div class="card"><span class="fn">int main()</span><p>ponto de entrada obrigatório — é daqui que a execução começa</p></div>
+        <div class="card"><span class="fn">{ }</span><p>delimitam o corpo: comandos executados em ordem, de cima a baixo</p></div>
+        <div class="card"><span class="fn">return 0;</span><p>encerra a função e devolve um status ao sistema operacional</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Do código ao executável</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. TIPOS PRIMITIVOS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <h1>Cada tipo ocupa um número fixo de bytes</h1>
+    <p class="sub">char, int, float, double e void — <code>sizeof</code> revela o tamanho de cada um.</p>
+    <div class="body">
+      <div class="sizes">
+        <div class="row is-accent">
+          <span class="type">char</span>
+          <div class="units"><span class="unit"></span></div>
+          <span class="bytes">1 byte</span>
+        </div>
+        <div class="row">
+          <span class="type">int</span>
+          <div class="units"><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span></div>
+          <span class="bytes">4 bytes</span>
+        </div>
+        <div class="row">
+          <span class="type">float</span>
+          <div class="units"><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span></div>
+          <span class="bytes">4 bytes</span>
+        </div>
+        <div class="row">
+          <span class="type">double</span>
+          <div class="units"><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span></div>
+          <span class="bytes">8 bytes</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. DECLARAR != INICIALIZAR -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <h1>Declarar não é inicializar</h1>
+    <p class="sub">Sem atribuição explícita, uma variável recém-declarada guarda "lixo de memória".</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">int age;<span class="tag">declarada</span></div>
+        <div class="arrow">→</div>
+        <div class="box">?<span class="tag">valor indefinido</span></div>
+        <div class="op">scanf</div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">20<span class="tag">age, inicializada</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. DIVISÃO INTEIRA VS PONTO FLUTUANTE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Operadores e E/S</div>
+    <h1>Nem toda divisão sobra decimais</h1>
+    <p class="sub">O tipo dos operandos decide se o resultado trunca ou não.</p>
+    <div class="body">
+      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 52vw;">
+        <div class="col is-bad">
+          <h3>7 / 2</h3>
+          <p>Os dois operandos são int — divisão inteira, trunca a parte decimal.</p>
+          <span class="cap">3</span>
+        </div>
+        <div class="col">
+          <h3>7.0 / 2</h3>
+          <p>Pelo menos um operando é ponto flutuante — o resultado guarda casas decimais.</p>
+          <span class="cap">3.5</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. PRÉ VS PÓS-INCREMENTO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Operadores e E/S</div>
+    <h1>++x e x++ não são a mesma coisa</h1>
+    <p class="sub">A diferença aparece quando o operador está dentro de uma expressão maior.</p>
+    <div class="body">
+      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 52vw;">
+        <div class="col">
+          <h3>x++ (pós-fixado)</h3>
+          <p>A expressão usa o valor atual de x — o incremento acontece depois.</p>
+          <span class="cap">usa 5, x vira 6</span>
+        </div>
+        <div class="col is-bad">
+          <h3>++x (pré-fixado)</h3>
+          <p>x é incrementado primeiro — a expressão já usa o novo valor.</p>
+          <span class="cap">x vira 6, usa 6</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. PRINTF: LARGURA DE CAMPO -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Operadores e E/S</div>
+      <h1>printf também controla a largura</h1>
+      <p class="sub"><code>%4d</code> e <code>%7.2f</code> reservam um número mínimo de posições, alinhadas à direita.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig2-1.jpg" alt="Dois especificadores de formato do printf com largura de campo: %4d reserva 4 posições para o inteiro 23, alinhado à direita; %7.2f reserva 7 posições (2 delas para casas decimais) para o valor 5.30, também alinhado à direita.">
+    </div>
+  </section>
+
+  <!-- 10. SCANF PRECISA DO ENDEREÇO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Operadores e E/S</div>
+    <h1>scanf sempre pede o endereço</h1>
+    <p class="sub">Sem o <code>&amp;</code>, scanf não sabe onde guardar o valor lido.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">idade<span class="tag">variável</span></div>
+        <div class="op">&amp;</div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">&amp;idade<span class="tag">endereço na memória</span></div>
+        <div class="arrow">→</div>
+        <div class="box">scanf<span class="tag">escreve aqui</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. TODA CONDIÇÃO É UM NÚMERO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Decisões</div>
+    <h1>C não tem um tipo booleano</h1>
+    <p class="sub">Qualquer expressão numérica pode ser usada como condição de um if.</p>
+    <div class="body">
+      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 52vw;">
+        <div class="col is-bad">
+          <h3>0</h3>
+          <p>Tratado como falso — o bloco do if não executa.</p>
+          <span class="cap">if (0) → não executa</span>
+        </div>
+        <div class="col">
+          <h3>≠ 0</h3>
+          <p>Qualquer valor diferente de zero é tratado como verdadeiro.</p>
+          <span class="cap">if (5) → executa</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Decisões</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. SWITCH: DECISÃO EM CASCATA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Decisões</div>
+    <h1>switch testa em cascata, até bater</h1>
+    <p class="sub">Sem <code>break</code>, a execução "cai" para o case seguinte (fall-through).</p>
+    <div class="body">
+      <div class="caseflow">
+        <div class="case">case '+'</div>
+        <div class="case">case '-'</div>
+        <div class="case">case '*'</div>
+        <div class="case is-match">case '/' <span class="note">← bate aqui, executa até o break</span></div>
+        <div class="case is-default">default <span class="note">só roda se nenhum case bater</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Decisões</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 13. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, explicação linha a linha e simulação da execução passo a passo — sem precisar compilar nada. Depois, teste o que aprendeu no quiz.</p>
+    <div class="cta-row">
+      <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/01_intro</span></div>
+      <div class="cta">🎯 Quiz de fixação<span class="url">thiagopx.github.io/ed/01_intro/quiz</span></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>
