@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Vetores e Matrizes</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --accent: #B1752F;
+    --accent-soft: #F1E3CC;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    min-font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 9vw;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- title / closing slide ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  /* ---- vetor (chips de assinatura da capa) ---- */
+
+  .array-strip { display: flex; gap: 1vw; margin-top: 3vw; }
+  .array-strip .acell { display: flex; flex-direction: column; align-items: center; gap: 0.5vw; }
+  .array-strip .aval {
+    font-family: var(--font-mono);
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.6vw 1.1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+    min-width: 2.4vw;
+    text-align: center;
+  }
+  .array-strip .aidx { font-family: var(--font-mono); font-size: clamp(0.75rem, 1.2vw, 0.95rem); color: var(--ink-faint); }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.4vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- flow (transformação em passos) ---- */
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6vw;
+    flex-wrap: wrap;
+  }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.6vw, 2.9rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.2vw 1.8vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.4vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .flow .arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
+  .flow .op {
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+    color: var(--ink-soft);
+  }
+
+  /* ---- figura em tela cheia ---- */
+
+  .fig-slide { padding: 0; }
+  .fig-slide .fig-head {
+    padding: 2.4vw 4.4vw 1.2vw;
+  }
+  .fig-slide .fig-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4.4vw 3vw;
+    min-height: 0;
+  }
+  .fig-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 1.4vw;
+  }
+
+  /* ---- cadeia de caixinhas (vetor) ---- */
+
+  .chain { display: flex; flex-direction: column; align-items: center; gap: 1.4vw; }
+  .chain .strip { display: flex; gap: 0.7vw; }
+  .chain .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2.6vw, 2.1rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    width: clamp(2.6rem, 4.8vw, 4rem);
+    height: clamp(2.6rem, 4.8vw, 4rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chain .cell.is-gap { color: var(--ink-faint); border-style: dashed; }
+  .chain .cell.is-oob { border-color: var(--accent); border-style: dashed; color: var(--accent); background: var(--accent-soft); }
+  .chain .label { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--ink-soft); text-align: center; max-width: 46vw; }
+  .chain .label strong { color: var(--accent); }
+
+  /* ---- comparação (2 ou 3 colunas) ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0; }
+
+  /* ---- duelo (dois elementos lado a lado) ---- */
+
+  .duel { display: flex; align-items: center; justify-content: center; gap: 4vw; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 1vw; }
+  .duel .item .demo { display: flex; gap: 0.6vw; }
+  .duel .item .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.9vw 1.6vw;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .duel .item .cell.is-accent { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .duel .item .tag { font-family: var(--font-mono); font-size: clamp(1rem, 1.6vw, 1.35rem); color: var(--ink-soft); text-align: center; }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); }
+
+  /* ---- grade de matriz ---- */
+
+  .matgrid { display: flex; flex-direction: column; align-items: center; gap: 1.8vw; }
+  .matgrid .mg-table { display: flex; flex-direction: column; gap: 0.55vw; }
+  .matgrid .mg-headrow { display: flex; gap: 0.55vw; padding-left: 3.9vw; }
+  .matgrid .mg-colhead {
+    font-family: var(--font-mono);
+    font-size: clamp(0.8rem, 1.15vw, 1rem);
+    color: var(--ink-faint);
+    width: clamp(2.8rem, 4.6vw, 3.8rem);
+    text-align: center;
+  }
+  .matgrid .mg-row { display: flex; align-items: center; gap: 0.55vw; }
+  .matgrid .mg-rowhead {
+    font-family: var(--font-mono);
+    font-size: clamp(0.8rem, 1.15vw, 1rem);
+    color: var(--ink-faint);
+    width: 3.4vw;
+    min-width: 38px;
+    text-align: right;
+  }
+  .matgrid .mg-cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    width: clamp(2.8rem, 4.6vw, 3.8rem);
+    height: clamp(2.8rem, 4.6vw, 3.8rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+  }
+  .matgrid .mg-row.is-active .mg-cell { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .matgrid .mg-row.is-done .mg-cell { opacity: 0.4; }
+  .matgrid .mg-row.is-pending .mg-cell { border-style: dashed; opacity: 0.55; }
+  .matgrid .mg-cell.is-diag { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); border-style: solid; opacity: 1; }
+  .matgrid .mg-cap { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); text-align: center; }
+  .matgrid .mg-cap code {
+    font-family: var(--font-mono);
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.4em;
+    color: var(--ink);
+  }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  .cover .quiz-note { margin-top: 1.2vw; font-size: clamp(0.9rem, 1.5vw, 1.15rem); color: var(--ink-faint); }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    min-font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .compare { grid-template-columns: 1fr; }
+    .duel { flex-direction: column; gap: 1.5vw; }
+    .matgrid .mg-cell, .matgrid .mg-colhead { width: 2.4rem; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulo 6</div>
+    <h1>Vetores e matrizes</h1>
+    <p class="sub">Como o C guarda várias posições sob um único nome — e por que, por baixo dos panos, tudo é sempre um bloco de memória contíguo.</p>
+    <div class="array-strip">
+      <div class="acell"><span class="aval">5</span><span class="aidx">v[0]</span></div>
+      <div class="acell"><span class="aval">11</span><span class="aidx">v[1]</span></div>
+      <div class="acell"><span class="aval">0</span><span class="aidx">v[2]</span></div>
+      <div class="acell"><span class="aval">3</span><span class="aidx">v[3]</span></div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">Vetores</div><div class="d">memória contígua, índices — e os limites que o C não confere</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Vetores e ponteiros</div><div class="d">por que v[i] e *(v + i) são exatamente a mesma coisa</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Matrizes</div><div class="d">uma grade lógica sobre um único bloco de memória linear</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Laços aninhados</div><div class="d">como percorrer — e nem sempre percorrer tudo — uma matriz</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Vetores e matrizes</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. VETOR: MEMÓRIA CONTÍGUA -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Vetores</div>
+      <h1>Um bloco contíguo, acessado por índice</h1>
+      <p class="sub"><code>int v[10];</code> reserva de uma vez 10 posições — <code>v</code> aponta sempre para a posição 0.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig6-1.jpg" alt="Duas visões de um vetor v de 10 inteiros: a visão de memória, uma coluna de células com endereços crescentes, e a visão abstrata usual, uma linha de 10 células indexadas de 0 a 9.">
+    </div>
+  </section>
+
+  <!-- 4. FORA DOS LIMITES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetores</div>
+    <h1>C não confere se o índice cabe no vetor</h1>
+    <p class="sub">Escrever em <code>v[30]</code> com um vetor de 10 posições compila e roda — só que em memória que não é sua.</p>
+    <div class="body">
+      <div class="chain">
+        <div class="strip">
+          <div class="cell">5</div>
+          <div class="cell">11</div>
+          <div class="cell">0</div>
+          <div class="cell">3</div>
+          <div class="cell">7</div>
+          <div class="cell">2</div>
+          <div class="cell">9</div>
+          <div class="cell">4</div>
+          <div class="cell">6</div>
+          <div class="cell">1</div>
+          <div class="cell is-gap">···</div>
+          <div class="cell is-oob">?</div>
+        </div>
+        <div class="label"><strong>v[0]</strong> a <strong>v[9]</strong> são válidos — <strong>v[30]</strong> já não pertence a v, mas o C acessa mesmo assim.</div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetores</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. V[I] ≡ *(V+I) -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetores e ponteiros</div>
+    <h1>Colchetes são aritmética de ponteiro disfarçada</h1>
+    <p class="sub">O nome do vetor já é um ponteiro constante para sua primeira posição.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">v[3]<span class="tag">notação de índice</span></div>
+        <div class="arrow">≡</div>
+        <div class="box is-accent">*(v + 3)<span class="tag">aritmética de ponteiro</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetores e ponteiros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. SIZEOF: VETOR VS PONTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetores e ponteiros</div>
+    <h1>sizeof(vetor) ≠ sizeof(ponteiro)</h1>
+    <p class="sub"><code>int v[10]; int *u = v;</code> — só <code>v</code> conhece o tamanho do bloco inteiro.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="demo"><div class="cell">40 bytes</div></div>
+          <div class="tag">sizeof(v) — o vetor inteiro</div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="item">
+          <div class="demo"><div class="cell is-accent">8 bytes</div></div>
+          <div class="tag">sizeof(u) — só um endereço</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetores e ponteiros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. DUAS FORMAS DE PERCORRER -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetores e ponteiros</div>
+    <h1>Duas formas de escrever o mesmo laço</h1>
+    <p class="sub">A equivalência entre índice e aritmética de ponteiro abre dois estilos de percurso.</p>
+    <div class="body">
+      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 60vw;">
+        <div class="col">
+          <h3>*(ptr + i)</h3>
+          <p><code>ptr</code> fica parado em <code>numbers[0]</code> do início ao fim — é o deslocamento <code>+ i</code> que muda a cada volta.</p>
+        </div>
+        <div class="col">
+          <h3>*ptr; ptr++;</h3>
+          <p>Sem índice: <code>*ptr</code> lê o valor atual, depois <code>ptr++</code> avança o próprio ponteiro.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetores e ponteiros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. PASSAGEM DE VETOR PARA FUNÇÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetores e ponteiros</div>
+    <h1>Passar um vetor é passar um endereço</h1>
+    <p class="sub"><code>float calculate_mean(float ptr[], int size)</code> — dentro da função, <code>ptr</code> é só um ponteiro comum.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">v<span class="tag">vetor original — 40 bytes</span></div>
+        <div class="op">só o endereço viaja</div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">ptr<span class="tag">dentro da função — 8 bytes</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetores e ponteiros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. RECURSÃO COM VETORES -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Vetores e ponteiros</div>
+      <h1>O mesmo padrão, um elemento menor a cada chamada</h1>
+      <p class="sub">Caso base: um único elemento. Caso recursivo: o primeiro combinado com o resultado do resto.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig6-2.jpg" alt="Esquema recursivo genérico: vetor(n, v) é igual a v[0] quando n = 1 (caso base); e igual a v[0] combinado com vetor(n - 1, &v[1]) quando n > 1 (caso recursivo).">
+    </div>
+  </section>
+
+  <!-- 10. MATRIZ = VETOR ÚNICO, ROW-MAJOR -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Matrizes</div>
+      <h1>Uma grade lógica sobre um bloco linear</h1>
+      <p class="sub"><code>int mat[3][4];</code> guarda 12 inteiros contíguos, preenchidos linha por linha.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig6-3.jpg" alt="A mesma matriz 3x4 mostrada de duas formas: a grade lógica indexada por i (linha) e j (coluna), e a visão de memória — um bloco contíguo de 12 células em ordem row-major.">
+    </div>
+  </section>
+
+  <!-- 11. LAÇOS ANINHADOS: PERCORRENDO A MATRIZ -->
+  <section class="slide" data-slide>
+    <div class="kicker">Laços aninhados</div>
+    <h1>Um laço para a linha, outro para a coluna</h1>
+    <p class="sub">O laço externo só avança para a próxima linha depois que o interno termina todas as colunas.</p>
+    <div class="body">
+      <div class="matgrid">
+        <div class="mg-table">
+          <div class="mg-headrow">
+            <span class="mg-colhead">j=0</span><span class="mg-colhead">j=1</span><span class="mg-colhead">j=2</span><span class="mg-colhead">j=3</span>
+          </div>
+          <div class="mg-row is-done">
+            <span class="mg-rowhead">i=0</span>
+            <span class="mg-cell">1</span><span class="mg-cell">5</span><span class="mg-cell">2</span><span class="mg-cell">0</span>
+          </div>
+          <div class="mg-row is-active">
+            <span class="mg-rowhead">i=1</span>
+            <span class="mg-cell">8</span><span class="mg-cell">2</span><span class="mg-cell">3</span><span class="mg-cell">1</span>
+          </div>
+          <div class="mg-row is-pending">
+            <span class="mg-rowhead">i=2</span>
+            <span class="mg-cell">1</span><span class="mg-cell">6</span><span class="mg-cell">7</span><span class="mg-cell">2</span>
+          </div>
+        </div>
+        <div class="mg-cap">Ordem de <code>mat[i][j]</code>: <code>0,0 · 0,1 · 0,2 · 0,3 · 1,0 …</code></div>
+      </div>
+    </div>
+    <div class="footer"><span>Laços aninhados</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. DIAGONAL PRINCIPAL -->
+  <section class="slide" data-slide>
+    <div class="kicker">Laços aninhados</div>
+    <h1>Nem sempre é preciso visitar tudo</h1>
+    <p class="sub">A diagonal principal (i == j) precisa de um único laço, sem aninhamento.</p>
+    <div class="body">
+      <div class="matgrid">
+        <div class="mg-table">
+          <div class="mg-headrow">
+            <span class="mg-colhead">j=0</span><span class="mg-colhead">j=1</span><span class="mg-colhead">j=2</span><span class="mg-colhead">j=3</span>
+          </div>
+          <div class="mg-row">
+            <span class="mg-rowhead">i=0</span>
+            <span class="mg-cell is-diag">1</span><span class="mg-cell">5</span><span class="mg-cell">2</span><span class="mg-cell">0</span>
+          </div>
+          <div class="mg-row">
+            <span class="mg-rowhead">i=1</span>
+            <span class="mg-cell">8</span><span class="mg-cell is-diag">2</span><span class="mg-cell">3</span><span class="mg-cell">1</span>
+          </div>
+          <div class="mg-row">
+            <span class="mg-rowhead">i=2</span>
+            <span class="mg-cell">1</span><span class="mg-cell">6</span><span class="mg-cell is-diag">7</span><span class="mg-cell">2</span>
+          </div>
+        </div>
+        <div class="mg-cap">Soma apenas onde <code>i == j</code>: 1 + 2 + 7 = 10</div>
+      </div>
+    </div>
+    <div class="footer"><span>Laços aninhados</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 13. PASSAGEM DE MATRIZ PARA FUNÇÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Matrizes</div>
+    <h1>Linhas livres, colunas obrigatórias</h1>
+    <p class="sub"><code>int primary_diagonal_sum(int matrix[][4], int size)</code> — só o número de colunas precisa ser fixo.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">matrix[ ]<span class="tag">linhas — pode ficar em branco</span></div>
+        <div class="box is-accent">[4]<span class="tag">colunas — obrigatório</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Matrizes</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 14. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, explicação linha a linha e simulação da execução passo a passo — sem precisar compilar nada.</p>
+    <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/04_arrays</span></div>
+    <p class="quiz-note">Depois, teste o que aprendeu no quiz — 10 questões sobre vetores, ponteiros e matrizes.</p>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>
