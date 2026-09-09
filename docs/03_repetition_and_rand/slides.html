@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Repetição e Números Aleatórios</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --accent: #2F8132;
+    --accent-soft: #DCEEDD;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-str: #E29A4E;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    min-font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 9vw;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- title / closing slide ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  .string-strip {
+    display: flex;
+    gap: 0.6vw;
+    margin-top: 3vw;
+  }
+  .string-strip .chip {
+    font-family: var(--font-mono);
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.6vw 1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .string-strip .chip.is-accent { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.2vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- for: anatomia (term + argv-row) ---- */
+
+  .term {
+    font-family: var(--font-mono);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.7vw;
+    padding: 1.6vw 2vw;
+    font-size: clamp(1.1rem, 2.1vw, 1.7rem);
+    width: 100%;
+    max-width: 50vw;
+    text-align: center;
+  }
+  .argv-row { display: flex; gap: 1vw; margin-top: 2.4vw; flex-wrap: wrap; justify-content: center; }
+  .argv-row .tok { display: flex; flex-direction: column; align-items: center; gap: 0.5vw; }
+  .argv-row .tok .word {
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 1.8vw, 1.5rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.6vw 1.1vw;
+  }
+  .argv-row .tok.is-key .word { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .argv-row .tok .idx { font-family: var(--font-body); font-weight: 600; font-size: clamp(0.85rem, 1.3vw, 1.05rem); color: var(--ink-faint); }
+
+  /* ---- while vs do-while (duel de sequências) ---- */
+
+  .duel { display: flex; align-items: flex-start; justify-content: center; gap: 4vw; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 0.9vw; }
+  .duel .item .tag { font-family: var(--font-mono); font-size: clamp(1.1rem, 1.9vw, 1.6rem); color: var(--ink); font-weight: 700; margin-bottom: 0.3vw; }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); margin-top: 3.2vw; }
+  .duel .seq { display: flex; flex-direction: column; align-items: center; gap: 0.3vw; }
+  .duel .seq .step {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.6vw, 1.3rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.7vw 1.3vw;
+    text-align: center;
+    min-width: 12vw;
+  }
+  .duel .seq .step.is-accent { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .duel .seq .down { font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--ink-faint); }
+  .duel .badge {
+    margin-top: 0.8vw;
+    font-size: clamp(0.8rem, 1.25vw, 1rem);
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 0.4vw 1vw;
+    text-align: center;
+    max-width: 15vw;
+  }
+
+  /* ---- while(1) + break ---- */
+
+  .infloop { display: flex; align-items: center; justify-content: center; gap: 1.6vw; flex-wrap: wrap; }
+  .infloop .loop-box, .infloop .break-box, .infloop .exit-box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.2vw 1.8vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+    position: relative;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+  }
+  .infloop .loop-box { margin-top: 1vw; }
+  .infloop .loop-badge {
+    position: absolute;
+    top: -1.1vw;
+    left: -1.1vw;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    width: 2.4vw;
+    height: 2.4vw;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2vw;
+    font-weight: 800;
+  }
+  .infloop .break-box { border-color: var(--line-strong, var(--line)); }
+  .infloop .exit-box { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .infloop .tag { display: block; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: var(--ink-faint); margin-top: 0.5vw; }
+  .infloop-arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
+
+  /* ---- break vs continue (trace de iterações) ---- */
+
+  .itertrace { display: flex; flex-direction: column; gap: 2.6vw; width: 100%; max-width: 58vw; margin: 0 auto; }
+  .itertrace .trace-row { display: flex; align-items: center; gap: 1.6vw; }
+  .itertrace .trace-label { font-family: var(--font-mono); font-weight: 700; font-size: clamp(1rem, 1.6vw, 1.3rem); min-width: 8vw; }
+  .itertrace .trace-chips { display: flex; gap: 0.9vw; flex-wrap: wrap; }
+  .itertrace .tchip {
+    position: relative;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    width: clamp(2.6rem, 4.6vw, 3.6rem);
+    height: clamp(2.6rem, 4.6vw, 3.6rem);
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .itertrace .tchip.is-stop { border-color: var(--accent); color: #fff; background: var(--accent); }
+  .itertrace .tchip.is-ghost { border-style: dashed; color: var(--ink-faint); opacity: 0.45; }
+  .itertrace .tchip.is-skip { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); border-style: dashed; }
+  .itertrace .tchip .mark {
+    position: absolute;
+    top: -1.8vw;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ---- RAND_MAX (faixa numérica) ---- */
+
+  .rangeband { display: flex; flex-direction: column; align-items: center; gap: 1.6vw; width: 100%; max-width: 58vw; margin: 0 auto; }
+  .rangeband .call {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0.6vw;
+    padding: 0.6vw 1.3vw;
+  }
+  .rangeband .band {
+    position: relative;
+    width: 100%;
+    height: clamp(2rem, 3.6vw, 2.8rem);
+    background: var(--surface-2);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+  }
+  .rangeband .band .marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(1rem, 1.8vw, 1.5rem);
+    height: clamp(1rem, 1.8vw, 1.5rem);
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .rangeband .caps { display: flex; justify-content: space-between; width: 100%; font-family: var(--font-mono); font-size: clamp(0.9rem, 1.4vw, 1.15rem); color: var(--ink-soft); }
+
+  /* ---- rand() % N + 1 (flow) ---- */
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4vw;
+    flex-wrap: wrap;
+  }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1vw 1.5vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.4vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); background: var(--accent-soft); }
+  .flow .arrow { font-size: clamp(1.4rem, 2.6vw, 2.1rem); color: var(--ink-faint); }
+  .flow .op {
+    font-family: var(--font-mono);
+    font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+
+  /* ---- comparação 2 colunas (semente) ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare.cols-2 { grid-template-columns: repeat(2, 1fr); max-width: 56vw; margin: 0 auto; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.9vw; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.4vw;
+    padding: 0.7vw 0.9vw;
+    display: block;
+    line-height: 1.7;
+  }
+  .compare .col .cap .kept { color: #7fd99a; }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  .quiz-note {
+    margin-top: 1.4vw;
+    font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+    color: var(--ink-faint);
+  }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    min-font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .compare { grid-template-columns: 1fr; }
+    .duel { flex-direction: column; gap: 1.5vw; }
+    .infloop { flex-direction: column; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulo 5</div>
+    <h1>Repetição e números aleatórios</h1>
+    <p class="sub">As três formas de repetir um bloco de código em C — e como transformar isso em sorteios, dados e jogos.</p>
+    <div class="string-strip">
+      <div class="chip">1</div>
+      <div class="chip">2</div>
+      <div class="chip">3</div>
+      <div class="chip">4</div>
+      <div class="chip">5</div>
+      <div class="chip is-accent">↺</div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">while</div><div class="d">o laço de pré-teste — testa a condição antes de repetir</div></div></li>
+        <li><span class="n">02</span><div><div class="t">for</div><div class="d">inicialização, condição e incremento numa linha só</div></div></li>
+        <li><span class="n">03</span><div><div class="t">do-while</div><div class="d">o laço de pós-teste — repete pelo menos uma vez</div></div></li>
+        <li><span class="n">04</span><div><div class="t">break e continue</div><div class="d">interrompendo o laço ou pulando só uma repetição</div></div></li>
+        <li><span class="n">05</span><div><div class="t">Números aleatórios</div><div class="d">rand(), srand() e o truque para sortear num intervalo</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Repetição e números aleatórios</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. FOR: ANATOMIA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Construção for</div>
+    <h1>Três partes, uma linha só</h1>
+    <p class="sub">Inicialização, condição e incremento — o que normalmente anda junto num laço controlado por contador.</p>
+    <div class="body">
+      <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+        <div class="term">for (int i = 1; i &lt;= n; ++i)</div>
+        <div class="argv-row">
+          <div class="tok"><span class="word">int i = 1</span><span class="idx">inicialização</span></div>
+          <div class="tok is-key"><span class="word">i &lt;= n</span><span class="idx">condição</span></div>
+          <div class="tok"><span class="word">++i</span><span class="idx">incremento</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Construção for</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. WHILE vs DO-WHILE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Pré-teste vs. pós-teste</div>
+    <h1>Quando a condição é testada muda tudo</h1>
+    <p class="sub">do-while garante que o corpo rode pelo menos uma vez, mesmo que a condição já comece falsa.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <span class="tag">while</span>
+          <div class="seq">
+            <div class="step is-accent">testa condição</div>
+            <div class="down">↓</div>
+            <div class="step">executa corpo</div>
+          </div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="item">
+          <span class="tag">do-while</span>
+          <div class="seq">
+            <div class="step">executa corpo</div>
+            <div class="down">↓</div>
+            <div class="step is-accent">testa condição</div>
+          </div>
+          <div class="badge">corpo roda ≥ 1 vez, mesmo se a condição já for falsa</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Pré-teste vs. pós-teste</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. WHILE(1) + BREAK -->
+  <section class="slide" data-slide>
+    <div class="kicker">Laço infinito, saída manual</div>
+    <h1>Repete para sempre — até um break</h1>
+    <p class="sub">while (1) nunca fica falso sozinho: só um break interrompe, tipicamente dentro de um if.</p>
+    <div class="body">
+      <div class="infloop">
+        <div class="loop-box">
+          <span class="loop-badge">↺</span>
+          corpo do laço
+          <span class="tag">repete enquanto não houver break</span>
+        </div>
+        <div class="infloop-arrow">→</div>
+        <div class="break-box">
+          if (condição) break;
+          <span class="tag">dentro do corpo</span>
+        </div>
+        <div class="infloop-arrow">→</div>
+        <div class="exit-box">fim do laço</div>
+      </div>
+    </div>
+    <div class="footer"><span>Laço infinito, saída manual</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. BREAK vs CONTINUE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Interrupções do laço</div>
+    <h1>break para tudo, continue pula só uma volta</h1>
+    <div class="body">
+      <div class="itertrace">
+        <div class="trace-row">
+          <span class="trace-label">break</span>
+          <div class="trace-chips">
+            <div class="tchip">1</div>
+            <div class="tchip">2</div>
+            <div class="tchip is-stop">3<span class="mark">break</span></div>
+            <div class="tchip is-ghost">4</div>
+            <div class="tchip is-ghost">5</div>
+            <div class="tchip is-ghost">6</div>
+          </div>
+        </div>
+        <div class="trace-row">
+          <span class="trace-label">continue</span>
+          <div class="trace-chips">
+            <div class="tchip">1</div>
+            <div class="tchip">2</div>
+            <div class="tchip is-skip">3<span class="mark">continue</span></div>
+            <div class="tchip">4</div>
+            <div class="tchip">5</div>
+            <div class="tchip">6</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Interrupções do laço</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. RAND_MAX -->
+  <section class="slide" data-slide>
+    <div class="kicker">Números (pseudo)aleatórios</div>
+    <h1>rand() devolve um número gigante</h1>
+    <p class="sub">Entre 0 e RAND_MAX (tipicamente 2147483647) — quase nunca o intervalo que você realmente precisa.</p>
+    <div class="body">
+      <div class="rangeband">
+        <div class="call">rand() → 1215069295</div>
+        <div class="band"><div class="marker" style="left:56.6%"></div></div>
+        <div class="caps"><span>0</span><span>RAND_MAX ≈ 2147483647</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Números (pseudo)aleatórios</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. rand() % N + 1 -->
+  <section class="slide" data-slide>
+    <div class="kicker">Números (pseudo)aleatórios</div>
+    <h1>% encolhe o intervalo, +1 desloca ele</h1>
+    <p class="sub">rand() % 6 + 1 sorteia um valor entre 1 e 6 — como um dado de verdade.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">rand()<span class="tag">número gigante</span></div>
+        <div class="op">% 6</div>
+        <div class="arrow">→</div>
+        <div class="box">0–5<span class="tag">resto da divisão por 6</span></div>
+        <div class="op">+ 1</div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">1–6<span class="tag">🎲 igual um dado</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Números (pseudo)aleatórios</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. SEMENTE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Números (pseudo)aleatórios</div>
+    <h1>A semente decide a sequência inteira</h1>
+    <p class="sub">srand(valor) define o ponto de partida de rand() — sem chamar srand, a sequência é sempre a mesma.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col">
+          <h3>srand(10)</h3>
+          <p>Semente fixa — útil para depurar ou reproduzir um resultado.</p>
+          <span class="cap"><span class="kept">Execução 1: 5.65, 6.10, 5.05…</span><br><span class="kept">Execução 2: 5.65, 6.10, 5.05…</span></span>
+        </div>
+        <div class="col">
+          <h3>srand(time(NULL))</h3>
+          <p>Semente pelo relógio — muda a cada segundo, então a sequência muda a cada execução.</p>
+          <span class="cap">Execução 1: 3.21, 7.48, 1.90…<br>Execução 2: 8.77, 2.05, 6.63…</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Números (pseudo)aleatórios</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 10. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, explicação do laço e simulação da execução passo a passo de cada exemplo — sem precisar compilar nada.</p>
+    <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/03_repetition_and_rand</span></div>
+    <p class="quiz-note">Depois, teste o que aprendeu no quiz da aula.</p>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>
