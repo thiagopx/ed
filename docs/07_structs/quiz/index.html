@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Tipos Estruturados</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>🧩 Quiz — Tipos Estruturados</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de tipos estruturados!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Estruturas",
+    text: "O que uma struct permite fazer, que uma coleção de variáveis soltas não oferece diretamente?",
+    options: [
+      "Executar código mais rápido do que com variáveis separadas",
+      "Agrupar vários campos, possivelmente de tipos diferentes, sob um único nome, tratando-os como uma unidade",
+      "Armazenar um número ilimitado de valores em sequência",
+      "Evitar o uso de ponteiros no programa inteiro"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Uma struct agrupa campos relacionados (de tipos iguais ou diferentes) sob um único tipo composto, permitindo tratar essa coleção como uma unidade só — por exemplo, ao passá-la para uma função.",
+    explainIncorrect: "A resposta correta é: agrupar vários campos, possivelmente de tipos diferentes, sob um único nome. Isso não tem relação com desempenho nem elimina o uso de ponteiros."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Ponteiro para struct",
+    text: "Qual expressão é equivalente a (*p).x, quando p é um ponteiro para uma struct com um campo x?",
+    options: ["p.x", "*p->x", "&p.x", "p->x"],
+    correctIndex: 3,
+    explainCorrect: "p->x é só uma forma mais legível de escrever (*p).x: primeiro desreferencia o ponteiro, depois acessa o campo. É o operador usado sempre que se tem um ponteiro para a struct, não a struct em si.",
+    explainIncorrect: "A resposta correta é p->x. O operador seta combina, num único símbolo, a desreferência do ponteiro e o acesso ao campo."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Operadores de acesso",
+    text: "Uma variável point é uma struct point2d comum (não um ponteiro). Qual operador acessa o campo x dela?",
+    code: `<span class="type">struct</span> point2d point;
+point<span class="cmt">/* ??? */</span>x = <span class="str">3.0</span>;`,
+    options: [".", "->", "::", "&"],
+    correctIndex: 0,
+    explainCorrect: "O operador ponto (.) acessa um campo quando se tem a struct diretamente, não um ponteiro para ela. A seta (->) só é usada quando se tem um ponteiro.",
+    explainIncorrect: "A resposta correta é o ponto (.). A seta (->) seria usada se point fosse um ponteiro para a struct, não a struct em si."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Passagem por ponteiro",
+    text: "Por que os exemplos deste módulo sempre passam uma struct para uma função por ponteiro, em vez de por valor (a struct inteira como parâmetro)?",
+    options: [
+      "Passar por valor é proibido pela linguagem C para structs",
+      "Por ponteiro, a struct passa a ocupar menos memória",
+      "Por ponteiro, a função acessa e pode alterar os campos da struct original, sem copiar todos os campos para dentro da função",
+      "Não há diferença prática entre as duas formas"
+    ],
+    correctIndex: 2,
+    explainCorrect: "Passar por ponteiro evita a cópia de todos os campos e permite que a função altere a struct original através do endereço recebido — exatamente como já acontecia com vetores.",
+    explainIncorrect: "A resposta correta é: por ponteiro, a função acessa (e pode alterar) a struct original sem copiar seus campos. Passar por valor é permitido em C, só copia a struct inteira."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Alocação dinâmica",
+    text: "Complete a lacuna para alocar dinamicamente uma struct point2d, guardando o endereço em point:",
+    code: `<span class="type">struct</span> point2d *point;
+point = (<span class="type">struct</span> point2d *)malloc(/* ??? */);`,
+    options: [
+      "sizeof(point)",
+      "sizeof(struct point2d)",
+      "sizeof(struct point2d *)",
+      "4"
+    ],
+    correctIndex: 1,
+    explainCorrect: "malloc precisa do tamanho da struct em si (sizeof(struct point2d)), não do tamanho do ponteiro (sizeof(point) ou sizeof(struct point2d *), que dariam o tamanho de um endereço, não dos campos x e y).",
+    explainIncorrect: "A resposta correta é sizeof(struct point2d). sizeof(point) ou sizeof(struct point2d *) calculariam o tamanho de um ponteiro, não o tamanho da struct que ele deve apontar."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "typedef",
+    text: "Depois de typedef struct point2d Point2D;, o que passa a ser verdade?",
+    options: [
+      "Point2D é só um apelido — Point2D e struct point2d referem-se ao mesmo tipo",
+      "point2d deixa de existir como nome de struct",
+      "Point2D é uma struct diferente de struct point2d, com os mesmos campos",
+      "Toda variável do tipo Point2D é automaticamente alocada dinamicamente"
+    ],
+    correctIndex: 0,
+    explainCorrect: "typedef não cria um tipo novo, só um apelido: Point2D e struct point2d podem ser usados de forma intercambiável a partir dali, sem repetir a palavra struct.",
+    explainIncorrect: "A resposta correta é: Point2D é só um apelido para struct point2d, o mesmo tipo. typedef não cria um segundo tipo nem afeta como a memória é alocada."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Vetor de structs",
+    text: "Qual declaração cria um vetor com 10 pontos do tipo Point2D, cada um ocupando seu próprio espaço dentro do vetor (não um vetor de ponteiros)?",
+    options: ["Point2D *pontos[10];", "Point2D pontos = malloc(10);", "struct Point2D[10] pontos;", "Point2D pontos[10];"],
+    correctIndex: 3,
+    explainCorrect: "Point2D pontos[10]; declara um vetor comum de 10 elementos do tipo Point2D — cada posição já reserva espaço para os campos da struct, acessados como pontos[i].x.",
+    explainIncorrect: "A resposta correta é Point2D pontos[10];. A opção com *pontos[10] declararia um vetor de 10 ponteiros, não de structs completas."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Aninhamento de structs",
+    text: "Circle guarda um campo Point2D *center. Dado Circle *circle, qual expressão acessa a coordenada x do centro?",
+    code: `<span class="kw">typedef</span> <span class="kw">struct</span>
+{
+    <span class="type">Point2D</span> *center;
+    <span class="kw">double</span> radius;
+} <span class="type">Circle</span>;`,
+    options: ["circle.center.x", "circle->center->x", "circle->center.x", "circle.center->x"],
+    correctIndex: 1,
+    explainCorrect: "circle é um ponteiro (usa ->) e center também é um ponteiro dentro da struct apontada (usa -> de novo): circle->center->x encadeia as duas setas para chegar ao campo x do Point2D aninhado.",
+    explainIncorrect: "A resposta correta é circle->center->x. Como circle e center são, os dois, ponteiros, é preciso usar a seta duas vezes seguidas."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Union",
+    text: "Qual a principal diferença entre uma union e uma struct com os mesmos campos?",
+    options: [
+      "Não há diferença nenhuma, são sinônimos em C",
+      "Uma union reserva espaço separado para cada campo; uma struct reserva um único espaço compartilhado",
+      "Union só pode ter campos do tipo int",
+      "Uma union reserva um único espaço compartilhado, do tamanho do maior campo; uma struct reserva espaço separado para cada campo"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Numa union, todos os campos compartilham o mesmo espaço de memória (do tamanho do maior deles) — escrever em um campo sobrescreve os demais. Numa struct, cada campo tem seu próprio espaço, coexistindo ao mesmo tempo.",
+    explainIncorrect: "A resposta correta é: union compartilha um único espaço (do tamanho do maior campo); struct reserva espaço separado para cada campo, todos coexistindo."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Enum",
+    text: "Em enum dia_semana { DOM, SEG, TER, QUA, QUI, SEX, SAB };, sem nenhum valor explícito atribuído, qual o valor inteiro de TER?",
+    options: ["0", "1", "2", "3"],
+    correctIndex: 2,
+    explainCorrect: "Por padrão, cada nome de um enum recebe um inteiro sequencial começando em 0, na ordem em que aparece: DOM=0, SEG=1, TER=2 — a posição de TER na lista, começando a contar do zero.",
+    explainIncorrect: "A resposta correta é 2. Os nomes recebem valores inteiros sequenciais a partir de 0 (DOM=0, SEG=1, TER=2), na ordem em que aparecem na declaração."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  const codeHtml = q.code ? `<pre class="code-block">${q.code}</pre>` : '';
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${codeHtml}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou tipos estruturados em C.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou para fixar structs, ponteiros e alocação dinâmica.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale a pena revisar o operador -> e o padrão de alocação dinâmica de structs.';
+  else msg = '🔁 Releia as notas do módulo e tente novamente para reforçar os fundamentos.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>

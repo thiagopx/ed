@@ -1,0 +1,124 @@
+<div
+  style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <div
+    style="border-bottom: 2px solid #b0342f; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: #2c3e50; margin: 0;">📇 EP 07: Tipos Abstratos e Persistência</h2>
+    <span
+      style="background-color: #b0342f; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
+      30 de Setembro</span>
+  </div>
+  <p><strong>O Cenário:</strong> Este exercício é a base do Trabalho Prático I e da Prova — aqui você
+    demonstra domínio em criar um tipo de dado próprio com <code>typedef struct</code>, alocar registros
+    dinamicamente e manipulá-los sempre por ponteiro. A parte de arquivo já vem pronta no Código Base: seu
+    trabalho é entender como um registro que vive na memória (a struct alocada com <code>malloc</code>) vira
+    um registro num arquivo texto — e como volta de lá, num novo registro alocado, idêntico ao original.</p>
+  <h3
+    style="color: #b0342f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    📋 Requisitos Técnicos</h3>
+  <div
+    style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <ul style="margin: 0; padding-left: 20px;">
+      <li style="margin-bottom: 10px;"><strong>Novo tipo:</strong> defina um tipo <code>Time</code> com
+        <code>typedef struct</code>, contendo <code>id</code> (int), <code>nome</code> (string, até 49
+        caracteres + <code>'\0'</code>) e <code>pontos</code> (int).</li>
+      <li style="margin-bottom: 10px;"><strong>Alocação dinâmica:</strong> solicite os dados de um time ao
+        usuário e aloque o registro dinamicamente, via ponteiro (<code>malloc</code>).</li>
+      <li style="margin-bottom: 10px;"><strong>Acesso pelos campos:</strong> acesse sempre os campos do
+        registro pelo operador seta (<code>-&gt;</code>), nunca pelo ponto.</li>
+      <li style="margin-bottom: 10px;"><strong>Gravar e reler:</strong> use as funções de arquivo já
+        fornecidas no Código Base (<code>write_time_to_file</code>/<code>read_time_from_file</code>) para
+        gravar o time em <code>time.txt</code> e, depois, para carregá-lo de volta num <strong>novo</strong>
+        ponteiro alocado.</li>
+      <li style="margin-bottom: 10px;"><strong>Liberação de memória:</strong> libere a memória de cada
+        ponteiro alocado (<code>free</code>) quando não precisar mais dele.</li>
+      <li style="margin-bottom: 10px;"><strong>Sem variáveis globais.</strong></li>
+    </ul>
+  </div>
+  <h3
+    style="color: #b0342f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    💻 Exemplo de Execução</h3>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">$ gcc main.c -o main
+$ ./main
+Cadastro de um novo time
+-------------------------
+ID do time: 7
+Nome do time: Federal SC
+Pontos: 42
+
+Time salvo em time.txt.
+
+Lendo os dados gravados em time.txt...
+
+Time carregado do arquivo:
+ID: 7
+Nome: Federal SC
+Pontos: 42</pre>
+  <h3
+    style="color: #b0342f; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    🧩 Código Base</h3>
+  <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">A manipulação de arquivos (ler/gravar
+    texto) é conteúdo do próximo módulo — por isso as duas funções de arquivo abaixo já vêm prontas. O que é
+    deste módulo, e cabe a você implementar, é a parte de tipo estruturado: defina o tipo <code>Time</code>
+    e complete os <code>TODO</code>s em <code>main</code>.</p>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#define ARQUIVO "time.txt"
+
+// Já implementado: grava id, nome e pontos no arquivo texto
+void write_time_to_file(const char *filename, int id, const char *nome, int pontos)
+{
+    FILE *file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        perror("Erro ao abrir o arquivo para escrita");
+        exit(1);
+    }
+    fprintf(file, "%d\n%s\n%d\n", id, nome, pontos);
+    fclose(file);
+}
+
+// Já implementado: le id, nome e pontos do arquivo texto
+int read_time_from_file(const char *filename, int *id, char *nome, int *pontos)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        perror("Erro ao abrir o arquivo para leitura");
+        return 0;
+    }
+    // " %49[^\n]" pula o '\n' deixado pelo %d anterior e lê o nome até o
+    // próximo '\n' -- mesma lição de leitura em cascata vista em 06_strings
+    int ok = (fscanf(file, "%d %49[^\n] %d", id, nome, pontos) == 3);
+    fclose(file);
+    return ok;
+}
+
+// TODO: defina aqui o tipo Time com typedef struct, conforme os requisitos
+// typedef struct { ... } Time;
+
+int main()
+{
+    // TODO 1: aloque dinamicamente um Time (malloc) e leia id, nome e pontos
+    //         do usuário (acesse os campos com o operador -&gt; a partir do ponteiro)
+
+    // TODO 2: chame write_time_to_file(ARQUIVO, ...) passando os campos do Time
+
+    // TODO 3: libere a memória desse primeiro ponteiro (free)
+
+    // TODO 4: aloque um NOVO ponteiro Time, chame read_time_from_file(ARQUIVO, ...)
+    //         para preencher seus campos, e exiba os dados na tela
+
+    // TODO 5: libere a memória do segundo ponteiro
+
+    return 0;
+}</pre>
+  <div
+    style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
+    <strong>Dica de Ouro:</strong> Com <code>typedef</code>, você não precisa mais escrever
+    <code>struct</code> toda vez que declarar um ponteiro para o seu tipo — basta
+    <code>Time *t = malloc(sizeof(Time));</code>.</div>
+</div>

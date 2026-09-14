@@ -1,0 +1,1459 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tipos Estruturados — Estruturas de Dados</title>
+<meta name="description" content="Material didático sobre tipos estruturados em C — structs, ponteiros para structs, alocação dinâmica, typedef, aninhamento, vetores de structs, union e enum — código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #B0342F;
+    --accent-soft: #F6DCDA;
+    --wash: rgba(176, 52, 47, 0.07);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #E8897F;
+      --accent-soft: #3A1D1A;
+      --wash: rgba(232, 137, 127, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #E8897F;
+    --accent-soft: #3A1D1A;
+    --wash: rgba(232, 137, 127, 0.09);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 100%;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .notes pre.mini-code {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    margin: 0 0 1rem;
+  }
+  .notes pre.mini-code .kw   { color: var(--code-kw); }
+  .notes pre.mini-code .type { color: var(--code-type); }
+  .notes pre.mini-code .fn   { color: var(--code-fn); }
+  .notes pre.mini-code .str  { color: var(--code-str); }
+  .notes pre.mini-code .num  { color: var(--code-num); }
+  .notes pre.mini-code .cmt  { color: var(--code-cmt); font-style: italic; }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Tipos estruturados</div>
+    <h1>Tipos estruturados em C</h1>
+    <p class="lede">
+      Estas são as notas da nona aula: como agrupar valores de tipos diferentes numa única unidade com
+      <code>struct</code>, como manipular essas structs por ponteiro e alocá-las dinamicamente, como batizar
+      um tipo novo com <code>typedef</code>, como aninhar uma struct dentro de outra e organizá-las em
+      vetores — e os tipos <code>union</code> e <code>enum</code>, dois primos de <code>struct</code> com
+      papéis mais específicos. Os exemplos interativos logo abaixo colocam parte dessa teoria em prática,
+      passo a passo.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Tipos estruturados</h2>
+    <p>
+      Até aqui, cada variável deste curso guardava um valor de um único tipo — um <code>int</code>, um
+      <code>float</code>, um vetor de um desses. Muitos problemas, porém, giram em torno de uma
+      <strong>entidade</strong> composta por vários valores relacionados: um ponto no plano tem uma
+      coordenada <code>x</code> e uma <code>y</code>; um aluno tem nome, matrícula e nota. Representar cada
+      um desses campos como uma variável solta funciona, mas obriga o programador a carregar manualmente o
+      vínculo entre eles — passar três parâmetros para toda função que lida com "o aluno", por exemplo, em
+      vez de um só. A <code>struct</code> resolve exatamente essa lacuna: um novo tipo composto, definido
+      pelo próprio programador, que agrupa vários campos (de tipos iguais ou diferentes) sob um único nome.
+    </p>
+
+    <h3>Estruturas</h3>
+    <p>
+      A sintaxe básica declara a "forma" da struct — seus campos e os tipos de cada um — sem ainda criar
+      nenhuma variável:
+    </p>
+    <pre class="mini-code"><span class="kw">struct</span> <span class="type">point2d</span>
+{
+    <span class="kw">float</span> x;
+    <span class="kw">float</span> y;
+};</pre>
+    <p>
+      <code>point2d</code> aqui é o <strong>nome da struct</strong> (a "etiqueta", ou <em>tag</em>), não o
+      nome de uma variável — <code>struct point2d point;</code> é que declara de fato uma variável chamada
+      <code>point</code>, desse tipo. Cada campo é acessado com o operador ponto:
+      <code>point.x = 3;</code>, <code>point.y = 4;</code>. É esse o padrão que o exemplo <em>Ponto 2D:
+      variável ponteiro</em> usa para ler as coordenadas diretamente em <code>main</code>, antes de qualquer
+      ponteiro entrar em cena.
+    </p>
+
+    <h4>Ponteiros para estruturas</h4>
+    <p>
+      Assim como qualquer outra variável, uma struct pode ter seu endereço guardado num ponteiro:
+      <code>struct point2d *point_ptr = &amp;point;</code>. A diferença prática está no operador de acesso
+      aos campos: em vez do ponto (<code>.</code>), usado quando se tem a struct em si, um ponteiro para
+      struct usa a <strong>seta</strong> (<code>-&gt;</code>) — <code>point_ptr-&gt;x</code> é só um atalho
+      para <code>(*point_ptr).x</code> (primeiro desreferencia o ponteiro, depois acessa o campo), mas
+      escrito de um jeito muito mais legível. É essa seta que aparece em todos os cinco exemplos deste
+      módulo, sempre que uma função recebe uma struct por ponteiro.
+    </p>
+
+    <h4>Passagem de estruturas para funções</h4>
+    <p>
+      Passar uma struct para uma função por <strong>valor</strong> (só <code>struct point2d p</code> como
+      parâmetro, sem <code>*</code>) copia todos os seus campos para dentro da função — qualquer alteração
+      feita lá dentro não é vista por quem chamou, exatamente como acontece com um <code>int</code> comum.
+      Por isso o padrão adotado em todos os exemplos deste módulo é passar structs <strong>por
+      ponteiro</strong>: a função recebe o endereço da struct original (<code>struct point2d *point</code>)
+      e manipula os campos diretamente através dele, sem cópia. É o que os exemplos <em>Ponto 2D via
+      ponteiro</em> e <em>Ponto 2D: variável ponteiro</em> ilustram lado a lado: no primeiro, o próprio
+      parâmetro da função já chega como ponteiro (<code>read_point(&amp;point)</code>); no segundo, uma
+      variável ponteiro comum (<code>point_ptr</code>) é declarada à parte, apontando para uma struct já
+      existente, e usada para alterar seus campos fora de qualquer função. Um detalhe que aparece em
+      <em>Ponto 2D via ponteiro</em>: quando a função só precisa <em>ler</em> os campos, sem alterá-los
+      (como <code>print_point</code>), o parâmetro pode ser declarado <code>const struct point2d *point</code>
+      — o <code>const</code> promete ao compilador (que passa a barrar qualquer tentativa de escrita) que a
+      struct apontada não será modificada ali dentro.
+    </p>
+
+    <h4>Alocação dinâmica de estruturas</h4>
+    <p>
+      Uma struct também pode ser alocada dinamicamente, do mesmo jeito que um vetor: <code>struct point2d
+      *point = malloc(sizeof(struct point2d));</code>. O padrão de sempre se aplica sem surpresas —
+      <code>sizeof</code> calcula o tamanho exato da struct (a soma dos tamanhos de seus campos, com algum
+      ajuste de alinhamento que o compilador cuida sozinho), <code>malloc</code> devolve o endereço do bloco
+      recém-reservado no heap, e é preciso verificar se o retorno não foi <code>NULL</code> antes de usá-lo.
+      A diferença mais visível para quem só viu structs na pilha: como o exemplo <em>Ponto 2D alocado
+      dinamicamente</em> mostra, a variável <code>point</code> já <em>é</em> um ponteiro desde a
+      declaração — não existe mais nenhuma struct "solta" para tirar o endereço com <code>&amp;</code>; as
+      funções recebem <code>point</code> diretamente, e o bloco só é devolvido ao heap com
+      <code>free(point);</code> ao final.
+    </p>
+
+    <h3>Definição de novos tipos</h3>
+    <p>
+      Escrever <code>struct point2d</code> por extenso toda vez que se quer declarar uma variável, um
+      parâmetro ou um retorno de função é repetitivo. O <code>typedef</code> resolve isso criando um
+      <strong>apelido</strong> para o tipo:
+    </p>
+    <pre class="mini-code"><span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">point2d</span> <span class="type">Point2D</span>;</pre>
+    <p>
+      A partir daí, <code>Point2D</code> passa a significar exatamente a mesma coisa que
+      <code>struct point2d</code>, mas sem precisar repetir a palavra <code>struct</code>:
+      <code>Point2D *point = malloc(sizeof(Point2D));</code> é o exemplo <em>Distância entre pontos
+      (typedef)</em> aplicando essa troca. É comum, inclusive, pular a etapa de nomear a struct
+      separadamente e combinar as duas declarações numa só, com uma struct <strong>anônima</strong> (sem
+      <em>tag</em> própria) logo seguida do apelido — é o padrão que o exemplo <em>Círculo (structs
+      aninhadas)</em> usa tanto para <code>Point2D</code> quanto para <code>Circle</code>:
+    </p>
+    <pre class="mini-code"><span class="kw">typedef</span> <span class="kw">struct</span>
+{
+    <span class="kw">double</span> x;
+    <span class="kw">double</span> y;
+} <span class="type">Point2D</span>;</pre>
+
+    <h3>Aninhamento de estruturas</h3>
+    <p>
+      Um campo de uma struct pode, ele próprio, ser outra struct — ou, mais comumente quando a struct
+      interna também é alocada dinamicamente, um <strong>ponteiro</strong> para outra struct. É o padrão do
+      exemplo <em>Círculo (structs aninhadas)</em>: um <code>Circle</code> guarda um <code>Point2D
+      *center</code> (o centro) e um <code>double radius</code> — para chegar até as coordenadas do centro
+      a partir de um <code>Circle *circle</code>, é preciso encadear dois acessos:
+      <code>circle-&gt;center-&gt;x</code> primeiro segue a seta até o <code>Point2D</code> apontado por
+      <code>center</code>, depois acessa o campo <code>x</code> dele. Esse aninhamento também muda a ordem
+      da liberação de memória: como <code>center</code> foi alocado separadamente (dentro de
+      <code>create_circle</code>, que chama <code>create_point</code> para isso), liberar um
+      <code>Circle</code> exige liberar primeiro o <code>Point2D</code> apontado por <code>center</code>, e
+      só depois o próprio <code>Circle</code> — na ordem inversa, perderia o único ponteiro que leva até o
+      centro, vazando aquele bloco de memória.
+    </p>
+
+    <h3>Vetores de estruturas</h3>
+    <p>
+      Como qualquer outro tipo, uma struct pode ser o tipo dos elementos de um vetor:
+      <code>Point2D pontos[N];</code> declara <code>N</code> pontos em sequência, cada um acessado
+      normalmente por índice — <code>pontos[i].x</code>. É uma forma natural de representar uma coleção de
+      entidades do mesmo tipo, como os vértices de um polígono: em vez de um vetor de <code>x</code>s e um
+      vetor separado de <code>y</code>s (que o programador precisaria manter sincronizados manualmente), um
+      único vetor de <code>Point2D</code> já mantém cada par de coordenadas junto, na posição correspondente
+      ao vértice.
+    </p>
+    <figure class="resumo-fig">
+      <img src="figs/fig9-1.jpg" alt="Um polígono representado por uma sequência de vértices p0, p1, p2, ... no plano cartesiano, com a área sombreada decomposta em faixas trapezoidais entre vértices consecutivos e o eixo horizontal, ilustrando a soma de trapézios para calcular a área do polígono.">
+      <figcaption>Figura 9.1: um polígono como sequência de vértices <code>p_i = (x_i, y_i)</code> — cada vértice é um <code>Point2D</code>, e o polígono inteiro é um vetor dessas structs. A área sombreada mostra a técnica de somar faixas trapezoidais entre vértices consecutivos para calcular a área total do polígono.</figcaption>
+    </figure>
+
+    <h4>Vetores de ponteiros para estruturas</h4>
+    <p>
+      Quando cada struct é alocada dinamicamente (em vez de viver inteira dentro do vetor), o vetor passa a
+      guardar <strong>ponteiros</strong> para essas structs, não as structs em si:
+      <code>Point2D *pontos[N];</code> — mesma ideia já vista no módulo de cadeias de caracteres para um
+      vetor de strings (<code>char *nomes[N];</code>), agora aplicada a structs. Cada posição
+      <code>pontos[i]</code> aponta para um bloco independente do heap, o que permite, por exemplo, alocar
+      só os pontos que de fato serão usados, ou compartilhar a mesma struct entre mais de um vetor sem
+      duplicar seu conteúdo.
+    </p>
+
+    <h3>Tipo Union</h3>
+    <p>
+      Uma <code>union</code> se declara com uma sintaxe quase idêntica à de uma struct, mas o significado é
+      bem diferente: enquanto uma struct reserva espaço <strong>separado</strong> para cada campo (todos
+      coexistindo ao mesmo tempo), uma union reserva um único espaço de memória, do tamanho do
+      <strong>maior</strong> de seus campos, e todos os campos <strong>compartilham</strong> esse mesmo
+      espaço — escrever num campo sobrescreve o que estava guardado em qualquer outro.
+    </p>
+    <pre class="mini-code"><span class="kw">union</span> <span class="type">valor</span>
+{
+    <span class="kw">int</span> i;
+    <span class="kw">float</span> f;
+};
+
+<span class="kw">union</span> <span class="type">valor</span> v;
+v.i = <span class="num">10</span>;      <span class="cmt">// grava um int nos 4 bytes da union</span>
+v.f = <span class="num">3.14</span>;    <span class="cmt">// sobrescreve os mesmos 4 bytes com um float</span>
+                 <span class="cmt">// a essa altura, v.i já não vale mais 10</span></pre>
+    <p>
+      Uma union é útil quando se sabe que, em cada instante, só um dos campos estará "ativo" de verdade — por
+      exemplo, para economizar memória guardando um valor que pode ser <em>ou</em> um <code>int</code>
+      <em>ou</em> um <code>float</code>, nunca os dois ao mesmo tempo, sem precisar do espaço somado dos
+      dois tipos como uma struct exigiria.
+    </p>
+
+    <h3>Tipo Enum</h3>
+    <p>
+      Um <code>enum</code> (enumeração) define um novo tipo cujos valores possíveis são uma lista nomeada de
+      constantes — útil para representar um conjunto pequeno e fixo de opções (um dia da semana, um estado
+      de um jogo, uma cor) de um jeito muito mais legível do que "o código 0 significa segunda-feira, o
+      código 1 significa terça-feira...":
+    </p>
+    <pre class="mini-code"><span class="kw">enum</span> <span class="type">dia_semana</span> { DOM, SEG, TER, QUA, QUI, SEX, SAB };
+
+<span class="kw">enum</span> <span class="type">dia_semana</span> hoje = TER;
+<span class="kw">if</span> (hoje == TER)
+    printf(<span class="str">"É terça-feira!\n"</span>);</pre>
+    <p>
+      Por baixo, cada nome do enum é só uma constante inteira — por padrão, <code>DOM</code> vale
+      <code>0</code>, <code>SEG</code> vale <code>1</code>, e assim por diante, na ordem em que aparecem —
+      mas usar o nome (<code>TER</code>) em vez do número (<code>2</code>) deixa o código muito mais claro
+      sobre o que ele representa, sem perder a eficiência de comparar e armazenar um inteiro simples.
+    </p>
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a
+    simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="pointer" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Ponto 2D via ponteiro</span>
+      </div>
+      <p class="row-desc">Struct básica, passada para funções sempre por ponteiro — leitura e impressão de um ponto 2D.</p>
+    </li>
+    <li class="example-row" data-target="ponteirovar" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Ponto 2D: variável ponteiro</span>
+      </div>
+      <p class="row-desc">Uma variável ponteiro declarada à parte, apontando para uma struct já existente, manipulando seus campos via seta.</p>
+    </li>
+    <li class="example-row" data-target="dinamico" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Ponto 2D alocado dinamicamente</span>
+      </div>
+      <p class="row-desc">malloc(sizeof(struct point2d)) — a struct inteira alocada no heap, sem nenhuma variável na pilha.</p>
+    </li>
+    <li class="example-row" data-target="distancia" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Distância entre pontos (typedef)</span>
+      </div>
+      <p class="row-desc">typedef struct point2d Point2D; mais uma função que recebe duas structs para calcular a distância euclidiana.</p>
+    </li>
+    <li class="example-row" data-target="circulo" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Círculo (structs aninhadas)</span>
+      </div>
+      <p class="row-desc">Um Circle que guarda um ponteiro para Point2D — aninhamento de structs e a ordem correta de liberação.</p>
+    </li>
+  </ul>
+
+  <!-- ================= PONTO 2D VIA PONTEIRO ================= -->
+  <section class="detail" id="panel-pointer" data-panel>
+    <div class="detail-head">
+      <h2>Ponto 2D via ponteiro</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/07_structs/01_point2d_pointer" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="type">point2d</span>
+{
+    <span class="kw">float</span> x;
+    <span class="kw">float</span> y;
+};
+
+<span class="kw">void</span> <span class="fn">read_point</span>(<span class="kw">struct</span> <span class="type">point2d</span> *point)
+{
+    <span class="fn">printf</span>(<span class="str">"Enter the x-coordinate: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;(point-&gt;x));
+
+    <span class="fn">printf</span>(<span class="str">"Enter the y-coordinate: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;(point-&gt;y));
+}
+
+<span class="kw">void</span> <span class="fn">print_point</span>(<span class="kw">const</span> <span class="kw">struct</span> <span class="type">point2d</span> *point)
+{
+    <span class="fn">printf</span>(<span class="str">"The 2D point has the following coordinates:\n"</span>);
+    <span class="fn">printf</span>(<span class="str">"x = %.2f\n"</span>, point-&gt;x);
+    <span class="fn">printf</span>(<span class="str">"y = %.2f\n"</span>, point-&gt;y);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">struct</span> <span class="type">point2d</span> point;
+    <span class="fn">read_point</span>(&amp;point);
+    <span class="fn">print_point</span>(&amp;point);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Struct como parâmetro, sempre por ponteiro</h3>
+        <p>
+          <code>point</code> é declarada em <code>main</code>, na pilha, e seu endereço (<code>&amp;point</code>)
+          é o que de fato viaja para <code>read_point</code> e <code>print_point</code> — dentro de cada
+          função, o parâmetro <code>point</code> é um ponteiro, e o acesso aos campos usa a seta
+          (<code>point-&gt;x</code>), não o ponto. Como <code>print_point</code> só lê os campos, sem
+          alterá-los, o parâmetro é declarado <code>const</code>: uma promessa ao compilador (e a quem lê o
+          código) de que essa função não modifica a struct apontada.
+        </p>
+
+        <h3>Execução passo a passo — x = 3, y = 4</h3>
+        <div class="stepper" data-stepper="pointer">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the x-coordinate: <span class="in">3</span>
+Enter the y-coordinate: <span class="in">4</span>
+The 2D point has the following coordinates:
+x = 3.00
+y = 4.00</pre>
+
+        <div class="callout">
+          O parêntese em <code>&amp;(point-&gt;x)</code> não é obrigatório — <code>-&gt;</code> já tem
+          precedência maior que <code>&amp;</code>, então <code>&amp;point-&gt;x</code> significaria a
+          mesma coisa. É só um reforço visual comum quando se combina <code>&amp;</code> com acesso a
+          campo, para deixar claro que primeiro se segue a seta até o campo, e só depois se tira o endereço
+          dele.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PONTO 2D: VARIÁVEL PONTEIRO ================= -->
+  <section class="detail" id="panel-ponteirovar" data-panel hidden>
+    <div class="detail-head">
+      <h2>Ponto 2D: variável ponteiro</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/07_structs/02_point2d" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">struct</span> <span class="type">point2d</span>
+{
+    <span class="kw">float</span> x;
+    <span class="kw">float</span> y;
+};
+
+<span class="kw">void</span> <span class="fn">print_point</span>(<span class="kw">struct</span> <span class="type">point2d</span> *point_ptr)
+{
+    <span class="fn">printf</span>(<span class="str">"x=%.2f y=%.2f\n"</span>, point_ptr-&gt;x, point_ptr-&gt;y);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">struct</span> <span class="type">point2d</span> point;
+    <span class="fn">printf</span>(<span class="str">"Enter the x and y coordinates in a single line: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f %f"</span>, &amp;point.x, &amp;point.y);
+    <span class="fn">print_point</span>(&amp;point);
+
+    <span class="kw">struct</span> <span class="type">point2d</span> *point_ptr = &amp;point;
+    point_ptr-&gt;x += <span class="num">1.0</span>;
+    point_ptr-&gt;y += <span class="num">2.0</span>;
+    <span class="fn">printf</span>(<span class="str">"After manipulation, the 2D point has the following coordinates: (%.2f, %.2f)\n"</span>, point_ptr-&gt;x, point_ptr-&gt;y);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Um ponteiro não precisa vir de um parâmetro</h3>
+        <p>
+          Diferente do exemplo anterior, aqui <code>point_ptr</code> não é parâmetro de nenhuma função — é
+          uma variável ponteiro comum, declarada em <code>main</code>, apontando para uma struct que já
+          existia (<code>point</code>). A partir daí, alterar um campo através de
+          <code>point_ptr-&gt;x</code> altera <code>point</code> de verdade, porque os dois nomes levam ao
+          mesmo endereço de memória — <code>point.x</code> e <code>point_ptr-&gt;x</code> são, neste
+          programa, duas formas de acessar exatamente o mesmo <code>float</code>.
+        </p>
+
+        <h3>Execução passo a passo — x = 1, y = 1</h3>
+        <div class="stepper" data-stepper="ponteirovar">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the x and y coordinates in a single line: <span class="in">1 1</span>
+x=1.00 y=1.00
+After manipulation, the 2D point has the following coordinates: (2.00, 3.00)</pre>
+
+        <div class="callout">
+          <code>scanf("%f %f", &amp;point.x, &amp;point.y);</code> usa o operador ponto, não seta —
+          <code>point</code> é a struct em si (não um ponteiro para ela) até a linha em que
+          <code>point_ptr</code> é declarado. Os dois operadores nunca se misturam por acidente: ponto para
+          quem tem a struct, seta para quem tem um ponteiro para ela.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PONTO 2D ALOCADO DINAMICAMENTE ================= -->
+  <section class="detail" id="panel-dinamico" data-panel hidden>
+    <div class="detail-head">
+      <h2>Ponto 2D alocado dinamicamente</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/07_structs/03_point2d_dynamic" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kw">struct</span> <span class="type">point2d</span>
+{
+    <span class="kw">float</span> x;
+    <span class="kw">float</span> y;
+};
+
+<span class="kw">void</span> <span class="fn">read_point</span>(<span class="kw">struct</span> <span class="type">point2d</span> *point)
+{
+    <span class="fn">printf</span>(<span class="str">"Enter the x-coordinate: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;(point-&gt;x));
+    <span class="fn">printf</span>(<span class="str">"Enter the y-coordinate: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;(point-&gt;y));
+}
+
+<span class="kw">void</span> <span class="fn">print_point</span>(<span class="kw">const</span> <span class="kw">struct</span> <span class="type">point2d</span> *point)
+{
+    <span class="fn">printf</span>(<span class="str">"The 2D point has the following coordinates:\n"</span>);
+    <span class="fn">printf</span>(<span class="str">"x = %.2f\n"</span>, point-&gt;x);
+    <span class="fn">printf</span>(<span class="str">"y = %.2f\n"</span>, point-&gt;y);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">struct</span> <span class="type">point2d</span> *point;
+    point = (<span class="kw">struct</span> <span class="type">point2d</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="kw">struct</span> <span class="type">point2d</span>));
+    <span class="kw">if</span> (point == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Memory allocation failed.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+    <span class="fn">read_point</span>(point);
+    <span class="fn">print_point</span>(point);
+    <span class="fn">free</span>(point);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Nenhuma struct na pilha — só o ponteiro</h3>
+        <p>
+          A diferença central para os dois exemplos anteriores: <code>struct point2d *point;</code> declara
+          apenas uma <em>variável ponteiro</em>, sem nenhuma struct correspondente ainda existindo em lugar
+          nenhum. É só depois de <code>malloc(sizeof(struct point2d))</code> que um bloco de memória (no
+          heap, do tamanho exato de dois <code>float</code>) passa a existir, e <code>point</code> passa a
+          apontar para ele. Como <code>point</code> já é um endereço, as chamadas
+          <code>read_point(point)</code> e <code>print_point(point)</code> não usam <code>&amp;</code> —
+          diferente do primeiro exemplo, onde era preciso tirar o endereço de uma struct da pilha.
+        </p>
+
+        <h3>Execução passo a passo — x = 5, y = 2.5</h3>
+        <div class="stepper" data-stepper="dinamico">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the x-coordinate: <span class="in">5</span>
+Enter the y-coordinate: <span class="in">2.5</span>
+The 2D point has the following coordinates:
+x = 5.00
+y = 2.50</pre>
+
+        <div class="callout">
+          Depois de <code>free(point);</code>, a variável <code>point</code> continua existindo e ainda
+          guarda o mesmo endereço, mas esse endereço não pertence mais ao programa — usá-lo (por exemplo,
+          <code>point-&gt;x</code> depois do <code>free</code>) seria um <em>use-after-free</em>, o mesmo
+          bug já visto no módulo de alocação dinâmica, agora aplicado a uma struct em vez de um vetor.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DISTÂNCIA ENTRE PONTOS (TYPEDEF) ================= -->
+  <section class="detail" id="panel-distancia" data-panel hidden>
+    <div class="detail-head">
+      <h2>Distância entre pontos (typedef)</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/07_structs/04_point2d_distance" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+
+<span class="kw">struct</span> <span class="type">point2d</span>
+{
+    <span class="kw">float</span> x;
+    <span class="kw">float</span> y;
+};
+
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">point2d</span> <span class="type">Point2D</span>;
+
+<span class="type">Point2D</span> *<span class="fn">create_point</span>()
+{
+    <span class="type">Point2D</span> *point = (<span class="type">Point2D</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Point2D</span>));
+    <span class="kw">if</span> (point == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Memory allocation failed.\n"</span>);
+        <span class="fn">exit</span>(<span class="num">1</span>);
+    }
+    <span class="kw">return</span> point;
+}
+
+<span class="kw">void</span> <span class="fn">read_point</span>(<span class="type">Point2D</span> *point)
+{
+    <span class="fn">printf</span>(<span class="str">"Enter the x-coordinate: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;(point-&gt;x));
+    <span class="fn">printf</span>(<span class="str">"Enter the y-coordinate: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;(point-&gt;y));
+}
+
+<span class="kw">void</span> <span class="fn">print_point</span>(<span class="kw">const</span> <span class="type">Point2D</span> *point)
+{
+    <span class="fn">printf</span>(<span class="str">"Point: (%.2f, %.2f)\n"</span>, point-&gt;x, point-&gt;y);
+}
+
+<span class="kw">float</span> <span class="fn">euclidean_distance</span>(<span class="kw">const</span> <span class="type">Point2D</span> *point1, <span class="kw">const</span> <span class="type">Point2D</span> *point2)
+{
+    <span class="kw">float</span> dx = point2-&gt;x - point1-&gt;x;
+    <span class="kw">float</span> dy = point2-&gt;y - point1-&gt;y;
+    <span class="kw">return</span> <span class="fn">sqrt</span>(dx * dx + dy * dy);
+}
+
+<span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point)
+{
+    <span class="fn">free</span>(point);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">Point2D</span> *point1 = <span class="fn">create_point</span>();
+    <span class="type">Point2D</span> *point2 = <span class="fn">create_point</span>();
+
+    <span class="fn">printf</span>(<span class="str">"Enter the coordinates of the first point:\n"</span>);
+    <span class="fn">read_point</span>(point1);
+    <span class="fn">printf</span>(<span class="str">"Enter the coordinates of the second point:\n"</span>);
+    <span class="fn">read_point</span>(point2);
+
+    <span class="fn">printf</span>(<span class="str">"Coordinates of the first point:\n"</span>);
+    <span class="fn">print_point</span>(point1);
+    <span class="fn">printf</span>(<span class="str">"Coordinates of the second point:\n"</span>);
+    <span class="fn">print_point</span>(point2);
+
+    <span class="kw">float</span> distance = <span class="fn">euclidean_distance</span>(point1, point2);
+    <span class="fn">printf</span>(<span class="str">"Euclidean distance between the two points: %.2f\n"</span>, distance);
+
+    <span class="fn">free_point</span>(point1);
+    <span class="fn">free_point</span>(point2);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Point2D, não struct point2d</h3>
+        <p>
+          <code>typedef struct point2d Point2D;</code> cria o apelido usado no resto do arquivo — a partir
+          dali, <code>Point2D</code> e <code>struct point2d</code> significam exatamente o mesmo tipo, mas
+          só o apelido aparece no código. Repare também o padrão <code>create_point</code>/<code>free_point</code>:
+          uma função de "fábrica" que aloca e devolve um ponteiro pronto para uso, espelhada por uma função
+          que devolve a memória — o mesmo padrão do exemplo anterior, só que encapsulado em funções
+          próprias. <code>euclidean_distance</code> mostra ainda uma função recebendo <strong>duas</strong>
+          structs por ponteiro, não uma só.
+        </p>
+
+        <h3>Execução passo a passo — (0,0) e (3,4)</h3>
+        <div class="stepper" data-stepper="distancia">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Enter the coordinates of the first point:
+Enter the x-coordinate: <span class="in">0</span>
+Enter the y-coordinate: <span class="in">0</span>
+Enter the coordinates of the second point:
+Enter the x-coordinate: <span class="in">3</span>
+Enter the y-coordinate: <span class="in">4</span>
+Coordinates of the first point:
+Point: (0.00, 0.00)
+Coordinates of the second point:
+Point: (3.00, 4.00)
+Euclidean distance between the two points: 5.00</pre>
+
+        <div class="callout">
+          <code>point1</code> e <code>point2</code> são dois blocos completamente independentes no heap —
+          <code>euclidean_distance</code> só os lê (ambos os parâmetros são <code>const</code>), nunca os
+          modifica; o resultado (<code>5.00</code>, a hipotenusa do triângulo 3-4-5) é devolvido por valor,
+          não escrito de volta em nenhum dos dois pontos.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CÍRCULO (STRUCTS ANINHADAS) ================= -->
+  <section class="detail" id="panel-circulo" data-panel hidden>
+    <div class="detail-head">
+      <h2>Círculo (structs aninhadas)</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/07_structs/05_circle" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span>
+{
+    <span class="kw">double</span> x;
+    <span class="kw">double</span> y;
+} <span class="type">Point2D</span>;
+
+<span class="kw">typedef</span> <span class="kw">struct</span>
+{
+    <span class="type">Point2D</span> *center;
+    <span class="kw">double</span> radius;
+} <span class="type">Circle</span>;
+
+<span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2)
+{
+    <span class="kw">double</span> dx = point1-&gt;x - point2-&gt;x;
+    <span class="kw">double</span> dy = point1-&gt;y - point2-&gt;y;
+    <span class="kw">return</span> <span class="fn">sqrt</span>(dx * dx + dy * dy);
+}
+
+<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y)
+{
+    <span class="type">Point2D</span> *new_point = (<span class="type">Point2D</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Point2D</span>));
+    <span class="kw">if</span> (new_point == <span class="kw">NULL</span>)
+    {
+        <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Point2D"</span>);
+        <span class="fn">exit</span>(EXIT_FAILURE);
+    }
+    new_point-&gt;x = x;
+    new_point-&gt;y = y;
+    <span class="kw">return</span> new_point;
+}
+
+<span class="type">Circle</span> *<span class="fn">create_circle</span>(<span class="kw">double</span> center_x, <span class="kw">double</span> center_y, <span class="kw">double</span> radius)
+{
+    <span class="type">Circle</span> *new_circle = (<span class="type">Circle</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Circle</span>));
+    <span class="kw">if</span> (new_circle == <span class="kw">NULL</span>)
+    {
+        <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Circle"</span>);
+        <span class="fn">exit</span>(EXIT_FAILURE);
+    }
+    new_circle-&gt;center = <span class="fn">create_point</span>(center_x, center_y);
+    new_circle-&gt;radius = radius;
+    <span class="kw">return</span> new_circle;
+}
+
+<span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle)
+{
+    <span class="kw">double</span> distance = <span class="fn">euclidean_distance</span>(point, circle-&gt;center);
+    <span class="kw">if</span> (distance &lt; circle-&gt;radius)
+        <span class="kw">return</span> <span class="num">1</span>;
+    <span class="kw">else</span>
+        <span class="kw">return</span> <span class="num">0</span>;
+}
+
+<span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point)
+{
+    <span class="fn">free</span>(point);
+}
+
+<span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle)
+{
+    <span class="fn">free_point</span>(circle-&gt;center);
+    <span class="fn">free</span>(circle);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">Circle</span> *my_circle = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
+    <span class="type">Point2D</span> *my_point = <span class="fn">create_point</span>(<span class="num">2</span>, <span class="num">1</span>);
+
+    <span class="kw">if</span> (<span class="fn">is_point_inside_circle</span>(my_point, my_circle))
+        <span class="fn">printf</span>(<span class="str">"The point is inside the circle.\n"</span>);
+    <span class="kw">else</span>
+        <span class="fn">printf</span>(<span class="str">"The point is outside the circle.\n"</span>);
+
+    <span class="fn">free_circle</span>(my_circle);
+    <span class="fn">free_point</span>(my_point);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Uma struct dentro da outra</h3>
+        <p>
+          <code>Circle</code> não guarda as coordenadas do centro diretamente — guarda um
+          <code>Point2D *center</code>, um ponteiro para uma struct alocada separadamente. Chegar até
+          <code>x</code> do centro a partir de um <code>Circle *circle</code> exige duas setas em sequência:
+          <code>circle-&gt;center</code> primeiro leva até o <code>Point2D</code>, e só então
+          <code>-&gt;x</code> acessa a coordenada. <code>create_circle</code> monta essa estrutura aninhada
+          chamando <code>create_point</code> internamente; <code>free_circle</code> desfaz na ordem inversa,
+          liberando <code>center</code> antes do próprio <code>circle</code>.
+        </p>
+
+        <h3>Execução passo a passo — círculo (0,0) raio 5, ponto (2,1)</h3>
+        <div class="stepper" data-stepper="circulo">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">The point is inside the circle.</pre>
+
+        <div class="callout">
+          Este exemplo não lê nada do usuário — os valores (centro <code>(0,0)</code>, raio <code>5</code>,
+          ponto <code>(2,1)</code>) já estão fixos no código, em <code>main</code>. A distância do ponto até
+          o centro é <code>sqrt(2² + 1²) = sqrt(5) ≈ 2.236</code>, menor que o raio <code>5</code> — por
+          isso o ponto está dentro do círculo.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    pointer: {
+      vars: ["point"],
+      steps: [
+        { line: 27, vars: {}, desc: "struct point2d point; declara point na pilha, sem inicializar — os campos x e y começam com lixo de memória." },
+        { line: 28, vars: {}, desc: "read_point(&point); passa o endereço de point para a função — dentro dela, o parâmetro point é um ponteiro para a struct de main, não uma cópia." },
+        { line: 11, vars: {}, desc: "Dentro de read_point: printf exibe o prompt \"Enter the x-coordinate: \"." },
+        { line: 12, vars: { point: "x=3.00 y=?" }, desc: "scanf(\"%f\", &(point->x)); lê 3 e grava em point->x — o parêntese em point->x é só clareza visual, -> já tem prioridade alta o suficiente." },
+        { line: 14, vars: {}, desc: "printf exibe o prompt \"Enter the y-coordinate: \"." },
+        { line: 15, vars: { point: "x=3.00 y=4.00" }, desc: "scanf(\"%f\", &(point->y)); lê 4 e grava em point->y." },
+        { line: 16, vars: {}, desc: "read_point retorna — de volta em main, point já tem os dois campos preenchidos." },
+        { line: 29, vars: {}, desc: "print_point(&point); passa o mesmo endereço para a segunda função, desta vez com o parâmetro const (só leitura)." },
+        { line: 20, vars: {}, desc: "Dentro de print_point: printf exibe o cabeçalho \"The 2D point has the following coordinates:\"." },
+        { line: 21, vars: {}, desc: "printf exibe \"x = 3.00\"." },
+        { line: 22, vars: {}, desc: "printf exibe \"y = 4.00\"." },
+        { line: 30, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    ponteirovar: {
+      vars: ["point", "point_ptr"],
+      steps: [
+        { line: 16, vars: {}, desc: "struct point2d point; declara point na pilha, sem inicializar." },
+        { line: 17, vars: {}, desc: "printf exibe o prompt \"Enter the x and y coordinates in a single line: \"." },
+        { line: 18, vars: { point: "x=1.00 y=1.00" }, desc: "scanf(\"%f %f\", &point.x, &point.y); lê 1 e 1, gravando direto nos campos de point — usa o operador ponto (point.x), porque point ainda não tem nenhum ponteiro associado a ela." },
+        { line: 19, vars: {}, desc: "print_point(&point); passa o endereço de point para a função." },
+        { line: 11, vars: {}, desc: "Dentro de print_point: printf exibe \"x=1.00 y=1.00\"." },
+        { line: 21, vars: { point_ptr: "→ point" }, desc: "struct point2d *point_ptr = &point; declara uma variável ponteiro separada, apontando para o mesmo point já existente — não é parâmetro de função, é uma variável comum em main." },
+        { line: 22, vars: { point: "x=2.00 y=1.00" }, desc: "point_ptr->x += 1.0; segue o ponteiro e soma 1 ao campo x de point — como point_ptr aponta para point, a alteração aparece em point mesmo sem usar seu nome diretamente." },
+        { line: 23, vars: { point: "x=2.00 y=3.00" }, desc: "point_ptr->y += 2.0; soma 2 ao campo y." },
+        { line: 24, vars: {}, desc: "printf exibe: \"After manipulation, the 2D point has the following coordinates: (2.00, 3.00)\"." },
+        { line: 25, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    dinamico: {
+      vars: ["point"],
+      steps: [
+        { line: 27, vars: { point: "?" }, desc: "struct point2d *point; declara apenas um ponteiro, não a struct em si — point ainda não aponta para lugar nenhum." },
+        { line: 28, vars: { point: "malloc(8) → bloco no heap" }, desc: "point = (struct point2d *)malloc(sizeof(struct point2d)); reserva no heap exatamente o tamanho de um struct point2d (8 bytes: dois float) e guarda o endereço em point. Diferente dos exemplos anteriores, não existe nenhuma struct point2d na pilha — só o ponteiro." },
+        { line: 29, vars: {}, desc: "if (point == NULL) → alocação bem-sucedida, condição falsa; o bloco do else (linhas 31-32) é ignorado." },
+        { line: 34, vars: {}, desc: "read_point(point); — point já é um endereço, então passa direto, sem &." },
+        { line: 12, vars: {}, desc: "Dentro de read_point: printf exibe \"Enter the x-coordinate: \"." },
+        { line: 13, vars: { point: "x=5.00" }, desc: "scanf(\"%f\", &(point->x)); lê 5." },
+        { line: 14, vars: {}, desc: "printf exibe \"Enter the y-coordinate: \"." },
+        { line: 15, vars: { point: "x=5.00 y=2.50" }, desc: "scanf(\"%f\", &(point->y)); lê 2.5." },
+        { line: 35, vars: {}, desc: "print_point(point); imprime o cabeçalho e os dois campos." },
+        { line: 20, vars: {}, desc: "printf exibe o cabeçalho \"The 2D point has the following coordinates:\"." },
+        { line: 21, vars: {}, desc: "printf exibe \"x = 5.00\"." },
+        { line: 22, vars: {}, desc: "printf exibe \"y = 2.50\"." },
+        { line: 36, vars: {}, desc: "free(point); devolve o bloco de 8 bytes ao heap — depois disso, point continua com o mesmo endereço, mas usá-lo seria um use-after-free." },
+        { line: 37, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    distancia: {
+      vars: ["point1", "point2", "distance"],
+      steps: [
+        { line: 51, vars: { point1: "malloc(8) → bloco A" }, desc: "Point2D *point1 = create_point(); dentro de create_point, malloc(sizeof(Point2D)) reserva 8 bytes no heap e devolve o endereço, guardado em point1." },
+        { line: 52, vars: { point2: "malloc(8) → bloco B" }, desc: "Point2D *point2 = create_point(); um segundo bloco de 8 bytes, independente do primeiro." },
+        { line: 55, vars: { point1: "x=0.00 y=0.00" }, desc: "read_point(point1); lê 0 e 0 do usuário, gravados nos campos do bloco A." },
+        { line: 57, vars: { point2: "x=3.00 y=4.00" }, desc: "read_point(point2); lê 3 e 4, gravados no bloco B." },
+        { line: 60, vars: {}, desc: "print_point(point1); imprime \"Point: (0.00, 0.00)\"." },
+        { line: 62, vars: {}, desc: "print_point(point2); imprime \"Point: (3.00, 4.00)\"." },
+        { line: 64, vars: { distance: "?" }, desc: "float distance = euclidean_distance(point1, point2); chama a função que recebe as duas structs por ponteiro." },
+        { line: 41, vars: { distance: "5.00" }, desc: "Dentro de euclidean_distance: dx = 3.00 - 0.00 = 3.00, dy = 4.00 - 0.00 = 4.00, sqrt(3² + 4²) = sqrt(25) = 5.00 — devolvido para distance." },
+        { line: 65, vars: {}, desc: "printf exibe: \"Euclidean distance between the two points: 5.00\"." },
+        { line: 67, vars: {}, desc: "free_point(point1); libera o bloco A." },
+        { line: 68, vars: {}, desc: "free_point(point2); libera o bloco B." },
+        { line: 69, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    circulo: {
+      vars: ["my_circle", "my_point", "distance"],
+      steps: [
+        { line: 72, vars: { my_circle: "center=? radius=?" }, desc: "Circle *my_circle = create_circle(0, 0, 5); dentro de create_circle: malloc(sizeof(Circle)) reserva 16 bytes (um ponteiro + um double) para o Circle." },
+        { line: 45, vars: { my_circle: "center → bloco Point2D(0,0)" }, desc: "new_circle->center = create_point(center_x, center_y); chama create_point(0, 0), que aloca um Point2D à parte (8 bytes) — uma struct aninhada dentro da outra, cada uma em seu próprio bloco do heap." },
+        { line: 46, vars: { my_circle: "center=(0.00,0.00) radius=5.00" }, desc: "new_circle->radius = radius; grava o raio 5.00 — create_circle retorna o Circle pronto, com o centro já apontando para o Point2D recém-criado." },
+        { line: 73, vars: { my_point: "x=2.00 y=1.00" }, desc: "Point2D *my_point = create_point(2, 1); um Point2D independente, sem nenhuma relação com my_circle." },
+        { line: 75, vars: {}, desc: "if (is_point_inside_circle(my_point, my_circle)) — chama a função de verificação." },
+        { line: 52, vars: { distance: "≈2.236" }, desc: "Dentro da função: distance = euclidean_distance(point, circle->center); circle->center segue o ponteiro aninhado até o Point2D do centro — dx = 2-0 = 2, dy = 1-0 = 1, distance = sqrt(4+1) = sqrt(5) ≈ 2.236." },
+        { line: 53, vars: {}, desc: "if (distance < circle->radius) → 2.236 < 5.00 é verdadeiro." },
+        { line: 54, vars: {}, desc: "return 1; — a função devolve verdadeiro, o ponto está dentro do círculo." },
+        { line: 76, vars: {}, desc: "printf exibe: \"The point is inside the circle.\"." },
+        { line: 80, vars: {}, desc: "free_circle(my_circle); dentro dela, free_point(circle->center) libera primeiro o Point2D aninhado, e só depois free(circle) libera o Circle — na ordem inversa, o programa perderia o único ponteiro para o centro antes de liberá-lo, vazando aquele bloco." },
+        { line: 81, vars: {}, desc: "free_point(my_point); libera o Point2D independente." },
+        { line: 82, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+</body>
+</html>

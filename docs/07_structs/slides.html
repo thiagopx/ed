@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Tipos Estruturados</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --accent: #B0342F;
+    --accent-soft: #F6DCDA;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-str: #E29A4E;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    min-font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 9vw;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- title / closing slide ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  /* ---- struct-card: caixinha struct com campos rotulados ---- */
+
+  .struct-card { display: flex; flex-direction: column; align-items: center; }
+  .struct-card .box {
+    border: 2px solid var(--line);
+    border-radius: 0.8vw;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .struct-card .box .tag {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.9vw, 1.5rem);
+    background: var(--accent);
+    color: #fff;
+    padding: 0.55vw 1.5vw;
+    text-align: center;
+  }
+  .struct-card .box .field {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2.4vw;
+    padding: 0.6vw 1.5vw;
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.7vw, 1.3rem);
+    border-top: 1px solid var(--line);
+  }
+  .struct-card .box .field .fname { color: var(--ink); font-weight: 700; }
+  .struct-card .box .field .ftype { color: var(--ink-faint); }
+
+  .struct-card.is-cover { margin-top: 3vw; transform: scale(0.72); transform-origin: top center; }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.4vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- duelo de duas formas ---- */
+
+  .duel { display: flex; align-items: center; justify-content: center; gap: 4vw; flex-wrap: wrap; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 1vw; }
+  .duel .item .demo { display: flex; gap: 0.6vw; }
+  .duel .item .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2.6vw, 2.1rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    width: auto;
+    min-width: 4.4rem;
+    height: clamp(2.6rem, 5vw, 4rem);
+    padding: 0 1.3vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .duel .item .cell.is-null { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .duel .item .tag { font-family: var(--font-mono); font-size: clamp(1rem, 1.7vw, 1.4rem); color: var(--ink-soft); text-align: center; max-width: 20vw; }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); }
+
+  /* ---- comparação 2/3 colunas ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare.two-col { grid-template-columns: repeat(2, 1fr); max-width: 56vw; margin: 0 auto; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.8vw; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.4vw;
+    padding: 0.8vw 1vw;
+    display: block;
+    line-height: 1.6;
+  }
+
+  /* ---- figura em tela cheia ---- */
+
+  .fig-slide { padding: 0; }
+  .fig-slide .fig-head {
+    padding: 2.4vw 4.4vw 1.2vw;
+  }
+  .fig-slide .fig-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4.4vw 3vw;
+    min-height: 0;
+  }
+  .fig-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 1.4vw;
+  }
+
+  /* ---- aninhamento: dois struct-cards ligados por seta ---- */
+
+  .nestpair { display: flex; align-items: center; justify-content: center; gap: 2.6vw; flex-wrap: wrap; }
+  .nestpair .arrow-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.3vw; }
+  .nestpair .arrow-wrap .arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
+  .nestpair .arrow-wrap .lbl { font-family: var(--font-mono); font-size: clamp(0.8rem, 1.2vw, 1rem); color: var(--ink-faint); }
+
+  /* ---- union vs struct: memória ---- */
+
+  .memcmp { display: flex; align-items: flex-start; justify-content: center; gap: 4vw; flex-wrap: wrap; }
+  .memcmp .group { display: flex; flex-direction: column; align-items: center; gap: 1.1vw; }
+  .memcmp .group h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.15rem, 2vw, 1.6rem);
+    color: var(--accent);
+    margin: 0;
+  }
+  .memcmp .row { display: flex; gap: 0.5vw; }
+  .memcmp .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 1vw 1.2vw;
+    background: var(--surface);
+    text-align: center;
+  }
+  .memcmp .cell .byt { display: block; font-size: 0.75rem; color: var(--ink-faint); margin-top: 0.3vw; font-weight: 400; }
+  .memcmp .shared {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3vw;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .memcmp .caption { font-size: clamp(0.85rem, 1.3vw, 1.05rem); color: var(--ink-soft); text-align: center; max-width: 16vw; }
+
+  /* ---- enum: nomes para números ---- */
+
+  .enum-strip { display: flex; gap: 0.7vw; flex-wrap: wrap; justify-content: center; }
+  .enum-strip .chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4vw;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.8vw 1.1vw;
+  }
+  .enum-strip .chip .name { font-family: var(--font-mono); font-weight: 700; font-size: clamp(1rem, 1.7vw, 1.3rem); }
+  .enum-strip .chip .val { font-family: var(--font-mono); font-size: clamp(0.85rem, 1.3vw, 1.05rem); color: var(--ink-faint); }
+  .enum-strip .chip.is-accent { border-color: var(--accent); background: var(--accent-soft); }
+  .enum-strip .chip.is-accent .name, .enum-strip .chip.is-accent .val { color: var(--accent); }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    min-font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .compare { grid-template-columns: 1fr; }
+    .compare.two-col { max-width: 100%; }
+    .duel { flex-direction: column; gap: 1.5vw; }
+    .nestpair { flex-direction: column; }
+    .memcmp { flex-direction: column; align-items: center; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulo 9</div>
+    <h1>Tipos estruturados</h1>
+    <p class="sub">Como agrupar valores de tipos diferentes numa única unidade — e manipular, alocar e organizar essas unidades em C.</p>
+    <div class="struct-card is-cover">
+      <div class="box">
+        <div class="tag">point2d</div>
+        <div class="field"><span class="fname">x</span><span class="ftype">float</span></div>
+        <div class="field"><span class="fname">y</span><span class="ftype">float</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">Estruturas</div><div class="d">agrupar campos, acessar com . ou -&gt;, sempre passar por ponteiro</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Definição de novos tipos</div><div class="d">typedef como apelido — Point2D em vez de struct point2d</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Aninhamento de estruturas</div><div class="d">uma struct guardando um ponteiro para outra struct</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Vetores, union e enum</div><div class="d">várias structs num só vetor — e dois tipos primos, com papéis mais específicos</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Tipos estruturados</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. O QUE É UMA STRUCT -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estruturas</div>
+    <h1>Campos de tipos diferentes, uma unidade só</h1>
+    <p class="sub"><code>typedef struct { ... } Time;</code> agrupa um <code>int</code>, uma string e outro <code>int</code> sob um único tipo.</p>
+    <div class="body">
+      <div class="struct-card">
+        <div class="box">
+          <div class="tag">Time</div>
+          <div class="field"><span class="fname">id</span><span class="ftype">int</span></div>
+          <div class="field"><span class="fname">nome</span><span class="ftype">char[50]</span></div>
+          <div class="field"><span class="fname">pontos</span><span class="ftype">int</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Estruturas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. PONTEIRO PARA STRUCT E O OPERADOR -> -->
+  <section class="slide" data-slide>
+    <div class="kicker">Ponteiros para estruturas</div>
+    <h1>A seta é só um atalho</h1>
+    <p class="sub">p é um ponteiro para uma struct com um campo x — as duas formas abaixo são idênticas.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="demo"><div class="cell">(*p).x</div></div>
+          <div class="tag">desreferencia p, depois acessa o campo</div>
+        </div>
+        <div class="vs">≡</div>
+        <div class="item">
+          <div class="demo"><div class="cell is-null">p-&gt;x</div></div>
+          <div class="tag">mesma coisa, escrita de um jeito mais direto</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Ponteiros para estruturas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. ALOCAÇÃO DINÂMICA DE UMA STRUCT -->
+  <section class="slide" data-slide>
+    <div class="kicker">Alocação dinâmica de estruturas</div>
+    <h1>Uma struct pode viver na pilha ou no heap</h1>
+    <p class="sub"><code>malloc(sizeof(...))</code> tira a struct da pilha e a coloca no heap, com vida própria.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="demo"><div class="cell">struct point2d point;</div></div>
+          <div class="tag">pilha — existe enquanto a função existir</div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="item">
+          <div class="demo"><div class="cell is-null">malloc(sizeof(struct point2d))</div></div>
+          <div class="tag">heap — existe até um free explícito</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Alocação dinâmica de estruturas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. TYPEDEF -->
+  <section class="slide" data-slide>
+    <div class="kicker">Definição de novos tipos</div>
+    <h1>typedef: um apelido para o tipo</h1>
+    <p class="sub">Point2D e struct point2d são exatamente o mesmo tipo — só muda o que se escreve.</p>
+    <div class="body">
+      <div class="compare two-col">
+        <div class="col">
+          <h3>Sem typedef</h3>
+          <span class="cap">struct point2d p;<br>struct point2d *ptr;</span>
+        </div>
+        <div class="col">
+          <h3>Com typedef</h3>
+          <span class="cap">Point2D p;<br>Point2D *ptr;</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Definição de novos tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. ANINHAMENTO DE ESTRUTURAS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Aninhamento de estruturas</div>
+    <h1>Uma struct guardando um ponteiro para outra</h1>
+    <p class="sub">circle-&gt;center-&gt;x encadeia duas setas: primeiro chega ao Point2D, depois ao campo x dele.</p>
+    <div class="body">
+      <div class="nestpair">
+        <div class="struct-card">
+          <div class="box">
+            <div class="tag">Circle</div>
+            <div class="field"><span class="fname">center</span><span class="ftype">Point2D *</span></div>
+            <div class="field"><span class="fname">radius</span><span class="ftype">double</span></div>
+          </div>
+        </div>
+        <div class="arrow-wrap">
+          <span class="arrow">→</span>
+          <span class="lbl">center</span>
+        </div>
+        <div class="struct-card">
+          <div class="box">
+            <div class="tag">Point2D</div>
+            <div class="field"><span class="fname">x</span><span class="ftype">double</span></div>
+            <div class="field"><span class="fname">y</span><span class="ftype">double</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Aninhamento de estruturas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. VETOR DE STRUCTS -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Vetores de estruturas</div>
+      <h1>Um polígono é só um vetor de pontos</h1>
+      <p class="sub">Cada vértice é um Point2D; o polígono inteiro é um vetor dessas structs, na ordem dos vértices.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig9-1.jpg" alt="Um polígono representado por uma sequência de vértices no plano cartesiano, com a área sombreada decomposta em faixas trapezoidais entre vértices consecutivos">
+    </div>
+  </section>
+
+  <!-- 9. UNION vs STRUCT -->
+  <section class="slide" data-slide>
+    <div class="kicker">Tipo Union</div>
+    <h1>Campos separados vs. espaço compartilhado</h1>
+    <p class="sub">Uma struct reserva espaço para cada campo; uma union reserva um único espaço, do tamanho do maior campo.</p>
+    <div class="body">
+      <div class="memcmp">
+        <div class="group">
+          <h3>struct</h3>
+          <div class="row">
+            <div class="cell">int i<span class="byt">4 bytes</span></div>
+            <div class="cell">float f<span class="byt">4 bytes</span></div>
+          </div>
+          <div class="caption">campos coexistem — 8 bytes ao todo</div>
+        </div>
+        <div class="group">
+          <h3>union</h3>
+          <div class="row">
+            <div class="cell shared">int i<br>float f<span class="byt">4 bytes (compartilhados)</span></div>
+          </div>
+          <div class="caption">escrever num campo sobrescreve o outro</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Tipo Union</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 10. ENUM -->
+  <section class="slide" data-slide>
+    <div class="kicker">Tipo Enum</div>
+    <h1>Nomes em vez de números soltos</h1>
+    <p class="sub">Cada nome do enum é, por baixo, uma constante inteira sequencial, começando em 0.</p>
+    <div class="body">
+      <div class="enum-strip">
+        <div class="chip"><span class="name">DOM</span><span class="val">0</span></div>
+        <div class="chip"><span class="name">SEG</span><span class="val">1</span></div>
+        <div class="chip is-accent"><span class="name">TER</span><span class="val">2</span></div>
+        <div class="chip"><span class="name">QUA</span><span class="val">3</span></div>
+        <div class="chip"><span class="name">QUI</span><span class="val">4</span></div>
+        <div class="chip"><span class="name">SEX</span><span class="val">5</span></div>
+        <div class="chip"><span class="name">SAB</span><span class="val">6</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Tipo Enum</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, explicação linha a linha e simulação da execução passo a passo — sem precisar compilar nada. Depois, teste o que aprendeu no quiz.</p>
+    <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/07_structs</span></div>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>
