@@ -500,6 +500,101 @@
     color: var(--ink-soft);
   }
 
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
   footer.closing {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -660,14 +755,27 @@
     <p>
       Uma função recursiva é uma função que chama a si mesma, geralmente para resolver um problema
       dividindo-o em uma versão menor do mesmo problema, até alcançar um <em>caso-base</em> que
-      interrompe as chamadas. Cada chamada recursiva empilha sua própria moldura na pilha de execução —
-      a mesma pilha do modelo visto acima — por isso uma recursão sem caso-base, ou com um caso-base
-      que nunca é alcançado, esgota a memória disponível e trava o programa.
+      interrompe as chamadas. Se uma função <code>A</code> chama a própria <code>A</code>, a recursão é
+      <em>direta</em>; se <code>A</code> chama <code>B</code>, que por sua vez chama <code>A</code> de
+      volta, a recursão é <em>indireta</em> — os exemplos deste módulo usam sempre a forma direta, mais
+      comum. Cada chamada recursiva empilha sua própria moldura na pilha de execução — a mesma pilha do
+      modelo visto acima, com parâmetros e variáveis locais independentes a cada chamada — por isso uma
+      recursão sem caso-base, ou com um caso-base que nunca é alcançado, esgota a memória disponível e
+      trava o programa com um erro de estouro de pilha (<em>stack overflow</em>).
     </p>
     <figure class="resumo-fig">
       <img src="figs/fig4-5.jpg" alt="Quatro painéis mostrando a pilha de execução de uma função recursiva func(n): pilha após a chamada func(4); nova moldura empilhada em func(3); pilha na profundidade máxima com uma moldura para cada chamada até o caso-base func(0); desempilhamento de func(0) de volta ao contexto de func(1).">
       <figcaption>Cada chamada recursiva empilha uma nova moldura; elas são desempilhadas em ordem inversa conforme cada chamada retorna, a partir do caso-base.</figcaption>
     </figure>
+    <p>
+      O exemplo <em>Fatorial recursivo</em> aplica essa ideia ao cálculo de <code>n!</code>, definido
+      recursivamente como <code>n! = n × (n-1)!</code>, com caso-base <code>0! = 1! = 1</code> — a
+      tradução quase direta dessa definição para C já é a função inteira. Já vimos o mesmo cálculo de
+      forma <em>iterativa</em>, com um <code>for</code> multiplicando os números de 1 até <code>n</code>
+      (módulo de repetições, exemplo <em>Fatorial</em>); aqui, em vez de acumular o resultado num laço, cada
+      chamada delega quase todo o trabalho a uma chamada menor de si mesma, até a mais simples de todas
+      (<code>n &lt;= 1</code>) resolver sozinha.
+    </p>
 
     <h3>Pré-processador e macros</h3>
     <p>
@@ -719,6 +827,12 @@
         <span class="row-title"><span class="row-icon">🔗</span>Macro do quadrado</span>
       </div>
       <p class="row-desc">#define expande texto antes da compilação — não é uma chamada de função de verdade.</p>
+    </li>
+    <li class="example-row" data-target="fatorial-recursivo" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Fatorial recursivo</span>
+      </div>
+      <p class="row-desc">Uma função que chama a si mesma, com um caso-base para interromper a recursão.</p>
     </li>
   </ul>
 
@@ -799,6 +913,25 @@ Volume: 100.53</pre>
           <code>gcc cylinder.c -o cylinder -lm</code> — sem o <code>-lm</code> o compilador acusa
           "undefined reference to <code>pow</code>".
         </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            <code>cylinder_volume</code> é declarada com retorno <code>double</code>. O que aconteceria
+            se ela fosse declarada com retorno <code>int</code>, mantendo o resto do código (inclusive
+            <code>volume</code>, ainda <code>double</code>) igual?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Não mudaria nada — C converte automaticamente o tipo de retorno para bater com o tipo do <code>double</code> que recebe o resultado.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa passaria a calcular a área em vez do volume.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O valor calculado dentro da função (<code>double</code>) seria truncado para inteiro no <code>return</code>, perdendo a parte decimal antes mesmo de chegar a <code>volume</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa não compilaria, pois C não permite funções <code>int</code> com corpo contendo cálculos <code>double</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> O valor é convertido para o tipo de retorno declarado da função (<code>int</code>) antes mesmo de ser devolvido — a parte decimal do cálculo (M_PI × radius² × height) seria descartada ali, não depois, quando o <code>double volume</code> recebesse o resultado já truncado.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é essa.</strong> O tipo de retorno declarado da função é o que vale: o resultado seria truncado para <code>int</code> — perdendo a parte decimal — antes mesmo de ser devolvido para <code>volume</code>, mesmo que <code>volume</code> continue sendo <code>double</code>.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -878,6 +1011,24 @@ Value pointed to by ptr: 100</pre>
           embaralha a memória por segurança). Rode o programa você mesmo: o valor vai ser
           diferente, e isso é esperado.
         </div>
+
+        <div class="check-question" data-correct="3">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O programa altera <code>num</code> executando <code>*ptr = 100;</code>. O que aconteceria
+            se, em vez disso, o código tentasse <code>ptr = 100;</code> (sem o <code>*</code>)?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O mesmo resultado: <code>num</code> passaria a valer 100.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Erro de compilação obrigatório, pois ponteiros não podem receber valores literais.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>num</code> seria automaticamente definida como ponteiro também.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>ptr</code> deixaria de apontar para <code>num</code> e passaria a guardar o valor 100 como se fosse um endereço de memória — quase certamente inválido, que não deve ser dereferenciado.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem o <code>*</code>, a atribuição é sobre o próprio <code>ptr</code>, não sobre o que ele aponta: <code>ptr</code> passaria a guardar o valor 100 como se fosse um endereço de memória — quase certamente inválido — e <code>num</code> continuaria com seu valor original (42). É o <code>*</code> que redireciona a atribuição para o conteúdo apontado, não para o ponteiro em si.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é essa.</strong> Sem o <code>*</code>, você estaria alterando o próprio ponteiro, não a variável apontada: <code>ptr</code> passaria a guardar o valor 100 como endereço (quase certamente inválido), e <code>num</code> continuaria com seu valor original.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -952,6 +1103,26 @@ Difference: 6.00</pre>
           "devolve" o valor lido escrevendo no endereço que você fornece com <code>&amp;</code>,
           em vez de usar <code>return</code>.
         </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            A função recebe <code>double *sum, double *difference</code> e escreve com
+            <code>*sum = ...</code>, <code>*difference = ...</code>. O que aconteceria se, em vez de
+            ponteiros, ela recebesse os parâmetros por valor — <code>double sum, double
+            difference</code> — trocando <code>*sum =</code> por <code>sum =</code> dentro da função?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>A função alteraria apenas suas próprias cópias locais de <code>sum</code> e <code>difference</code>; as variáveis de mesmo nome em <code>main</code> continuariam com valor indefinido (lixo) depois da chamada.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Funcionaria exatamente igual — o compilador otimiza automaticamente a passagem para usar os endereços quando necessário.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa não compilaria, pois uma função <code>void</code> não pode alterar variável nenhuma.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>sum</code> e <code>difference</code> em <code>main</code> receberiam os valores calculados, só que arredondados.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Por valor, <code>sum</code> e <code>difference</code> dentro da função seriam apenas cópias locais — alterá-las não afeta as variáveis de mesmo nome em <code>main</code>, que nunca chegariam a ser inicializadas de verdade. O <code>printf</code> imprimiria lixo de memória. É exatamente esse problema que passar os endereços (ponteiros) resolve.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é essa.</strong> Por valor, a função só alteraria cópias locais de <code>sum</code> e <code>difference</code> — as variáveis de <code>main</code>, nunca escritas, ficariam com valor indefinido (lixo). É o problema que os ponteiros resolvem neste exemplo.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1020,6 +1191,24 @@ Function has been called 5 times.</pre>
           dentro de <code>count_calls</code> — nenhuma outra função enxerga ou altera esse
           <code>counter</code> diretamente.
         </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se <code>static</code> fosse removido de <code>static int counter =
+            0;</code>, mantendo as mesmas 5 chamadas de <code>count_calls()</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O comportamento seria idêntico, pois toda variável local em C já preserva seu valor entre chamadas por padrão.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span><code>counter</code> passaria a ser compartilhada entre todas as funções do programa, como se fosse global.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>counter</code> seria recriada e reinicializada em 0 a cada chamada; a função imprimiria "1 times" nas 5 vezes, em vez de 1, 2, 3, 4, 5.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa não compilaria, pois toda variável usada com <code>++</code> precisa ser <code>static</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem <code>static</code>, <code>counter</code> volta a ser uma variável local comum: nasce e é reinicializada em 0 a cada chamada, sempre incrementada para 1 antes do retorno. As 5 chamadas imprimiriam "...1 times." cinco vezes, em vez de 1, 2, 3, 4, 5 — a função "esqueceria" quantas vezes já foi chamada.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é essa.</strong> Sem <code>static</code>, <code>counter</code> volta a ser uma variável local comum, sempre recriada com valor 0 a cada chamada: as 5 chamadas imprimiriam "...1 times." em todas elas, nunca avançando.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1077,6 +1266,113 @@ Function has been called 5 times.</pre>
           Compile com <code>gcc square_macro.c -o square_macro -E</code> (ou
           <code>--save-temps</code>) para ver o código já com a macro expandida, antes da
           compilação de verdade — é uma boa forma de enxergar o que o pré-processador faz.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            A macro é definida como <code>#define SQUARE(x) ((x) * (x))</code>. O que aconteceria se
+            ela fosse definida sem os parênteses internos — <code>#define SQUARE(x) (x * x)</code> —
+            e chamada como <code>SQUARE(2 + 3)</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>A expansão viraria <code>(2 + 3 * 2 + 3)</code>, que por precedência de operadores avalia para 11, não 25.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O resultado seria o mesmo, 25 — os parênteses externos já protegem toda a expressão.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O pré-processador detectaria a ausência de parênteses no parâmetro e os adicionaria automaticamente.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa não compilaria, pois macros exigem parênteses ao redor de cada parâmetro.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem parênteses ao redor de <code>x</code>, a substituição é literal: <code>(x * x)</code> vira <code>(2 + 3 * 2 + 3)</code>. Por precedência de operadores, a multiplicação (3 × 2 = 6) acontece antes das somas, dando 2 + 6 + 3 = 11 — bem diferente do 25 esperado (5²). É por isso que a macro real do exemplo envolve cada parâmetro com seus próprios parênteses.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é essa.</strong> A resposta certa é 11: sem parênteses ao redor de <code>x</code>, <code>(x * x)</code> vira, literalmente, <code>(2 + 3 * 2 + 3)</code> — a multiplicação (3 × 2) acontece antes das somas, dando 2 + 6 + 3 = 11, não 25.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FATORIAL RECURSIVO ================= -->
+  <section class="detail" id="panel-fatorial-recursivo" data-panel hidden>
+    <div class="detail-head">
+      <h2>Fatorial recursivo</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/02_functions_and_pointers/06_recursive_factorial" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">long long</span> <span class="fn">factorial</span>(<span class="kw">int</span> n)
+{
+    <span class="kw">if</span> (n &lt;= <span class="num">1</span>)
+    {
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> n;
+    <span class="fn">printf</span>(<span class="str">"Digite um numero: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;n);
+
+    <span class="fn">printf</span>(<span class="str">"%d! = %lld\n"</span>, n, <span class="fn">factorial</span>(n));
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Recursão: chamando a própria função</h3>
+        <p>
+          <code>factorial</code> é definida chamando a si mesma: dentro do próprio corpo, a linha
+          <code>return n * factorial(n - 1);</code> invoca <code>factorial</code> de novo, agora com um
+          valor menor (<code>n - 1</code>). <code>if (n &lt;= 1) return 1;</code> é o caso-base — sem
+          ele, a recursão nunca pararia, e o programa travaria com estouro de pilha assim que a memória
+          disponível para molduras se esgotasse. Já vimos a versão <em>iterativa</em> do mesmo cálculo no
+          módulo de repetições (<code>03_repetition_and_rand/01_factorial</code>, com um <code>for</code>);
+          aqui, a mesma ideia — multiplicar os números de 1 até <code>n</code> — é resolvida de forma
+          recursiva: cada chamada delega quase todo o trabalho a uma chamada menor de si mesma, até a
+          mais simples de todas (<code>n &lt;= 1</code>) resolver sozinha.
+        </p>
+
+        <h3>Execução passo a passo — n = 5</h3>
+        <div class="stepper" data-stepper="fatorial-recursivo">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Digite um numero: <span class="in">5</span>
+5! = 120</pre>
+
+        <div class="callout">
+          O tipo de retorno é <code>long long</code>, não <code>int</code>: fatoriais crescem muito
+          rápido (<code>13!</code> já ultrapassa a faixa de um <code>int</code> de 32 bits) — por isso o
+          especificador usado no <code>printf</code> é <code>%lld</code>, não <code>%d</code>. O
+          caso-base <code>n &lt;= 1</code> (em vez de só <code>n == 0</code>) também cobre corretamente
+          <code>n = 1</code>, sem precisar de uma chamada recursiva a mais.
+        </div>
+
+        <div class="check-question" data-correct="3">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se o caso-base <code>if (n &lt;= 1) return 1;</code> fosse removido de
+            <code>factorial</code>, deixando só <code>return n * factorial(n - 1);</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O compilador recusaria compilar, pois toda função recursiva precisa de um caso-base explícito.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>A função retornaria sempre 1, independente do valor de <code>n</code>.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa entraria em loop infinito, mas sem consumir memória adicional, rodando para sempre sem travar.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>A recursão nunca pararia: cada chamada geraria outra, com <code>n</code> cada vez mais negativo, até a pilha de execução se esgotar (stack overflow) e o programa travar.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem uma condição de parada, cada chamada de <code>factorial(n)</code> dispararia outra, com <code>n</code> cada vez menor — passando por 0, depois valores negativos — sem nunca satisfazer nenhuma condição de parada, que nem existe mais. Cada chamada empilha uma nova moldura; como a pilha de execução tem tamanho limitado, o programa eventualmente trava com um erro de estouro de pilha (stack overflow).</p>
+            <p class="feedback-incorrect" hidden><strong>Não é essa.</strong> Sem o caso-base, a recursão nunca pararia: cada chamada gera outra chamada (com <code>n</code> cada vez mais negativo), empilhando uma nova moldura a cada vez, até a pilha de execução se esgotar (stack overflow) e o programa travar.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1203,6 +1499,25 @@ Function has been called 5 times.</pre>
         { line: 11, vars: {}, desc: "printf imprime “The square of 5 is 25”." },
         { line: 13, vars: {}, desc: "return 0; — o programa termina." }
       ]
+    },
+    "fatorial-recursivo": {
+      vars: ["n (main)", "pilha", "retorno"],
+      steps: [
+        { line: 15, vars: {}, desc: "printf exibe o prompt: “Digite um numero: ” (sem quebra de linha)." },
+        { line: 16, vars: { "n (main)": "5" }, desc: "scanf lê o valor digitado: n (em main) = 5." },
+        { line: 18, vars: { pilha: "factorial(5)" }, desc: "Antes de poder imprimir, o printf precisa primeiro avaliar o argumento factorial(n): a execução salta para dentro da função (linha 5), empilhando a moldura de factorial(5) — seu parâmetro n é uma cópia independente do n de main." },
+        { line: 9, vars: { pilha: "factorial(5) → factorial(4)" }, desc: "Dentro de factorial(5): a condição n <= 1 (linha 5) é falsa, então a linha 9 precisa primeiro calcular factorial(n - 1) = factorial(4) antes de multiplicar por 5 — nova chamada, nova moldura empilhada." },
+        { line: 9, vars: { pilha: "factorial(5) → factorial(4) → factorial(3)" }, desc: "Dentro de factorial(4): mesma história — 4 <= 1 é falso, então chama factorial(3) antes de poder multiplicar por 4." },
+        { line: 9, vars: { pilha: "factorial(5) → factorial(4) → factorial(3) → factorial(2)" }, desc: "Dentro de factorial(3): 3 <= 1 é falso, chama factorial(2)." },
+        { line: 9, vars: { pilha: "factorial(5) → factorial(4) → factorial(3) → factorial(2) → factorial(1)" }, desc: "Dentro de factorial(2): 2 <= 1 é falso, chama factorial(1) — a quinta e mais profunda moldura da pilha." },
+        { line: 7, vars: { pilha: "factorial(5) → factorial(4) → factorial(3) → factorial(2)", retorno: "factorial(1) = 1" }, desc: "Dentro de factorial(1): agora 1 <= 1 é verdadeiro — o caso-base é alcançado. A função retorna 1 sem nenhuma chamada recursiva nova, e sua moldura é imediatamente desempilhada." },
+        { line: 9, vars: { pilha: "factorial(5) → factorial(4) → factorial(3)", retorno: "factorial(2) = 2" }, desc: "De volta em factorial(2), agora com o resultado de factorial(1) em mãos: n * factorial(n - 1) = 2 * 1 = 2. factorial(2) retorna 2 e desempilha." },
+        { line: 9, vars: { pilha: "factorial(5) → factorial(4)", retorno: "factorial(3) = 6" }, desc: "De volta em factorial(3): 3 * 2 = 6. Retorna 6 e desempilha." },
+        { line: 9, vars: { pilha: "factorial(5)", retorno: "factorial(4) = 24" }, desc: "De volta em factorial(4): 4 * 6 = 24. Retorna 24 e desempilha." },
+        { line: 9, vars: { pilha: "—", retorno: "factorial(5) = 120" }, desc: "De volta em factorial(5), a chamada original: 5 * 24 = 120. Retorna 120 e desempilha — a pilha volta ao estado de antes da chamada, e o valor 120 já está pronto para o printf que a originou." },
+        { line: 18, vars: {}, desc: "printf imprime “5! = 120”: n é o de main (ainda 5 — nunca foi alterado, cada chamada recursiva tinha seu próprio n local, independente), e o segundo valor é o retorno de factorial(n)." },
+        { line: 20, vars: {}, desc: "return 0; — o programa termina." }
+      ]
     }
   };
 
@@ -1296,6 +1611,35 @@ Function has been called 5 times.</pre>
   document.querySelectorAll("[data-stepper]").forEach(function (root) {
     var config = STEPS[root.getAttribute("data-stepper")];
     if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
   });
 })();
 </script>

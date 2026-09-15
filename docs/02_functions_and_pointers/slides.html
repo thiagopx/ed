@@ -274,6 +274,51 @@
   .chain .label { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--ink-soft); }
   .chain .label strong { color: var(--ink); }
 
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 38vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: #4FD9C4; }
+  .code-panel .fn   { color: #E8C15A; }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: #C792EA; }
+  .code-panel .cmt  { color: #8A96A3; font-style: italic; }
+  .code-panel .pp   { color: #E2685A; }
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
   /* ---- comparação 2 ou 3 colunas ---- */
 
   .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
@@ -524,6 +569,8 @@
     .compare.cols-2 { grid-template-columns: 1fr; }
     .duel { flex-direction: column; gap: 1.5vw; }
     .ptrgrid { flex-direction: column; align-items: center; }
+    .code-panel { max-width: 90vw; }
+    .concept-split { flex-direction: column; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -706,7 +753,46 @@
     </div>
   </section>
 
-  <!-- 10. MACRO -->
+  <!-- 10. FATORIAL RECURSIVO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Recursão</div>
+    <h1>Fatorial: a tradução quase direta da definição</h1>
+    <p class="sub"><code>n! = n × (n−1)!</code>, com caso-base <code>0! = 1! = 1</code> — a mesma ideia já vista de forma <em>iterativa</em> no módulo de repetições.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div style="display:flex; flex-direction:column; gap:1.6vw; align-items:center;">
+            <div class="flow">
+              <div class="box">n!<span class="tag">n &gt; 1</span></div>
+              <div class="arrow">=</div>
+              <div class="box is-accent">n × (n − 1)!<span class="tag">chamada recursiva</span></div>
+            </div>
+            <div class="flow">
+              <div class="box">0! = 1!<span class="tag">caso-base</span></div>
+              <div class="arrow">=</div>
+              <div class="box is-accent">1<span class="tag">interrompe a recursão</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_recursive_factorial/main.c</div>
+            <pre><code><span class="kw">long long</span> <span class="fn">factorial</span>(<span class="kw">int</span> n)
+{
+    <span class="kw">if</span> (n &lt;= <span class="num">1</span>)
+    {
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Recursão</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. MACRO -->
   <section class="slide" data-slide>
     <div class="kicker">Pré-processador e macros</div>
     <h1>Texto substituído antes de compilar</h1>
@@ -722,7 +808,7 @@
     <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 11. FECHAMENTO -->
+  <!-- 12. FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>

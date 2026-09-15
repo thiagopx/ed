@@ -299,7 +299,7 @@
 
   <div class="quiz-header">
     <h2>🧠 Quiz — Ponteiros em C</h2>
-    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 11</span>
   </div>
 
   <div class="progress-bar-track">
@@ -310,7 +310,7 @@
 
   <div class="result-screen" id="result-screen">
     <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz!</div>
-    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-score" id="result-score">0 / 11</div>
     <div class="result-msg" id="result-msg"></div>
     <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
   </div>
@@ -519,6 +519,25 @@ const questions = [
     correctIndex: 1,
     explainCorrect: '"v" é uma variável automática (da pilha), que deixa de existir assim que f() termina. O endereço retornado (um ponteiro pendente/dangling) pode até "parecer funcionar" às vezes, mas o comportamento é indefinido — a memória pode ser reaproveitada por outra coisa a qualquer momento.',
     explainIncorrect: 'A resposta certa é que há comportamento indefinido. "v" existe apenas durante a execução de f(); ao retornar, seu endereço se torna inválido (ponteiro pendente). O programa pode imprimir 42 por "sorte" em alguns testes, mas isso não é garantido.'
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Recursão",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">int</span> <span class="type">soma</span>(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n &lt;= 0) <span class="kw">return</span> 0;
+    <span class="kw">return</span> n + soma(n - 1);
+}
+
+<span class="kw">int</span> <span class="type">main</span>() {
+    printf(<span class="cmt">"%d"</span>, soma(4));
+    <span class="kw">return</span> 0;
+}`,
+    options: ["4", "24", "10", "Erro de compilação: função recursiva sem protótipo"],
+    correctIndex: 2,
+    explainCorrect: 'Certo! soma(4) chama soma(3), que chama soma(2), que chama soma(1), que chama soma(0) — o caso-base, que retorna 0 sem nenhuma chamada nova. Voltando: soma(1) = 1+0 = 1, soma(2) = 2+1 = 3, soma(3) = 3+3 = 6, soma(4) = 4+6 = 10.',
+    explainIncorrect: 'A resposta certa é 10. Cada chamada soma(n) devolve n + soma(n-1), até o caso-base soma(0), que retorna 0: 4 + 3 + 2 + 1 + 0 = 10. (Não há erro de compilação: uma função pode ser usada dentro do seu próprio corpo sem protótipo, desde que já tenha sido declarada/definida antes de main.)'
   }
 ];
 
