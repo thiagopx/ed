@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Arquivos</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #8A6D1F;
+    --accent-soft: #F3E6C4;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    min-font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 9vw;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- title / closing slide ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  /* ---- capa: arquivo estilizado (texto ou bytes) ---- */
+
+  .file-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.4vw;
+    margin-top: 3vw;
+  }
+  .file-badge .sheet {
+    position: relative;
+    width: 9vw;
+    min-width: 108px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 1.1vw 1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .file-badge .sheet::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 1.3vw; height: 1.3vw;
+    background: var(--paper);
+    border-left: 2px solid var(--line);
+    border-bottom: 2px solid var(--line);
+    border-bottom-left-radius: 0.3vw;
+  }
+  .file-badge .sheet .tline {
+    height: 0.45vw;
+    background: var(--line-strong);
+    border-radius: 999px;
+    margin-bottom: 0.55vw;
+  }
+  .file-badge .sheet .tline:nth-child(3) { width: 65%; }
+  .file-badge .arrow2 { font-size: clamp(1.4rem, 2.6vw, 2.2rem); color: var(--ink-faint); }
+  .file-badge .bytes {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.7vw, 1.5rem);
+    background: var(--code-bg);
+    color: var(--accent);
+    border-radius: 0.5vw;
+    padding: 1vw 1.3vw;
+    letter-spacing: 0.08em;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.4vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- cards de modos / funções ---- */
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4vw; width: 100%; }
+  .cards .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw 1.2vw;
+    text-align: center;
+  }
+  .cards .card.is-accent { border-color: var(--accent); }
+  .cards .card .fn {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 1.9vw, 1.5rem);
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.6vw;
+  }
+  .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
+
+  /* ---- comparação 3 colunas ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col.is-accent { border-color: var(--accent); }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.8vw; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-size: clamp(0.82rem, 1.2vw, 1rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.4vw;
+    padding: 0.5vw 0.7vw;
+    display: block;
+  }
+
+  /* ---- fluxo (dois arquivos → soma → arquivo) ---- */
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2vw;
+    flex-wrap: wrap;
+  }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 2vw, 1.6rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1vw 1.4vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.35vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .flow .arrow { font-size: clamp(1.4rem, 2.6vw, 2.1rem); color: var(--ink-faint); }
+
+  /* ---- duel (texto vs binário) ---- */
+
+  .duel { display: flex; align-items: center; justify-content: center; gap: 3.4vw; flex-wrap: wrap; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 1vw; }
+  .duel .item .demo { display: flex; gap: 0.5vw; }
+  .duel .item .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    min-width: clamp(2.2rem, 3.6vw, 3rem);
+    height: clamp(2.4rem, 4vw, 3.2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.3vw;
+  }
+  .duel .item.is-bin .cell { background: var(--code-bg); color: var(--accent); border-color: var(--code-bg); }
+  .duel .item .tag { font-size: clamp(0.85rem, 1.35vw, 1.1rem); color: var(--ink-soft); text-align: center; max-width: 16vw; }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); }
+
+  /* ---- tira de registros (fseek) ---- */
+
+  .recordstrip { display: flex; flex-direction: column; align-items: center; gap: 1.8vw; width: 100%; }
+  .recordstrip .track { display: flex; gap: 0.8vw; }
+  .recordstrip .rec {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 1.1vw 1.5vw;
+    text-align: center;
+  }
+  .recordstrip .rec .off {
+    display: block;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.68em;
+    color: var(--ink-faint);
+    margin-top: 0.4vw;
+  }
+  .recordstrip .rec.is-skip { opacity: 0.45; border-style: dashed; }
+  .recordstrip .rec.is-target { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.3vw 0 var(--accent); }
+  .recordstrip .jump {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+    color: var(--accent);
+    font-weight: 700;
+    text-align: center;
+    max-width: 46vw;
+  }
+
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 38vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: var(--code-type); }
+  .code-panel .fn   { color: var(--code-fn); }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: var(--code-num); }
+  .code-panel .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-panel .pp   { color: var(--code-pp); }
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    min-font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .compare { grid-template-columns: 1fr; }
+    .duel { flex-direction: column; gap: 1.5vw; }
+    .concept-split { flex-direction: column; }
+    .code-panel { max-width: 90vw; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulo 10</div>
+    <h1>Arquivos</h1>
+    <p class="sub">Como um programa C grava e recupera informação em disco — em modo texto, legível, ou em modo binário, byte a byte — e como escolher a forma certa de organizar cada tipo de dado.</p>
+    <div class="file-badge">
+      <div class="sheet">
+        <div class="tline"></div>
+        <div class="tline"></div>
+        <div class="tline"></div>
+      </div>
+      <div class="arrow2">⇄</div>
+      <div class="bytes">01 4E 6F</div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">Abrir e fechar arquivos</div><div class="d">fopen, os modos r/w/a/+, e por que sempre testar o retorno</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Arquivos em modo texto</div><div class="d">fscanf, fgetc, fgets para ler; fprintf, fputc para escrever</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Estruturação de dados</div><div class="d">caractere a caractere, linha a linha, palavras-chave — e sscanf</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Arquivos em modo binário</div><div class="d">fwrite, fread, e acesso direto a um registro com fseek</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Arquivos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. ABRIR/FECHAR, MODOS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Abrir e fechar arquivos</div>
+    <h1>fopen devolve NULL quando falha</h1>
+    <p class="sub">Todo código deve testar o retorno antes de usar o arquivo.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="card is-accent"><span class="fn">"r"</span><p>leitura — o arquivo precisa já existir</p></div>
+            <div class="card"><span class="fn">"w"</span><p>escrita — cria vazio, destrói o que já existia</p></div>
+            <div class="card"><span class="fn">"a"</span><p>escrita no final — preserva o conteúdo anterior</p></div>
+            <div class="card"><span class="fn">"+"</span><p>combinado a r/w — leitura e escrita no mesmo arquivo</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_count_chars/main.c</div>
+            <pre><code><span class="type">FILE</span> *file = <span class="fn">fopen</span>(<span class="str">"main.c"</span>, <span class="str">"r"</span>);
+
+<span class="kw">if</span> (file == <span class="kw">NULL</span>)
+{
+    <span class="fn">printf</span>(<span class="str">"Error opening file\n"</span>);
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Abrir e fechar arquivos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. LEITURA EM MODO TEXTO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Arquivos em modo texto</div>
+    <h1>Três jeitos de ler, cada um com seu grão</h1>
+    <p class="sub">Mesma família de funções do teclado — agora lendo de um FILE*.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="compare" style="grid-template-columns: 1fr;">
+            <div class="col is-accent"><h3>fgetc(fp)</h3><p>um caractere por chamada — o grão mais fino</p></div>
+            <div class="col"><h3>fgets(s, n, fp)</h3><p>uma linha inteira, até '\n' ou n-1 caracteres</p></div>
+            <div class="col"><h3>fscanf(fp, fmt, ...)</h3><p>valores formatados, como um scanf que lê de arquivo</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_count_lines/main.c</div>
+            <pre><code><span class="kw">while</span> (<span class="fn">fgets</span>(line, <span class="num">200</span>, file) != <span class="kw">NULL</span>)
+{
+    line_count++;
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, line);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Arquivos em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. ESCRITA EM MODO TEXTO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Arquivos em modo texto</div>
+    <h1>fprintf e fputc espelham a leitura</h1>
+    <p class="sub">Dois arquivos de entrada, um de saída — três FILE* abertos ao mesmo tempo.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow">
+            <div class="box">vector_1.txt<span class="tag">fscanf</span></div>
+            <div class="arrow">+</div>
+            <div class="box">vector_2.txt<span class="tag">fscanf</span></div>
+            <div class="arrow">→</div>
+            <div class="box is-accent">sum_vector.txt<span class="tag">fprintf</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">04_sum_vectors/main.c</div>
+            <pre><code><span class="fn">fprintf</span>(output_file, <span class="str">"%d\n"</span>, n1);
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n1; i++)
+{
+    <span class="fn">fprintf</span>(output_file, <span class="str">"%d "</span>, sum_vector[i]);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Arquivos em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. TRÊS FORMAS DE ESTRUTURAR -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estruturação de dados</div>
+    <h1>Como organizar o que está dentro do arquivo</h1>
+    <p class="sub">A escolha depende da aplicação — os três exemplos deste módulo isolam cada mecânica.</p>
+    <div class="body">
+      <div class="compare">
+        <div class="col">
+          <h3>Caractere a caractere</h3>
+          <p>fgetc num laço até EOF — ideal para contar ou classificar caracteres individuais.</p>
+          <span class="cap">01_count_chars</span>
+        </div>
+        <div class="col is-accent">
+          <h3>Linha a linha</h3>
+          <p>fgets até NULL — cada linha vira uma unidade, útil combinada com sscanf.</p>
+          <span class="cap">03_count_lines</span>
+        </div>
+        <div class="col">
+          <h3>Palavras-chave</h3>
+          <p>fscanf com %s captura um token por vez — a base para despachar por tipo de registro.</p>
+          <span class="cap">02_count_words</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Estruturação de dados em arquivos textos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. SSCANF -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estruturação de dados</div>
+    <h1>sscanf: fscanf para uma string em memória</h1>
+    <p class="sub">O padrão real: fgets pega a linha inteira, sscanf extrai os campos dela.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow">
+            <div class="box">"John 25 75.5"<span class="tag">input_string</span></div>
+            <div class="arrow">→</div>
+            <div class="box is-accent">"John" · 25 · 75.50<span class="tag">name, age, height</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">05_string_parser/main.c</div>
+            <pre><code><span class="kw">char</span> input_string[] = <span class="str">"John 25 75.5"</span>;
+<span class="kw">char</span> name[<span class="num">50</span>];
+<span class="kw">int</span> age;
+<span class="kw">float</span> height;
+
+<span class="fn">sscanf</span>(input_string, <span class="str">"%s %d %f"</span>, name, &amp;age, &amp;height);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>sscanf</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. MODO BINÁRIO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Arquivos em modo binário</div>
+    <h1>Os mesmos bytes da memória, sem tradução</h1>
+    <p class="sub">fwrite/fread copiam blocos inteiros — sem nenhuma formatação de texto.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="duel">
+            <div class="item">
+              <div class="demo"><div class="cell">1</div><div class="cell">2</div><div class="cell">.</div><div class="cell">5</div><div class="cell">0</div></div>
+              <div class="tag">modo texto — "12.50", legível, 5 bytes</div>
+            </div>
+            <div class="vs">vs</div>
+            <div class="item is-bin">
+              <div class="demo"><div class="cell">41</div><div class="cell">48</div><div class="cell">00</div><div class="cell">00</div></div>
+              <div class="tag">modo binário — os 4 bytes brutos do float 12.50</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_binary_records/main.c</div>
+            <pre><code><span class="kw">void</span> <span class="fn">salvar_produtos</span>(
+    <span class="kw">const</span> <span class="kw">char</span> *arquivo, <span class="type">Produto</span> *produtos, <span class="kw">int</span> n)
+{
+    <span class="type">FILE</span> *fp = <span class="fn">fopen</span>(arquivo, <span class="str">"wb"</span>);
+    <span class="fn">fwrite</span>(produtos, <span class="kw">sizeof</span>(<span class="type">Produto</span>), n, fp);
+    <span class="fn">fclose</span>(fp);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Arquivos em modo binário</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. FSEEK -->
+  <section class="slide" data-slide>
+    <div class="kicker">Arquivos em modo binário</div>
+    <h1>fseek: acesso direto a um registro</h1>
+    <p class="sub">Como cada registro ocupa sempre o mesmo número de bytes, dá para pular direto até ele.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="recordstrip">
+            <div class="track">
+              <div class="rec is-skip">Produto[0]<span class="off">offset 0</span></div>
+              <div class="rec is-target">Produto[1]<span class="off">offset sizeof(Produto)</span></div>
+              <div class="rec">Produto[2]<span class="off">offset 2×sizeof(Produto)</span></div>
+            </div>
+            <div class="jump">fseek(fp, 1 × sizeof(Produto), SEEK_SET) → salta direto para Produto[1], sem ler Produto[0]</div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_binary_records/main.c</div>
+            <pre><code><span class="type">Produto</span> <span class="fn">carregar_produto_por_indice</span>(
+    <span class="kw">const</span> <span class="kw">char</span> *arquivo, <span class="kw">int</span> indice)
+{
+    <span class="type">Produto</span> p;
+    <span class="type">FILE</span> *fp = <span class="fn">fopen</span>(arquivo, <span class="str">"rb"</span>);
+    <span class="fn">fseek</span>(fp, indice * <span class="kw">sizeof</span>(<span class="type">Produto</span>), <span class="kw">SEEK_SET</span>);
+    <span class="fn">fread</span>(&amp;p, <span class="kw">sizeof</span>(<span class="type">Produto</span>), <span class="num">1</span>, fp);
+    <span class="fn">fclose</span>(fp);
+    <span class="kw">return</span> p;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>fseek</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 10. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, explicação linha a linha e simulação da execução passo a passo — sem precisar compilar nada. Depois, teste o que aprendeu no quiz.</p>
+    <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/08_files</span></div>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>

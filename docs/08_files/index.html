@@ -1,0 +1,1896 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquivos — Estruturas de Dados</title>
+<meta name="description" content="Material didático sobre manipulação de arquivos em C — abrir e fechar arquivos, arquivos em modo texto (fscanf, fgetc, fgets, fprintf, fputc), estratégias de estruturação de dados (caractere a caractere, linha a linha, palavras-chave), sscanf e arquivos em modo binário (fwrite, fread, fseek) — código comentado, explicação e simulação da execução, sem precisar compilar. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #8A6D1F;
+    --accent-soft: #F3E6C4;
+    --wash: rgba(138, 109, 31, 0.07);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #E0B84A;
+      --accent-soft: #3A2E13;
+      --wash: rgba(224, 184, 74, 0.09);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #E0B84A;
+    --accent-soft: #3A2E13;
+    --wash: rgba(224, 184, 74, 0.09);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .notes pre.mini-code {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    margin: 0 0 1rem;
+  }
+  .notes pre.mini-code .kw   { color: var(--code-kw); }
+  .notes pre.mini-code .type { color: var(--code-type); }
+  .notes pre.mini-code .fn   { color: var(--code-fn); }
+  .notes pre.mini-code .str  { color: var(--code-str); }
+  .notes pre.mini-code .num  { color: var(--code-num); }
+  .notes pre.mini-code .cmt  { color: var(--code-cmt); font-style: italic; }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Arquivos</div>
+    <h1>Manipulação de arquivos em C</h1>
+    <p class="lede">
+      Estas são as notas da décima aula: como abrir, ler, escrever e fechar arquivos em disco a partir de um
+      programa C, as diferenças entre tratar um arquivo em <strong>modo texto</strong> ou em <strong>modo
+      binário</strong>, e três formas comuns de organizar dados dentro de um arquivo texto — caractere a
+      caractere, linha a linha e por palavras-chave. Os seis exemplos interativos logo abaixo colocam parte
+      dessa teoria em prática, passo a passo.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Arquivos</h2>
+    <p>
+      Até aqui, todo dado que um programa manipulava existia só enquanto o programa estava rodando — guardado
+      em variáveis, vetores ou structs na memória principal (RAM), que se perdem assim que o programa termina.
+      Um <strong>arquivo</strong> resolve essa limitação: é uma unidade de informação gravada em memória
+      <em>secundária</em> (o disco), que continua existindo depois que o programa que a criou já encerrou, e
+      que pode ser lida de volta por outro programa, ou pela mesma pessoa, tempo depois. A troca não é de
+      graça — acessar o disco é, em geral, muito mais lento do que acessar a RAM diretamente, por isso o
+      sistema operacional usa <strong>buffers</strong> (áreas da memória principal que funcionam como zona de
+      trânsito entre o programa e o disco): ele lê e escreve em blocos de alguns Kbytes de cada vez, em vez de
+      um byte por vez, para reduzir o número de acessos físicos ao dispositivo.
+    </p>
+    <p>
+      Cada arquivo é identificado por um nome (geralmente com uma extensão, como <code>.txt</code> ou
+      <code>.c</code>, que indica o tipo de conteúdo ou o programa que o interpreta) dentro de um diretório.
+      Um arquivo pode ser tratado de duas formas: em <strong>modo texto</strong>, como uma sequência de
+      caracteres legível por um editor comum, ou em <strong>modo binário</strong>, como uma sequência de bytes
+      que só faz sentido para o programa que sabe interpretá-la. Arquivos texto são mais fáceis de inspecionar
+      e editar à mão; arquivos binários costumam ser mais compactos e eficientes para grandes volumes de
+      dados, por dispensar qualquer conversão entre a representação em memória e a representação salva. Um
+      conceito importante em ambos os casos é o <strong>cursor</strong>: uma posição de trabalho, mantida pelo
+      sistema operacional, que indica de onde a próxima leitura vai começar (ou onde a próxima escrita vai
+      acontecer). O cursor avança automaticamente a cada leitura ou escrita bem-sucedida, e pode também ser
+      reposicionado manualmente, como veremos na seção sobre arquivos binários.
+    </p>
+
+    <h3>Funções para abrir e fechar arquivos</h3>
+    <p>
+      Antes de ler ou escrever qualquer coisa, é preciso abrir o arquivo com <code>fopen</code>, que devolve
+      um ponteiro do tipo <code>FILE</code> (um tipo opaco definido pela biblioteca padrão, que representa a
+      abstração do arquivo aberto) ou <code>NULL</code>, caso a abertura falhe:
+    </p>
+    <pre class="mini-code"><span class="type">FILE</span> *<span class="fn">fopen</span>(<span class="kw">char</span> *nome_arquivo, <span class="kw">char</span> *modo);</pre>
+    <p>
+      O segundo parâmetro, <code>modo</code>, é uma string que combina alguns caracteres com significado
+      próprio: <code>r</code> abre para leitura (o arquivo precisa já existir, senão a função falha),
+      <code>w</code> abre para escrita (cria um arquivo novo vazio, destruindo qualquer conteúdo anterior com
+      o mesmo nome) e <code>a</code> abre para escrita no final de um arquivo já existente, preservando o
+      conteúdo anterior (se o arquivo não existir, um novo é criado). Um <code>+</code> acrescentado a
+      qualquer um desses (<code>r+</code>, <code>w+</code>) habilita leitura <em>e</em> escrita no mesmo
+      arquivo. Os caracteres <code>t</code> (texto) e <code>b</code> (binário) indicam o modo de tratamento —
+      por convenção em C, omitir os dois costuma equivaler a modo texto. Toda abertura de arquivo deve ser
+      seguida de uma verificação, antes de qualquer outra operação:
+    </p>
+    <pre class="mini-code"><span class="type">FILE</span> *fp = <span class="fn">fopen</span>(<span class="str">"entrada.txt"</span>, <span class="str">"rt"</span>);
+<span class="kw">if</span> (fp == <span class="kw">NULL</span>)
+{
+    <span class="fn">printf</span>(<span class="str">"Erro na abertura do arquivo!\n"</span>);
+    <span class="fn">exit</span>(<span class="num">1</span>);
+}</pre>
+    <p>
+      Depois de terminar de usar um arquivo, é obrigatório fechá-lo com <code>fclose(fp)</code>: essa chamada
+      garante que qualquer dado ainda pendente no buffer seja de fato gravado em disco (no caso de um arquivo
+      aberto para escrita) e libera a área de memória reservada para esse buffer. A função devolve
+      <code>0</code> em caso de sucesso, ou a constante <code>EOF</code> se algo der errado. Todos os seis
+      exemplos deste módulo seguem esse par <code>fopen</code>/<code>fclose</code> — sempre verificando o
+      retorno de <code>fopen</code> antes de prosseguir.
+    </p>
+
+    <h3>Arquivos em modo texto</h3>
+    <p>
+      Em modo texto, o conteúdo do arquivo é interpretado como uma sequência de caracteres — os mesmos
+      caracteres que apareceriam se o arquivo fosse aberto num editor comum. A linguagem C oferece funções
+      específicas para ler e escrever nesse modo, próximas das já conhecidas <code>scanf</code> e
+      <code>printf</code>, mas operando sobre um arquivo em vez da entrada e saída padrão.
+    </p>
+
+    <h4>Funções para ler dados</h4>
+    <p>
+      <code>fscanf</code> é a versão de <code>scanf</code> que lê de um arquivo em vez do teclado: recebe o
+      ponteiro do arquivo como primeiro parâmetro, seguido da mesma string de formato e da mesma lista de
+      endereços já usados em <code>scanf</code>. Seu valor de retorno é o número de itens lidos com sucesso —
+      informação útil para detectar o fim do arquivo ou um erro de formato.
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">fscanf</span>(<span class="type">FILE</span> *fp, <span class="kw">char</span> *formato, ...);</pre>
+    <p>
+      Outra função de leitura muito usada é <code>fgetc</code>, que captura um único caractere do arquivo por
+      vez, avançando o cursor uma posição a cada chamada. Seu tipo de retorno é <code>int</code> (não
+      <code>char</code>) justamente para poder representar, além de qualquer código de caractere válido, a
+      constante <code>EOF</code> (<em>end of file</em>), devolvida quando o fim do arquivo é alcançado. Já
+      <code>fgets</code> lê uma linha inteira de uma vez: recebe a cadeia de caracteres que vai armazenar o
+      resultado, o número máximo de caracteres a ler (importante para não estourar o espaço reservado) e o
+      ponteiro do arquivo — lê até encontrar um <code>'\n'</code> ou atingir esse máximo, e devolve
+      <code>NULL</code> quando não há mais nada para ler.
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">fgetc</span>(<span class="type">FILE</span> *fp);
+<span class="kw">char</span> *<span class="fn">fgets</span>(<span class="kw">char</span> *s, <span class="kw">int</span> n, <span class="type">FILE</span> *fp);</pre>
+    <p>
+      Como sempre acontece na leitura de um arquivo, o cursor avança automaticamente a cada chamada bem-sucedida
+      — uma leitura subsequente sempre captura o trecho que vem <em>depois</em> do que já foi lido, nunca o
+      mesmo trecho duas vezes.
+    </p>
+
+    <h4>Funções para escrever dados</h4>
+    <p>
+      As funções de escrita em modo texto espelham as de leitura. <code>fprintf</code> é a versão de
+      <code>printf</code> que escreve num arquivo em vez da tela, recebendo o ponteiro do arquivo como
+      primeiro parâmetro; seu retorno é o número de bytes escritos. <code>fputc</code> escreve um único
+      caractere no arquivo, devolvendo o próprio caractere escrito (ou <code>EOF</code>, se a escrita falhar).
+      O exemplo <em>Três arquivos abertos ao mesmo tempo</em>, mais adiante, usa <code>fprintf</code> para
+      gravar o resultado da soma.
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">fprintf</span>(<span class="type">FILE</span> *fp, <span class="kw">char</span> *formato, ...);
+<span class="kw">int</span> <span class="fn">fputc</span>(<span class="kw">int</span> c, <span class="type">FILE</span> *fp);</pre>
+
+    <h3>Estruturação de dados em arquivos textos</h3>
+    <p>
+      Um arquivo texto não impõe nenhuma estrutura por si só — cabe a quem escreve o programa decidir como
+      organizar os dados dentro dele, de um jeito que depois possa ser lido de volta sem ambiguidade. Três
+      estratégias aparecem com frequência: processar o conteúdo caractere a caractere, linha a linha, ou
+      dividido em palavras-chave que identificam o tipo de cada registro.
+    </p>
+
+    <h4>Acesso caractere a caractere</h4>
+    <p>
+      A estratégia mais granular é varrer o arquivo um caractere por vez com <code>fgetc</code>, dentro de um
+      laço que só para quando encontra <code>EOF</code>. É a abordagem certa quando o que importa é contar ou
+      classificar caracteres individuais — por exemplo, contar quantas linhas um arquivo tem contando as
+      ocorrências de <code>'\n'</code>, ou converter cada letra minúscula para maiúscula com a função
+      <code>toupper</code> da biblioteca <code>ctype.h</code>, lendo de um arquivo de entrada e escrevendo,
+      caractere a caractere, num arquivo de saída. O exemplo <em>Contagem de caracteres</em> deste módulo
+      aplica exatamente essa técnica, usando <code>fgetc</code> dentro de uma condição de laço que já
+      aproveita o fato de a atribuição em C também ser uma expressão: <code>while ((c = fgetc(fp)) != EOF)</code>
+      lê e testa o caractere na mesma linha. Vale registrar também a função <code>ungetc</code>, que permite
+      "devolver" o último caractere lido, fazendo-o ser capturado de novo na próxima leitura — útil quando o
+      programa precisa "espiar" o próximo caractere sem avançar o cursor de fato, antes de decidir o que
+      fazer.
+    </p>
+
+    <h4>Acesso linha a linha</h4>
+    <p>
+      Muitas aplicações fazem mais sentido processando o arquivo uma linha inteira de cada vez, com
+      <code>fgets</code> dentro de um laço que termina quando a função devolve <code>NULL</code>. É o caso,
+      por exemplo, de um programa que busca a primeira linha de um arquivo que contém uma certa subcadeia
+      (usando <code>strstr</code> sobre cada linha lida) — o análogo em C do utilitário <code>grep</code>. O
+      exemplo <em>Contagem de linhas</em> deste módulo usa essa técnica para contar quantas linhas um arquivo
+      tem, imprimindo cada uma conforme é lida.
+    </p>
+    <p>
+      A leitura linha a linha também combina bem com <code>sscanf</code>, uma função irmã de
+      <code>fscanf</code> que, em vez de ler de um arquivo, lê valores formatados de dentro de uma cadeia de
+      caracteres já em memória (o par inverso, <code>sprintf</code>, escreve valores formatados numa string em
+      vez de imprimi-los na tela):
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">sscanf</span>(<span class="kw">char</span> *s, <span class="kw">char</span> *formato, ...);</pre>
+    <p>
+      O padrão típico é: ler uma linha inteira com <code>fgets</code> e, em seguida, usar <code>sscanf</code>
+      para extrair os campos daquela linha — por exemplo, um caractere que identifica o tipo de uma figura
+      geométrica (<code>r</code> para retângulo, <code>c</code> para círculo, <code>t</code> para triângulo)
+      seguido dos parâmetros numéricos que a descrevem, cada tipo de figura com sua própria quantidade de
+      valores esperados. O valor de retorno de <code>sscanf</code> (quantos itens foram lidos com sucesso)
+      permite ainda detectar linhas vazias ou mal formatadas, sem que isso interrompa a leitura do restante do
+      arquivo. O exemplo <em>Parser com sscanf</em> deste módulo isola esse mecanismo: extrai um nome, uma
+      idade e uma altura de dentro de uma única string já lida, exatamente o passo que viria depois de um
+      <code>fgets</code> num cenário real de arquivo.
+    </p>
+
+    <h4>Acesso via palavras-chave</h4>
+    <p>
+      Quando os registros de um arquivo têm tamanhos variáveis — um polígono pode ter qualquer número de
+      vértices, por exemplo — é comum precedê-los de uma palavra-chave que identifica o tipo do registro
+      (<code>RETANGULO</code>, <code>CIRCULO</code>, <code>POLIGONO</code>). A leitura passa a girar em torno
+      de capturar uma palavra por vez com <code>fscanf(fp, "%s", palavra)</code> — que já ignora
+      automaticamente espaços e quebras de linha entre uma palavra e outra — e decidir, a partir do conteúdo
+      lido (comparado com <code>strcmp</code>), como interpretar o que vem a seguir. O exemplo <em>Contagem de
+      palavras</em> deste módulo isola justamente esse mecanismo de leitura: cada chamada de
+      <code>fscanf(file, "%s", word)</code> captura a próxima sequência de caracteres não separada por espaço
+      — a mesma primitiva usada para reconhecer palavras-chave num arquivo real, mesmo sem o
+      <code>strcmp</code> de despacho por tipo.
+    </p>
+
+    <h3>Arquivos em modo binário</h3>
+    <p>
+      Um arquivo binário guarda o conteúdo da memória diretamente, byte a byte, sem nenhuma conversão para
+      texto — o mesmo bloco de bytes que representa uma struct em RAM é copiado, tal como está, para o disco.
+      Isso torna a gravação e a recuperação de grandes volumes de dados bem mais eficientes do que passar por
+      formatação e interpretação de texto, ao custo de o arquivo deixar de ser legível por um editor comum.
+    </p>
+
+    <h4>Funções para salvar e recuperar</h4>
+    <p>
+      As duas funções centrais são análogas entre si: <code>fwrite</code> copia um bloco de memória para o
+      arquivo, e <code>fread</code> faz o caminho inverso, copiando bytes do arquivo de volta para a memória.
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">fwrite</span>(<span class="kw">void</span> *p, <span class="kw">int</span> tam, <span class="kw">int</span> nelem, <span class="type">FILE</span> *fp);
+<span class="kw">int</span> <span class="fn">fread</span>(<span class="kw">void</span> *p, <span class="kw">int</span> tam, <span class="kw">int</span> nelem, <span class="type">FILE</span> *fp);</pre>
+    <p>
+      Em ambas, <code>p</code> é o endereço do bloco de memória (de onde ler, no caso de <code>fwrite</code>,
+      ou para onde copiar, no caso de <code>fread</code>), <code>tam</code> é o tamanho em bytes de cada
+      elemento (tipicamente obtido com <code>sizeof</code>) e <code>nelem</code> é a quantidade de elementos —
+      permitindo gravar ou recuperar um vetor inteiro de uma só vez, não apenas um valor isolado. O exemplo
+      <em>Registros binários</em> deste módulo aplica exatamente esse par de funções a um vetor de structs
+      <code>Produto</code>, gravando os três de uma vez com <code>fwrite(produtos, sizeof(Produto), n, fp)</code>
+      e recuperando-os da mesma forma com <code>fread</code>.
+    </p>
+    <p>
+      Uma vantagem exclusiva do modo binário é a possibilidade de acessar diretamente um registro específico,
+      sem precisar ler tudo o que vem antes dele — algo que não é natural em modo texto, onde o tamanho de
+      cada linha ou registro pode variar. Isso é possível porque, em modo binário, o programador sabe
+      exatamente quantos bytes cada registro ocupa, e pode reposicionar o cursor do arquivo com
+      <code>fseek</code>:
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">fseek</span>(<span class="type">FILE</span> *fp, <span class="kw">long</span> offset, <span class="kw">int</span> origem);</pre>
+    <p>
+      O parâmetro <code>offset</code> indica quantos bytes avançar, e <code>origem</code> indica a referência
+      desse deslocamento: <code>SEEK_SET</code> (a partir do início do arquivo), <code>SEEK_CUR</code> (a
+      partir da posição atual do cursor) ou <code>SEEK_END</code> (a partir do final do arquivo). Para chegar
+      direto ao registro de índice <code>i</code> de um arquivo com registros de tamanho fixo, basta
+      <code>fseek(fp, i * sizeof(Tipo), SEEK_SET)</code> antes de um único <code>fread</code>. O exemplo
+      <em>Registros binários</em> usa exatamente essa combinação para recuperar só o segundo produto do
+      arquivo, sem ler o primeiro — a mesma técnica que o material de referência ilustra para acessar um ponto
+      específico dentro de um arquivo de pontos 3D.
+    </p>
+
+  </div>
+
+  <div class="examples-wrap">
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a
+    simulação da execução passo a passo — sem precisar compilar nada.
+  </p>
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="charcount" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">📄</span>Contagem de caracteres</span>
+      </div>
+      <p class="row-desc">fgetc, caractere a caractere, até EOF — conta os caracteres não-brancos do próprio arquivo-fonte.</p>
+    </li>
+    <li class="example-row" data-target="wordcount" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">📄</span>Contagem de palavras</span>
+      </div>
+      <p class="row-desc">fscanf com %s lê uma palavra por vez — a mesma primitiva usada para reconhecer palavras-chave.</p>
+    </li>
+    <li class="example-row" data-target="linecount" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">📄</span>Contagem de linhas</span>
+      </div>
+      <p class="row-desc">fgets lê uma linha inteira por vez, até devolver NULL no fim do arquivo.</p>
+    </li>
+    <li class="example-row" data-target="sumvectors" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">📄</span>Soma de vetores em arquivo</span>
+      </div>
+      <p class="row-desc">Lê dois vetores de dois arquivos texto com fscanf, soma e grava o resultado com fprintf.</p>
+    </li>
+    <li class="example-row" data-target="parser" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">📄</span>Parser com sscanf</span>
+      </div>
+      <p class="row-desc">sscanf extrai valores de uma string já em memória; sprintf faz o caminho inverso.</p>
+    </li>
+    <li class="example-row" data-target="binary" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">📄</span>Registros binários</span>
+      </div>
+      <p class="row-desc">fwrite/fread salvam e recuperam um vetor de structs; fseek acessa um registro direto, sem ler os outros.</p>
+    </li>
+  </ul>
+
+  <!-- ================= CONTAGEM DE CARACTERES ================= -->
+  <section class="detail" id="panel-charcount" data-panel>
+    <div class="detail-head">
+      <h2>Contagem de caracteres</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/08_files/01_count_chars" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">FILE</span> *file = <span class="fn">fopen</span>(<span class="str">"main.c"</span>, <span class="str">"r"</span>);
+    <span class="cmt">// FILE *file = fopen(__FILE__, "r");</span>
+
+    <span class="kw">if</span> (file == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Error opening file\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">int</span> char_count = <span class="num">0</span>;
+    <span class="kw">char</span> ch;
+
+    <span class="kw">while</span> ((ch = <span class="fn">fgetc</span>(file)) != <span class="kw">EOF</span>) <span class="cmt">// EOF is typically -1</span>
+    {
+        <span class="kw">if</span> (ch != <span class="str">' '</span> &amp;&amp; ch != <span class="str">'\n'</span> &amp;&amp; ch != <span class="str">'\t'</span>)
+        {
+            char_count++;
+        }
+    }
+
+    <span class="fn">printf</span>(<span class="str">"Total characters (excluding spaces, tabs, and newlines): %d\n"</span>, char_count);
+
+    <span class="fn">fclose</span>(file);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>fgetc num laço, até EOF</h3>
+        <p>
+          O arquivo é aberto pelo próprio nome literal, <code>"main.c"</code> — a linha comentada logo abaixo
+          mostra a alternativa usada pelos dois próximos exemplos, a macro <code>__FILE__</code>, que o
+          pré-processador substitui pelo nome do arquivo-fonte atual. <code>ch</code> é declarada como
+          <code>int</code>, não <code>char</code>: é esse detalhe que permite comparar com <code>EOF</code>
+          (um valor fora da faixa normal de um <code>char</code>) sem ambiguidade. A atribuição dentro da
+          condição do <code>while</code> — <code>(ch = fgetc(file)) != EOF</code> — lê e testa o caractere na
+          mesma expressão, um padrão comum em C.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="charcount">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Total characters (excluding spaces, tabs, and newlines): 356</pre>
+
+        <div class="callout">
+          O arquivo lido é o próprio <code>main.c</code> deste exemplo (356 caracteres não-brancos no total) —
+          um jeito conveniente de ter sempre um arquivo de entrada disponível, sem depender de um arquivo
+          externo. Os dois próximos exemplos fazem o mesmo, mas com <code>__FILE__</code> em vez do nome
+          literal.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O código declara <code>ch</code> como <code>int</code>, não como <code>char</code>, mesmo cada
+            caractere lido ocupando só um byte. O que poderia acontecer se <code>ch</code> fosse declarado
+            como <code>char</code> neste laço, num sistema em que <code>char</code> é sinalizado (signed)?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O programa não compilaria, pois <code>fgetc</code> exige uma variável <code>int</code> por assinatura.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O laço poderia terminar antes do fim real do arquivo: um byte lido como <code>0xFF</code> seria interpretado como <code>-1</code>, o mesmo valor de <code>EOF</code>.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Nada mudaria — <code>char</code> e <code>int</code> se comportam de forma idêntica nesta comparação.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O laço passaria a contar cada caractere duas vezes.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Com <code>char</code> assinado, um byte de valor alto (como <code>0xFF</code>) pode ser promovido para o <code>int</code> negativo <code>-1</code> — exatamente o valor de <code>EOF</code> — encerrando a leitura antes do fim verdadeiro do arquivo. É por isso que <code>fgetc</code> devolve <code>int</code>, e o código segue essa convenção ao declarar <code>ch</code>.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O risco real é outro: com <code>char</code> assinado, um byte de valor alto (como <code>0xFF</code>) pode virar o <code>int</code> negativo <code>-1</code> ao ser comparado com <code>EOF</code>, terminando o laço cedo demais — mesmo sem ter chegado ao fim do arquivo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTAGEM DE PALAVRAS ================= -->
+  <section class="detail" id="panel-wordcount" data-panel hidden>
+    <div class="detail-head">
+      <h2>Contagem de palavras</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/08_files/02_count_words" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">FILE</span> *file = <span class="fn">fopen</span>(<span class="kw">__FILE__</span>, <span class="str">"r"</span>);
+
+    <span class="kw">if</span> (file == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Error opening file\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">int</span> word_count = <span class="num">0</span>;
+    <span class="kw">char</span> word[<span class="num">100</span>]; <span class="cmt">// sequence of non-blank characters</span>
+
+    <span class="kw">while</span> (<span class="fn">fscanf</span>(file, <span class="str">"%s"</span>, word) != <span class="kw">EOF</span>)
+    {
+        word_count++;
+        <span class="fn">printf</span>(<span class="str">"%s\n"</span>, word);
+    }
+
+    <span class="fn">printf</span>(<span class="str">"\nTotal words in the source code: %d\n"</span>, word_count);
+
+    <span class="fn">fclose</span>(file);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>fscanf com %s: uma palavra por chamada</h3>
+        <p>
+          <code>fscanf(file, "%s", word)</code> captura a próxima sequência de caracteres não separada por
+          espaço, tab ou quebra de linha — pulando automaticamente qualquer espaço em branco antes dela. É a
+          mesma primitiva de leitura usada, na prática, para reconhecer palavras-chave num arquivo real
+          (comparando o texto lido com <code>strcmp</code>), só que aqui sem nenhum despacho por tipo: cada
+          "palavra" (inclusive pontuação colada a ela, como <code>"1;"</code> ou <code>"(file"</code>) é só
+          impressa e contada.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="wordcount">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">#include
+&lt;stdio.h&gt;
+int
+main()
+{
+FILE
+*file
+=
+fopen(__FILE__,
+"r");
+if
+(file
+==
+NULL)
+{
+printf("Error
+opening
+file\n");
+return
+1;
+}
+int
+word_count
+=
+0;
+char
+word[100];
+//
+sequence
+of
+non-blank
+characters
+while
+(fscanf(file,
+"%s",
+word)
+!=
+EOF)
+{
+word_count++;
+printf("%s\n",
+word);
+}
+printf("\nTotal
+words
+in
+the
+source
+code:
+%d\n",
+word_count);
+fclose(file);
+return
+0;
+}
+
+Total words in the source code: 55</pre>
+
+        <div class="callout">
+          Note que <code>%s</code> não respeita quebra de linha nem pontuação — <code>"fopen(__FILE__,"</code>
+          e <code>"\"r\");"</code> saem como duas "palavras" separadas, exatamente onde houve um espaço no
+          código-fonte original, mesmo cruzando o fim de uma linha para o início da próxima.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O vetor <code>word</code> tem capacidade para 100 caracteres, e a chamada
+            <code>fscanf(file, "%s", word)</code> não impõe nenhum limite explícito de tamanho na leitura. O
+            que poderia acontecer se o arquivo contivesse uma sequência de mais de 99 caracteres sem nenhum
+            espaço, tab ou quebra de linha no meio?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>fscanf</code> trunca automaticamente em 99 caracteres e descarta o restante com segurança.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>A escrita ultrapassaria os limites de <code>word</code>, um comportamento indefinido (possível corrupção de memória).</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>fscanf</code> detecta o excesso e devolve <code>EOF</code> imediatamente, sem escrever nada em <code>word</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa pula essa "palavra" inteira e continua a leitura normalmente a partir da próxima.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem um limite de largura no formato (algo como <code>%99s</code>), <code>fscanf</code> escreve quantos caracteres forem necessários em <code>word</code>, podendo ultrapassar seus 100 bytes — um buffer overflow, comportamento indefinido em C. Por isso especificar um limite de largura é uma boa prática que este exemplo, por simplicidade, não aplica.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>fscanf</code> com <code>%s</code> sem limite de largura não impõe nenhuma proteção: ele escreve em <code>word</code> quantos caracteres a "palavra" tiver, podendo ultrapassar os 100 bytes reservados — um buffer overflow, comportamento indefinido em C.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTAGEM DE LINHAS ================= -->
+  <section class="detail" id="panel-linecount" data-panel hidden>
+    <div class="detail-head">
+      <h2>Contagem de linhas</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/08_files/03_count_lines" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">FILE</span> *file = <span class="fn">fopen</span>(<span class="kw">__FILE__</span>, <span class="str">"r"</span>);
+
+    <span class="kw">if</span> (file == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Error opening file\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">int</span> line_count = <span class="num">0</span>;
+    <span class="kw">char</span> line[<span class="num">200</span>]; <span class="cmt">// sequence of non-blank characters</span>
+
+    <span class="kw">while</span> (<span class="fn">fgets</span>(line, <span class="num">200</span>, file) != <span class="kw">NULL</span>) <span class="cmt">// returns line or NULL (if reach the end of file)</span>
+    {
+        line_count++;
+        <span class="fn">printf</span>(<span class="str">"%s\n"</span>, line);
+    }
+
+    <span class="fn">printf</span>(<span class="str">"\nTotal lines in the source code: %d\n"</span>, line_count);
+
+    <span class="fn">fclose</span>(file);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>fgets: uma linha inteira por chamada</h3>
+        <p>
+          <code>fgets(line, 200, file)</code> lê até 199 caracteres do arquivo, parando ao encontrar um
+          <code>'\n'</code> (que fica incluído em <code>line</code>) ou ao atingir esse limite — o espaço
+          extra é reservado para o <code>'\0'</code> final. Como <code>line</code> já traz a quebra de linha
+          original, e <code>printf("%s\n", line)</code> adiciona outra, cada linha impressa aparece separada
+          por uma linha em branco extra na saída. O laço termina quando <code>fgets</code> devolve
+          <code>NULL</code>, sinal de que não há mais nenhuma linha para ler.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="linecount">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">#include &lt;stdio.h&gt;
+
+
+
+int main()
+
+{
+
+    FILE *file = fopen(__FILE__, "r");
+
+
+
+    if (file == NULL)
+
+    {
+
+        printf("Error opening file\n");
+
+        return 1;
+
+    }
+
+
+
+    int line_count = 0;
+
+    char line[200]; // sequence of non-blank characters
+
+
+
+    while (fgets(line, 200, file) != NULL) // returns line or NULL (if reach the end of file)
+
+    {
+
+        line_count++;
+
+        printf("%s\n", line);
+
+    }
+
+
+
+    printf("\nTotal lines in the source code: %d\n", line_count);
+
+
+
+    fclose(file);
+
+    return 0;
+
+}
+
+
+Total lines in the source code: 26</pre>
+
+        <div class="callout">
+          As linhas em branco do próprio código-fonte (usadas para separar blocos) também contam como linhas
+          lidas — <code>fgets</code> não distingue uma linha vazia de uma linha com conteúdo, só reconhece o
+          <code>'\n'</code> como fim de cada leitura.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O laço termina quando <code>fgets(line, 200, file)</code> devolve <code>NULL</code>. O que
+            aconteceria se, em vez de testar o retorno de <code>fgets</code> contra <code>NULL</code>, o
+            código verificasse apenas se <code>line[0] != '\0'</code> a cada iteração?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Funcionaria exatamente igual — <code>fgets</code> sempre zera <code>line</code> antes de tentar ler.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa pararia uma linha antes do fim do arquivo.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Ao chegar no fim do arquivo, <code>fgets</code> não altera <code>line</code>, que ainda teria o conteúdo da última leitura bem-sucedida — arriscando um laço que não termina corretamente ou reprocessa a mesma linha.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa passaria a contar corretamente até mesmo arquivos vazios.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Quando <code>fgets</code> falha (fim de arquivo ou erro), ele não toca em <code>line</code> — o conteúdo permanece o da última leitura bem-sucedida. Testar <code>line[0]</code> em vez do retorno da própria função não detectaria essa falha, quebrando a lógica de parada do laço.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Quando <code>fgets</code> falha, ele não modifica <code>line</code> — o vetor mantém o conteúdo da leitura anterior. Testar <code>line[0]</code> em vez do valor de retorno de <code>fgets</code> não seria capaz de detectar o fim do arquivo de forma confiável.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOMA DE VETORES EM ARQUIVO ================= -->
+  <section class="detail" id="panel-sumvectors" data-panel hidden>
+    <div class="detail-head">
+      <h2>Soma de vetores em arquivo</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/08_files/04_sum_vectors" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">FILE</span> *input_file_1 = <span class="fn">fopen</span>(<span class="str">"vector_1.txt"</span>, <span class="str">"r"</span>);
+    <span class="type">FILE</span> *input_file_2 = <span class="fn">fopen</span>(<span class="str">"vector_2.txt"</span>, <span class="str">"r"</span>);
+    <span class="type">FILE</span> *output_file = <span class="fn">fopen</span>(<span class="str">"sum_vector.txt"</span>, <span class="str">"w"</span>); <span class="cmt">// w means writting</span>
+
+    <span class="kw">if</span> (input_file_1 == <span class="kw">NULL</span> || input_file_2 == <span class="kw">NULL</span> || output_file == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Error opening files.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">int</span> n1, n2;
+    <span class="fn">fscanf</span>(input_file_1, <span class="str">"%d"</span>, &amp;n1); <span class="cmt">// Read the size of the vectors</span>
+    <span class="fn">fscanf</span>(input_file_2, <span class="str">"%d"</span>, &amp;n2);
+
+    <span class="kw">if</span> (n1 != n2)
+    {
+        <span class="fn">printf</span>(<span class="str">"Error: n1 and n2 should be equal."</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="cmt">// Dynamically allocate memory for the vectors</span>
+    <span class="kw">int</span> *vector_1 = (<span class="kw">int</span> *)<span class="fn">malloc</span>(n1 * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+    <span class="kw">int</span> *vector_2 = (<span class="kw">int</span> *)<span class="fn">malloc</span>(n1 * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+    <span class="kw">int</span> *sum_vector = (<span class="kw">int</span> *)<span class="fn">malloc</span>(n1 * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+    <span class="kw">if</span> (vector_1 == <span class="kw">NULL</span> || vector_2 == <span class="kw">NULL</span> || sum_vector == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Memory allocation failed.\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="cmt">// Read the elements of the first vector</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n1; i++)
+    {
+        <span class="fn">fscanf</span>(input_file_1, <span class="str">"%d"</span>, &amp;vector_1[i]);
+    }
+
+    <span class="cmt">// Read the elements of the second vector</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n2; i++)
+    {
+        <span class="fn">fscanf</span>(input_file_2, <span class="str">"%d"</span>, &amp;vector_2[i]);
+    }
+
+    <span class="cmt">// Calculate the sum of the vectors</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n1; i++)
+    {
+        sum_vector[i] = vector_1[i] + vector_2[i];
+    }
+
+    <span class="cmt">// Write the sum_vector to the output file</span>
+    <span class="fn">fprintf</span>(output_file, <span class="str">"%d\n"</span>, n1); <span class="cmt">// Write the size of the sum vector</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n1; i++)
+    {
+        <span class="fn">fprintf</span>(output_file, <span class="str">"%d "</span>, sum_vector[i]);
+    }
+
+    <span class="cmt">// Free dynamically allocated memory</span>
+    <span class="fn">free</span>(vector_1);
+    <span class="fn">free</span>(vector_2);
+    <span class="fn">free</span>(sum_vector);
+
+    <span class="cmt">// Close the files</span>
+    <span class="fn">fclose</span>(input_file_1);
+    <span class="fn">fclose</span>(input_file_2);
+    <span class="fn">fclose</span>(output_file);
+
+    <span class="fn">printf</span>(<span class="str">"Sum of vectors has been written to sum_vector.txt.\n"</span>);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Três arquivos abertos ao mesmo tempo</h3>
+        <p>
+          Este exemplo combina leitura e escrita: dois arquivos (<code>vector_1.txt</code>,
+          <code>vector_2.txt</code>) abertos para leitura e um terceiro (<code>sum_vector.txt</code>) aberto
+          para escrita, todos simultaneamente — cada um com seu próprio ponteiro <code>FILE*</code> e seu
+          próprio cursor independente. A leitura usa <code>fscanf</code> com <code>%d</code>, que, assim como
+          <code>%s</code>, ignora espaços e quebras de linha entre um número e outro — por isso o formato do
+          arquivo de entrada (tamanho numa linha, valores na seguinte) não precisa ser lido "linha a linha"
+          propriamente, os números são lidos um a um independentemente de onde as quebras de linha caem. Os
+          três vetores são alocados dinamicamente, unindo a técnica do módulo de alocação dinâmica ao
+          conteúdo vindo de arquivo.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="sumvectors">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Sum of vectors has been written to sum_vector.txt.</pre>
+
+        <div class="callout">
+          Com <code>vector_1.txt</code> contendo <code>5</code> seguido de <code>1 2 3 4 5</code> e
+          <code>vector_2.txt</code> contendo <code>5</code> seguido de <code>6 7 8 9 10</code>, o arquivo
+          <code>sum_vector.txt</code> resultante passa a conter <code>5</code> na primeira linha e
+          <code>7 9 11 13 15 </code> na segunda — a soma posição a posição dos dois vetores de entrada.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            A leitura usa <code>fscanf(input_file_1, "%d", &amp;n1)</code>, que funciona independentemente de
+            os números do arquivo estarem todos numa linha ou espalhados em várias. Por que isso não seria
+            garantido se a leitura fosse feita com <code>fgets</code> (uma linha inteira por chamada, como no
+            exemplo anterior) sem um <code>sscanf</code> depois para separar os valores?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>fgets</code> devolveria a linha crua como texto — sem separar os números, o programa teria que interpretá-los manualmente, e uma linha com mais de um número, ou um número quebrado entre duas linhas, quebraria essa suposição.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span><code>fgets</code> converte automaticamente cada linha lida em um número inteiro, então o resultado seria o mesmo.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>fgets</code> não pode ser usado em arquivos abertos para leitura de números, apenas texto.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Não haveria diferença nenhuma — as duas funções leem exatamente o mesmo tipo de dado.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>fscanf</code> com <code>%d</code> ignora espaços e quebras de linha entre um número e outro, tratando o arquivo como uma sequência de tokens — por isso não importa como os números estão distribuídos entre linhas. <code>fgets</code>, ao contrário, devolve o texto bruto de uma linha por vez; sem um <code>sscanf</code> para reinterpretar esse texto, o programa dependeria de uma correspondência exata entre "linha" e "número", que este formato de arquivo não garante.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>fscanf</code> com <code>%d</code> lê o arquivo como uma sequência de tokens numéricos, ignorando onde caem as quebras de linha. <code>fgets</code> devolveria só o texto bruto da linha; sem <code>sscanf</code> para reinterpretá-lo, o programa dependeria de uma correspondência exata entre linha e número que este arquivo não garante.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PARSER COM SSCANF ================= -->
+  <section class="detail" id="panel-parser" data-panel hidden>
+    <div class="detail-head">
+      <h2>Parser com sscanf</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/08_files/05_string_parser" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="cmt">// Parsing values from a string using sscanf</span>
+    <span class="kw">char</span> input_string[] = <span class="str">"John 25 75.5"</span>;
+    <span class="kw">char</span> name[<span class="num">50</span>];
+    <span class="kw">int</span> age;
+    <span class="kw">float</span> height;
+
+    <span class="fn">sscanf</span>(input_string, <span class="str">"%s %d %f"</span>, name, &amp;age, &amp;height);
+
+    <span class="fn">printf</span>(<span class="str">"Name: %s\n"</span>, name);
+    <span class="fn">printf</span>(<span class="str">"Age: %d\n"</span>, age);
+    <span class="fn">printf</span>(<span class="str">"Height: %.2f\n"</span>, height);
+
+    <span class="cmt">// Formatting values into a string using sprintf</span>
+    <span class="kw">char</span> output_string[<span class="num">100</span>];
+    <span class="kw">int</span> score = <span class="num">95</span>;
+
+    <span class="fn">sprintf</span>(output_string, <span class="str">"Student: %s, Score: %d"</span>, name, score);
+
+    <span class="fn">printf</span>(<span class="str">"Formatted String: %s\n"</span>, output_string);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>A família fscanf/fprintf, aplicada a strings</h3>
+        <p>
+          Este exemplo não abre nenhum arquivo — ele isola o par <code>sscanf</code>/<code>sprintf</code>, que
+          fazem para uma string em memória exatamente o que <code>fscanf</code>/<code>fprintf</code> fazem
+          para um arquivo. Na prática de arquivos, o uso mais comum é ler uma linha inteira com
+          <code>fgets</code> e, em seguida, aplicar <code>sscanf</code> sobre o conteúdo já lido para extrair
+          os campos — é esse segundo passo que este exemplo demonstra isoladamente, com
+          <code>input_string</code> já pronta em vez de vinda de um <code>fgets</code>.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="parser">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Name: John
+Age: 25
+Height: 75.50
+Formatted String: Student: John, Score: 95</pre>
+
+        <div class="callout">
+          <code>sscanf</code> com <code>%s</code> também para no primeiro espaço em branco, do mesmo jeito que
+          <code>fscanf</code> e <code>scanf</code> — por isso <code>name</code> recebe só <code>"John"</code>,
+          não a string inteira.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Diferente de todos os exemplos anteriores deste módulo, este programa nunca chama
+            <code>fopen</code>. Por que <code>sscanf</code>/<code>sprintf</code> conseguem funcionar
+            perfeitamente sem nenhum arquivo aberto, enquanto <code>fscanf</code>/<code>fprintf</code> exigem
+            um <code>FILE*</code> válido como primeiro parâmetro?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>sscanf</code>/<code>sprintf</code> abrem e fecham um arquivo temporário automaticamente, por trás dos panos.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Elas operam sobre uma cadeia de caracteres já em memória, no lugar do arquivo em disco — não existe buffer de disco nem cursor de arquivo a gerenciar.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Elas são versões mais antigas de <code>fscanf</code>/<code>fprintf</code>, mantidas só por compatibilidade, sem diferença real de funcionamento.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Só funcionam porque o programa já tem a variável <code>input_string</code> inicializada com um valor constante.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> O primeiro parâmetro de <code>sscanf</code>/<code>sprintf</code> é uma cadeia de caracteres em memória, não um <code>FILE*</code> — não há buffer de disco, cursor de arquivo, nem necessidade de abrir/fechar nada. É a mesma lógica de formatação de <code>fscanf</code>/<code>fprintf</code>, só que aplicada a uma string já disponível na memória.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A diferença central é a fonte/destino dos dados: <code>sscanf</code>/<code>sprintf</code> operam sobre uma cadeia de caracteres já em memória, sem buffer de disco nem cursor de arquivo — por isso dispensam <code>fopen</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REGISTROS BINÁRIOS ================= -->
+  <section class="detail" id="panel-binary" data-panel hidden>
+    <div class="detail-head">
+      <h2>Registros binários</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/08_files/06_binary_records" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span>
+{
+    <span class="kw">int</span> id;
+    <span class="kw">char</span> nome[<span class="num">30</span>];
+    <span class="kw">float</span> preco;
+} <span class="type">Produto</span>;
+
+<span class="kw">void</span> <span class="fn">salvar_produtos</span>(<span class="kw">const</span> <span class="kw">char</span> *arquivo, <span class="type">Produto</span> *produtos, <span class="kw">int</span> n)
+{
+    <span class="type">FILE</span> *fp = <span class="fn">fopen</span>(arquivo, <span class="str">"wb"</span>);
+    <span class="kw">if</span> (fp == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Erro ao abrir arquivo para escrita.\n"</span>);
+        <span class="fn">exit</span>(<span class="num">1</span>);
+    }
+    <span class="fn">fwrite</span>(produtos, <span class="kw">sizeof</span>(<span class="type">Produto</span>), n, fp);
+    <span class="fn">fclose</span>(fp);
+}
+
+<span class="kw">int</span> <span class="fn">carregar_produtos</span>(<span class="kw">const</span> <span class="kw">char</span> *arquivo, <span class="type">Produto</span> *produtos, <span class="kw">int</span> n)
+{
+    <span class="type">FILE</span> *fp = <span class="fn">fopen</span>(arquivo, <span class="str">"rb"</span>);
+    <span class="kw">if</span> (fp == <span class="kw">NULL</span>)
+    {
+        <span class="fn">printf</span>(<span class="str">"Erro ao abrir arquivo para leitura.\n"</span>);
+        <span class="kw">return</span> <span class="num">0</span>;
+    }
+    <span class="kw">int</span> lidos = <span class="fn">fread</span>(produtos, <span class="kw">sizeof</span>(<span class="type">Produto</span>), n, fp);
+    <span class="fn">fclose</span>(fp);
+    <span class="kw">return</span> lidos;
+}
+
+<span class="type">Produto</span> <span class="fn">carregar_produto_por_indice</span>(<span class="kw">const</span> <span class="kw">char</span> *arquivo, <span class="kw">int</span> indice)
+{
+    <span class="type">Produto</span> p;
+    <span class="type">FILE</span> *fp = <span class="fn">fopen</span>(arquivo, <span class="str">"rb"</span>);
+    <span class="fn">fseek</span>(fp, indice * <span class="kw">sizeof</span>(<span class="type">Produto</span>), <span class="kw">SEEK_SET</span>);
+    <span class="fn">fread</span>(&amp;p, <span class="kw">sizeof</span>(<span class="type">Produto</span>), <span class="num">1</span>, fp);
+    <span class="fn">fclose</span>(fp);
+    <span class="kw">return</span> p;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">Produto</span> catalogo[<span class="num">3</span>] = {
+        {<span class="num">1</span>, <span class="str">"Caderno"</span>, <span class="num">12.50</span>},
+        {<span class="num">2</span>, <span class="str">"Caneta"</span>, <span class="num">3.20</span>},
+        {<span class="num">3</span>, <span class="str">"Mochila"</span>, <span class="num">89.90</span>}
+    };
+
+    <span class="fn">salvar_produtos</span>(<span class="str">"produtos.bin"</span>, catalogo, <span class="num">3</span>);
+    <span class="fn">printf</span>(<span class="str">"3 produtos salvos em produtos.bin (modo binario).\n\n"</span>);
+
+    <span class="type">Produto</span> lidos[<span class="num">3</span>];
+    <span class="kw">int</span> n = <span class="fn">carregar_produtos</span>(<span class="str">"produtos.bin"</span>, lidos, <span class="num">3</span>);
+    <span class="fn">printf</span>(<span class="str">"Produtos recuperados do arquivo binario:\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+    {
+        <span class="fn">printf</span>(<span class="str">"  #%d %-10s R$ %.2f\n"</span>, lidos[i].id, lidos[i].nome, lidos[i].preco);
+    }
+
+    <span class="fn">printf</span>(<span class="str">"\nAcesso direto ao produto de indice 1 (sem ler os demais):\n"</span>);
+    <span class="type">Produto</span> p = <span class="fn">carregar_produto_por_indice</span>(<span class="str">"produtos.bin"</span>, <span class="num">1</span>);
+    <span class="fn">printf</span>(<span class="str">"  #%d %-10s R$ %.2f\n"</span>, p.id, p.nome, p.preco);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>fwrite/fread para o vetor inteiro, fseek para um registro só</h3>
+        <p>
+          <code>salvar_produtos</code> grava o vetor <code>catalogo</code> inteiro de uma vez com
+          <code>fwrite(produtos, sizeof(Produto), n, fp)</code> — os <code>n × sizeof(Produto)</code> bytes de
+          memória são copiados para o arquivo tal como estão, sem nenhuma formatação de texto.
+          <code>carregar_produtos</code> faz o caminho inverso com <code>fread</code>. Já
+          <code>carregar_produto_por_indice</code> mostra a vantagem exclusiva do modo binário: como cada
+          <code>Produto</code> ocupa sempre o mesmo número de bytes, <code>fseek(fp, indice *
+          sizeof(Produto), SEEK_SET)</code> posiciona o cursor direto no início do registro desejado, e um
+          único <code>fread</code> de <code>sizeof(Produto)</code> bytes recupera só aquele produto — sem
+          precisar ler (nem alocar espaço para) os que vêm antes dele.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="binary">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">3 produtos salvos em produtos.bin (modo binario).
+
+Produtos recuperados do arquivo binario:
+  #1 Caderno    R$ 12.50
+  #2 Caneta     R$ 3.20
+  #3 Mochila    R$ 89.90
+
+Acesso direto ao produto de indice 1 (sem ler os demais):
+  #2 Caneta     R$ 3.20</pre>
+
+        <div class="callout">
+          O último bloco da saída repete o produto <code>#2 Caneta</code>, já impresso acima — mas dessa vez
+          ele foi obtido só com <code>fseek</code> + <code>fread</code>, sem passar por
+          <code>carregar_produtos</code> nem tocar nos registros de <code>Caderno</code> e <code>Mochila</code>.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            <code>carregar_produto_por_indice</code> usa <code>fseek(fp, indice * sizeof(Produto),
+            SEEK_SET)</code> para pular direto ao registro desejado, sem ler os anteriores. Esse mesmo
+            cálculo funcionaria se <code>catalogo</code> fosse gravado como arquivo texto, um produto por
+            linha, via <code>fprintf</code> (nome, preço etc. formatados como texto)?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Não — em modo texto o tamanho de cada linha varia (nomes com tamanhos diferentes, números com quantidades diferentes de dígitos), então não dá para calcular o deslocamento em bytes sem antes ler o conteúdo.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Sim — <code>fseek</code> funciona da mesma forma em qualquer arquivo, texto ou binário, bastando multiplicar pelo tamanho da struct.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Sim, desde que o arquivo texto seja aberto com <code>"r"</code> em vez de <code>"rt"</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Não — arquivos texto não suportam a função <code>fseek</code> em nenhuma circunstância.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> O truque só funciona porque, em modo binário, todo <code>Produto</code> ocupa exatamente <code>sizeof(Produto)</code> bytes — um tamanho fixo e previsível. Num arquivo texto com <code>fprintf</code>, o número de bytes de cada linha varia (nome mais curto ou mais longo, preço com mais ou menos dígitos), então não existe uma fórmula fixa de deslocamento: seria preciso ler o arquivo sequencialmente para achar o registro certo.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O cálculo <code>indice * sizeof(Produto)</code> só é confiável porque, em modo binário, cada registro ocupa sempre o mesmo número de bytes. Num arquivo texto gravado com <code>fprintf</code>, o tamanho de cada linha varia, então não haveria como calcular o deslocamento sem ler o arquivo sequencialmente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+</main>
+
+<footer class="closing">
+  Notas da aula de <strong>Arquivos</strong> — Estruturas de Dados, Ifes Campus Serra. Veja também o
+  <a href="quiz/" style="color: inherit;">quiz de autoavaliação</a> e os
+  <a href="slides.html" style="color: inherit;">slides da aula</a>.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    charcount: {
+      vars: ["char_count", "ch"],
+      steps: [
+        { line: 5, vars: {}, desc: "FILE *file = fopen(\"main.c\", \"r\"); abre o próprio arquivo-fonte para leitura em modo texto." },
+        { line: 8, vars: {}, desc: "if (file == NULL) → a abertura teve sucesso, a condição é falsa; o bloco de erro é ignorado." },
+        { line: 14, vars: { char_count: "0" }, desc: "int char_count = 0; começa a contagem zerada." },
+        { line: 15, vars: {}, desc: "char ch; guarda cada caractere lido, um de cada vez." },
+        { line: 17, vars: { ch: "'#'" }, desc: "Primeira iteração: fgetc(file) lê o primeiro caractere do arquivo, '#' (de #include), e o atribui a ch — como não é EOF, o laço continua." },
+        { line: 19, vars: {}, desc: "'#' não é espaço, quebra de linha nem tab — a condição é verdadeira." },
+        { line: 21, vars: { char_count: "1" }, desc: "char_count++; passa a valer 1." },
+        { line: 17, vars: { ch: "'i', 'n', 'c', 'l', 'u', 'd', 'e' ..." }, desc: "O laço se repete, caractere a caractere, para o restante do arquivo: cada caractere não-branco incrementa char_count; espaços, tabs e quebras de linha fazem a condição da linha 19 falhar, e char_count não muda nessas iterações.", skip: true },
+        { line: 17, vars: { ch: "EOF", char_count: "356" }, desc: "Ao alcançar o fim do arquivo, fgetc devolve EOF — a condição do while se torna falsa e o laço termina. Ao todo, 356 caracteres não-brancos foram contados.", fail: true },
+        { line: 25, vars: {}, desc: "printf exibe: \"Total characters (excluding spaces, tabs, and newlines): 356\"." },
+        { line: 27, vars: {}, desc: "fclose(file); fecha o arquivo, liberando o buffer usado pelo sistema operacional." },
+        { line: 28, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    wordcount: {
+      vars: ["word_count", "word"],
+      steps: [
+        { line: 5, vars: {}, desc: "FILE *file = fopen(__FILE__, \"r\"); abre o próprio main.c, desta vez usando a macro __FILE__ em vez do nome literal." },
+        { line: 7, vars: {}, desc: "if (file == NULL) → abertura bem-sucedida, segue em frente." },
+        { line: 13, vars: { word_count: "0" }, desc: "int word_count = 0;" },
+        { line: 14, vars: {}, desc: "char word[100]; guarda cada palavra lida, uma de cada vez." },
+        { line: 16, vars: { word: "\"#include\"" }, desc: "fscanf(file, \"%s\", word) lê a próxima sequência de caracteres não separada por espaço — a primeira é #include." },
+        { line: 18, vars: { word_count: "1" }, desc: "word_count++; passa a valer 1." },
+        { line: 19, vars: {}, desc: "printf(\"%s\\n\", word); imprime a palavra lida." },
+        { line: 16, vars: { word: "\"<stdio.h>\", \"int\", \"main()\" ..." }, desc: "O laço se repete: cada chamada de fscanf(file, \"%s\", word) avança o cursor para a próxima sequência não-branca, pulando espaços e quebras de linha automaticamente.", skip: true },
+        { line: 16, vars: { word: "EOF", word_count: "55" }, desc: "Ao alcançar o fim do arquivo, fscanf devolve EOF — o laço termina. Ao todo, 55 palavras foram lidas e impressas.", fail: true },
+        { line: 22, vars: {}, desc: "printf exibe: \"Total words in the source code: 55\"." },
+        { line: 24, vars: {}, desc: "fclose(file);" },
+        { line: 25, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    linecount: {
+      vars: ["line_count", "line"],
+      steps: [
+        { line: 5, vars: {}, desc: "FILE *file = fopen(__FILE__, \"r\"); abre o próprio main.c para leitura." },
+        { line: 7, vars: {}, desc: "if (file == NULL) → abertura bem-sucedida, segue em frente." },
+        { line: 13, vars: { line_count: "0" }, desc: "int line_count = 0;" },
+        { line: 14, vars: {}, desc: "char line[200]; guarda cada linha lida, uma de cada vez." },
+        { line: 16, vars: { line: "\"#include <stdio.h>\\n\"" }, desc: "fgets(line, 200, file) lê a primeira linha inteira, até e incluindo o '\\n' — que fica dentro da string lida." },
+        { line: 18, vars: { line_count: "1" }, desc: "line_count++; passa a valer 1." },
+        { line: 19, vars: {}, desc: "printf(\"%s\\n\", line); imprime a linha — como line já contém '\\n', e printf adiciona outro, aparece uma linha em branco extra." },
+        { line: 16, vars: { line: "linhas 2 a 25 do arquivo, uma por iteração ..." }, desc: "O laço se repete para cada linha restante do arquivo, incluindo as linhas em branco do próprio código-fonte.", skip: true },
+        { line: 16, vars: { line: "NULL", line_count: "26" }, desc: "Ao alcançar o fim do arquivo, fgets devolve NULL — o laço termina. Ao todo, 26 linhas foram lidas.", fail: true },
+        { line: 22, vars: {}, desc: "printf exibe: \"Total lines in the source code: 26\"." },
+        { line: 24, vars: {}, desc: "fclose(file);" },
+        { line: 25, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    sumvectors: {
+      vars: ["n1", "n2", "vector_1", "vector_2", "sum_vector"],
+      steps: [
+        { line: 6, vars: {}, desc: "Abre vector_1.txt e vector_2.txt para leitura, e cria sum_vector.txt para escrita — três arquivos, três ponteiros FILE* independentes." },
+        { line: 10, vars: {}, desc: "if (... == NULL) → as três aberturas tiveram sucesso, segue em frente." },
+        { line: 17, vars: { n1: "5" }, desc: "fscanf(input_file_1, \"%d\", &n1); lê o primeiro valor de vector_1.txt: o tamanho do vetor, 5." },
+        { line: 18, vars: { n2: "5" }, desc: "fscanf(input_file_2, \"%d\", &n2); lê o tamanho de vector_2.txt: também 5." },
+        { line: 20, vars: {}, desc: "if (n1 != n2) → 5 é igual a 5, a condição é falsa; segue em frente." },
+        { line: 27, vars: { vector_1: "malloc(20 bytes)", vector_2: "malloc(20 bytes)", sum_vector: "malloc(20 bytes)" }, desc: "Aloca dinamicamente os três vetores de 5 inteiros cada — 20 bytes cada um nesta plataforma." },
+        { line: 38, vars: { vector_1: "{1, 2, 3, 4, 5}" }, desc: "O primeiro laço lê os 5 inteiros de vector_1.txt, um fscanf por posição: vector_1 = {1, 2, 3, 4, 5}." },
+        { line: 44, vars: { vector_2: "{6, 7, 8, 9, 10}" }, desc: "O segundo laço lê os 5 inteiros de vector_2.txt: vector_2 = {6, 7, 8, 9, 10}." },
+        { line: 50, vars: { sum_vector: "{7, 9, 11, 13, 15}" }, desc: "O terceiro laço soma posição a posição: sum_vector[i] = vector_1[i] + vector_2[i] para cada i." },
+        { line: 56, vars: {}, desc: "fprintf(output_file, \"%d\\n\", n1); escreve o tamanho do vetor de soma (5) na primeira linha de sum_vector.txt." },
+        { line: 57, vars: {}, desc: "O último laço escreve os 5 valores somados: \"7 9 11 13 15 \" — sum_vector.txt passa a conter \"5\\n7 9 11 13 15 \"." },
+        { line: 63, vars: {}, desc: "free(vector_1); free(vector_2); free(sum_vector); liberam os três blocos alocados dinamicamente." },
+        { line: 68, vars: {}, desc: "fclose fecha os três arquivos, um por um." },
+        { line: 72, vars: {}, desc: "printf exibe: \"Sum of vectors has been written to sum_vector.txt.\"." },
+        { line: 74, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    parser: {
+      vars: ["input_string", "name", "age", "height", "output_string"],
+      steps: [
+        { line: 6, vars: { input_string: "\"John 25 75.5\"" }, desc: "char input_string[] = \"John 25 75.5\"; a string de origem, já em memória (não vem de nenhum arquivo)." },
+        { line: 7, vars: {}, desc: "Declara name, age e height — três variáveis prontas para receber os valores extraídos." },
+        { line: 11, vars: { name: "\"John\"", age: "25", height: "75.50" }, desc: "sscanf(input_string, \"%s %d %f\", name, &age, &height); extrai os três valores na ordem do formato: %s captura \"John\" até o primeiro espaço, %d captura 25, %f captura 75.5." },
+        { line: 13, vars: {}, desc: "printf exibe: \"Name: John\"." },
+        { line: 14, vars: {}, desc: "printf exibe: \"Age: 25\"." },
+        { line: 15, vars: {}, desc: "printf exibe: \"Height: 75.50\"." },
+        { line: 19, vars: { score: "95" }, desc: "int score = 95; um valor extra, para compor a string formatada a seguir." },
+        { line: 21, vars: { output_string: "\"Student: John, Score: 95\"" }, desc: "sprintf(output_string, \"Student: %s, Score: %d\", name, score); o inverso de sscanf — formata os valores numa string em memória, em vez de imprimi-los na tela." },
+        { line: 23, vars: {}, desc: "printf exibe: \"Formatted String: Student: John, Score: 95\"." },
+        { line: 25, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    binary: {
+      vars: ["catalogo", "lidos", "n", "p"],
+      steps: [
+        { line: 48, vars: { catalogo: "[{1,Caderno,12.50}, {2,Caneta,3.20}, {3,Mochila,89.90}]" }, desc: "Produto catalogo[3] = {...}; um vetor de 3 structs Produto, já inicializado na pilha." },
+        { line: 54, vars: {}, desc: "salvar_produtos(\"produtos.bin\", catalogo, 3); chama a função que grava o vetor inteiro em modo binário." },
+        { line: 13, vars: {}, desc: "Dentro de salvar_produtos: fopen(arquivo, \"wb\") abre produtos.bin para escrita em modo binário." },
+        { line: 19, vars: {}, desc: "fwrite(produtos, sizeof(Produto), n, fp); copia os 3 × sizeof(Produto) bytes de catalogo direto para o arquivo, sem nenhuma conversão de texto." },
+        { line: 20, vars: {}, desc: "fclose(fp); fecha produtos.bin." },
+        { line: 55, vars: {}, desc: "printf exibe: \"3 produtos salvos em produtos.bin (modo binario).\"." },
+        { line: 58, vars: {}, desc: "int n = carregar_produtos(\"produtos.bin\", lidos, 3); chama a função que lê o vetor de volta." },
+        { line: 25, vars: {}, desc: "Dentro de carregar_produtos: fopen(arquivo, \"rb\") abre produtos.bin para leitura em modo binário." },
+        { line: 31, vars: { n: "3" }, desc: "fread(produtos, sizeof(Produto), n, fp); copia de volta 3 × sizeof(Produto) bytes do arquivo para o vetor lidos, reconstituindo as structs originais." },
+        { line: 59, vars: {}, desc: "O laço seguinte imprime cada produto recuperado: #1 Caderno R$ 12.50, #2 Caneta R$ 3.20, #3 Mochila R$ 89.90 — idênticos aos gravados." },
+        { line: 66, vars: {}, desc: "Produto p = carregar_produto_por_indice(\"produtos.bin\", 1); chama a função que busca só o produto de índice 1 (Caneta), sem ler os outros dois." },
+        { line: 39, vars: {}, desc: "Dentro da função: fopen abre produtos.bin de novo, e fseek(fp, 1 * sizeof(Produto), SEEK_SET) move o cursor direto para o byte onde o segundo registro começa, pulando o primeiro (Caderno) sem lê-lo." },
+        { line: 41, vars: { p: "{2, Caneta, 3.20}" }, desc: "fread(&p, sizeof(Produto), 1, fp); lê só 1 registro a partir da posição em que o cursor foi posicionado — recupera exatamente o produto Caneta, sem ter tocado nos outros dois." },
+        { line: 67, vars: {}, desc: "printf exibe: \"#2 Caneta R$ 3.20\"." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

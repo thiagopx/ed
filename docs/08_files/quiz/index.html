@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Arquivos</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>🗂️ Quiz — Arquivos</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de arquivos!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Abrir arquivos",
+    text: "O que fopen devolve se o arquivo não puder ser aberto (por exemplo, um arquivo inexistente aberto em modo de leitura)?",
+    options: ["Um ponteiro para um arquivo vazio", "EOF", "NULL", "O programa aborta imediatamente"],
+    correctIndex: 2,
+    explainCorrect: "fopen devolve NULL quando a abertura falha — por isso todo código deve testar esse retorno antes de usar o ponteiro do arquivo.",
+    explainIncorrect: "A resposta correta é NULL. EOF é o valor devolvido por funções de leitura ao alcançar o fim do arquivo, não por fopen."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Modos de abertura",
+    text: "Um arquivo chamado dados.txt já existe e contém texto. Ele é aberto com fopen(\"dados.txt\", \"w\"). O que acontece com o conteúdo anterior?",
+    options: [
+      "É preservado, e a escrita começa no final do arquivo",
+      "O arquivo é destruído e recriado vazio",
+      "fopen falha, porque o arquivo já existe",
+      "O conteúdo anterior é mantido, mas o cursor começa no início"
+    ],
+    correctIndex: 1,
+    explainCorrect: "O modo \"w\" sempre cria um arquivo novo e vazio — se um arquivo com o mesmo nome já existe, seu conteúdo anterior é destruído. Preservar o conteúdo e escrever no final é o comportamento do modo \"a\".",
+    explainIncorrect: "A resposta correta é: o arquivo é destruído e recriado vazio. Esse é o efeito do modo \"w\" — para preservar o conteúdo e acrescentar ao final, o modo correto seria \"a\"."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Fechar arquivos",
+    text: "Qual o protótipo correto da função usada para fechar um arquivo previamente aberto?",
+    code: `<span class="kw">int</span> /* ??? */(<span class="type">FILE</span> *fp);`,
+    options: ["fclose", "fexit", "fend", "closefile"],
+    correctIndex: 0,
+    explainCorrect: "fclose(fp) fecha o arquivo, garantindo que qualquer dado pendente no buffer seja gravado em disco (se aberto para escrita) e liberando a área de memória do buffer.",
+    explainIncorrect: "A resposta correta é fclose. É a única função da biblioteca padrão de C com esse papel — as demais opções não existem."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Leitura em modo texto",
+    text: "Qual função lê um único caractere de um arquivo por vez, avançando o cursor uma posição a cada chamada?",
+    options: ["fscanf", "fgets", "fgetc", "fread"],
+    correctIndex: 2,
+    explainCorrect: "fgetc(fp) captura o próximo caractere do arquivo e devolve seu código (como int, para poder também representar EOF).",
+    explainIncorrect: "A resposta correta é fgetc. fgets lê uma linha inteira; fscanf lê valores formatados; fread é usado em modo binário."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Leitura em modo texto",
+    text: "Complete a lacuna para ler uma linha inteira de fp (até 199 caracteres) para dentro da variável linha:",
+    code: `<span class="kw">char</span> linha[<span class="type">200</span>];
+/* ??? */(linha, <span class="type">200</span>, fp);`,
+    options: ["fscanf", "fgets", "fgetc", "fputs"],
+    correctIndex: 1,
+    explainCorrect: "fgets(linha, 200, fp) lê até 199 caracteres (o último espaço é reservado para o '\\0'), parando ao encontrar um '\\n' ou ao atingir esse limite.",
+    explainIncorrect: "A resposta correta é fgets. fscanf lê valores formatados (não necessariamente uma linha inteira); fgetc lê um único caractere; fputs escreve, não lê."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Escrita em modo texto",
+    text: "Qual função escreve um único caractere num arquivo, devolvendo o próprio caractere escrito (ou EOF, em caso de erro)?",
+    options: ["fprintf", "fwrite", "fputs", "fputc"],
+    correctIndex: 3,
+    explainCorrect: "fputc(c, fp) escreve o caractere c no arquivo apontado por fp — a contrapartida de escrita de fgetc.",
+    explainIncorrect: "A resposta correta é fputc. fprintf escreve dados formatados (não só um caractere); fwrite é usada em modo binário."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Estruturação — caractere a caractere",
+    text: "Um programa conta o número de linhas de um arquivo texto lendo caractere a caractere com fgetc. Qual condição ele deve testar a cada caractere lido para incrementar o contador de linhas?",
+    options: [
+      "O caractere é igual a EOF",
+      "O caractere é igual a ' ' (espaço)",
+      "O caractere é diferente de '\\0'",
+      "O caractere é igual a '\\n'"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Cada ocorrência de '\\n' marca o fim de uma linha — contar as ocorrências desse caractere, lendo o arquivo caractere a caractere com fgetc, é a técnica clássica para contar linhas dessa forma.",
+    explainIncorrect: "A resposta correta é: o caractere é igual a '\\n'. EOF é usado para parar o laço de leitura, não para contar linhas."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Estruturação — palavras-chave",
+    text: "Um arquivo descreve figuras geométricas usando palavras-chave (RETANGULO, CIRCULO, ...) seguidas dos parâmetros de cada figura. Qual chamada captura a próxima palavra-chave do arquivo, para depois comparar com strcmp?",
+    code: `<span class="kw">char</span> palavra[<span class="type">121</span>];
+/* ??? */`,
+    options: [
+      "fscanf(fp, \"%s\", palavra)",
+      "fgets(palavra, 121, fp)",
+      "fgetc(fp)",
+      "fread(palavra, 1, 121, fp)"
+    ],
+    correctIndex: 0,
+    explainCorrect: "fscanf(fp, \"%s\", palavra) captura a próxima sequência de caracteres não separada por espaço em branco, ignorando automaticamente espaços e quebras de linha entre uma palavra e outra — a leitura natural para reconhecer uma palavra-chave por vez.",
+    explainIncorrect: "A resposta correta é fscanf(fp, \"%s\", palavra). fgets leria a linha inteira (que pode conter mais de uma palavra-chave ou parâmetros); fgetc leria só um caractere."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "sscanf",
+    text: "Uma linha já foi lida para dentro de char linha[121] com fgets. Qual função extrai, a partir do conteúdo de linha (já em memória), um caractere seguido de dois valores float?",
+    options: ["fscanf(linha, \"%c %f %f\", ...)", "scanf(linha, \"%c %f %f\", ...)", "sscanf(linha, \"%c %f %f\", ...)", "strscan(linha, \"%c %f %f\", ...)"],
+    correctIndex: 2,
+    explainCorrect: "sscanf lê valores formatados de dentro de uma string já em memória (o primeiro parâmetro é a string, não um FILE*) — é o par de fscanf para quando os dados já foram capturados numa cadeia de caracteres.",
+    explainIncorrect: "A resposta correta é sscanf(linha, \"%c %f %f\", ...). fscanf exigiria um FILE* como primeiro parâmetro, não uma string; strscan não existe na biblioteca padrão."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Modo binário",
+    text: "Um vetor de 10 structs Produto já foi gravado em disco com fwrite, cada struct ocupando sizeof(Produto) bytes. Qual chamada recupera diretamente o produto de índice 3, sem ler os três primeiros registros?",
+    code: `<span class="type">FILE</span> *fp = fopen(<span class="str">"produtos.bin"</span>, <span class="str">"rb"</span>);
+<span class="type">Produto</span> p;
+/* ??? */
+fread(&amp;p, sizeof(<span class="type">Produto</span>), <span class="type">1</span>, fp);`,
+    options: [
+      "fseek(fp, 3, SEEK_SET);",
+      "fseek(fp, 3 * sizeof(Produto), SEEK_SET);",
+      "fread(fp, 3 * sizeof(Produto), 1, NULL);",
+      "rewind(fp, 3);"
+    ],
+    correctIndex: 1,
+    explainCorrect: "fseek(fp, 3 * sizeof(Produto), SEEK_SET) move o cursor para o byte onde o quarto registro (índice 3) começa, contando a partir do início do arquivo (SEEK_SET) — o deslocamento precisa ser em bytes, não em número de registros.",
+    explainIncorrect: "A resposta correta é fseek(fp, 3 * sizeof(Produto), SEEK_SET). O deslocamento de fseek é sempre em bytes — avançar só 3 bytes (primeira opção) não pularia os registros inteiros."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  const codeHtml = q.code ? `<pre class="code-block">${q.code}</pre>` : '';
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${codeHtml}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou a manipulação de arquivos em C.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou para fixar os modos de abertura e as funções de leitura/escrita.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale a pena revisar a diferença entre modo texto e modo binário, e o papel do fseek.';
+  else msg = '🔁 Releia as notas do módulo e tente novamente para reforçar os fundamentos.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
