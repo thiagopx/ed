@@ -500,6 +500,101 @@
     color: var(--ink-soft);
   }
 
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
   footer.closing {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -596,12 +691,17 @@
       O <code>do-while</code> inverte a ordem do teste: <code>do { comandos; } while (condição);</code> executa o
       corpo do laço primeiro e só então verifica a condição, repetindo enquanto ela for verdadeira. Por ser um
       laço de <strong>pós-teste</strong>, ele garante que o corpo execute <em>pelo menos uma vez</em>, mesmo que a
-      condição já comece falsa — diferença que faz dele a escolha natural para validar uma entrada do usuário
-      (é preciso ler o valor pelo menos uma vez antes de poder testá-lo), como em
+      condição já comece falsa — diferença que faz dele a escolha natural para validar (ou, de forma mais geral,
+      repetir a leitura de) uma entrada do usuário, já que é preciso ler o valor pelo menos uma vez antes de poder
+      testá-lo, como em
       <code>do { printf("Escolha 1-3: "); scanf("%d", &amp;opcao); } while (opcao &lt; 1 || opcao &gt; 3);</code>.
-      Nenhum exemplo deste módulo usa <code>do-while</code>, mas o laço <code>while (1) { ... break; ... }</code>
-      de <em>Adivinhe o número</em> resolve o mesmo problema (repetir a leitura até um valor válido) com pré-teste
-      e uma saída manual, no lugar do pós-teste automático do <code>do-while</code>.
+      É exatamente esse padrão que o exemplo <em>Soma com do-while</em> usa para ler números do teclado: o corpo
+      do laço (pedir e ler um número) sempre executa pelo menos uma vez, e só depois de ler é que
+      <code>while (numero != 0)</code> decide se pede outro número ou encerra — não haveria como testar
+      <code>numero != 0</code> antes de ter lido o primeiro valor. Compare com <em>Adivinhe o número</em>, que
+      resolve um problema parecido (repetir até uma condição de parada) com pré-teste: <code>while (1) { ...
+      break; ... }</code> força a primeira execução com uma condição sempre verdadeira e sai manualmente com
+      <code>break</code>, em vez do pós-teste automático do <code>do-while</code>.
     </p>
 
     <h3>Interrupções com break e continue</h3>
@@ -611,10 +711,12 @@
       interrompe o laço imediatamente, pulando para a primeira linha depois dele — é o que o exemplo
       <em>Adivinhe o número</em> faz assim que o palpite do usuário acerta o número sorteado, encerrando o
       <code>while (1)</code> que, de outra forma, rodaria para sempre. Já o <code>continue</code> não encerra o
-      laço: ele pula direto para a próxima repetição (no <code>for</code>, isso inclui rodar o incremento antes do
-      próximo teste da condição), abandonando apenas o restante do corpo na iteração atual. Um uso típico é
-      descartar uma entrada inválida sem sair do laço: <code>if (opcao &lt; 1 || opcao &gt; 5) continue;</code>
-      volta ao início do laço para pedir uma nova entrada, sem executar o restante do corpo naquela repetição.
+      laço: ele pula direto para o teste da condição (no <code>while</code> e no <code>do-while</code>) ou para a
+      expressão de atualização (no <code>for</code>), abandonando apenas o restante do corpo na iteração atual. O
+      exemplo <em>Soma com do-while</em> mostra esse uso típico: ao ler um número negativo,
+      <code>if (numero &lt; 0) { printf(...); continue; }</code> descarta aquela entrada sem somá-la e sem sair do
+      laço — o <code>continue</code> pula direto para <code>while (numero != 0)</code>, pedindo o próximo número
+      normalmente.
     </p>
 
     <h3>Geração de números (pseudo)aleatórios</h3>
@@ -694,6 +796,12 @@
         <span class="row-title"><span class="row-icon">🔗</span>Adivinhe o número</span>
       </div>
       <p class="row-desc">Jogo em que o usuário tenta acertar o número sorteado pelo computador.</p>
+    </li>
+    <li class="example-row" data-target="soma-dowhile" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Soma com do-while</span>
+      </div>
+      <p class="row-desc">Lê números do teclado num do-while, ignora negativos com continue e soma os positivos até digitar 0.</p>
     </li>
   </ul>
 
@@ -776,6 +884,24 @@ Factorial of 5 is 120</pre>
           faixa de valores representável por <code>int</code>. Tente rastrear o programa para
           <code>n = 13</code> e para <code>n = -1</code>.
         </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O laço está escrito como <code>for (int i = 1; i &lt;= n; ++i)</code>. O que aconteceria se a condição
+            fosse trocada para <code>i &lt; n</code> (sem o igual), mantendo o resto do código como está?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Nada mudaria — <code>i &lt; n</code> e <code>i &lt;= n</code> produzem o mesmo conjunto de valores de <code>i</code> neste laço.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O laço passaria a rodar uma vez a mais, multiplicando por <code>n + 1</code> no lugar de <code>n</code>.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O laço pararia uma iteração mais cedo, deixando de multiplicar por <code>n</code> — o resultado passaria a ser <code>(n-1)!</code> em vez de <code>n!</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa entraria em laço infinito, pois <code>i</code> nunca alcançaria <code>n</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Com <code>i &lt; n</code>, a última rodada em que o corpo ainda executa é <code>i = n - 1</code> — o fator <code>n</code> nunca entra na multiplicação, então <code>factorial</code> termina valendo <code>(n-1)!</code>, não <code>n!</code>.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é que o resultado passaria a ser <code>(n-1)!</code>: com <code>i &lt; n</code>, a rodada com <code>i = n</code> nunca acontece, então o laço para um fator antes do necessário.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -857,6 +983,24 @@ Result: 32.000000</pre>
         <div class="callout">
           Para um expoente negativo o segundo laço divide em vez de multiplicar. Tente rastrear
           <code>base = 2, exponent = -2</code>: o resultado deve chegar a <code>0.25</code>.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se o usuário digitasse <code>exponent = 0</code>, considerando que
+            <code>result</code> começa em <code>1.0f</code> antes dos dois laços <code>for</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>result</code> permaneceria <code>1.0f</code>: como <code>0 &gt;= 0</code> é verdadeiro, entra no primeiro laço, mas a condição <code>i &lt; 0</code> já é falsa na primeira checagem, então o corpo nunca executa.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa entraria em laço infinito, pois nenhum dos dois laços tem uma condição de parada para expoente zero.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>result</code> viraria <code>0.0f</code>, já que qualquer número elevado a zero é multiplicado por zero.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O segundo laço (divisão) seria executado, já que <code>-exponent</code> valeria <code>0</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Com <code>exponent = 0</code>, a condição <code>exponent &gt;= 0</code> escolhe o primeiro laço, mas <code>i &lt; 0</code> (com <code>i</code> começando em 0) já é falsa antes da primeira volta — o corpo nunca roda e <code>result</code> fica no valor inicial, <code>1.0f</code>, que é matematicamente correto (qualquer base elevada a 0 é 1).</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é que <code>result</code> permanece <code>1.0f</code>: o primeiro laço é escolhido (<code>exponent &gt;= 0</code>), mas sua condição <code>i &lt; exponent</code> (isto é, <code>i &lt; 0</code>) já começa falsa, então o corpo nunca executa.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -943,6 +1087,24 @@ Result: 32.000000</pre>
           esta sequência é sempre igual — os exemplos <em>Dados</em> e <em>Adivinhe o número</em>
           usam <code>srand(time(NULL))</code>, que muda a cada execução.
         </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se a chamada <code>srand(10);</code> fosse removida deste programa, sem colocar
+            nenhuma outra chamada a <code>srand</code> no lugar?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O programa não compilaria, pois <code>rand()</code> exige que <code>srand()</code> seja chamada antes.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>A sequência de números continuaria sempre a mesma entre execuções — sem <code>srand()</code>, a semente interna do gerador usa um valor padrão fixo.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>A sequência passaria a mudar a cada execução, como se <code>srand(time(NULL))</code> tivesse sido chamada.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>rand()</code> passaria a devolver sempre o mesmo número em todas as chamadas dentro da mesma execução.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem uma chamada a <code>srand()</code>, o gerador de <code>rand()</code> começa com uma semente padrão fixa (equivalente a <code>srand(1)</code>) — a sequência de números continua determinística e igual em toda execução, só que com uma semente diferente da escolhida deliberadamente aqui (<code>10</code>).</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A sequência continuaria sempre igual entre execuções: sem <code>srand()</code>, o gerador usa uma semente padrão fixa internamente — é <code>srand(time(NULL))</code>, não a ausência de <code>srand</code>, que faz a sequência mudar a cada execução.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1012,6 +1174,24 @@ You rolled a 4!</pre>
           Este exemplo não tem laço — ele está aqui porque combina com o tema "números
           aleatórios" do módulo e mostra outro padrão comum: uma função <code>void</code> que
           apenas executa uma ação, sem devolver valor com <code>return</code>.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se <code>main()</code> chamasse <code>roll_dice();</code> duas vezes seguidas, uma
+            logo após a outra?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Erro de compilação: uma função <code>void</code> só pode ser chamada uma vez por programa.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>A segunda chamada imprimiria o mesmo valor da primeira, pois <code>result</code> guardaria o valor anterior.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Cada chamada criaria sua própria variável <code>result</code>, independente da outra — a segunda rolagem poderia sortear um valor diferente da primeira, sem relação entre elas.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa travaria, pois <code>result</code> já estaria "ocupada" pela primeira chamada.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>result</code> é uma variável local: ela nasce e morre a cada chamada de <code>roll_dice()</code>. Duas chamadas seguidas são duas execuções independentes da função, cada uma com sua própria cópia de <code>result</code> — não há memória entre elas.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Como <code>result</code> é local à função, cada chamada de <code>roll_dice()</code> cria sua própria cópia dela, do zero — a segunda chamada não "lembra" o valor sorteado na primeira.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1106,6 +1286,129 @@ Congratulations! You guessed the correct number: 42</pre>
           <code>number_to_guess</code> é sorteado uma única vez, antes do laço. Repare que ele
           não muda entre as tentativas — só <code>user_guess</code> é lido de novo a cada volta.
         </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se o <code>break;</code> dentro do bloco <code>else</code> fosse removido, mantendo
+            o resto do código exatamente como está?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Nada mudaria — o <code>while (1)</code> pararia sozinho assim que o palpite estivesse correto.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa continuaria pedindo palpites para sempre, mesmo depois de acertar e imprimir a mensagem de vitória — <code>while (1)</code> não tem outra forma de parar.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa encerraria imediatamente após imprimir a mensagem de vitória, como se houvesse um <code>return</code> implícito.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Erro de compilação, pois todo <code>while (1)</code> exige um <code>break</code> em algum <code>else</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>while (1)</code> é sempre verdadeiro por si só — o <code>break</code> é o único jeito de sair dele neste programa. Sem ele, mesmo depois de acertar e imprimir a mensagem de vitória, o laço voltaria ao topo e pediria outro palpite, indefinidamente.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é que o laço continuaria rodando para sempre: <code>while (1)</code> não tem condição própria de parada, então sem o <code>break</code> o programa voltaria a pedir palpites mesmo após a vitória.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOMA COM DO-WHILE ================= -->
+  <section class="detail" id="panel-soma-dowhile" data-panel hidden>
+    <div class="detail-head">
+      <h2>Soma com do-while</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/03_repetition_and_rand/06_do_while_continue" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> numero;
+    <span class="kw">int</span> soma = <span class="num">0</span>;
+    <span class="kw">int</span> quantidade = <span class="num">0</span>;
+
+    <span class="fn">printf</span>(<span class="str">"Digite numeros para somar (negativos sao ignorados; digite 0 para parar):\n"</span>);
+
+    <span class="kw">do</span>
+    {
+        <span class="fn">printf</span>(<span class="str">"Numero: "</span>);
+        <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;numero);
+
+        <span class="kw">if</span> (numero &lt; <span class="num">0</span>)
+        {
+            <span class="fn">printf</span>(<span class="str">"  (ignorado, numero negativo)\n"</span>);
+            <span class="kw">continue</span>;
+        }
+
+        <span class="kw">if</span> (numero &gt; <span class="num">0</span>)
+        {
+            soma += numero;
+            quantidade++;
+        }
+    } <span class="kw">while</span> (numero != <span class="num">0</span>);
+
+    <span class="fn">printf</span>(<span class="str">"\nSoma dos %d numeros positivos digitados: %d\n"</span>, quantidade, soma);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o laço</h3>
+        <p>
+          <code>do { ... } while (numero != 0);</code> é um laço de <strong>pós-teste</strong>: o corpo (pedir e
+          ler um número) executa primeiro, e só depois a condição é avaliada — por isso o programa sempre lê pelo
+          menos um número, mesmo que o primeiro digitado já seja <code>0</code>. Dentro do corpo, um número
+          negativo aciona <code>continue</code>, que pula direto para o teste <code>while (numero != 0)</code>,
+          sem passar pelo segundo <code>if</code> nem somar nada — diferente de <code>break</code>, o laço
+          continua rodando normalmente na próxima volta.
+        </p>
+
+        <h3>Execução passo a passo — entradas: 5, -3, 10, 0</h3>
+        <div class="stepper" data-stepper="soma-dowhile">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+          <table class="trace-table">
+            <thead>
+              <tr><th>número lido</th><th>ação</th><th>soma</th><th>quantidade</th></tr>
+            </thead>
+            <tbody data-log></tbody>
+          </table>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Digite numeros para somar (negativos sao ignorados; digite 0 para parar):
+Numero: Numero:   (ignorado, numero negativo)
+Numero: Numero:
+Soma dos 2 numeros positivos digitados: 15</pre>
+
+        <div class="callout">
+          Entradas digitadas, em ordem: <code>5</code>, <code>-3</code>, <code>10</code>, <code>0</code>. O
+          terminal não ecoa o que foi digitado neste programa, então os números não aparecem na saída — só os
+          prompts <code>"Numero: "</code> e as mensagens do programa. Repare que dois prompts <code>"Numero: "</code>
+          aparecem colados na mesma linha antes do aviso "(ignorado, numero negativo)": é o buffer de saída do
+          terminal, que às vezes só mostra o texto acumulado depois de mais de uma chamada a <code>printf</code> —
+          o programa em si pede um número de cada vez, normalmente.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se o <code>continue;</code> dentro do bloco que trata números negativos fosse trocado
+            por <code>break;</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Nada mudaria — para um número negativo, <code>continue</code> e <code>break</code> têm o mesmo efeito neste laço.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa ignoraria o número negativo e pediria o próximo normalmente, exatamente como acontece hoje.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa encerraria o laço assim que o primeiro número negativo fosse digitado, sem chance de digitar mais números — mesmo que ainda não tivesse digitado <code>0</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa entraria em laço infinito ao encontrar um número negativo.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>break</code> interrompe o laço imediatamente, pulando para depois do <code>while</code> — diferente de <code>continue</code>, que só pula para o teste da condição e permite que o laço continue. Trocar um pelo outro faria o programa parar de pedir números assim que encontrasse o primeiro negativo, em vez de simplesmente ignorá-lo.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é que o laço terminaria ali mesmo: <code>break</code> sai do laço por completo, enquanto <code>continue</code> (o comando usado de fato no código) só pula para o teste da condição, deixando o laço seguir pedindo números.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1114,7 +1417,9 @@ Congratulations! You guessed the correct number: 42</pre>
     <strong>Para lembrar.</strong> Use <em>for</em> quando o número de repetições é conhecido antes
     do laço começar (como percorrer de <em>1</em> até <em>n</em>). Use <em>while</em> quando a
     repetição depende de uma condição que só pode ser avaliada durante a execução — como no jogo
-    "Adivinhe o número", que repete até o usuário acertar.
+    "Adivinhe o número", que repete até o usuário acertar. Use <em>do-while</em> quando o corpo do
+    laço precisa executar pelo menos uma vez antes de a condição poder ser avaliada — como em "Soma
+    com do-while", que só sabe se deve parar depois de ler o primeiro número.
   </footer>
 </main>
 
@@ -1245,6 +1550,38 @@ Congratulations! You guessed the correct number: 42</pre>
         { line: 33, vars: {}, desc: "break; interrompe o while (1) imediatamente." },
         { line: 37, vars: {}, desc: "return 0; — o programa termina." }
       ]
+    },
+    "soma-dowhile": {
+      vars: ["numero", "soma", "quantidade"],
+      steps: [
+        { line: 9, vars: {}, desc: "Exibimos a mensagem inicial, explicando a regra: negativos são ignorados, 0 encerra." },
+        { line: 11, vars: { soma: "0", quantidade: "0" }, desc: "Entramos no do — diferente de while/for, o corpo executa pelo menos uma vez antes de qualquer teste de condição." },
+        { line: 13, vars: {}, desc: "Exibimos o prompt “Numero: ” (sem quebra de linha)." },
+        { line: 14, vars: { numero: "5" }, desc: "Lemos o primeiro valor digitado: numero = 5." },
+        { line: 16, vars: {}, desc: "if (numero < 0) → 5 < 0 é falso, não é negativo." },
+        { line: 22, vars: {}, desc: "if (numero > 0) → 5 > 0 é verdadeiro." },
+        { line: 24, vars: { soma: "5", quantidade: "1" }, desc: "soma += numero (0 + 5 = 5); quantidade++ (0 → 1).", row: ["5", "somado", "5", "1"] },
+        { line: 27, vars: {}, desc: "while (numero != 0) → 5 != 0 é verdadeiro → o laço repete." },
+        { line: 13, vars: {}, desc: "Nova repetição: exibimos o prompt de novo." },
+        { line: 14, vars: { numero: "-3" }, desc: "Lemos o segundo valor digitado: numero = -3." },
+        { line: 16, vars: {}, desc: "if (numero < 0) → -3 < 0 é verdadeiro." },
+        { line: 18, vars: {}, desc: "Exibimos o aviso de número ignorado." },
+        { line: 19, vars: {}, desc: "continue; pula direto para o teste da condição do while, sem passar pelo segundo if nem somar nada.", row: ["-3", "ignorado (negativo)", "5", "1"] },
+        { line: 27, vars: {}, desc: "while (numero != 0) → -3 != 0 é verdadeiro → o laço repete (soma e quantidade continuam como estavam)." },
+        { line: 13, vars: {}, desc: "Nova repetição: exibimos o prompt de novo." },
+        { line: 14, vars: { numero: "10" }, desc: "Lemos o terceiro valor digitado: numero = 10." },
+        { line: 16, vars: {}, desc: "if (numero < 0) → 10 < 0 é falso." },
+        { line: 22, vars: {}, desc: "if (numero > 0) → 10 > 0 é verdadeiro." },
+        { line: 24, vars: { soma: "15", quantidade: "2" }, desc: "soma += numero (5 + 10 = 15); quantidade++ (1 → 2).", row: ["10", "somado", "15", "2"] },
+        { line: 27, vars: {}, desc: "while (numero != 0) → 10 != 0 é verdadeiro → o laço repete." },
+        { line: 13, vars: {}, desc: "Nova repetição: exibimos o prompt de novo." },
+        { line: 14, vars: { numero: "0" }, desc: "Lemos o quarto valor digitado: numero = 0 — o sinal de parada." },
+        { line: 16, vars: {}, desc: "if (numero < 0) → 0 < 0 é falso." },
+        { line: 22, vars: {}, desc: "if (numero > 0) → 0 > 0 também é falso: 0 não é somado nem gera aviso, simplesmente não entra em nenhum dos dois ifs." },
+        { line: 27, vars: {}, desc: "while (numero != 0) → 0 != 0 é falso → o laço termina. É só aqui, no teste de pós-condição, que a repetição efetivamente para.", row: ["0", "fim do laço", "15", "2"], fail: true },
+        { line: 29, vars: {}, desc: "printf final exibe: “Soma dos 2 numeros positivos digitados: 15”." },
+        { line: 31, vars: {}, desc: "return 0; — o programa termina." }
+      ]
     }
   };
 
@@ -1338,6 +1675,35 @@ Congratulations! You guessed the correct number: 42</pre>
   document.querySelectorAll("[data-stepper]").forEach(function (root) {
     var config = STEPS[root.getAttribute("data-stepper")];
     if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
   });
 })();
 </script>

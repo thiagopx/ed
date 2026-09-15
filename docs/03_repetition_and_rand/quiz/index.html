@@ -353,6 +353,32 @@ const questions = [
     explainIncorrect: "A resposta correta é a primeira opção. while testa a condição antes (não executa nada), enquanto do-while executa o corpo pelo menos uma vez antes de testar."
   },
   {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "do-while com continue",
+    text: "No exemplo Soma com do-while, o trecho abaixo trata números negativos. O que acontece, exatamente, quando o usuário digita um número negativo?",
+    code: `<span class="kw">do</span> {
+    printf(<span class="str">"Numero: "</span>);
+    scanf(<span class="str">"%d"</span>, &amp;numero);
+
+    <span class="kw">if</span> (numero &lt; 0) {
+        printf(<span class="str">"  (ignorado, numero negativo)\\n"</span>);
+        <span class="kw">continue</span>;
+    }
+
+    <span class="cmt">// soma numero, se for positivo</span>
+} <span class="kw">while</span> (numero != 0);`,
+    options: [
+      "O laço termina imediatamente, sem pedir mais números.",
+      "O número negativo é somado normalmente, mas quantidade não é incrementada.",
+      "A execução pula direto para o teste while (numero != 0), sem somar o número nem incrementar quantidade, e o laço continua pedindo o próximo número.",
+      "O programa entra em laço infinito, pois numero nunca é atualizado depois do continue."
+    ],
+    correctIndex: 2,
+    explainCorrect: "continue não encerra o laço: ele interrompe só a iteração atual, pulando direto para o teste da condição (aqui, o while (numero != 0) do do-while). O número negativo não é somado, quantidade não muda, e o laço volta a pedir um novo número normalmente.",
+    explainIncorrect: "A resposta correta é a terceira opção. continue não é break: ele não sai do laço, apenas pula para o teste da condição, ignorando aquele número sem alterar soma ou quantidade — o laço segue pedindo o próximo número."
+  },
+  {
     difficulty: "basico",
     diffLabel: "Básico",
     tag: "Intervalo com rand()",

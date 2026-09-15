@@ -19,7 +19,12 @@
     --code-bg: #1B222C;
     --code-ink: #E7ECF1;
     --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
     --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
 
     --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
     --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -288,6 +293,51 @@
     white-space: nowrap;
   }
 
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 38vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: var(--code-type); }
+  .code-panel .fn   { color: var(--code-fn); }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: var(--code-num); }
+  .code-panel .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-panel .pp   { color: var(--code-pp); }
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
   /* ---- RAND_MAX (faixa numérica) ---- */
 
   .rangeband { display: flex; flex-direction: column; align-items: center; gap: 1.6vw; width: 100%; max-width: 58vw; margin: 0 auto; }
@@ -543,24 +593,38 @@
     <h1>Quando a condição é testada muda tudo</h1>
     <p class="sub">do-while garante que o corpo rode pelo menos uma vez, mesmo que a condição já comece falsa.</p>
     <div class="body">
-      <div class="duel">
-        <div class="item">
-          <span class="tag">while</span>
-          <div class="seq">
-            <div class="step is-accent">testa condição</div>
-            <div class="down">↓</div>
-            <div class="step">executa corpo</div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="duel">
+            <div class="item">
+              <span class="tag">while</span>
+              <div class="seq">
+                <div class="step is-accent">testa condição</div>
+                <div class="down">↓</div>
+                <div class="step">executa corpo</div>
+              </div>
+            </div>
+            <div class="vs">vs</div>
+            <div class="item">
+              <span class="tag">do-while</span>
+              <div class="seq">
+                <div class="step">executa corpo</div>
+                <div class="down">↓</div>
+                <div class="step is-accent">testa condição</div>
+              </div>
+              <div class="badge">corpo roda ≥ 1 vez, mesmo se a condição já for falsa</div>
+            </div>
           </div>
         </div>
-        <div class="vs">vs</div>
-        <div class="item">
-          <span class="tag">do-while</span>
-          <div class="seq">
-            <div class="step">executa corpo</div>
-            <div class="down">↓</div>
-            <div class="step is-accent">testa condição</div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_do_while_continue/main.c</div>
+            <pre><code><span class="kw">do</span>
+{
+    <span class="cmt">// pede e le um numero,</span>
+    <span class="cmt">// soma se for positivo</span>
+} <span class="kw">while</span> (numero != <span class="num">0</span>);</code></pre>
           </div>
-          <div class="badge">corpo roda ≥ 1 vez, mesmo se a condição já for falsa</div>
         </div>
       </div>
     </div>
@@ -596,27 +660,41 @@
     <div class="kicker">Interrupções do laço</div>
     <h1>break para tudo, continue pula só uma volta</h1>
     <div class="body">
-      <div class="itertrace">
-        <div class="trace-row">
-          <span class="trace-label">break</span>
-          <div class="trace-chips">
-            <div class="tchip">1</div>
-            <div class="tchip">2</div>
-            <div class="tchip is-stop">3<span class="mark">break</span></div>
-            <div class="tchip is-ghost">4</div>
-            <div class="tchip is-ghost">5</div>
-            <div class="tchip is-ghost">6</div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="itertrace" style="max-width: 100%;">
+            <div class="trace-row">
+              <span class="trace-label">break</span>
+              <div class="trace-chips">
+                <div class="tchip">1</div>
+                <div class="tchip">2</div>
+                <div class="tchip is-stop">3<span class="mark">break</span></div>
+                <div class="tchip is-ghost">4</div>
+                <div class="tchip is-ghost">5</div>
+                <div class="tchip is-ghost">6</div>
+              </div>
+            </div>
+            <div class="trace-row">
+              <span class="trace-label">continue</span>
+              <div class="trace-chips">
+                <div class="tchip">1</div>
+                <div class="tchip">2</div>
+                <div class="tchip is-skip">3<span class="mark">continue</span></div>
+                <div class="tchip">4</div>
+                <div class="tchip">5</div>
+                <div class="tchip">6</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="trace-row">
-          <span class="trace-label">continue</span>
-          <div class="trace-chips">
-            <div class="tchip">1</div>
-            <div class="tchip">2</div>
-            <div class="tchip is-skip">3<span class="mark">continue</span></div>
-            <div class="tchip">4</div>
-            <div class="tchip">5</div>
-            <div class="tchip">6</div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_do_while_continue/main.c</div>
+            <pre><code><span class="kw">if</span> (numero &lt; <span class="num">0</span>)
+{
+    <span class="fn">printf</span>(<span class="str">"  (ignorado, numero negativo)\n"</span>);
+    <span class="kw">continue</span>;
+}</code></pre>
           </div>
         </div>
       </div>
