@@ -500,6 +500,101 @@
     color: var(--ink-soft);
   }
 
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
   footer.closing {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -680,6 +775,14 @@
       programa chamado como <code>./programa entrada.txt</code> consegue descobrir, dentro de si mesmo,
       que o texto <code>"entrada.txt"</code> foi passado como argumento.
     </p>
+    <p>
+      O exemplo <em>Argumentos de linha de comando</em>, logo abaixo, coloca isso em prática: nenhum
+      <code>scanf</code> — os valores chegam prontos em <code>argc</code>/<code>argv</code> assim que
+      <code>main</code> começa a rodar, a partir do que foi digitado no terminal antes mesmo do programa
+      iniciar. Por isso ele precisa ser compilado (<code>gcc main.c -o main</code>) e executado passando
+      os argumentos direto na chamada (<code>./main ola mundo</code>), em vez de digitá-los depois que o
+      programa já começou.
+    </p>
 
   </div>
 
@@ -719,6 +822,12 @@
         <span class="row-title"><span class="row-icon">🔗</span>Vetor de nomes de alunos</span>
       </div>
       <p class="row-desc">Um vetor de ponteiros para string, cada nome alocado dinamicamente conforme é lido.</p>
+    </li>
+    <li class="example-row" data-target="argv" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Argumentos de linha de comando</span>
+      </div>
+      <p class="row-desc">argc e argv chegando prontos em main, sem scanf — a partir do que foi digitado na própria chamada do programa.</p>
     </li>
   </ul>
 
@@ -781,6 +890,25 @@ Rio</pre>
           <code>'\0'</code>. Se o código tentasse escrever um quinto caractere (por exemplo,
           <code>city[4] = '!';</code>), isso escreveria fora dos limites do vetor: um comportamento
           indefinido que pode corromper outra variável ou travar o programa, sem que o compilador avise.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se você quisesse guardar a palavra <code>"Vitoria"</code> (7 letras) do mesmo jeito que
+            <code>city</code> guarda <code>"Rio"</code>, qual o tamanho mínimo que o vetor <code>char</code>
+            precisaria ter?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>7 — um byte por letra.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>8 — um byte por letra mais um para o <code>'\0'</code>.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>6 — o compilador reserva o terminador automaticamente fora do vetor.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>14 — dois bytes por letra, como em outras linguagens.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Toda string em C reserva uma posição extra para o <code>'\0'</code> — sem ela, nenhuma função de string saberia onde a palavra termina. 7 letras exigem 8 bytes, exatamente como "Rio" (3 letras) exige 4.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é 8: 7 bytes para as letras mais 1 para o <code>'\0'</code> — a mesma lógica que faz <code>city[4]</code> ter tamanho 4 para guardar "Rio" (3 letras).</p>
+          </div>
         </div>
       </div>
     </div>
@@ -845,6 +973,25 @@ You entered: Hello World</pre>
           no primeiro espaço em branco, então uma entrada como <code>"Hello World"</code> só capturaria
           <code>"Hello"</code> — o <code>%[^\n]</code> é o que permite ler uma frase inteira, com espaços
           internos.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Imagine que este fosse o <em>primeiro</em> comando do programa — não haveria nenhuma leitura
+            anterior, então nenhum <code>'\n'</code> pendente no buffer antes dele. Removendo o espaço de
+            <code>scanf(" %c", &amp;user_char);</code>, o que mudaria nesse cenário específico?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O programa deixaria de compilar, pois <code>%c</code> sem espaço não é uma sintaxe válida.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Nada mudaria neste caso — sem <code>'\n'</code> pendente, o espaço não tem o que descartar.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa passaria a ler dois caracteres de uma só vez.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa travaria esperando entrada para sempre.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> O espaço em <code>" %c"</code> só importa quando há espaço em branco pendente no buffer — geralmente o <code>'\n'</code> deixado por uma leitura anterior. Sendo a primeira leitura do programa, o buffer está vazio, então o comportamento seria o mesmo com ou sem o espaço.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O espaço só tem efeito quando existe algo pendente no buffer para descartar — normalmente um <code>'\n'</code> de uma leitura anterior. Sendo esta a primeira leitura do programa, não haveria nada pendente, então o resultado seria idêntico com ou sem o espaço.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -980,6 +1127,26 @@ str1 is less than str2</pre>
           biblioteca padrão se comporta. O que importa para quem chama é só o <strong>sinal</strong> do
           resultado, não seu valor exato.
         </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O <code>for</code> de <code>my_strcmp</code> repete enquanto <code>str1[i] != '\0' &amp;&amp;
+            str2[i] != '\0'</code>. Se as cadeias comparadas fossem <code>"apple"</code> e
+            <code>"applepie"</code> — uma prefixo exata da outra — o que aconteceria quando <code>i</code>
+            chegasse a 5?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O <code>for</code> para (pois <code>str1[5]</code> é <code>'\0'</code>), e a comparação final fora do laço decide o resultado com base em quem chegou ao <code>'\0'</code> primeiro.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O laço continua acessando memória além do fim de <code>str1</code>, comparando lixo com <code>str2[5]</code>.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>A função retorna 0 imediatamente, pois os 5 primeiros caracteres são iguais.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa entra em laço infinito, pois nenhuma das duas condições fica falsa ao mesmo tempo.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Assim que <code>str1[5]</code> é <code>'\0'</code>, a condição do <code>for</code> já fica falsa e o laço termina — sem nunca acessar <code>str1[6]</code>. A linha final (<code>return str1[i] - str2[i];</code>) então compara <code>'\0'</code> com <code>'p'</code>, um valor negativo, indicando corretamente que "apple" vem antes de "applepie".</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O <code>&amp;&amp;</code> garante que o laço pare assim que qualquer uma das duas strings chegar ao <code>'\0'</code> — aqui, <code>str1[5]</code>. A linha de retorno fora do laço então compara <code>'\0'</code> com <code>'p'</code>, um valor negativo, sem nunca ler além do fim de <code>str1</code>.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1059,6 +1226,25 @@ Copied string: Hello, World!</pre>
           retornar, a responsabilidade de chamar <code>free</code> passa para quem usa o valor devolvido —
           é <code>main</code>, não <code>duplicate</code>, quem libera <code>copied</code>. Esquecer essa
           responsabilidade é a forma mais comum de vazamento de memória com esse padrão.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se a checagem <code>if (dest == NULL)</code> fosse removida do código, e <code>malloc</code>
+            realmente falhasse (devolvendo <code>NULL</code>, algo raro mas possível quando a memória
+            disponível se esgota), o que aconteceria na linha seguinte, <code>strcpy(dest, src);</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>strcpy</code> perceberia que <code>dest</code> é <code>NULL</code> e não faria nada.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span><code>strcpy</code> tentaria escrever através de um ponteiro nulo — comportamento indefinido, tipicamente um crash.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa alocaria memória automaticamente para compensar.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>src</code> seria copiado para <code>original</code> em vez de <code>dest</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Um ponteiro <code>NULL</code> não aponta para nenhum endereço válido; <code>strcpy</code> não tem como saber disso sozinho e tentaria escrever ali mesmo, causando comportamento indefinido — daí a importância de checar o retorno de <code>malloc</code> antes de usá-lo.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Sem a checagem, <code>strcpy</code> tentaria escrever através de um ponteiro <code>NULL</code>, que não aponta para memória válida nenhuma — comportamento indefinido, tipicamente um crash. É exatamente esse risco que <code>if (dest == NULL)</code> evita.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1169,6 +1355,109 @@ Student_5: Elisa</pre>
           diferentes. Por isso o laço final precisa liberar cada nome com <code>free(student_names[i]);</code>
           — liberar só o vetor de ponteiros (que nem foi alocado dinamicamente) não devolveria a memória
           das strings.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se <code>student_names</code> tivesse sido declarado como uma grade fixa,
+            <code>char student_names[NUM_STUDENTS][MAX_NAME_LENGTH];</code>, em vez de um vetor de
+            ponteiros, qual seria a principal diferença de uso de memória?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Nenhuma diferença — as duas formas ocupam exatamente o mesmo espaço.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>A grade fixa usaria menos memória, pois dispensa os ponteiros.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>A grade fixa reservaria <code>MAX_NAME_LENGTH</code> bytes para cada um dos 5 alunos, mesmo para nomes bem mais curtos — o vetor de ponteiros aloca só o necessário para cada nome.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>A grade fixa não poderia armazenar nomes com mais de 3 caracteres.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Uma grade <code>char[N][M]</code> reserva <code>M</code> bytes para cada linha, não importa o tamanho real do nome — "Ana" ocuparia o mesmo espaço que um nome de 90 caracteres. O vetor de ponteiros deste exemplo aloca, via <code>duplicate_string</code>, exatamente <code>strlen(nome) + 1</code> bytes para cada um, sem desperdício.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A diferença central é o desperdício: a grade fixa reservaria <code>MAX_NAME_LENGTH</code> bytes por aluno, não importa o tamanho real do nome, enquanto o vetor de ponteiros aloca sob medida para cada string com <code>duplicate_string</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ARGUMENTOS DE LINHA DE COMANDO ================= -->
+  <section class="detail" id="panel-argv" data-panel hidden>
+    <div class="detail-head">
+      <h2>Argumentos de linha de comando</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/06_strings/06_command_line_args" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">int</span> argc, <span class="kw">char</span> *argv[])
+{
+    <span class="fn">printf</span>(<span class="str">"Numero de argumentos (argc): %d\n"</span>, argc);
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; argc; i++)
+    {
+        <span class="fn">printf</span>(<span class="str">"argv[%d] = \"%s\"\n"</span>, i, argv[i]);
+    }
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Argumentos chegam prontos — não é scanf</h3>
+        <p>
+          Diferente de todos os outros exemplos deste módulo, este programa não lê nada durante a
+          execução: os valores de <code>argc</code> e <code>argv</code> já chegam preenchidos pelo sistema
+          operacional assim que <code>main</code> começa a rodar, a partir do que foi digitado na linha de
+          comando <em>antes</em> do programa iniciar — não há nenhum <code>scanf</code> aqui.
+        </p>
+        <p>
+          Para reproduzir a simulação abaixo, compile com <code>gcc main.c -o main</code> e execute
+          passando os argumentos direto na chamada, <code>./main ola mundo</code> — não digitados depois
+          que o programa já começou.
+        </p>
+
+        <h3>Execução passo a passo — ./main ola mundo</h3>
+        <div class="stepper" data-stepper="argv">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block"><span class="in">$ gcc main.c -o main</span>
+<span class="in">$ ./main ola mundo</span>
+Numero de argumentos (argc): 3
+argv[0] = "./main"
+argv[1] = "ola"
+argv[2] = "mundo"</pre>
+
+        <div class="callout">
+          O vetor <code>argv</code> guarda, na verdade, <code>argc + 1</code> posições: a convenção do C
+          garante que <code>argv[argc]</code> é sempre um ponteiro <code>NULL</code>, mesmo esse programa
+          nunca acessando essa posição. É esse ponteiro extra — mais do que o próprio <code>argc</code> —
+          que outras funções da família <code>exec</code> (fora do escopo deste curso) usam para descobrir
+          onde o vetor termina.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se o programa fosse executado apenas como <code>./main</code>, sem nenhum argumento extra,
+            quais seriam os valores de <code>argc</code> e <code>argv[0]</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>argc</code> = 1; <code>argv[0]</code> = <code>"./main"</code> — o nome do programa sempre conta, mesmo sem argumentos extras.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span><code>argc</code> = 0; <code>argv[0]</code> = <code>NULL</code> — sem argumentos extras, nada é contado.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa não compilaria sem receber pelo menos um argumento.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>argc</code> = 1; <code>argv[0]</code> = <code>""</code> (string vazia).</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>argv[0]</code> é sempre o nome usado para chamar o programa, esteja ele sozinho ou acompanhado de outros argumentos — por isso <code>argc</code> nunca é menor que 1 numa execução normal.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>argc</code> conta o próprio nome do programa como o primeiro argumento — <code>argv[0]</code>. Rodando só <code>./main</code>, sem nada depois, <code>argc</code> vale 1 e <code>argv[0]</code> é <code>"./main"</code>.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1312,6 +1601,21 @@ Student_5: Elisa</pre>
         { line: 51, vars: {}, desc: "— e, logo em seguida a cada impressão, free(student_names[i]); libera a string daquela posição, uma de cada vez." },
         { line: 54, vars: {}, desc: "return 0; — o programa termina, com as 5 strings já devidamente liberadas." }
       ]
+    },
+    argv: {
+      vars: ["argc", "i"],
+      steps: [
+        { line: 3, vars: {}, desc: "int main(int argc, char *argv[]) — ao rodar ./main ola mundo, o sistema operacional já entrega argc e argv prontos, antes do primeiro printf." },
+        { line: 5, vars: { argc: "3" }, desc: "printf(\"Numero de argumentos (argc): %d\\n\", argc); — argc vale 3: \"./main\" (o nome do programa, argv[0]) mais \"ola\" e \"mundo\"." },
+        { line: 7, vars: { i: "0" }, desc: "for (int i = 0; i < argc; i++) começa em i = 0; a condição 0 < 3 é verdadeira." },
+        { line: 9, vars: {}, desc: "i=0: printf imprime argv[0] = \"./main\" — o nome usado para chamar o programa, sempre a primeira posição do vetor." },
+        { line: 7, vars: { i: "1" }, desc: "i incrementa para 1; 1 < 3 ainda é verdadeiro." },
+        { line: 9, vars: {}, desc: "i=1: printf imprime argv[1] = \"ola\" — o primeiro argumento digitado depois do nome do programa." },
+        { line: 7, vars: { i: "2" }, desc: "i incrementa para 2; 2 < 3 ainda é verdadeiro." },
+        { line: 9, vars: {}, desc: "i=2: printf imprime argv[2] = \"mundo\"." },
+        { line: 7, vars: { i: "3" }, desc: "i incrementa para 3; 3 < 3 é falso — o laço termina." },
+        { line: 12, vars: {}, desc: "return 0; — o programa termina." }
+      ]
     }
   };
 
@@ -1405,6 +1709,35 @@ Student_5: Elisa</pre>
   document.querySelectorAll("[data-stepper]").forEach(function (root) {
     var config = STEPS[root.getAttribute("data-stepper")];
     if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
   });
 })();
 </script>

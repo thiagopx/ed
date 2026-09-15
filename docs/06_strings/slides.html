@@ -19,7 +19,12 @@
     --code-bg: #1B222C;
     --code-ink: #E7ECF1;
     --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
     --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
 
     --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
     --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -400,6 +405,51 @@
     padding: 0.5vw 1.1vw;
   }
 
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 38vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: var(--code-type); }
+  .code-panel .fn   { color: var(--code-fn); }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: var(--code-num); }
+  .code-panel .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-panel .pp   { color: var(--code-pp); }
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
   /* ---- terminal / argv ---- */
 
   .term {
@@ -482,6 +532,8 @@
     .compare { grid-template-columns: 1fr; }
     .duel { flex-direction: column; gap: 1.5vw; }
     .ptrgrid { flex-direction: column; align-items: center; }
+    .code-panel { max-width: 90vw; }
+    .concept-split { flex-direction: column; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -744,12 +796,32 @@
     <div class="kicker">Parâmetros da função main</div>
     <h1>main também recebe argumentos</h1>
     <div class="body">
-      <div style="display:flex; flex-direction:column; align-items:center;">
-        <div class="term">./programa entrada.txt saida.txt</div>
-        <div class="argv-row">
-          <div class="tok is-0"><span class="word">./programa</span><span class="idx">argv[0]</span></div>
-          <div class="tok"><span class="word">entrada.txt</span><span class="idx">argv[1]</span></div>
-          <div class="tok"><span class="word">saida.txt</span><span class="idx">argv[2]</span></div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="term">./main ola mundo</div>
+            <div class="argv-row">
+              <div class="tok is-0"><span class="word">./main</span><span class="idx">argv[0]</span></div>
+              <div class="tok"><span class="word">ola</span><span class="idx">argv[1]</span></div>
+              <div class="tok"><span class="word">mundo</span><span class="idx">argv[2]</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_command_line_args/main.c</div>
+            <pre><code><span class="kw">int</span> <span class="fn">main</span>(<span class="kw">int</span> argc, <span class="kw">char</span> *argv[])
+{
+    <span class="fn">printf</span>(<span class="str">"Numero de argumentos (argc): %d\n"</span>, argc);
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; argc; i++)
+    {
+        <span class="fn">printf</span>(<span class="str">"argv[%d] = \"%s\"\n"</span>, i, argv[i]);
+    }
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+          </div>
         </div>
       </div>
     </div>
