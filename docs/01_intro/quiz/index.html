@@ -301,7 +301,7 @@
 
   <div class="quiz-header">
     <h2>💻 Quiz — Fundamentos da Linguagem C</h2>
-    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 20</span>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 21</span>
   </div>
 
   <div class="progress-bar-track">
@@ -607,6 +607,23 @@ printf(<span class="str">"%c"</span>, letra);`,
     correctIndex: 1,
     explainCorrect: "Em C, o tipo char é essencialmente um tipo inteiro que armazena códigos da tabela ASCII. 'A' (código 65) + 2 resulta em 67, que impresso com %c corresponde ao caractere 'C'.",
     explainIncorrect: "A resposta correta é 'C'. Em C, caracteres possuem representação numérica na tabela ASCII ('A' + 2 = 'C')."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Variáveis não inicializadas",
+    text: "O que se pode afirmar sobre o valor impresso pelo trecho abaixo?",
+    code: `<span class="type">int</span> x;
+printf(<span class="str">"%d"</span>, x);`,
+    options: [
+      "É sempre 0, pois o C inicializa variáveis automaticamente.",
+      "É imprevisível (\"lixo de memória\") e pode variar entre execuções ou compilações — e o compilador pode até avisar sobre isso.",
+      "O programa não compila, pois toda variável precisa ser inicializada na própria declaração.",
+      "É sempre o mesmo valor em qualquer computador, já que depende só do código-fonte."
+    ],
+    correctIndex: 1,
+    explainCorrect: "Isso mesmo — o C não zera variáveis automaticamente; x guarda o que já estava naquele espaço de memória. Esse valor não é garantido e pode variar entre execuções, compilações e sistemas. Muitos compiladores (como o gcc com -Wall) ainda emitem um aviso (-Wuninitialized) alertando sobre o uso antes da inicialização.",
+    explainIncorrect: "A resposta correta é a segunda: o valor impresso é lixo de memória, imprevisível — não é 0 por padrão, nem impede a compilação. O gcc com -Wall costuma avisar sobre esse tipo de uso com um warning."
   }
 ];
 

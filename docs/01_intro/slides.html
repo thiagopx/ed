@@ -298,6 +298,51 @@
     white-space: nowrap;
   }
 
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 38vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: #4FD9C4; }
+  .code-panel .fn   { color: #E8C15A; }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: #C792EA; }
+  .code-panel .cmt  { color: #8A96A3; font-style: italic; }
+  .code-panel .pp   { color: #E2685A; }
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
   /* ---- switch: decisão em cascata ---- */
 
   .caseflow { display: flex; flex-direction: column; gap: 0.75vw; align-items: flex-start; margin: 0 auto; }
@@ -387,6 +432,8 @@
   @media (max-width: 760px) {
     .cards { grid-template-columns: repeat(2, 1fr); }
     .compare { grid-template-columns: 1fr; }
+    .code-panel { max-width: 90vw; }
+    .concept-split { flex-direction: column; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -519,15 +566,26 @@
   <section class="slide" data-slide>
     <div class="kicker">Variáveis e tipos</div>
     <h1>Declarar não é inicializar</h1>
-    <p class="sub">Sem atribuição explícita, uma variável recém-declarada guarda "lixo de memória".</p>
+    <p class="sub">Sem atribuição explícita, uma variável recém-declarada guarda "lixo de memória" — e o compilador pode avisar.</p>
     <div class="body">
-      <div class="flow">
-        <div class="box">int age;<span class="tag">declarada</span></div>
-        <div class="arrow">→</div>
-        <div class="box">?<span class="tag">valor indefinido</span></div>
-        <div class="op">scanf</div>
-        <div class="arrow">→</div>
-        <div class="box is-accent">20<span class="tag">age, inicializada</span></div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow">
+            <div class="box">int x;<span class="tag">declarada</span></div>
+            <div class="arrow">→</div>
+            <div class="box">?<span class="tag">valor indefinido</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">07_conversion_and_uninitialized/main.c</div>
+            <pre><code><span class="kw">int</span> nao_inicializada;
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, nao_inicializada);
+<span class="cmt">// gcc -Wall avisa:</span>
+<span class="cmt">// warning: 'nao_inicializada'</span>
+<span class="cmt">// is used uninitialized</span></code></pre>
+          </div>
+        </div>
       </div>
     </div>
     <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
@@ -537,18 +595,33 @@
   <section class="slide" data-slide>
     <div class="kicker">Operadores e E/S</div>
     <h1>Nem toda divisão sobra decimais</h1>
-    <p class="sub">O tipo dos operandos decide se o resultado trunca ou não.</p>
+    <p class="sub">O tipo dos operandos decide se o resultado trunca — o cast explícito força a conversão.</p>
     <div class="body">
-      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 52vw;">
-        <div class="col is-bad">
-          <h3>7 / 2</h3>
-          <p>Os dois operandos são int — divisão inteira, trunca a parte decimal.</p>
-          <span class="cap">3</span>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 26vw;">
+            <div class="col is-bad">
+              <h3>7 / 2</h3>
+              <p>Os dois operandos são int — divisão inteira, trunca.</p>
+              <span class="cap">3</span>
+            </div>
+            <div class="col">
+              <h3>7.0 / 2</h3>
+              <p>Um operando é ponto flutuante — preserva as casas decimais.</p>
+              <span class="cap">3.5</span>
+            </div>
+          </div>
         </div>
-        <div class="col">
-          <h3>7.0 / 2</h3>
-          <p>Pelo menos um operando é ponto flutuante — o resultado guarda casas decimais.</p>
-          <span class="cap">3.5</span>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">07_conversion_and_uninitialized/main.c</div>
+            <pre><code><span class="cmt">// os dois sao int: trunca</span>
+<span class="kw">float</span> media_errada =
+    total_pontos / quantidade_provas;
+<span class="cmt">// (float) antes da divisao:</span>
+<span class="kw">float</span> media_certa =
+    (<span class="kw">float</span>) total_pontos / quantidade_provas;</code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -561,16 +634,30 @@
     <h1>++x e x++ não são a mesma coisa</h1>
     <p class="sub">A diferença aparece quando o operador está dentro de uma expressão maior.</p>
     <div class="body">
-      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 52vw;">
-        <div class="col">
-          <h3>x++ (pós-fixado)</h3>
-          <p>A expressão usa o valor atual de x — o incremento acontece depois.</p>
-          <span class="cap">usa 5, x vira 6</span>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 26vw;">
+            <div class="col">
+              <h3>x++</h3>
+              <p>Usa o valor atual — o incremento acontece depois.</p>
+              <span class="cap">usa 5, x vira 6</span>
+            </div>
+            <div class="col is-bad">
+              <h3>++x</h3>
+              <p>Incrementa primeiro — a expressão já usa o novo valor.</p>
+              <span class="cap">x vira 7, usa 7</span>
+            </div>
+          </div>
         </div>
-        <div class="col is-bad">
-          <h3>++x (pré-fixado)</h3>
-          <p>x é incrementado primeiro — a expressão já usa o novo valor.</p>
-          <span class="cap">x vira 6, usa 6</span>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">05_increment_decrement/main.c</div>
+            <pre><code><span class="kw">int</span> resultado_pos = x++;
+<span class="cmt">// resultado_pos = 5, x agora = 6</span>
+
+<span class="kw">int</span> resultado_pre = ++x;
+<span class="cmt">// x agora = 7, resultado_pre = 7</span></code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -607,7 +694,37 @@
     <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 11. TODA CONDIÇÃO É UM NÚMERO -->
+  <!-- 11. OPERADORES LÓGICOS E TERNÁRIO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Operadores e E/S</div>
+    <h1>&amp;&amp;, || e ! combinam condições</h1>
+    <p class="sub">E o operador <code>?:</code> escolhe um valor sem precisar de if-else.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: repeat(3, 1fr); max-width: 34vw;">
+            <div class="card is-accent"><span class="fn">a &amp;&amp; b</span><p>verdadeiro só se os dois lados forem verdadeiros</p></div>
+            <div class="card"><span class="fn">a || b</span><p>verdadeiro se pelo menos um lado for</p></div>
+            <div class="card"><span class="fn">!a</span><p>inverte um valor lógico</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_logical_and_ternary/main.c</div>
+            <pre><code><span class="kw">int</span> elegivel =
+    maior_de_idade &amp;&amp; renda_baixa;
+
+<span class="kw">const</span> <span class="kw">char</span> *faixa =
+    idade &lt; <span class="num">18</span> ? <span class="str">"menor de idade"</span> :
+    (idade &lt; <span class="num">60</span> ? <span class="str">"adulto"</span> : <span class="str">"idoso"</span>);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. TODA CONDIÇÃO É UM NÚMERO -->
   <section class="slide" data-slide>
     <div class="kicker">Decisões</div>
     <h1>C não tem um tipo booleano</h1>
@@ -629,7 +746,7 @@
     <div class="footer"><span>Decisões</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 12. SWITCH: DECISÃO EM CASCATA -->
+  <!-- 13. SWITCH: DECISÃO EM CASCATA -->
   <section class="slide" data-slide>
     <div class="kicker">Decisões</div>
     <h1>switch testa em cascata, até bater</h1>
@@ -646,7 +763,7 @@
     <div class="footer"><span>Decisões</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 13. FECHAMENTO -->
+  <!-- 14. FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>

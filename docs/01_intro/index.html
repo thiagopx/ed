@@ -500,6 +500,101 @@
     color: var(--ink-soft);
   }
 
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
   footer.closing {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -637,7 +732,10 @@
       caso de <code>age</code> no exemplo <em>Primeiro programa</em> entre a declaração
       (<code>int age;</code>) e a leitura pelo <code>scanf</code>: usar seu valor nesse intervalo leria "lixo
       de memória". Por isso a boa prática é nunca presumir um valor inicial e sempre inicializar
-      explicitamente uma variável antes de lê-la.
+      explicitamente uma variável antes de lê-la. O exemplo <em>Conversão e variável indefinida</em> imprime
+      esse lixo de propósito, para tornar o problema visível — e mostra um bônus: o próprio compilador
+      (<code>gcc -Wall</code>) já avisa sobre isso com um <code>-Wuninitialized</code> antes mesmo do programa
+      rodar, o que ajuda a pegar esse tipo de erro cedo.
     </p>
 
     <h3>Operadores</h3>
@@ -668,7 +766,11 @@
       (pré-fixado, <code>++x</code>) ou depois (pós-fixado, <code>x++</code>) da variável — a diferença
       aparece quando o operador é usado dentro de uma expressão maior: no pré-fixado, a variável é
       incrementada primeiro, e o novo valor é o que entra na expressão; no pós-fixado, o valor atual entra na
-      expressão, e só depois a variável é incrementada.
+      expressão, e só depois a variável é incrementada. Só é possível aplicar <code>++</code>/<code>--</code>
+      diretamente a uma variável, nunca a uma expressão como <code>(a + 1)++</code>. O exemplo <em>Incremento
+      e decremento</em> isola cada uma das quatro formas (<code>x++</code>, <code>++x</code>, <code>y--</code>,
+      <code>--y</code>) em sua própria instrução — misturar, por exemplo, <code>x</code> e <code>x++</code> no
+      mesmo <code>printf</code> é um erro comum que leva a um comportamento não bem definido pela linguagem.
     </p>
 
     <h4>Operadores relacionais e lógicos</h4>
@@ -678,7 +780,12 @@
       (<code>0</code>) — é assim que o exemplo <em>Fahrenheit para Celsius</em> decide se
       <code>celsius &lt; 0</code>. Os operadores lógicos combinam expressões booleanas:
       <code>&amp;&amp;</code> (E) só é verdadeiro se ambos os lados forem verdadeiros, <code>||</code> (OU) é
-      verdadeiro se pelo menos um lado for, e <code>!</code> (NÃO) inverte um valor lógico.
+      verdadeiro se pelo menos um lado for, e <code>!</code> (NÃO) inverte um valor lógico. Expressões
+      conectadas por <code>&amp;&amp;</code> ou <code>||</code> são avaliadas da esquerda para a direita, e a
+      avaliação para assim que o resultado já está decidido — chamado de <em>curto-circuito</em>: em
+      <code>a &amp;&amp; b</code>, se <code>a</code> já for falso, <code>b</code> nem chega a ser avaliado. O
+      exemplo <em>Operadores lógicos e ternário</em> combina os três operadores lógicos para decidir a
+      elegibilidade a um benefício a partir da idade e da renda.
     </p>
 
     <h4>Operador sizeof</h4>
@@ -697,7 +804,10 @@
       números inteiros. Também é possível forçar uma conversão explicitamente com um modelador
       (<em>cast</em>): <code>(float)a / b</code> converte <code>a</code> para <code>float</code> antes da
       divisão, garantindo um resultado com casas decimais mesmo que <code>a</code> e <code>b</code> sejam
-      <code>int</code>.
+      <code>int</code>. O exemplo <em>Conversão e variável indefinida</em> deixa a pegadinha lado a lado: uma
+      divisão entre dois <code>int</code> trunca o resultado antes mesmo de ser guardada numa variável
+      <code>float</code>, e só o <em>cast</em> aplicado a um operando, antes da divisão acontecer, preserva as
+      casas decimais.
     </p>
 
     <h3>Entrada e saída básicas</h3>
@@ -762,7 +872,9 @@
       decide qual de dois valores usar: <code>condição ? valor_se_verdadeiro : valor_se_falso</code>. Por
       exemplo, <code>int maior = (a &gt; b) ? a : b;</code> guarda em <code>maior</code> o maior valor entre
       <code>a</code> e <code>b</code>, substituindo um <code>if-else</code> de quatro linhas por uma única
-      expressão.
+      expressão. É possível também encadear ternários para decidir entre mais de duas opções — o exemplo
+      <em>Operadores lógicos e ternário</em> (visto na seção de Operadores) usa um ternário dentro de outro
+      para classificar uma idade em três faixas.
     </p>
 
     <h3>Seleção</h3>
@@ -810,6 +922,24 @@
         <span class="row-title"><span class="row-icon">🔗</span>Calculadora</span>
       </div>
       <p class="row-desc">Uma calculadora de dois operandos que usa switch para escolher a operação.</p>
+    </li>
+    <li class="example-row" data-target="incremento" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Incremento e decremento</span>
+      </div>
+      <p class="row-desc">Pré e pós-incremento (e decremento) lado a lado, cada um isolado em sua própria instrução.</p>
+    </li>
+    <li class="example-row" data-target="logico-ternario" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Operadores lógicos e ternário</span>
+      </div>
+      <p class="row-desc">&amp;&amp;, || e ! combinados para decidir elegibilidade, e um ternário aninhado para classificar faixas etárias.</p>
+    </li>
+    <li class="example-row" data-target="conversao-indefinida" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Conversão e variável indefinida</span>
+      </div>
+      <p class="row-desc">Divisão truncada vs. cast explícito, e o que acontece ao ler uma variável antes de inicializá-la.</p>
     </li>
   </ul>
 
@@ -871,6 +1001,24 @@
           Declarar (<code>int age;</code>) e atribuir um valor (via <code>scanf</code>) são passos
           diferentes: logo após a declaração, <code>age</code> não tem nenhum valor definido — por
           isso o chip da variável mostra “—” até o <code>scanf</code> ser executado.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria se o <code>scanf</code> fosse chamado <strong>depois</strong> do
+            <code>printf</code> que usa <code>age</code>, em vez de antes?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O <code>printf</code> imprimiria um valor de lixo de memória, já que <code>age</code> ainda não teria sido inicializado.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa não compilaria.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>printf</code> esperaria automaticamente a entrada do usuário antes de imprimir.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Nada mudaria — o compilador reordena os comandos automaticamente para o programa funcionar.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem o <code>scanf</code> executado antes, <code>age</code> ainda teria um valor indefinido — o <code>printf</code> imprimiria lixo de memória, não um erro nem um valor previsível.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Sem o <code>scanf</code> executado antes, <code>age</code> ainda teria um valor indefinido — o <code>printf</code> imprimiria lixo de memória. O C não reordena comandos nem impede a compilação por isso.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -964,6 +1112,26 @@ Size of signed short: 2 bytes</pre>
           comportamento mesmo em compiladores onde <code>char</code> puro seria
           <code>unsigned</code>.
         </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Todos os usos de <code>sizeof</code> neste código recebem um <strong>tipo</strong> entre
+            parênteses (ex.: <code>sizeof(int)</code>). O que aconteceria se, em vez disso, o código
+            escrevesse <code>sizeof(idade)</code>, sendo <code>idade</code> uma variável do tipo
+            <code>int</code> já declarada?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Erro de compilação — <code>sizeof</code> só aceita tipos, nunca variáveis.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O mesmo resultado, 4 bytes — <code>sizeof</code> também aceita uma variável, devolvendo o tamanho do tipo dela.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O valor atual armazenado em <code>idade</code>, não o tamanho em bytes.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Um valor diferente, já que variáveis ocupam mais espaço na memória do que tipos puros.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>sizeof</code> aceita tanto um tipo quanto uma expressão ou variável; aplicado a uma variável, devolve o tamanho do tipo dela — aqui, os mesmos 4 bytes de <code>sizeof(int)</code>, nunca o valor armazenado.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>sizeof</code> também aceita uma variável (não só um tipo), devolvendo o tamanho do tipo dela — aqui, os mesmos 4 bytes de <code>sizeof(int)</code>.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1034,6 +1202,24 @@ It's freezing outside!</pre>
           Sem os parênteses extras, <code>* 5</code> primeiro promove a conta para
           <code>float</code> (porque <code>fahrenheit - 32</code> já é <code>float</code>), e só
           depois a divisão por <code>9</code> acontece em ponto flutuante.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O que aconteceria com o resultado da conversão se <code>fahrenheit</code> e
+            <code>celsius</code> fossem declaradas como <code>int</code> em vez de <code>float</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O programa não compilaria, pois <code>scanf("%f", ...)</code> exige uma variável <code>float</code>.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Nada mudaria — a fórmula continuaria produzindo o mesmo resultado.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>A divisão final por 9 passaria a truncar (divisão inteira), mudando o resultado da conversão em boa parte dos casos.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa passaria a imprimir sempre "It's freezing outside!", independente da temperatura.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Com <code>int</code>, <code>(fahrenheit - 32) * 5</code> continuaria um valor inteiro, mas a divisão final por <code>9</code> se tornaria uma divisão inteira, truncando o resultado — a conversão deixaria de ser precisa.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Com <code>int</code>, a divisão final por <code>9</code> se tornaria uma divisão inteira (truncada), alterando o resultado da fórmula em boa parte dos casos — o <code>scanf("%f", ...)</code> continuaria compilando, só leria errado.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1126,6 +1312,324 @@ Result: 2.500000</pre>
           o caractere de nova linha (<code>\n</code>) deixado no buffer pelo <code>scanf("%lf",
           ...)</code> anterior, em vez do operador digitado. É uma pegadinha clássica de misturar
           <code>%c</code> com outros formatos de <code>scanf</code>.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O <code>case '+'</code> não tem nenhum <code>if</code> extra, diferente do
+            <code>case '/'</code>. O que aconteceria se o <code>break;</code> do <code>case '+'</code>
+            fosse removido?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Erro de compilação — todo <code>case</code> é obrigado a terminar com <code>break</code>.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Depois de calcular a soma, a execução "cairia" (fall-through) para o <code>case '-'</code> seguinte, executando-o também.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O <code>switch</code> pularia direto para o <code>default</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Nada mudaria — o <code>switch</code> já para automaticamente ao fim de cada <code>case</code> que bateu.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem o <code>break</code>, a execução não para no fim do <code>case '+'</code> — ela "cai" (fall-through) para o próximo <code>case</code> na ordem em que aparece no código, executando-o também, mesmo que o operador digitado não bata com ele.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Sem o <code>break</code>, a execução "cai" (fall-through) para o <code>case</code> seguinte no código (<code>'-'</code>), executando-o também — <code>switch</code> não para sozinho ao fim de um <code>case</code> que bateu.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INCREMENTO E DECREMENTO ================= -->
+  <section class="detail" id="panel-incremento" data-panel hidden>
+    <div class="detail-head">
+      <h2>Incremento e decremento</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/05_increment_decrement" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> x = <span class="num">5</span>;
+    <span class="fn">printf</span>(<span class="str">"x = %d\n"</span>, x);
+
+    <span class="kw">int</span> resultado_pos = x++;
+    <span class="fn">printf</span>(<span class="str">"x++ devolveu %d (valor de x antes do incremento)\n"</span>, resultado_pos);
+    <span class="fn">printf</span>(<span class="str">"agora x = %d\n"</span>, x);
+
+    <span class="kw">int</span> resultado_pre = ++x;
+    <span class="fn">printf</span>(<span class="str">"++x devolveu %d (valor de x depois do incremento)\n"</span>, resultado_pre);
+    <span class="fn">printf</span>(<span class="str">"agora x = %d\n"</span>, x);
+
+    <span class="kw">int</span> y = <span class="num">10</span>;
+    <span class="fn">printf</span>(<span class="str">"\ny = %d\n"</span>, y);
+
+    <span class="kw">int</span> resultado_pos_y = y--;
+    <span class="fn">printf</span>(<span class="str">"y-- devolveu %d (valor de y antes do decremento)\n"</span>, resultado_pos_y);
+    <span class="fn">printf</span>(<span class="str">"agora y = %d\n"</span>, y);
+
+    <span class="kw">int</span> resultado_pre_y = --y;
+    <span class="fn">printf</span>(<span class="str">"--y devolveu %d (valor de y depois do decremento)\n"</span>, resultado_pre_y);
+    <span class="fn">printf</span>(<span class="str">"agora y = %d\n"</span>, y);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona pré e pós-incremento</h3>
+        <p>
+          Cada uma das quatro formas (<code>x++</code>, <code>++x</code>, <code>y--</code>, <code>--y</code>)
+          é isolada em sua própria instrução, guardando o valor devolvido numa variável separada
+          (<code>resultado_pos</code>, <code>resultado_pre</code> etc.) antes de imprimir — isso evita
+          misturar, por exemplo, <code>x</code> e <code>x++</code> no mesmo <code>printf</code>, o que a
+          linguagem C não define bem o resultado. No pós-fixado (<code>x++</code>), a expressão usa o valor
+          atual de <code>x</code>, e só depois <code>x</code> é incrementado. No pré-fixado (<code>++x</code>),
+          <code>x</code> é incrementado primeiro, e a expressão já usa o novo valor.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="incremento">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">x = 5
+x++ devolveu 5 (valor de x antes do incremento)
+agora x = 6
+++x devolveu 7 (valor de x depois do incremento)
+agora x = 7
+
+y = 10
+y-- devolveu 10 (valor de y antes do decremento)
+agora y = 9
+--y devolveu 8 (valor de y depois do decremento)
+agora y = 8</pre>
+
+        <div class="callout">
+          <code>resultado_pos</code> ("pos" de pós-fixado) guarda o valor de <code>x</code>
+          <strong>antes</strong> do incremento; <code>resultado_pre</code> guarda o valor
+          <strong>depois</strong>. O mesmo padrão se repete com <code>y--</code>/<code>--y</code>. Reparar
+          que <code>++</code> e <code>--</code> só podem ser aplicados diretamente a uma variável — uma
+          expressão como <code>(x + 1)++</code> não é válida em C.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Na linha <code>int resultado_pre = ++x;</code>, se o código usasse <code>x++</code> em vez de
+            <code>++x</code> nesse ponto — sabendo que <code>x</code> vale 6 antes dessa linha executar —
+            qual seria o valor guardado em <code>resultado_pre</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>6</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>7</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>5</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Erro de compilação.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>x++</code> é pós-fixado: a expressão usa o valor atual de <code>x</code> (6) antes de incrementar; <code>x</code> se tornaria 7 em seguida, mas <code>resultado_pre</code> guardaria 6.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é 6: pós-fixado (<code>x++</code>) usa o valor de <code>x</code> antes do incremento (aqui, 6) — só depois <code>x</code> muda para 7.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OPERADORES LÓGICOS E TERNÁRIO ================= -->
+  <section class="detail" id="panel-logico-ternario" data-panel hidden>
+    <div class="detail-head">
+      <h2>Operadores lógicos e ternário</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/06_logical_and_ternary" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> idade;
+    <span class="kw">float</span> renda_mensal;
+
+    <span class="fn">printf</span>(<span class="str">"Digite a idade: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;idade);
+    <span class="fn">printf</span>(<span class="str">"Digite a renda mensal: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, &amp;renda_mensal);
+
+    <span class="kw">int</span> maior_de_idade = idade &gt;= <span class="num">18</span>;
+    <span class="kw">int</span> renda_baixa = renda_mensal &lt; <span class="num">2000.0</span>;
+
+    <span class="cmt">/* Operadores logicos: &amp;&amp; (E), || (OU), ! (negacao) */</span>
+    <span class="kw">int</span> elegivel = maior_de_idade &amp;&amp; renda_baixa;
+    <span class="kw">int</span> precisa_documento_extra = !maior_de_idade || renda_mensal &gt; <span class="num">5000.0</span>;
+
+    <span class="fn">printf</span>(<span class="str">"\nElegivel para o beneficio: %s\n"</span>, elegivel ? <span class="str">"sim"</span> : <span class="str">"nao"</span>);
+    <span class="fn">printf</span>(<span class="str">"Precisa de documento extra: %s\n"</span>, precisa_documento_extra ? <span class="str">"sim"</span> : <span class="str">"nao"</span>);
+
+    <span class="cmt">/* Operador condicional (ternario): teste ? valor_se_verdadeiro : valor_se_falso */</span>
+    <span class="kw">const</span> <span class="kw">char</span> *faixa = idade &lt; <span class="num">18</span> ? <span class="str">"menor de idade"</span> : (idade &lt; <span class="num">60</span> ? <span class="str">"adulto"</span> : <span class="str">"idoso"</span>);
+    <span class="fn">printf</span>(<span class="str">"Faixa etaria: %s\n"</span>, faixa);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funcionam os operadores lógicos e o ternário</h3>
+        <p>
+          <code>&amp;&amp;</code> (E) só resulta em verdadeiro se os dois lados forem verdadeiros;
+          <code>||</code> (OU) resulta em verdadeiro se pelo menos um lado for; <code>!</code> (NÃO) inverte
+          um valor lógico. As duas primeiras chamadas de <code>printf</code> usam o operador ternário
+          (<code>?:</code>) só para escolher a <em>string</em> a imprimir (<code>"sim"</code> ou
+          <code>"nao"</code>); a última usa um ternário <strong>aninhado</strong> — o resultado do primeiro
+          <code>?:</code> é, ele mesmo, outro <code>?:</code> — para escolher entre três faixas etárias em
+          vez de só duas.
+        </p>
+
+        <h3>Execução passo a passo — idade = 25, renda_mensal = 1500</h3>
+        <div class="stepper" data-stepper="logico-ternario">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Digite a idade: <span class="in">25</span>
+Digite a renda mensal: <span class="in">1500</span>
+
+Elegivel para o beneficio: sim
+Precisa de documento extra: nao
+Faixa etaria: adulto</pre>
+
+        <div class="callout">
+          <code>&amp;&amp;</code> e <code>||</code> avaliam da esquerda para a direita e param assim que o
+          resultado já está decidido (<em>curto-circuito</em>): em <code>a &amp;&amp; b</code>, se
+          <code>a</code> já for falso, <code>b</code> nem chega a ser avaliado. Aqui não há efeito colateral
+          nos operandos, mas isso passa a importar quando um dos lados tem um efeito, como um incremento.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se a idade digitada fosse 15 (menor que 18) em vez de 25, o que seria impresso para "Precisa de
+            documento extra"?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>sim</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>nao</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Erro de compilação.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Depende só da renda digitada.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Com idade 15, <code>maior_de_idade</code> seria 0, então <code>!maior_de_idade</code> seria 1 (verdadeiro) — o <code>||</code> já teria o lado esquerdo verdadeiro e nem precisaria avaliar <code>renda_mensal &gt; 5000.0</code> (curto-circuito). O resultado seria "sim".</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é "sim": com idade 15, <code>!maior_de_idade</code> já seria verdadeiro, e o <code>||</code> (curto-circuito) decide o resultado sem sequer precisar olhar a renda.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONVERSÃO E VARIÁVEL INDEFINIDA ================= -->
+  <section class="detail" id="panel-conversao-indefinida" data-panel hidden>
+    <div class="detail-head">
+      <h2>Conversão e variável indefinida</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/01_intro/07_conversion_and_uninitialized" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="cmt">/* ---- Parte 1: conversao de tipo ---- */</span>
+    <span class="kw">int</span> total_pontos = <span class="num">17</span>;
+    <span class="kw">int</span> quantidade_provas = <span class="num">5</span>;
+
+    <span class="cmt">/* Divisao entre dois inteiros trunca o resultado */</span>
+    <span class="kw">float</span> media_errada = total_pontos / quantidade_provas;
+    <span class="fn">printf</span>(<span class="str">"Media (sem conversao): %.2f\n"</span>, media_errada);
+
+    <span class="cmt">/* Convertendo um operando para float antes da divisao (cast explicito) */</span>
+    <span class="kw">float</span> media_certa = (<span class="kw">float</span>) total_pontos / quantidade_provas;
+    <span class="fn">printf</span>(<span class="str">"Media (com conversao explicita): %.2f\n"</span>, media_certa);
+
+    <span class="cmt">/* ---- Parte 2: variavel com valor indefinido ---- */</span>
+    <span class="kw">int</span> nao_inicializada;
+    <span class="fn">printf</span>(<span class="str">"\nValor de uma variavel nao inicializada: %d\n"</span>, nao_inicializada);
+    <span class="fn">printf</span>(<span class="str">"(Esse numero nao tem significado - e o que sobrou na memoria antes de ser usada. Nunca leia uma variavel antes de dar um valor a ela.)\n"</span>);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funcionam a conversão e a variável indefinida</h3>
+        <p>
+          A primeira metade do programa mostra a mesma divisão calculada de duas formas: em
+          <code>media_errada</code>, os dois operandos (<code>total_pontos</code> e
+          <code>quantidade_provas</code>) são <code>int</code>, então a divisão já acontece truncada — o
+          resultado (inteiro) só é convertido para <code>float</code> <em>depois</em> de pronto, ao ser
+          guardado. Em <code>media_certa</code>, o <em>cast</em> <code>(float)</code> converte
+          <code>total_pontos</code> para <code>float</code> <em>antes</em> da divisão acontecer, o que já
+          basta para toda a conta ser feita em ponto flutuante. A segunda metade declara
+          <code>nao_inicializada</code> e a lê sem nunca ter atribuído um valor a ela — o C não zera
+          variáveis automaticamente, então o que é lido é lixo de memória.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="conversao-indefinida">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Media (sem conversao): 3.00
+Media (com conversao explicita): 3.40
+
+Valor de uma variavel nao inicializada: 32765
+(Esse numero nao tem significado - e o que sobrou na memoria antes de ser usada. Nunca leia uma variavel antes de dar um valor a ela.)</pre>
+
+        <div class="callout">
+          Compilar este arquivo com <code>gcc -Wall</code> já avisa sobre o problema antes mesmo de rodar:
+          <code>warning: 'nao_inicializada' is used uninitialized</code> — o compilador ajuda a pegar esse
+          tipo de erro cedo.
+        </div>
+
+        <div class="callout">
+          O valor <code>32765</code> impresso acima é <strong>lixo de memória</strong> — o que sobrava
+          naquele endereço antes de ser lido — e não é garantido: pode mudar entre compilações, sistemas ou
+          execuções diferentes. O que importa não é esse número específico, e sim a lição: nunca leia uma
+          variável antes de inicializá-la.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se o código trocasse <code>(float) total_pontos / quantidade_provas</code> por
+            <code>(float) (total_pontos / quantidade_provas)</code> — aplicando o <em>cast</em> só
+            <strong>depois</strong> da divisão, em vez de antes — qual seria o valor impresso para
+            <code>media_certa</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>3.00</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>3.40</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>17.00</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Erro de compilação.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Com o <em>cast</em> fora dos parênteses da divisão, <code>total_pontos / quantidade_provas</code> já aconteceria como divisão inteira (17 / 5 = 3, truncado) antes do <code>(float)</code> agir — o resultado seria 3.00, igual ao de <code>media_errada</code>.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é 3.00 — movendo o <code>(float)</code> para fora, a divisão inteira já teria truncado o resultado para 3 antes da conversão; o <em>cast</em>, tarde demais, não recupera as casas decimais perdidas.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1236,6 +1740,63 @@ Result: 2.500000</pre>
         { line: 42, vars: {}, desc: "printf exibe: “Result: 2.500000”." },
         { line: 44, vars: {}, desc: "return 0; — o programa termina com sucesso." }
       ]
+    },
+    incremento: {
+      vars: ["x", "resultado_pos", "resultado_pre", "y", "resultado_pos_y", "resultado_pre_y"],
+      steps: [
+        { line: 5, vars: { x: "5" }, desc: "int x = 5; declara e inicializa x com 5." },
+        { line: 6, vars: {}, desc: "printf exibe: “x = 5”." },
+        { line: 8, vars: { resultado_pos: "5", x: "6" }, desc: "x++ (pós-fixado): a expressão usa o valor ATUAL de x (5) — é isso que resultado_pos recebe. Só depois disso x é incrementado para 6." },
+        { line: 9, vars: {}, desc: "printf exibe: “x++ devolveu 5 (valor de x antes do incremento)”." },
+        { line: 10, vars: {}, desc: "printf exibe: “agora x = 6”." },
+        { line: 12, vars: { resultado_pre: "7", x: "7" }, desc: "++x (pré-fixado): x é incrementado primeiro (para 7), e é esse novo valor que resultado_pre recebe." },
+        { line: 13, vars: {}, desc: "printf exibe: “++x devolveu 7 (valor de x depois do incremento)”." },
+        { line: 14, vars: {}, desc: "printf exibe: “agora x = 7”." },
+        { line: 16, vars: { y: "10" }, desc: "int y = 10; declara e inicializa y com 10." },
+        { line: 17, vars: {}, desc: "printf exibe: “y = 10”." },
+        { line: 19, vars: { resultado_pos_y: "10", y: "9" }, desc: "y-- (pós-fixado): a expressão usa o valor ATUAL de y (10); só depois y é decrementado para 9." },
+        { line: 20, vars: {}, desc: "printf exibe: “y-- devolveu 10 (valor de y antes do decremento)”." },
+        { line: 21, vars: {}, desc: "printf exibe: “agora y = 9”." },
+        { line: 23, vars: { resultado_pre_y: "8", y: "8" }, desc: "--y (pré-fixado): y é decrementado primeiro (para 8), e é esse novo valor que resultado_pre_y recebe." },
+        { line: 24, vars: {}, desc: "printf exibe: “--y devolveu 8 (valor de y depois do decremento)”." },
+        { line: 25, vars: {}, desc: "printf exibe: “agora y = 8”." },
+        { line: 27, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "logico-ternario": {
+      vars: ["idade", "renda_mensal", "maior_de_idade", "renda_baixa", "elegivel", "precisa_documento_extra", "faixa"],
+      steps: [
+        { line: 5, vars: {}, desc: "int idade; declara idade, ainda sem valor." },
+        { line: 6, vars: {}, desc: "float renda_mensal; declara renda_mensal, ainda sem valor." },
+        { line: 8, vars: {}, desc: "printf exibe o prompt: “Digite a idade: ”." },
+        { line: 9, vars: { idade: "25" }, desc: "scanf lê a idade digitada: idade = 25." },
+        { line: 10, vars: {}, desc: "printf exibe o prompt: “Digite a renda mensal: ”." },
+        { line: 11, vars: { renda_mensal: "1500.0" }, desc: "scanf lê a renda digitada: renda_mensal = 1500." },
+        { line: 13, vars: { maior_de_idade: "1" }, desc: "idade >= 18 → 25 >= 18 é verdadeiro: maior_de_idade = 1." },
+        { line: 14, vars: { renda_baixa: "1" }, desc: "renda_mensal < 2000.0 → 1500 < 2000 é verdadeiro: renda_baixa = 1." },
+        { line: 17, vars: { elegivel: "1" }, desc: "&& (E): elegivel = maior_de_idade && renda_baixa = 1 && 1 = 1 — só é 1 se AMBOS os lados forem 1." },
+        { line: 18, vars: { precisa_documento_extra: "0" }, desc: "! e || (NÃO, OU): precisa_documento_extra = !maior_de_idade || (renda_mensal > 5000.0) = !1 || 0 = 0 || 0 = 0." },
+        { line: 20, vars: {}, desc: "printf usa o ternário elegivel ? \"sim\" : \"nao\" → elegivel é 1, então imprime “Elegivel para o beneficio: sim”." },
+        { line: 21, vars: {}, desc: "printf usa o mesmo padrão → precisa_documento_extra é 0, então imprime “Precisa de documento extra: nao”." },
+        { line: 24, vars: { faixa: "\"adulto\"" }, desc: "ternário aninhado: idade < 18? não (25) → avalia o segundo ?: → idade < 60? sim (25 < 60) → faixa = \"adulto\"." },
+        { line: 25, vars: {}, desc: "printf exibe: “Faixa etaria: adulto”." },
+        { line: 27, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "conversao-indefinida": {
+      vars: ["total_pontos", "quantidade_provas", "media_errada", "media_certa", "nao_inicializada"],
+      steps: [
+        { line: 6, vars: { total_pontos: "17" }, desc: "int total_pontos = 17;" },
+        { line: 7, vars: { quantidade_provas: "5" }, desc: "int quantidade_provas = 5;" },
+        { line: 10, vars: { media_errada: "3.00" }, desc: "total_pontos / quantidade_provas: os dois operandos são int, então a divisão é inteira — 17 / 5 = 3 (trunca). Só depois esse 3 é convertido para float ao ser guardado em media_errada." },
+        { line: 11, vars: {}, desc: "printf exibe: “Media (sem conversao): 3.00”." },
+        { line: 14, vars: { media_certa: "3.40" }, desc: "(float) converte total_pontos para 17.0 ANTES da divisão — a divisão passa a ser em ponto flutuante: 17.0 / 5 = 3.4." },
+        { line: 15, vars: {}, desc: "printf exibe: “Media (com conversao explicita): 3.40”." },
+        { line: 18, vars: { nao_inicializada: "?" }, desc: "int nao_inicializada; só reserva espaço na memória — nenhum valor é atribuído a ela." },
+        { line: 19, vars: { nao_inicializada: "32765 (lixo)" }, desc: "printf lê e imprime o que já estava naquele espaço de memória — aqui, 32765. Esse valor não é garantido; pode variar entre compilações e sistemas." },
+        { line: 20, vars: {}, desc: "printf exibe a explicação: esse número é lixo de memória, não deve ser usado." },
+        { line: 22, vars: {}, desc: "return 0; — o programa termina." }
+      ]
     }
   };
 
@@ -1329,6 +1890,35 @@ Result: 2.500000</pre>
   document.querySelectorAll("[data-stepper]").forEach(function (root) {
     var config = STEPS[root.getAttribute("data-stepper")];
     if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
   });
 })();
 </script>
