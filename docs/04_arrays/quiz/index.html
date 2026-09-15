@@ -301,7 +301,7 @@
 
   <div class="quiz-header">
     <h2>🧮 Quiz — Vetores e Matrizes</h2>
-    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 11</span>
   </div>
 
   <div class="progress-bar-track">
@@ -312,7 +312,7 @@
 
   <div class="result-screen" id="result-screen">
     <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de vetores e matrizes!</div>
-    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-score" id="result-score">0 / 11</div>
     <div class="result-msg" id="result-msg"></div>
     <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
   </div>
@@ -415,6 +415,22 @@ v[15] = 99; <span class="cmt">// v só tem 10 posições (0 a 9)</span>`,
     correctIndex: 1,
     explainCorrect: "O nome de um vetor já é um ponteiro para seu primeiro elemento; ao passar o vetor para a função, é esse ponteiro (o endereço) que é copiado. Como v e o vetor original apontam para o mesmo bloco de memória, alterações feitas através de v[i] afetam o vetor original.",
     explainIncorrect: "A resposta correta é a segunda: o parâmetro v recebe o endereço do vetor original, não uma cópia dos valores — por isso as alterações são visíveis fora da função."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Vetor somente leitura",
+    text: "Uma função só lê os elementos do vetor recebido, sem alterá-los. Qual assinatura sinaliza isso ao compilador (e a quem lê o código), impedindo qualquer escrita acidental em v dentro da função?",
+    code: `<span class="type">float</span> media(<span class="type">int</span> n, /* ??? */ v);`,
+    options: [
+      "float *v",
+      "const float *v",
+      "static float *v",
+      "float v[100]"
+    ],
+    correctIndex: 1,
+    explainCorrect: "O modificador const antes do tipo apontado (const float *v) diz ao compilador que a função não deve escrever através de v — qualquer tentativa de v[i] = ... dentro da função vira erro de compilação, e quem lê a assinatura sabe, sem abrir o corpo da função, que o vetor original está protegido.",
+    explainIncorrect: "A resposta correta é const float *v. Sem o const, o parâmetro aceita leitura e escrita normalmente; é o const antes do tipo apontado que restringe a função a só ler os elementos."
   },
   {
     difficulty: "intermediario",
