@@ -477,6 +477,101 @@
     color: var(--ink-soft);
   }
 
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
   footer.closing {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -660,6 +755,12 @@
       <img src="figs/fig9-1.jpg" alt="Um polígono representado por uma sequência de vértices p0, p1, p2, ... no plano cartesiano, com a área sombreada decomposta em faixas trapezoidais entre vértices consecutivos e o eixo horizontal, ilustrando a soma de trapézios para calcular a área do polígono.">
       <figcaption>Figura 9.1: um polígono como sequência de vértices <code>p_i = (x_i, y_i)</code> — cada vértice é um <code>Point2D</code>, e o polígono inteiro é um vetor dessas structs. A área sombreada mostra a técnica de somar faixas trapezoidais entre vértices consecutivos para calcular a área total do polígono.</figcaption>
     </figure>
+    <p>
+      O exemplo <em>Vetor de vértices, union e enum</em> deste módulo aplica exatamente essa técnica, sem
+      ainda calcular a área: um vetor de 4 <code>Point2D</code> guarda os vértices de um polígono retangular,
+      e um laço percorre o vetor por índice (<code>poligono[i].x</code>, <code>poligono[i].y</code>) para
+      imprimir cada vértice — a mesma organização da Figura 9.1 acima, só sem a soma de trapézios.
+    </p>
 
     <h4>Vetores de ponteiros para estruturas</h4>
     <p>
@@ -696,6 +797,13 @@ v.f = <span class="num">3.14</span>;    <span class="cmt">// sobrescreve os mesm
       <em>ou</em> um <code>float</code>, nunca os dois ao mesmo tempo, sem precisar do espaço somado dos
       dois tipos como uma struct exigiria.
     </p>
+    <p>
+      O exemplo <em>Vetor de vértices, union e enum</em> traz essa ideia em código real: uma union
+      <code>Valor</code> com campos <code>como_inteiro</code> (<code>int</code>) e <code>como_real</code>
+      (<code>float</code>). Depois de <code>v.como_real = 3.14f;</code>, o próprio programa imprime
+      <code>sizeof(Valor)</code> — 4 bytes, não os 4+4=8 que uma struct equivalente ocuparia, já que os dois
+      campos compartilham o mesmo espaço.
+    </p>
 
     <h3>Tipo Enum</h3>
     <p>
@@ -714,6 +822,13 @@ v.f = <span class="num">3.14</span>;    <span class="cmt">// sobrescreve os mesm
       <code>0</code>, <code>SEG</code> vale <code>1</code>, e assim por diante, na ordem em que aparecem —
       mas usar o nome (<code>TER</code>) em vez do número (<code>2</code>) deixa o código muito mais claro
       sobre o que ele representa, sem perder a eficiência de comparar e armazenar um inteiro simples.
+    </p>
+    <p>
+      O exemplo <em>Vetor de vértices, union e enum</em> combina os dois tipos desta seção e da anterior: um
+      enum <code>TipoValor</code> (<code>TIPO_INTEIRO</code>, <code>TIPO_REAL</code>) identifica qual campo
+      da union <code>Valor</code> está em uso naquele momento — um padrão comum, já que a union sozinha não
+      guarda essa informação (os bytes compartilhados não dizem se foram escritos como <code>int</code> ou
+      como <code>float</code>).
     </p>
 
   </div>
@@ -754,6 +869,12 @@ v.f = <span class="num">3.14</span>;    <span class="cmt">// sobrescreve os mesm
         <span class="row-title"><span class="row-icon">🔗</span>Círculo (structs aninhadas)</span>
       </div>
       <p class="row-desc">Um Circle que guarda um ponteiro para Point2D — aninhamento de structs e a ordem correta de liberação.</p>
+    </li>
+    <li class="example-row" data-target="poligono" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Vetor de vértices, union e enum</span>
+      </div>
+      <p class="row-desc">Um vetor de Point2D para os vértices de um polígono, mais uma union Valor e um enum TipoValor — espaço compartilhado na prática.</p>
     </li>
   </ul>
 
@@ -833,6 +954,26 @@ y = 4.00</pre>
           campo, para deixar claro que primeiro se segue a seta até o campo, e só depois se tira o endereço
           dele.
         </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            <code>read_point</code> recebe <code>point</code> como <code>struct point2d *point</code>
+            (ponteiro). Se a função fosse reescrita recebendo <code>struct point2d point</code> (por valor,
+            sem ponteiro) — trocando toda ocorrência de <code>point-&gt;</code> por <code>point.</code> — o
+            que aconteceria com os valores lidos do teclado?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>point.x</code> e <code>point.y</code> seriam gravados em <code>main</code> também, já que <code>scanf</code> sempre altera a variável original.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span><code>point.x</code> e <code>point.y</code> seriam gravados só na cópia local dentro de <code>read_point</code>; a struct <code>point</code> em <code>main</code> continuaria com valores indefinidos.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa não compilaria, pois <code>scanf</code> exige sempre um ponteiro como parâmetro de função.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>read_point</code> passaria a exigir dois parâmetros em vez de um.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Passar a struct por valor copia seus campos para dentro da função — <code>scanf</code> escreveria nessa cópia local, que desaparece quando <code>read_point</code> retorna. A struct <code>point</code> de <code>main</code> nunca seria tocada, ficando com lixo de memória. É exatamente por isso que o exemplo passa a struct por ponteiro.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Por valor, a struct inteira é copiada para dentro da função — <code>scanf</code> escreveria só nessa cópia local, que some ao fim de <code>read_point</code>. A <code>point</code> de <code>main</code> ficaria com valores indefinidos, sem nunca ser lida de verdade.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -904,6 +1045,25 @@ After manipulation, the 2D point has the following coordinates: (2.00, 3.00)</pr
           <code>point</code> é a struct em si (não um ponteiro para ela) até a linha em que
           <code>point_ptr</code> é declarado. Os dois operadores nunca se misturam por acidente: ponto para
           quem tem a struct, seta para quem tem um ponteiro para ela.
+        </div>
+
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Suponha que o código também declarasse <code>struct point2d outro_point;</code> e, logo depois de
+            <code>point_ptr = &amp;point;</code>, executasse <code>point_ptr = &amp;outro_point;</code>. A
+            partir dali, o que <code>point_ptr-&gt;x += 1.0;</code> passaria a alterar?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span><code>outro_point</code>, não mais <code>point</code> — <code>point</code> ficaria intocada por <code>point_ptr</code> dali em diante.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span><code>point</code> e <code>outro_point</code> ao mesmo tempo, já que <code>point_ptr</code> já apontou para as duas em algum momento.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa não compilaria, pois um ponteiro só pode receber um endereço uma única vez.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>point</code> e <code>outro_point</code> passariam a ocupar o mesmo endereço de memória.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Um ponteiro guarda um único endereço por vez — reatribuir <code>point_ptr</code> só muda para onde ele aponta agora, sem nenhum vínculo remanescente com o endereço anterior. Depois da reatribuição, <code>point_ptr-&gt;x</code> lê e escreve só em <code>outro_point</code>.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é: só <code>outro_point</code> passa a ser alterada. Um ponteiro guarda um único endereço por vez — reatribuir <code>point_ptr</code> descarta o vínculo anterior com <code>point</code>, sem afetar seu endereço de memória real.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -991,6 +1151,25 @@ y = 2.50</pre>
           guarda o mesmo endereço, mas esse endereço não pertence mais ao programa — usá-lo (por exemplo,
           <code>point-&gt;x</code> depois do <code>free</code>) seria um <em>use-after-free</em>, o mesmo
           bug já visto no módulo de alocação dinâmica, agora aplicado a uma struct em vez de um vetor.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O callout menciona que ler <code>point-&gt;x</code> depois de <code>free(point);</code> seria um
+            <em>use-after-free</em>. Por que esse tipo de acesso nem sempre falha de forma óbvia (um crash
+            imediato), tornando o bug particularmente perigoso?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Porque <code>free()</code> não libera a memória de verdade, só marca um sinalizador interno que <code>malloc</code> ignora depois.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Porque o sistema operacional impede qualquer leitura de memória liberada, sempre gerando um erro claro e imediato.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Porque o bloco liberado pode continuar com os bytes antigos por um tempo, até ser reaproveitado por outra alocação — o programa às vezes lê valores que ainda parecem corretos, mascarando o bug.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Porque o compilador substitui automaticamente qualquer acesso pós-free por zero, sem avisar.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>free()</code> devolve o bloco ao alocador, mas não apaga o conteúdo na hora — os bytes antigos costumam continuar lá até alguma alocação futura reutilizar aquele espaço. Isso faz um <em>use-after-free</em> às vezes "funcionar por acaso", o que é exatamente o que o torna perigoso: o bug pode passar despercebido em testes e só aparecer depois, de forma imprevisível.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O motivo real é que o bloco liberado costuma manter os bytes antigos por um tempo, até ser reaproveitado por outra alocação — o programa pode ler valores que ainda parecem corretos, sem nenhum erro visível, o que torna esse bug traiçoeiro de detectar.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1116,6 +1295,25 @@ Euclidean distance between the two points: 5.00</pre>
           <code>euclidean_distance</code> só os lê (ambos os parâmetros são <code>const</code>), nunca os
           modifica; o resultado (<code>5.00</code>, a hipotenusa do triângulo 3-4-5) é devolvido por valor,
           não escrito de volta em nenhum dos dois pontos.
+        </div>
+
+        <div class="check-question" data-correct="3">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            <code>euclidean_distance</code> recebe <code>point1</code> e <code>point2</code> como
+            <code>const Point2D *</code>. O que exatamente o compilador passa a impedir, dentro dessa função,
+            por causa do <code>const</code>?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Retornar um <code>float</code> como resultado da função.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Chamar <code>create_point()</code> em qualquer lugar do arquivo.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Ler os campos <code>x</code> e <code>y</code> de <code>point1</code> e <code>point2</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Atribuir um novo valor a <code>point1-&gt;x</code> ou <code>point2-&gt;y</code> dentro da função.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>const</code> promete ao compilador que a função não vai escrever nos campos apontados — qualquer tentativa de atribuição, como <code>point1-&gt;x = 0;</code>, vira erro de compilação. Ler os campos continua livre; a restrição é só sobre escrita.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é: atribuir um novo valor a um campo de <code>point1</code> ou <code>point2</code> dentro da função. <code>const</code> não impede leitura, nem chamadas a outras funções — só barra escrita nos dados apontados.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1244,6 +1442,155 @@ Euclidean distance between the two points: 5.00</pre>
           ponto <code>(2,1)</code>) já estão fixos no código, em <code>main</code>. A distância do ponto até
           o centro é <code>sqrt(2² + 1²) = sqrt(5) ≈ 2.236</code>, menor que o raio <code>5</code> — por
           isso o ponto está dentro do círculo.
+        </div>
+
+        <div class="check-question" data-correct="1">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            Se <code>free_circle</code> trocasse a ordem das duas linhas — chamando <code>free(circle);</code>
+            antes de <code>free_point(circle-&gt;center);</code> — o que aconteceria?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Nada muda — <code>free_point</code> e <code>free(circle)</code> liberam blocos independentes, a ordem entre eles é irrelevante.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa vazaria memória: depois de <code>free(circle)</code>, o único ponteiro que levava até o <code>Point2D</code> do centro (<code>circle-&gt;center</code>) não é mais seguro de acessar, e aquele bloco nunca seria liberado.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O compilador rejeitaria a troca — <code>free()</code> exige uma ordem fixa entre ponteiros aninhados.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>circle-&gt;center</code> passaria automaticamente a <code>NULL</code>, evitando qualquer problema.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Depois de <code>free(circle)</code>, ler <code>circle-&gt;center</code> para descobrir o endereço do <code>Point2D</code> aninhado já seria, ele mesmo, um use-after-free — o valor pode não ser confiável. Na prática, esse Point2D nunca mais seria liberado: um vazamento de memória. É por isso que a ordem certa libera sempre de dentro para fora — primeiro o que está aninhado, depois o que o contém.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é: vazaria memória. Depois de <code>free(circle)</code>, o ponteiro <code>circle-&gt;center</code> não é mais seguro de ler — o <code>Point2D</code> aninhado ficaria sem nenhum ponteiro válido apontando para ele, nunca sendo liberado.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VETOR DE VÉRTICES, UNION E ENUM ================= -->
+  <section class="detail" id="panel-poligono" data-panel hidden>
+    <div class="detail-head">
+      <h2>Vetor de vértices, union e enum</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/07_structs/06_union_enum_vector" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span>
+{
+    <span class="kw">float</span> x;
+    <span class="kw">float</span> y;
+} <span class="type">Point2D</span>;
+
+<span class="kw">typedef</span> <span class="kw">enum</span>
+{
+    TIPO_INTEIRO,
+    TIPO_REAL
+} <span class="type">TipoValor</span>;
+
+<span class="kw">typedef</span> <span class="kw">union</span>
+{
+    <span class="kw">int</span> como_inteiro;
+    <span class="kw">float</span> como_real;
+} <span class="type">Valor</span>;
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="type">Point2D</span> poligono[<span class="num">4</span>] = {
+        {<span class="num">0.0</span>, <span class="num">0.0</span>},
+        {<span class="num">4.0</span>, <span class="num">0.0</span>},
+        {<span class="num">4.0</span>, <span class="num">3.0</span>},
+        {<span class="num">0.0</span>, <span class="num">3.0</span>}
+    };
+
+    <span class="fn">printf</span>(<span class="str">"Vertices do poligono:\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++)
+    {
+        <span class="fn">printf</span>(<span class="str">"  p%d = (%.1f, %.1f)\n"</span>, i, poligono[i].x, poligono[i].y);
+    }
+
+    <span class="type">TipoValor</span> tipo = TIPO_REAL;
+    <span class="type">Valor</span> v;
+    v.como_real = <span class="num">3.14f</span>;
+
+    <span class="fn">printf</span>(<span class="str">"\n"</span>);
+    <span class="kw">if</span> (tipo == TIPO_INTEIRO)
+    {
+        <span class="fn">printf</span>(<span class="str">"Valor inteiro: %d\n"</span>, v.como_inteiro);
+    }
+    <span class="kw">else</span>
+    {
+        <span class="fn">printf</span>(<span class="str">"Valor real: %.2f\n"</span>, v.como_real);
+    }
+    <span class="fn">printf</span>(<span class="str">"Tamanho da union Valor: %lu bytes\n"</span>, <span class="kw">sizeof</span>(Valor));
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Vetor de Point2D, depois union e enum juntos</h3>
+        <p>
+          A primeira metade fecha a lacuna dos "Vetores de estruturas": <code>Point2D poligono[4]</code> é um
+          vetor comum, já inicializado com as coordenadas dos quatro vértices de um retângulo, percorrido por
+          índice num <code>for</code> — a mesma organização da Figura 9.1 das notas, sem a soma de trapézios.
+        </p>
+        <p>
+          A segunda metade demonstra <code>union</code> e <code>enum</code> juntos: o enum
+          <code>TipoValor</code> indica qual campo da union <code>Valor</code> está em uso —
+          <code>tipo = TIPO_REAL</code> diz que o programa deve ler <code>v.como_real</code>, não
+          <code>v.como_inteiro</code>. Como os dois campos da union compartilham o mesmo espaço de memória,
+          escrever em <code>v.como_real</code> não deixa <code>v.como_inteiro</code> com nenhum valor
+          separado — só os mesmos bytes, reinterpretados como outro tipo.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="poligono">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">Vertices do poligono:
+  p0 = (0.0, 0.0)
+  p1 = (4.0, 0.0)
+  p2 = (4.0, 3.0)
+  p3 = (0.0, 3.0)
+
+Valor real: 3.14
+Tamanho da union Valor: 4 bytes</pre>
+
+        <div class="callout">
+          A saída confirma que <code>sizeof(Valor)</code> vale <strong>4 bytes</strong>, não 4+4=8: como
+          <code>como_inteiro</code> e <code>como_real</code> compartilham o mesmo espaço dentro da union, o
+          tamanho total é o do maior campo (aqui, os dois têm 4 bytes nesta plataforma), nunca a soma dos
+          campos como aconteceria numa struct equivalente. Se o código tentasse ler
+          <code>v.como_inteiro</code> logo depois de <code>v.como_real = 3.14f;</code>, o resultado seria os
+          mesmos 4 bytes reinterpretados como <code>int</code> — um valor sem relação nenhuma com 3.14, não
+          um "3" arredondado.
+        </div>
+
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">
+            O programa imprime que <code>sizeof(Valor)</code> vale 4 bytes. Se <code>Valor</code> fosse
+            declarada como <code>struct</code> em vez de <code>union</code> — mantendo os mesmos dois campos,
+            <code>como_inteiro</code> e <code>como_real</code> — qual seria o valor mais provável de
+            <code>sizeof(Valor)</code>, e por quê?
+          </p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Ainda 4 bytes — struct e union sempre ocupam o mesmo espaço, só muda a forma de acessar os campos.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>0 bytes — <code>sizeof</code> não funciona em structs com campos de tipos diferentes.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>8 bytes — uma struct reserva espaço separado para cada campo (4 + 4), enquanto a union reserva um único espaço do tamanho do maior campo.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Depende do valor atribuído em tempo de execução — não dá para saber sem rodar o programa.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Numa struct, <code>como_inteiro</code> e <code>como_real</code> teriam endereços diferentes, cada um com seus próprios 4 bytes, coexistindo ao mesmo tempo — pelo menos 8 bytes ao todo. Na union, os dois campos apontam para o mesmo endereço, por isso <code>sizeof(Valor)</code> é 4, não 8: o tamanho do maior campo, nunca a soma deles.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A resposta certa é 8 bytes. Diferente da union (onde os campos compartilham o mesmo espaço, daí os 4 bytes), uma struct reserva um espaço separado para cada campo — <code>como_inteiro</code> e <code>como_real</code>, cada um com seus 4 bytes, coexistindo ao mesmo tempo.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1380,6 +1727,29 @@ Euclidean distance between the two points: 5.00</pre>
         { line: 81, vars: {}, desc: "free_point(my_point); libera o Point2D independente." },
         { line: 82, vars: {}, desc: "return 0; — o programa termina." }
       ]
+    },
+    poligono: {
+      vars: ["poligono", "i", "tipo", "v"],
+      steps: [
+        { line: 23, vars: { poligono: "4 vértices inicializados" }, desc: "Point2D poligono[4] = {...}; declara um vetor de 4 Point2D, cada elemento já inicializado com suas coordenadas — um vetor de structs, não vetores separados de x e de y." },
+        { line: 30, vars: {}, desc: "printf exibe o cabeçalho \"Vertices do poligono:\"." },
+        { line: 31, vars: { i: "0" }, desc: "for (int i = 0; i < 4; i++) inicia o laço — i começa em 0." },
+        { line: 33, vars: { poligono: "p0 = (0.0, 0.0)" }, desc: "poligono[i].x e poligono[i].y acessam os campos do i-ésimo Point2D do vetor — imprime \"p0 = (0.0, 0.0)\"." },
+        { line: 31, vars: { i: "1" }, desc: "i++ avança para 1; 1 < 4, o laço continua." },
+        { line: 33, vars: { poligono: "p1 = (4.0, 0.0)" }, desc: "imprime \"p1 = (4.0, 0.0)\"." },
+        { line: 31, vars: { i: "2" }, desc: "i++ avança para 2." },
+        { line: 33, vars: { poligono: "p2 = (4.0, 3.0)" }, desc: "imprime \"p2 = (4.0, 3.0)\"." },
+        { line: 31, vars: { i: "3" }, desc: "i++ avança para 3." },
+        { line: 33, vars: { poligono: "p3 = (0.0, 3.0)" }, desc: "imprime \"p3 = (0.0, 3.0)\"." },
+        { line: 31, vars: { i: "4 (fim)" }, desc: "i++ avança para 4; 4 < 4 é falso, o laço termina — os 4 vértices já foram impressos." },
+        { line: 36, vars: { tipo: "TIPO_REAL" }, desc: "TipoValor tipo = TIPO_REAL; guarda o enum que indica qual campo da union está em uso — por baixo, TIPO_REAL vale 1 (TIPO_INTEIRO vale 0)." },
+        { line: 38, vars: { v: "como_real = 3.14" }, desc: "v.como_real = 3.14f; grava 3.14 nos 4 bytes de v — como_inteiro passa a compartilhar esse mesmo espaço, sem nenhum valor próprio separado." },
+        { line: 40, vars: {}, desc: "printf(\"\\n\"); imprime uma linha em branco, separando a parte do vetor da parte da union." },
+        { line: 41, vars: {}, desc: "if (tipo == TIPO_INTEIRO) → tipo vale TIPO_REAL, a condição é falsa." },
+        { line: 47, vars: {}, desc: "else: printf(\"Valor real: %.2f\\n\", v.como_real); imprime \"Valor real: 3.14\", lendo o mesmo espaço de memória como float." },
+        { line: 49, vars: {}, desc: "sizeof(Valor) mede o tamanho da union: 4 bytes — o tamanho do maior campo (int ou float, ambos 4 bytes nesta plataforma), não a soma dos dois." },
+        { line: 51, vars: {}, desc: "return 0; — o programa termina." }
+      ]
     }
   };
 
@@ -1452,6 +1822,35 @@ Euclidean distance between the two points: 5.00</pre>
   document.querySelectorAll("[data-stepper]").forEach(function (root) {
     var config = STEPS[root.getAttribute("data-stepper")];
     if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
   });
 })();
 </script>

@@ -307,6 +307,69 @@
   .enum-strip .chip.is-accent { border-color: var(--accent); background: var(--accent-soft); }
   .enum-strip .chip.is-accent .name, .enum-strip .chip.is-accent .val { color: var(--accent); }
 
+  /* ---- vetor de structs: vértices como chips ---- */
+
+  .vertex-strip { display: flex; gap: 0.7vw; flex-wrap: wrap; justify-content: center; }
+  .vertex-strip .chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4vw;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.8vw 1.2vw;
+  }
+  .vertex-strip .chip .name { font-family: var(--font-mono); font-weight: 700; font-size: clamp(1rem, 1.7vw, 1.3rem); color: var(--accent); }
+  .vertex-strip .chip .val { font-family: var(--font-mono); font-size: clamp(0.85rem, 1.3vw, 1.05rem); color: var(--ink-faint); }
+
+  /* ---- concept-split: visual + code-panel lado a lado ---- */
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 38vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: #4FD9C4; }
+  .code-panel .fn   { color: #E8C15A; }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: #C792EA; }
+  .code-panel .cmt  { color: #8A96A3; font-style: italic; }
+  .code-panel .pp   { color: #E2685A; }
+
   /* ---- closing ---- */
 
   .cta {
@@ -365,6 +428,8 @@
     .duel { flex-direction: column; gap: 1.5vw; }
     .nestpair { flex-direction: column; }
     .memcmp { flex-direction: column; align-items: center; }
+    .concept-split { flex-direction: column; }
+    .code-panel { max-width: 90vw; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -555,53 +620,124 @@
     </div>
   </section>
 
-  <!-- 9. UNION vs STRUCT -->
+  <!-- 9. VETOR DE STRUCTS EM CÓDIGO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Vetores de estruturas</div>
+    <h1>Point2D poligono[4] — quatro vértices, um vetor só</h1>
+    <p class="sub">Cada posição já reserva espaço para um Point2D completo — sem vetores separados de x e de y.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="vertex-strip">
+            <div class="chip"><span class="name">p0</span><span class="val">(0.0, 0.0)</span></div>
+            <div class="chip"><span class="name">p1</span><span class="val">(4.0, 0.0)</span></div>
+            <div class="chip"><span class="name">p2</span><span class="val">(4.0, 3.0)</span></div>
+            <div class="chip"><span class="name">p3</span><span class="val">(0.0, 3.0)</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_union_enum_vector/main.c</div>
+            <pre><code><span class="type">Point2D</span> poligono[<span class="num">4</span>] = {
+    {<span class="num">0.0</span>, <span class="num">0.0</span>}, {<span class="num">4.0</span>, <span class="num">0.0</span>},
+    {<span class="num">4.0</span>, <span class="num">3.0</span>}, {<span class="num">0.0</span>, <span class="num">3.0</span>}
+};
+
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++)
+    <span class="fn">printf</span>(<span class="str">"p%d = (%.1f, %.1f)\n"</span>,
+        i, poligono[i].x, poligono[i].y);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Vetores de estruturas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 10. UNION vs STRUCT -->
   <section class="slide" data-slide>
     <div class="kicker">Tipo Union</div>
     <h1>Campos separados vs. espaço compartilhado</h1>
     <p class="sub">Uma struct reserva espaço para cada campo; uma union reserva um único espaço, do tamanho do maior campo.</p>
     <div class="body">
-      <div class="memcmp">
-        <div class="group">
-          <h3>struct</h3>
-          <div class="row">
-            <div class="cell">int i<span class="byt">4 bytes</span></div>
-            <div class="cell">float f<span class="byt">4 bytes</span></div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="memcmp">
+            <div class="group">
+              <h3>struct</h3>
+              <div class="row">
+                <div class="cell">int i<span class="byt">4 bytes</span></div>
+                <div class="cell">float f<span class="byt">4 bytes</span></div>
+              </div>
+              <div class="caption">campos coexistem — 8 bytes ao todo</div>
+            </div>
+            <div class="group">
+              <h3>union</h3>
+              <div class="row">
+                <div class="cell shared">int i<br>float f<span class="byt">4 bytes (compartilhados)</span></div>
+              </div>
+              <div class="caption">escrever num campo sobrescreve o outro</div>
+            </div>
           </div>
-          <div class="caption">campos coexistem — 8 bytes ao todo</div>
         </div>
-        <div class="group">
-          <h3>union</h3>
-          <div class="row">
-            <div class="cell shared">int i<br>float f<span class="byt">4 bytes (compartilhados)</span></div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_union_enum_vector/main.c</div>
+            <pre><code><span class="kw">typedef</span> <span class="kw">union</span>
+{
+    <span class="kw">int</span> como_inteiro;
+    <span class="kw">float</span> como_real;
+} <span class="type">Valor</span>;
+
+<span class="type">Valor</span> v;
+v.como_real = <span class="num">3.14f</span>;
+<span class="fn">printf</span>(<span class="str">"%lu bytes\n"</span>, <span class="kw">sizeof</span>(Valor));
+<span class="cmt">// imprime: 4 bytes (não 4+4=8)</span></code></pre>
           </div>
-          <div class="caption">escrever num campo sobrescreve o outro</div>
         </div>
       </div>
     </div>
     <div class="footer"><span>Tipo Union</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 10. ENUM -->
+  <!-- 11. ENUM -->
   <section class="slide" data-slide>
     <div class="kicker">Tipo Enum</div>
     <h1>Nomes em vez de números soltos</h1>
     <p class="sub">Cada nome do enum é, por baixo, uma constante inteira sequencial, começando em 0.</p>
     <div class="body">
-      <div class="enum-strip">
-        <div class="chip"><span class="name">DOM</span><span class="val">0</span></div>
-        <div class="chip"><span class="name">SEG</span><span class="val">1</span></div>
-        <div class="chip is-accent"><span class="name">TER</span><span class="val">2</span></div>
-        <div class="chip"><span class="name">QUA</span><span class="val">3</span></div>
-        <div class="chip"><span class="name">QUI</span><span class="val">4</span></div>
-        <div class="chip"><span class="name">SEX</span><span class="val">5</span></div>
-        <div class="chip"><span class="name">SAB</span><span class="val">6</span></div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="enum-strip">
+            <div class="chip"><span class="name">DOM</span><span class="val">0</span></div>
+            <div class="chip"><span class="name">SEG</span><span class="val">1</span></div>
+            <div class="chip is-accent"><span class="name">TER</span><span class="val">2</span></div>
+            <div class="chip"><span class="name">QUA</span><span class="val">3</span></div>
+            <div class="chip"><span class="name">QUI</span><span class="val">4</span></div>
+            <div class="chip"><span class="name">SEX</span><span class="val">5</span></div>
+            <div class="chip"><span class="name">SAB</span><span class="val">6</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">06_union_enum_vector/main.c</div>
+            <pre><code><span class="kw">typedef</span> <span class="kw">enum</span>
+{
+    TIPO_INTEIRO,
+    TIPO_REAL
+} <span class="type">TipoValor</span>;
+
+<span class="type">TipoValor</span> tipo = TIPO_REAL;
+<span class="cmt">// TIPO_INTEIRO = 0, TIPO_REAL = 1</span>
+<span class="kw">if</span> (tipo == TIPO_INTEIRO)
+    ...</code></pre>
+          </div>
+        </div>
       </div>
     </div>
     <div class="footer"><span>Tipo Enum</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 11. FECHAMENTO -->
+  <!-- 12. FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>
