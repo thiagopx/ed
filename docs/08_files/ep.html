@@ -1,0 +1,99 @@
+<div
+  style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <div
+    style="border-bottom: 2px solid #8A6D1F; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: #2c3e50; margin: 0;">🖼️ EP6: Leitor de Imagens PPM</h2>
+    <span
+      style="background-color: #8A6D1F; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
+      10 de Outubro</span>
+  </div>
+  <p><strong>O Cenário:</strong> Você vai implementar um leitor de imagens
+    coloridas no formato <strong>PPM</strong> (Portable Pixel Map), um dos
+    formatos de imagem mais simples que existem — texto puro, sem
+    compressão. A função <code>load_image_ppm</code> do
+    <a href="https://github.com/thiagopx/ed/tree/master/eps/ep5"
+      target="_blank" rel="noopener noreferrer">código base</a> já vem com
+    a estrutura pronta (a struct <code>Image</code>, a função
+    <code>write_image_to_ppm</code> que grava uma imagem, e um
+    <code>main</code> que só falta descomentar a chamada de leitura) —
+    falta só implementar a leitura. Antes de começar, vale a pena se
+    familiarizar com o formato PPM no modo texto (P3) em
+    <a href="https://paulbourke.net/dataformats/ppm/" target="_blank"
+      rel="noopener noreferrer">paulbourke.net/dataformats/ppm</a>.</p>
+  <h3
+    style="color: #8A6D1F; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    🗂️ Estrutura de um Arquivo PPM (P3)</h3>
+  <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+    <div
+      style="flex: 1; background: #fbf3de; padding: 10px; border-radius: 5px; border-left: 4px solid #8A6D1F;">
+      <strong>Número Mágico</strong><br><small><code>P3</code> — identifica
+        o formato</small></div>
+    <div
+      style="flex: 1; background: #fbf3de; padding: 10px; border-radius: 5px; border-left: 4px solid #8A6D1F;">
+      <strong>Dimensões</strong><br><small>largura e altura, em
+        pixels</small></div>
+    <div
+      style="flex: 1; background: #fbf3de; padding: 10px; border-radius: 5px; border-left: 4px solid #8A6D1F;">
+      <strong>Valor Máximo</strong><br><small>sempre <code>255</code> neste
+        EP</small></div>
+  </div>
+  <h3
+    style="color: #8A6D1F; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    📋 Requisitos Técnicos</h3>
+  <div
+    style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <ul style="margin: 0; padding-left: 20px;">
+      <li style="margin-bottom: 10px;"><strong>Assinatura da
+          Função:</strong> implemente somente o corpo de
+        <code>load_image_ppm(const char *filename, Image *image)</code> —
+        os passos esperados já estão indicados como comentários dentro
+        dela.</li>
+      <li style="margin-bottom: 10px;"><strong>Validação do
+          formato:</strong> se o número mágico não for <code>P3</code>, ou
+        o valor máximo de pixel não for <code>255</code>, exiba uma
+        mensagem de erro (o arquivo não segue o formato esperado por este
+        EP).</li>
+      <li style="margin-bottom: 10px;"><strong>Restrição:</strong> altere
+        somente o corpo de <code>load_image_ppm</code> — a struct
+        <code>Image</code>, a assinatura das funções e o restante do
+        código base devem permanecer inalterados.</li>
+    </ul>
+  </div>
+  <h3
+    style="color: #8A6D1F; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    🖥️ Passos da Leitura</h3>
+  <ol style="padding-left: 20px; font-size: 0.95em;">
+    <li>Abrir o arquivo e verificar se foi aberto com sucesso.</li>
+    <li>Ler o número mágico e validar que é <code>P3</code>.</li>
+    <li>Ler a largura, a altura e o valor máximo de pixel (validando que é
+      <code>255</code>).</li>
+    <li>Alocar a matriz de pixels de <code>image</code> com as dimensões
+      lidas.</li>
+    <li>Ler os três valores (R, G, B) de cada pixel, preenchendo a matriz.
+    </li>
+    <li>Fechar o arquivo.</li>
+  </ol>
+  <h3
+    style="color: #8A6D1F; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    💻 Exemplo de Execução</h3>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em;">$ cat input.ppm
+P3
+2 2
+255
+255 0 0 0 255 0
+0 0 255 255 255 0
+
+$ gcc ep5.c -o ep5
+$ ./ep5
+
+$ diff input.ppm output.ppm
+(sem diferenças — a imagem lida foi gravada de volta idêntica)</pre>
+  <div
+    style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
+    <strong>Dica:</strong> o campo <code>data</code> é um
+    <code>unsigned char ***</code> — pense nele como um vetor de linhas,
+    cada linha um vetor de colunas, e cada coluna um vetor de 3 valores (R,
+    G, B). Aloque nível por nível, do mais externo (altura) para o mais
+    interno (os 3 canais de cor).</div>
+</div>
