@@ -193,6 +193,15 @@
   }
   .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
   .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+  .roadmap.is-compact { gap: 0.7vw; }
+  .roadmap.is-compact li { padding-bottom: 0.7vw; }
+  .roadmap.is-compact .n { font-size: clamp(1.4rem, 2.6vw, 2.2rem); }
+  .roadmap.is-compact .t { font-size: clamp(1.1rem, 2vw, 1.6rem); }
+  .roadmap.is-compact .d { font-size: clamp(0.85rem, 1.2vw, 1rem); margin-top: 0.15vw; }
+
+  /* ---- dois visuais empilhados no mesmo slide ---- */
+
+  .stack { display: flex; flex-direction: column; align-items: center; gap: 2.4vw; width: 100%; }
 
   /* ---- cards de modos / funções ---- */
 
@@ -363,6 +372,19 @@
   .code-panel .cmt  { color: var(--code-cmt); font-style: italic; }
   .code-panel .pp   { color: var(--code-pp); }
 
+  /* variante clara: conteúdo de um arquivo (entrada/saída), não código */
+  .code-panel.is-file { background: var(--surface); border: 1px solid var(--line); box-shadow: 0 0.3vw 0 var(--line); }
+  .code-panel.is-file .file-tag { color: var(--accent); }
+  .code-panel.is-file pre { color: var(--ink); }
+  .code-panel.is-file .dim { color: var(--ink-faint); font-style: italic; }
+  .io { display: flex; flex-direction: column; gap: 1vw; align-items: stretch; width: 100%; }
+  .io .code-panel { max-width: none; padding: 0.9vw 1.4vw 1.1vw; }
+  .io .code-panel .file-tag { font-size: 0.8rem; margin-bottom: 0.5vw; }
+  .io .code-panel pre { font-size: clamp(0.85rem, 1.25vw, 1.15rem); line-height: 1.45; }
+  .concept-split.is-wide .visual-col, .concept-split.is-wide .code-col { flex: 1 1 46%; min-width: 0; }
+  .concept-split.is-wide .code-panel { max-width: none; width: 100%; }
+  .io .code-panel pre { white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hidden; }
+
   .concept-split {
     display: flex;
     align-items: center;
@@ -373,6 +395,63 @@
   }
   .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
   .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+
+  /* ---- pergunta de V ou F (par de slides, sem JS) ---- */
+
+  .vf-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+    text-align: center;
+    width: 100%;
+  }
+  .vf-label {
+    font-size: 1.1vw;
+    min-font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .vf-statement {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    line-height: 1.3;
+    max-width: 62vw;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .vf-options { display: flex; gap: 1.6vw; }
+  .vf-option {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 0.8vw 2.4vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .vf-answer {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    padding: 0.4vw 2vw;
+    border-radius: 1vw;
+  }
+  .vf-answer.is-accent { color: #fff; background: var(--accent); }
+  .vf-explanation {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 56vw;
+    margin: 0;
+  }
+  .vf-statement .mono, .vf-explanation .mono { font-family: var(--font-mono); color: var(--ink); }
 
   /* ---- closing ---- */
 
@@ -432,6 +511,8 @@
     .duel { flex-direction: column; gap: 1.5vw; }
     .concept-split { flex-direction: column; }
     .code-panel { max-width: 90vw; }
+    .vf-options { flex-direction: column; }
+    .vf-statement, .vf-explanation { max-width: 90vw; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -487,34 +568,158 @@
     </div>
   </section>
 
-  <!-- 2. ROTEIRO -->
+  <!-- 2. ROTEIRO (blocos de AULA.md) -->
   <section class="slide" data-slide>
     <div class="kicker">Nesta aula</div>
     <h1>O que vamos ver</h1>
     <div class="body">
-      <ul class="roadmap">
-        <li><span class="n">01</span><div><div class="t">Abrir e fechar arquivos</div><div class="d">fopen, os modos r/w/a/+, e por que sempre testar o retorno</div></div></li>
-        <li><span class="n">02</span><div><div class="t">Arquivos em modo texto</div><div class="d">fscanf, fgetc, fgets para ler; fprintf, fputc para escrever</div></div></li>
-        <li><span class="n">03</span><div><div class="t">Estruturação de dados</div><div class="d">caractere a caractere, linha a linha, palavras-chave — e sscanf</div></div></li>
-        <li><span class="n">04</span><div><div class="t">Arquivos em modo binário</div><div class="d">fwrite, fread, e acesso direto a um registro com fseek</div></div></li>
+      <ul class="roadmap is-compact">
+        <li><span class="n">01</span><div><div class="t">O que é um arquivo</div><div class="d">memória secundária, buffer, cursor, modo texto vs. binário, o tipo FILE</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Abrir e fechar</div><div class="d">fopen, os modos r/w/a/+, testar NULL, fclose</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Ler em modo texto</div><div class="d">fgetc, fgets, fscanf — e o cursor que avança</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Escrever em modo texto</div><div class="d">fprintf, com três arquivos abertos ao mesmo tempo</div></div></li>
+        <li><span class="n">05</span><div><div class="t">Estruturar dados em texto</div><div class="d">caractere a caractere, linha a linha, palavras-chave — e sscanf</div></div></li>
+        <li><span class="n">06</span><div><div class="t">Modo binário</div><div class="d">fwrite, fread, e acesso direto a um registro com fseek</div></div></li>
       </ul>
     </div>
     <div class="footer"><span>Arquivos</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 3. ABRIR/FECHAR, MODOS -->
+  <!-- ===== BLOCO 0 — O QUE É UM ARQUIVO ===== -->
+
+  <!-- 0.1 arquivo vs. memória principal -->
+  <section class="slide" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <h1>Um arquivo vive fora da memória do programa</h1>
+    <p class="sub">Memória secundária (disco): a informação persiste depois que o programa termina — mas acessá-la é muito mais lento do que acessar a RAM.</p>
+    <div class="body">
+      <div class="cards" style="grid-template-columns: repeat(2, 1fr); max-width: 60vw;">
+        <div class="card"><span class="fn">memória principal (RAM)</span><p>rápida · variáveis, vetores, structs · some quando o programa termina</p></div>
+        <div class="card is-accent"><span class="fn">disco (arquivo)</span><p>lenta · identificada por nome + diretório (ex.: dados.txt) · persiste — outro programa, ou outra pessoa, lê depois</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 0.2 buffer + os quatro serviços -->
+  <section class="slide" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <h1>O buffer é a zona de trânsito entre programa e disco</h1>
+    <p class="sub">O sistema operacional move blocos de alguns Kbytes de cada vez — e todo serviço de arquivo passa por esse buffer na RAM.</p>
+    <div class="body">
+      <div class="stack">
+        <div class="flow">
+          <div class="box">programa<span class="tag">pede um dado</span></div>
+          <div class="arrow">⇄</div>
+          <div class="box is-accent">buffer (RAM)<span class="tag">blocos de Kbytes</span></div>
+          <div class="arrow">⇄</div>
+          <div class="box">disco<span class="tag">acesso lento</span></div>
+        </div>
+        <div class="cards">
+          <div class="card"><span class="fn">abrir</span><p>localiza o arquivo e prepara o buffer</p></div>
+          <div class="card"><span class="fn">ler</span><p>recupera o trecho — muitas vezes já está no buffer</p></div>
+          <div class="card"><span class="fn">escrever</span><p>altera o buffer; o disco recebe depois</p></div>
+          <div class="card is-accent"><span class="fn">fechar</span><p>descarrega o buffer no disco e libera a memória</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 0.3 modo texto vs. binário -->
+  <section class="slide" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <h1>Modo texto ou modo binário: dois jeitos de guardar os dados</h1>
+    <p class="sub">Texto: uma sequência de caracteres, legível num editor comum. Binário: a cópia byte a byte do que estava na memória — compacta e eficiente, mas só o programa entende.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="demo"><div class="cell">1</div><div class="cell">2</div><div class="cell">.</div><div class="cell">5</div><div class="cell">0</div></div>
+          <div class="tag">modo texto — "12.50", legível, 5 bytes</div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="item is-bin">
+          <div class="demo"><div class="cell">41</div><div class="cell">48</div><div class="cell">00</div><div class="cell">00</div></div>
+          <div class="tag">modo binário — os 4 bytes brutos do float 12.50</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 0.4 cursor -->
+  <section class="slide" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <h1>O cursor marca onde a próxima leitura ou escrita acontece</h1>
+    <p class="sub">O arquivo é uma memória sequencial: cada leitura ou escrita avança o cursor — ao abrir para leitura, ele começa no início do arquivo.</p>
+    <div class="body">
+      <div class="recordstrip">
+        <div class="track">
+          <div class="rec is-skip">dado 0<span class="off">já lido</span></div>
+          <div class="rec is-skip">dado 1<span class="off">já lido</span></div>
+          <div class="rec is-target">dado 2<span class="off">◀ cursor: próximo</span></div>
+          <div class="rec">dado 3<span class="off">ainda não lido</span></div>
+          <div class="rec">…<span class="off">fim do arquivo</span></div>
+        </div>
+        <div class="jump">a cada leitura, o cursor avança para o dado seguinte — nunca lê o mesmo trecho duas vezes por conta própria</div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 0.5 tipo FILE -->
+  <section class="slide" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <h1>FILE: a abstração do arquivo aberto</h1>
+    <p class="sub">Um tipo da biblioteca padrão (stdio.h) que representa o arquivo aberto — toda função de arquivo recebe um FILE*. Você já usa dois sem saber: stdin e stdout, por baixo de scanf e printf.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">arquivo no disco<span class="tag">nome + diretório</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">FILE* fp<span class="tag">buffer + cursor + estado</span></div>
+        <div class="arrow">→</div>
+        <div class="box">seu programa<span class="tag">passa fp a cada função</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- V/F bloco 0 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Em modo texto, o conteúdo gravado é sempre uma cópia byte a byte da representação que os dados tinham na memória do programa.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">O que é um arquivo</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Essa é a característica do modo <em>binário</em>, não do texto. Em modo texto os dados passam por conversão/formatação (um número vira uma sequência de dígitos legíveis); a cópia byte a byte é exclusividade do modo binário, que vem mais adiante nesta aula.</p>
+    </div>
+    <div class="footer"><span>O que é um arquivo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 1 — ABRIR E FECHAR ===== -->
+
+  <!-- 1.1 fopen -->
   <section class="slide" data-slide>
     <div class="kicker">Abrir e fechar arquivos</div>
-    <h1>fopen devolve NULL quando falha</h1>
-    <p class="sub">Todo código deve testar o retorno antes de usar o arquivo.</p>
+    <h1>fopen localiza o arquivo, prepara o buffer e devolve um FILE*</h1>
+    <p class="sub">Se não conseguir — arquivo inexistente, diretório sem permissão — devolve NULL: por isso todo código testa o retorno antes de qualquer outra operação.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="cards" style="grid-template-columns: repeat(2, 1fr);">
-            <div class="card is-accent"><span class="fn">"r"</span><p>leitura — o arquivo precisa já existir</p></div>
-            <div class="card"><span class="fn">"w"</span><p>escrita — cria vazio, destrói o que já existia</p></div>
-            <div class="card"><span class="fn">"a"</span><p>escrita no final — preserva o conteúdo anterior</p></div>
-            <div class="card"><span class="fn">"+"</span><p>combinado a r/w — leitura e escrita no mesmo arquivo</p></div>
+          <div class="cards" style="grid-template-columns: 1fr;">
+            <div class="card is-accent"><span class="fn">sucesso → FILE*</span><p>arquivo encontrado, buffer preparado, cursor no início</p></div>
+            <div class="card"><span class="fn">falha → NULL</span><p>não existe (leitura) ou sem permissão de escrita no diretório</p></div>
           </div>
         </div>
         <div class="code-col">
@@ -534,18 +739,90 @@
     <div class="footer"><span>Abrir e fechar arquivos</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 4. LEITURA EM MODO TEXTO -->
+  <!-- 1.2 modos -->
   <section class="slide" data-slide>
-    <div class="kicker">Arquivos em modo texto</div>
-    <h1>Três jeitos de ler, cada um com seu grão</h1>
-    <p class="sub">Mesma família de funções do teclado — agora lendo de um FILE*.</p>
+    <div class="kicker">Abrir e fechar arquivos</div>
+    <h1>O modo diz o que você vai fazer com o arquivo</h1>
+    <p class="sub">Segundo parâmetro de fopen: leitura, escrita ou acréscimo — e texto ou binário (omitir t/b vale como texto).</p>
+    <div class="body">
+      <div class="cards" style="grid-template-columns: repeat(3, 1fr); max-width: 70vw;">
+        <div class="card is-accent"><span class="fn">"r"</span><p>leitura — o arquivo precisa já existir</p></div>
+        <div class="card"><span class="fn">"w"</span><p>escrita — cria vazio, destrói o que já existia</p></div>
+        <div class="card"><span class="fn">"a"</span><p>escrita no final — preserva o conteúdo anterior</p></div>
+        <div class="card"><span class="fn">"+"</span><p>combinado a r/w — leitura e escrita no mesmo arquivo</p></div>
+        <div class="card"><span class="fn">"t"</span><p>modo texto — sequência de caracteres</p></div>
+        <div class="card"><span class="fn">"b"</span><p>modo binário — bytes brutos</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Abrir e fechar arquivos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 1.3 fclose -->
+  <section class="slide" data-slide>
+    <div class="kicker">Abrir e fechar arquivos</div>
+    <h1>fclose descarrega o buffer e libera o arquivo</h1>
+    <p class="sub">Escrita pendente vai para o disco, a memória do buffer é liberada, e a função devolve 0 (ou EOF se algo deu errado) — obrigatório mesmo para um arquivo que só foi lido.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="compare" style="grid-template-columns: 1fr;">
-            <div class="col is-accent"><h3>fgetc(fp)</h3><p>um caractere por chamada — o grão mais fino</p></div>
-            <div class="col"><h3>fgets(s, n, fp)</h3><p>uma linha inteira, até '\n' ou n-1 caracteres</p></div>
-            <div class="col"><h3>fscanf(fp, fmt, ...)</h3><p>valores formatados, como um scanf que lê de arquivo</p></div>
+          <div class="flow">
+            <div class="box">buffer (RAM)<span class="tag">dados pendentes</span></div>
+            <div class="arrow">→</div>
+            <div class="box is-accent">disco<span class="tag">gravado · buffer e FILE* liberados</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_count_lines/main.c</div>
+            <pre><code>    <span class="cmt">/* ... leu e contou as linhas ... */</span>
+
+    <span class="fn">fclose</span>(file);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Abrir e fechar arquivos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- V/F bloco 1 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Abrir e fechar arquivos</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Chamar <span class="mono">fclose(fp)</span> sobre um arquivo que foi aberto só para leitura (modo "r") não tem nenhum efeito, já que não há dado pendente de gravação para proteger.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Abrir e fechar arquivos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Abrir e fechar arquivos</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Mesmo sem dado pendente de escrita, <span class="mono">fclose</span> ainda libera a área de memória reservada para o buffer e o recurso do sistema operacional associado ao arquivo — por isso vale chamá-lo mesmo depois de só ler um arquivo.</p>
+    </div>
+    <div class="footer"><span>Abrir e fechar arquivos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 2 — LER EM MODO TEXTO ===== -->
+
+  <!-- 2.1 visão geral -->
+  <section class="slide" data-slide>
+    <div class="kicker">Ler em modo texto</div>
+    <h1>Três funções para ler: um caractere, uma linha ou um valor</h1>
+    <p class="sub">Mesma família de scanf, agora lendo de um FILE* — a cada leitura, o cursor avança.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr; gap: 0.7vw;">
+            <div class="card is-accent" style="padding: 1vw 1.2vw;"><span class="fn">fgetc(fp)</span><p>um caractere por chamada — o grão mais fino</p></div>
+            <div class="card" style="padding: 1vw 1.2vw;"><span class="fn">fgets(s, n, fp)</span><p>uma linha inteira, até '\n' ou n-1 caracteres</p></div>
+            <div class="card" style="padding: 1vw 1.2vw;"><span class="fn">fscanf(fp, fmt, ...)</span><p>valores formatados, como um scanf que lê de arquivo</p></div>
           </div>
         </div>
         <div class="code-col">
@@ -560,45 +837,171 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Arquivos em modo texto</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Ler em modo texto</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 5. ESCRITA EM MODO TEXTO -->
+  <!-- 2.2 fgetc -->
   <section class="slide" data-slide>
-    <div class="kicker">Arquivos em modo texto</div>
-    <h1>fprintf e fputc espelham a leitura</h1>
-    <p class="sub">Dois arquivos de entrada, um de saída — três FILE* abertos ao mesmo tempo.</p>
+    <div class="kicker">Ler em modo texto</div>
+    <h1>fgetc: um caractere por chamada</h1>
+    <p class="sub">Devolve int, não char — para caber também a constante EOF quando o arquivo acaba; aqui, o laço de Contagem de caracteres lê até esse EOF.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="flow">
-            <div class="box">vector_1.txt<span class="tag">fscanf</span></div>
-            <div class="arrow">+</div>
-            <div class="box">vector_2.txt<span class="tag">fscanf</span></div>
-            <div class="arrow">→</div>
-            <div class="box is-accent">sum_vector.txt<span class="tag">fprintf</span></div>
+          <div class="cards" style="grid-template-columns: 1fr;">
+            <div class="card is-accent"><span class="fn">fgetc(fp)</span><p>o grão mais fino de leitura — ideal para contar ou classificar caracteres individuais</p></div>
           </div>
         </div>
         <div class="code-col">
           <div class="code-panel">
-            <div class="file-tag">04_sum_vectors/main.c</div>
-            <pre><code><span class="fn">fprintf</span>(output_file, <span class="str">"%d\n"</span>, n1);
-<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n1; i++)
+            <div class="file-tag">01_count_chars/main.c</div>
+            <pre><code><span class="kw">int</span> <span class="fn">fgetc</span>(<span class="type">FILE</span> *fp);
+
+<span class="kw">int</span> c;
+<span class="kw">while</span> ((c = <span class="fn">fgetc</span>(fp)) != <span class="kw">EOF</span>)
 {
-    <span class="fn">fprintf</span>(output_file, <span class="str">"%d "</span>, sum_vector[i]);
+    <span class="cmt">/* processa c */</span>
 }</code></pre>
           </div>
         </div>
       </div>
     </div>
-    <div class="footer"><span>Arquivos em modo texto</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Ler em modo texto</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 6. TRÊS FORMAS DE ESTRUTURAR -->
+  <!-- 2.3 fgets -->
   <section class="slide" data-slide>
-    <div class="kicker">Estruturação de dados</div>
-    <h1>Como organizar o que está dentro do arquivo</h1>
-    <p class="sub">A escolha depende da aplicação — os três exemplos deste módulo isolam cada mecânica.</p>
+    <div class="kicker">Ler em modo texto</div>
+    <h1>fgets: uma linha inteira por chamada</h1>
+    <p class="sub">Lê até '\n' ou até o limite informado — nunca escreve além dele, mesmo que a linha continue; aqui, Contagem de linhas lê uma linha por volta até fgets devolver NULL.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr;">
+            <div class="card is-accent"><span class="fn">fgets(s, n, fp)</span><p>uma linha inteira, até '\n' ou n-1 caracteres</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_count_lines/main.c</div>
+            <pre><code><span class="kw">char</span> *<span class="fn">fgets</span>(<span class="kw">char</span> *s, <span class="kw">int</span> n, <span class="type">FILE</span> *fp);
+
+<span class="kw">while</span> (<span class="fn">fgets</span>(line, <span class="num">200</span>, file) != <span class="kw">NULL</span>)
+{
+    line_count++;
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, line);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Ler em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 2.4 fscanf -->
+  <section class="slide" data-slide>
+    <div class="kicker">Ler em modo texto</div>
+    <h1>fscanf: valores formatados, como no teclado</h1>
+    <p class="sub">Mesma sintaxe de scanf, só que lendo de um FILE*; devolve quantos itens leu com sucesso — aqui, Contagem de palavras lê uma palavra por volta até EOF.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr;">
+            <div class="card is-accent"><span class="fn">fscanf(fp, fmt, ...)</span><p>valores formatados, um item por vez — devolve quantos itens foram lidos com sucesso</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">02_count_words/main.c</div>
+            <pre><code><span class="kw">int</span> <span class="fn">fscanf</span>(<span class="type">FILE</span> *fp, <span class="kw">char</span> *formato, ...);
+
+<span class="kw">while</span> (<span class="fn">fscanf</span>(file, <span class="str">"%s"</span>, word) != <span class="kw">EOF</span>)
+{
+    word_count++;
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, word);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Ler em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- V/F bloco 2 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Ler em modo texto</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Se a linha do arquivo for mais longa que o limite passado para fgets, os caracteres que não couberam são descartados — a próxima chamada de fgets continua a partir da linha seguinte, ignorando o restante daquela linha.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Ler em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Ler em modo texto</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation"><span class="mono">fgets</span> simplesmente para de ler ao atingir o limite, sem descartar nada — o cursor do arquivo fica exatamente onde a leitura parou, então a próxima chamada continua a partir do restante daquela mesma linha, não da linha seguinte.</p>
+    </div>
+    <div class="footer"><span>Ler em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 3 — ESCREVER EM MODO TEXTO ===== -->
+
+  <!-- 3.1 fprintf -->
+  <section class="slide" data-slide>
+    <div class="kicker">Escrever em modo texto</div>
+    <h1>fprintf escreve no arquivo o que printf escreveria na tela</h1>
+    <p class="sub" style="max-width: 64vw;">Aqui, Soma de vetores lê vector_1.txt e vector_2.txt com fscanf e grava sum_vector.txt com fprintf — mesmo layout: tamanho na 1ª linha, valores na 2ª.</p>
+    <div class="body">
+      <div class="concept-split is-wide">
+        <div class="visual-col">
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">vector_1.txt (entrada)</div>
+              <pre><code>5
+1 2 3 4 5</code></pre>
+            </div>
+            <div class="code-panel is-file">
+              <div class="file-tag">vector_2.txt (entrada)</div>
+              <pre><code>5
+6 7 8 9 10</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">04_sum_vectors/main.c</div>
+              <pre><code><span class="fn">fprintf</span>(output_file, <span class="str">"%d\n"</span>, n1);
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n1; i++)
+{
+    <span class="fn">fprintf</span>(output_file, <span class="str">"%d "</span>, sum_vector[i]);
+}</code></pre>
+            </div>
+            <div class="code-panel is-file">
+              <div class="file-tag">sum_vector.txt (saída — gravado por fprintf)</div>
+              <pre><code>5
+7 9 11 13 15 </code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Escrever em modo texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 4 — ESTRUTURAR DADOS EM TEXTO ===== -->
+
+  <!-- 4.1 por que estruturar -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estruturar dados em texto</div>
+    <h1>Um arquivo texto não impõe estrutura — quem grava decide</h1>
+    <p class="sub">Três estratégias para organizar os dados (e depois relê-los sem ambiguidade); cada exemplo deste módulo isola uma delas.</p>
     <div class="body">
       <div class="compare">
         <div class="col">
@@ -618,21 +1021,107 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Estruturação de dados em arquivos textos</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 7. SSCANF -->
+  <!-- 4.2 caractere a caractere -->
   <section class="slide" data-slide>
-    <div class="kicker">Estruturação de dados</div>
-    <h1>sscanf: fscanf para uma string em memória</h1>
-    <p class="sub">O padrão real: fgets pega a linha inteira, sscanf extrai os campos dela.</p>
+    <div class="kicker">Estruturar dados em texto</div>
+    <h1>Caractere a caractere: fgetc num laço até EOF</h1>
+    <p class="sub" style="max-width: 64vw;">O grão mais fino — aqui, Contagem de caracteres conta os que não são espaço, tab ou quebra de linha.</p>
     <div class="body">
-      <div class="concept-split">
+      <div class="concept-split is-wide">
         <div class="visual-col">
-          <div class="flow">
-            <div class="box">"John 25 75.5"<span class="tag">input_string</span></div>
-            <div class="arrow">→</div>
-            <div class="box is-accent">"John" · 25 · 75.50<span class="tag">name, age, height</span></div>
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">main.c (entrada — o próprio código-fonte)</div>
+              <pre><code>#include &lt;stdio.h&gt;
+
+int main()
+<span class="dim">... (26 linhas ao todo)</span></code></pre>
+            </div>
+            <div class="code-panel is-file">
+              <div class="file-tag">saída no terminal</div>
+              <pre><code>Total characters (excluding spaces, tabs, and newlines): 356</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_count_chars/main.c</div>
+            <pre><code><span class="kw">while</span> ((ch = <span class="fn">fgetc</span>(file)) != <span class="kw">EOF</span>)
+{
+    <span class="kw">if</span> (ch != <span class="str">' '</span> &amp;&amp; ch != <span class="str">'\n'</span> &amp;&amp; ch != <span class="str">'\t'</span>)
+    {
+        char_count++;
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4.3 linha a linha -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estruturar dados em texto</div>
+    <h1>Linha a linha: fgets até NULL, uma linha por unidade</h1>
+    <p class="sub" style="max-width: 64vw;">Cada linha vira um registro — aqui, Contagem de linhas conta e imprime cada uma; para extrair campos de dentro da linha, o próximo slide.</p>
+    <div class="body">
+      <div class="concept-split is-wide">
+        <div class="visual-col">
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">main.c (entrada — o próprio código-fonte)</div>
+              <pre><code>#include &lt;stdio.h&gt;
+
+int main()
+<span class="dim">... (26 linhas ao todo)</span></code></pre>
+            </div>
+            <div class="code-panel is-file">
+              <div class="file-tag">saída no terminal</div>
+              <pre><code>#include &lt;stdio.h&gt;
+<span class="dim">... (cada linha lida é impressa)</span>
+Total lines in the source code: 26</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_count_lines/main.c</div>
+            <pre><code><span class="kw">while</span> (<span class="fn">fgets</span>(line, <span class="num">200</span>, file) != <span class="kw">NULL</span>)
+{
+    line_count++;
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, line);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4.4 sscanf -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estruturar dados em texto</div>
+    <h1>sscanf: fscanf para uma string em memória</h1>
+    <p class="sub" style="max-width: 64vw;">O padrão real: fgets pega a linha inteira, sscanf extrai os campos dela — sprintf faz o caminho inverso, escrevendo formatado numa string.</p>
+    <div class="body">
+      <div class="concept-split is-wide">
+        <div class="visual-col">
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">entrada — a string já em memória</div>
+              <pre><code>John 25 75.5</code></pre>
+            </div>
+            <div class="code-panel is-file">
+              <div class="file-tag">saída no terminal</div>
+              <pre><code>Name: John
+Age: 25
+Height: 75.50
+Formatted String: Student: John, Score: 95   <span class="dim">← sprintf</span></code></pre>
+            </div>
           </div>
         </div>
         <div class="code-col">
@@ -648,27 +1137,102 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>sscanf</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 8. MODO BINÁRIO -->
+  <!-- 4.5 palavras-chave -->
   <section class="slide" data-slide>
-    <div class="kicker">Arquivos em modo binário</div>
-    <h1>Os mesmos bytes da memória, sem tradução</h1>
-    <p class="sub">fwrite/fread copiam blocos inteiros — sem nenhuma formatação de texto.</p>
+    <div class="kicker">Estruturar dados em texto</div>
+    <h1>Palavras-chave: fscanf com %s captura um token por vez</h1>
+    <p class="sub" style="max-width: 64vw;">%s pula espaços antes da palavra e para no primeiro espaço depois — aqui, Contagem de palavras conta cada token.</p>
+    <div class="body">
+      <div class="concept-split is-wide">
+        <div class="visual-col">
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">main.c (entrada — o próprio código-fonte)</div>
+              <pre><code>#include &lt;stdio.h&gt;
+
+int main()
+<span class="dim">... (26 linhas ao todo)</span></code></pre>
+            </div>
+            <div class="code-panel is-file">
+              <div class="file-tag">saída no terminal — um token por linha</div>
+              <pre><code>#include
+&lt;stdio.h&gt;
+<span class="dim">...</span>
+Total words in the source code: 55</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">02_count_words/main.c</div>
+            <pre><code><span class="kw">while</span> (<span class="fn">fscanf</span>(file, <span class="str">"%s"</span>, word) != <span class="kw">EOF</span>)
+{
+    word_count++;
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, word);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- V/F bloco 4 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Estruturar dados em texto</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">fscanf(fp, "%s", palavra) captura a palavra inteira mesmo que ela contenha um espaço no meio, como em "RIO DE JANEIRO".</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Estruturar dados em texto</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation"><span class="mono">%s</span> para no primeiro espaço que encontrar — em "RIO DE JANEIRO", <span class="mono">palavra</span> ficaria só com "RIO"; espaços no meio quebram a captura de uma palavra-chave só de uma peça.</p>
+    </div>
+    <div class="footer"><span>Estruturar dados em texto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 5 — MODO BINÁRIO ===== -->
+
+  <!-- 5.1 bytes sem tradução -->
+  <section class="slide" data-slide>
+    <div class="kicker">Modo binário</div>
+    <h1>Modo binário: o bloco de bytes da struct vai direto para o disco</h1>
+    <p class="sub">Sem formatação de texto — mais compacto e eficiente para grandes volumes, ao custo de não ser legível num editor comum.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">Produto em RAM<span class="tag">sizeof(Produto) bytes</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">arquivo binário<span class="tag">os mesmos bytes, sem tradução</span></div>
+        <div class="arrow">→</div>
+        <div class="box">Produto em RAM<span class="tag">de volta, idêntico</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Modo binário</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5.2 fwrite / fread -->
+  <section class="slide" data-slide>
+    <div class="kicker">Modo binário</div>
+    <h1>fwrite grava um bloco de memória; fread traz de volta</h1>
+    <p class="sub">p = endereço, tam = bytes por elemento (sizeof), nelem = quantos — um vetor inteiro numa chamada só; aqui, Registros binários salva n Produtos de uma vez.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="duel">
-            <div class="item">
-              <div class="demo"><div class="cell">1</div><div class="cell">2</div><div class="cell">.</div><div class="cell">5</div><div class="cell">0</div></div>
-              <div class="tag">modo texto — "12.50", legível, 5 bytes</div>
-            </div>
-            <div class="vs">vs</div>
-            <div class="item is-bin">
-              <div class="demo"><div class="cell">41</div><div class="cell">48</div><div class="cell">00</div><div class="cell">00</div></div>
-              <div class="tag">modo binário — os 4 bytes brutos do float 12.50</div>
-            </div>
+          <div class="cards" style="grid-template-columns: 1fr;">
+            <div class="card is-accent"><span class="fn">fwrite(p, tam, nelem, fp)</span><p>copia nelem × tam bytes da memória para o arquivo</p></div>
+            <div class="card"><span class="fn">fread(p, tam, nelem, fp)</span><p>o caminho inverso: do arquivo para a memória</p></div>
           </div>
         </div>
         <div class="code-col">
@@ -685,14 +1249,14 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Arquivos em modo binário</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Modo binário</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 9. FSEEK -->
+  <!-- 5.3 fseek -->
   <section class="slide" data-slide>
-    <div class="kicker">Arquivos em modo binário</div>
+    <div class="kicker">Modo binário</div>
     <h1>fseek: acesso direto a um registro</h1>
-    <p class="sub">Como cada registro ocupa sempre o mesmo número de bytes, dá para pular direto até ele.</p>
+    <p class="sub">Como cada registro ocupa sempre sizeof(Produto) bytes, dá para posicionar o cursor em indice × sizeof(Produto) e ler só aquele — sem passar pelos anteriores.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
@@ -722,10 +1286,33 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>fseek</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Modo binário</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 10. FECHAMENTO -->
+  <!-- V/F bloco 5 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Modo binário</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Uma única chamada fwrite(produtos, sizeof(Produto), n, fp) e n chamadas fwrite(&amp;produtos[i], sizeof(Produto), 1, fp), uma por volta de um laço, gravam exatamente a mesma sequência de bytes no arquivo.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Modo binário</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Modo binário</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Verdadeiro</div>
+      <p class="vf-explanation">O resultado final no arquivo é o mesmo — <span class="mono">nelem</span> só controla quantos elementos são copiados <em>por chamada</em>: uma chamada com <span class="mono">nelem = n</span> copia os n de uma vez; n chamadas com <span class="mono">nelem = 1</span> copiam um por vez, na mesma ordem. Mudam o número de chamadas (e a eficiência), não os bytes gravados.</p>
+    </div>
+    <div class="footer"><span>Modo binário</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>
