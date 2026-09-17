@@ -673,6 +673,31 @@
       <code>gcc --save-temps</code> (veja o desafio prático deste módulo) deixa os arquivos intermediários de
       cada etapa visíveis no diretório.
     </p>
+    <pre class="console-block">$ <span class="in">gcc --save-temps main.c -o program</span>
+$ <span class="in">ls</span>
+main.c  program  program-main.i  program-main.o  program-main.s</pre>
+    <p>
+      Cada arquivo é uma tradução do anterior: <code>program-main.i</code> é o código já pré-processado (o
+      conteúdo de <code>stdio.h</code> expandido acima do seu código, que continua lá intacto),
+      <code>program-main.s</code> é o mesmo programa em assembly, e <code>program-main.o</code> e
+      <code>program</code> já são binários — não há mais texto legível neles.
+    </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Um erro de execução (o programa roda, mas produz um resultado errado) é sinalizado pelo compilador da
+        mesma forma que um erro de sintaxe.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O compilador só detecta erros de sintaxe (erros de compilação); um erro de execução passa despercebido por ele — só aparece quando se compara a saída do programa com o resultado esperado.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O compilador não tem como saber se a lógica do programa está certa — ele só verifica a sintaxe. Um erro de execução (resultado errado, mas sem falha de compilação) só é percebido comparando a saída do programa com o que se esperava.</p>
+      </div>
+    </div>
 
     <h3>Programando em C: estrutura básica de um programa</h3>
     <p>
@@ -685,6 +710,31 @@
       Comentários (<code>/* ... */</code>, ou <code>//</code> até o fim da linha) documentam o código sem
       afetar a compilação — o compilador simplesmente os ignora.
     </p>
+    <p>
+      Ao lado do <code>#include</code>, a outra diretiva de pré-processador comum é o <code>#define</code>,
+      que cria um <strong>apelido de texto</strong> para um valor: antes de o código ser traduzido, toda
+      ocorrência do apelido é substituída pelo valor correspondente. É a maneira usual de dar nome a uma
+      constante, em vez de espalhar o número solto pelo programa.
+    </p>
+    <pre class="mini-code"><span class="pp">#define</span> IDADE_ADULTA <span class="num">18</span>
+
+<span class="kw">int</span> limite = IDADE_ADULTA;  <span class="cmt">/* vira "int limite = 18;" antes de compilar */</span></pre>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Comentários (<code>/* ... */</code> ou <code>//</code>) podem ser removidos do código-fonte sem
+        alterar em nada o comportamento do programa compilado.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Comentários são pura documentação, ignorados pelo compilador — removê-los do código-fonte não muda em nada o programa compilado, só a legibilidade para quem lê o código.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> Comentários não afetam a compilação nem a execução — são só documentação para quem lê o código; removê-los do fonte não muda o comportamento do programa.</p>
+      </div>
+    </div>
 
     <h2>Variáveis e operadores</h2>
 
@@ -693,6 +743,22 @@
       Uma variável é um espaço nomeado na memória que guarda um valor de um tipo específico — e que pode
       mudar ao longo da execução do programa.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Se um programa executa <code>idade = 20;</code> e, mais adiante, <code>idade = 21;</code>, a segunda
+        atribuição é inválida, porque <code>idade</code> já tinha um valor.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Reatribuir um novo valor a uma variável que já tinha um valor é exatamente o que uma variável permite — é isso que a diferencia de uma constante; <code>idade = 21;</code> é perfeitamente válida e simplesmente substitui o valor anterior.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Não há nada de inválido — uma variável pode receber um novo valor quantas vezes o programa precisar; <code>idade = 21;</code> simplesmente substitui os 20 anteriores.</p>
+      </div>
+    </div>
 
     <h4>Tipos básicos</h4>
     <p>
@@ -707,6 +773,22 @@
       o maior valor positivo possível.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        <code>unsigned int</code> consegue representar valores negativos, além de todos os valores positivos
+        que um <code>int</code> comum representa.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> É o contrário: <code>unsigned</code> abre mão de representar valores negativos justamente para dobrar o maior valor positivo representável, comparado a um <code>int</code> comum (<code>signed</code>).</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>unsigned</code> troca a capacidade de representar negativos por uma faixa maior de positivos — não representa os dois ao mesmo tempo.</p>
+      </div>
+    </div>
+
     <h4>Declaração de variáveis</h4>
     <p>
       Toda variável precisa ser declarada antes de usada — a forma geral é <code>tipo nome;</code>, como em
@@ -714,6 +796,22 @@
       mesmo tipo numa linha só, separadas por vírgula (<code>float base, altura;</code>), e também
       inicializar no mesmo passo da declaração (<code>int contador = 0;</code>).
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Em C, é possível declarar duas variáveis de tipos diferentes (por exemplo, <code>int</code> e
+        <code>float</code>) numa única instrução, separadas por vírgula.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> A declaração com vírgula (<code>tipo nome1, nome2;</code>) só funciona para variáveis do mesmo tipo — tipos diferentes exigem instruções de declaração separadas, cada uma com seu próprio tipo.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A vírgula só agrupa variáveis do mesmo tipo numa linha; tipos diferentes precisam de uma instrução de declaração para cada um.</p>
+      </div>
+    </div>
 
     <h4>Valores constantes</h4>
     <p>
@@ -724,6 +822,22 @@
       hexadecimais, prefixadas por <code>0x</code> (<code>0x1F</code>), e octais, prefixadas por um zero
       (<code>013</code>).
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Em C, <code>'a'</code> (aspas simples) e <code>"a"</code> (aspas duplas) representam o mesmo tipo de
+        constante, só com notações diferentes.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> <code>'a'</code> é uma constante de caractere, um único valor; <code>"a"</code> é uma constante string, um vetor de caracteres terminado em <code>'\0'</code> — são tipos diferentes, não só notações do mesmo valor.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> São tipos diferentes: <code>'a'</code> (aspas simples) é um caractere só; <code>"a"</code> (aspas duplas) é uma string, um vetor terminado em <code>'\0'</code>.</p>
+      </div>
+    </div>
 
     <h4>Variáveis com valores indefinidos</h4>
     <p>
@@ -738,8 +852,39 @@
       rodar, o que ajuda a pegar esse tipo de erro cedo.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Em C, uma variável recém-declarada, sem inicialização explícita, sempre começa automaticamente com o
+        valor zero.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Ao contrário do que se poderia esperar, o C não zera automaticamente uma variável recém-declarada — seu valor inicial é indefinido, o que estiver por acaso naquele endereço de memória.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Não há zeragem automática — o valor inicial de uma variável não inicializada é indefinido (lixo de memória), por isso a boa prática é sempre inicializar antes de usar.</p>
+      </div>
+    </div>
+
     <h3>Operadores</h3>
     <p>Operadores combinam e transformam os valores guardados nas variáveis.</p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Um operador em C só pode combinar duas variáveis entre si, nunca uma variável com uma constante.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Um operador combina valores de um modo geral — variável com variável, variável com constante (como em <code>x + 5</code>), ou até duas constantes — não só variável com variável.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Operadores combinam valores quaisquer, incluindo variável com constante (<code>x + 5</code>, por exemplo) — não é uma exigência ter duas variáveis.</p>
+      </div>
+    </div>
 
     <h4>Operadores aritméticos</h4>
     <p>
@@ -752,6 +897,22 @@
       ser de ponto flutuante.
     </p>
 
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Numa expressão como <code>soma / 2.0</code>, mesmo que <code>soma</code> seja do tipo <code>int</code>,
+        o resultado da divisão terá casas decimais.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Basta que um dos operandos seja de ponto flutuante para evitar a divisão inteira — como <code>2.0</code> já é <code>float</code>, <code>soma / 2.0</code> produz um resultado com casas decimais, mesmo com <code>soma</code> sendo <code>int</code>.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> Já vale ter só um operando de ponto flutuante para evitar a divisão inteira — como <code>2.0</code> é <code>float</code>, <code>soma / 2.0</code> produz um resultado com casas decimais, mesmo com <code>soma</code> sendo <code>int</code>.</p>
+      </div>
+    </div>
+
     <h4>Operadores de atribuição</h4>
     <p>
       O operador <code>=</code> atribui o valor da direita à variável da esquerda (<code>x = 5;</code>). O C
@@ -760,33 +921,90 @@
       <code>-=</code>, <code>*=</code>, <code>/=</code> e <code>%=</code>.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Depois de rodar <code>int x = 10; x /= 4;</code>, o valor de <code>x</code> é <code>2.5</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> <code>x /= 4</code> equivale a <code>x = x / 4</code>; como <code>x</code> é <code>int</code>, a divisão <code>10 / 4</code> é inteira e trunca para <code>2</code> — <code>x</code> fica com <code>2</code>, não <code>2.5</code> (para ter casas decimais, <code>x</code> precisaria ser <code>float</code> ou <code>double</code>).</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>x /= 4</code> equivale a <code>x = x / 4</code> — com <code>x</code> inteiro, essa divisão é inteira e trunca: <code>10 / 4</code> vale <code>2</code>, não <code>2.5</code>.</p>
+      </div>
+    </div>
+
     <h4>Operadores de incremento e decremento</h4>
     <p>
       <code>++</code> e <code>--</code> incrementam ou decrementam uma variável em 1, e podem ser usados antes
       (pré-fixado, <code>++x</code>) ou depois (pós-fixado, <code>x++</code>) da variável — a diferença
       aparece quando o operador é usado dentro de uma expressão maior: no pré-fixado, a variável é
       incrementada primeiro, e o novo valor é o que entra na expressão; no pós-fixado, o valor atual entra na
-      expressão, e só depois a variável é incrementada. Só é possível aplicar <code>++</code>/<code>--</code>
-      diretamente a uma variável, nunca a uma expressão como <code>(a + 1)++</code>. O exemplo <em>Incremento
-      e decremento</em> isola cada uma das quatro formas (<code>x++</code>, <code>++x</code>, <code>y--</code>,
-      <code>--y</code>) em sua própria instrução — misturar, por exemplo, <code>x</code> e <code>x++</code> no
-      mesmo <code>printf</code> é um erro comum que leva a um comportamento não bem definido pela linguagem.
+      expressão, e só depois a variável é incrementada.
     </p>
+    <pre class="mini-code"><span class="kw">int</span> x = <span class="num">5</span>;
+<span class="kw">int</span> y = x++;   <span class="cmt">/* y recebe 5, x vira 6 */</span>
+<span class="kw">int</span> z = ++x;   <span class="cmt">/* x vira 7, z recebe 7 */</span></pre>
+    <p>
+      Só é possível aplicar <code>++</code>/<code>--</code> diretamente a uma variável, nunca a uma expressão
+      como <code>(a + 1)++</code>. O exemplo <em>Incremento e decremento</em> isola cada uma das quatro formas
+      (<code>x++</code>, <code>++x</code>, <code>y--</code>, <code>--y</code>) em sua própria instrução —
+      misturar, por exemplo, <code>x</code> e <code>x++</code> no mesmo <code>printf</code> é um erro comum
+      que leva a um comportamento não bem definido pela linguagem.
+    </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Se <code>x</code> valer <code>5</code>, a expressão <code>y = ++x;</code> deixa tanto <code>x</code>
+        quanto <code>y</code> com o valor <code>6</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> No pré-fixado (<code>++x</code>), <code>x</code> é incrementado primeiro (para 6), e esse novo valor de <code>x</code> é o que entra na expressão — por isso <code>y</code> também recebe 6.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> No pré-fixado (<code>++x</code>), <code>x</code> é incrementado primeiro (para 6), e esse novo valor entra na expressão — então <code>y</code> recebe 6 também, não um valor diferente de <code>x</code>.</p>
+      </div>
+    </div>
 
     <h4>Operadores relacionais e lógicos</h4>
     <p>
       Os operadores relacionais (<code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>,
       <code>==</code>, <code>!=</code>) comparam dois valores e retornam verdadeiro (<code>1</code>) ou falso
-      (<code>0</code>) — é assim que o exemplo <em>Fahrenheit para Celsius</em> decide se
+      (<code>0</code>) — C não tem um tipo booleano dedicado, então esse resultado é um <code>int</code>
+      comum, como qualquer outro. É assim que o exemplo <em>Fahrenheit para Celsius</em> decide se
       <code>celsius &lt; 0</code>. Os operadores lógicos combinam expressões booleanas:
       <code>&amp;&amp;</code> (E) só é verdadeiro se ambos os lados forem verdadeiros, <code>||</code> (OU) é
-      verdadeiro se pelo menos um lado for, e <code>!</code> (NÃO) inverte um valor lógico. Expressões
-      conectadas por <code>&amp;&amp;</code> ou <code>||</code> são avaliadas da esquerda para a direita, e a
-      avaliação para assim que o resultado já está decidido — chamado de <em>curto-circuito</em>: em
-      <code>a &amp;&amp; b</code>, se <code>a</code> já for falso, <code>b</code> nem chega a ser avaliado. O
-      exemplo <em>Operadores lógicos e ternário</em> combina os três operadores lógicos para decidir a
-      elegibilidade a um benefício a partir da idade e da renda.
+      verdadeiro se pelo menos um lado for, e <code>!</code> (NÃO) inverte um valor lógico.
     </p>
+    <pre class="mini-code"><span class="kw">if</span> (a &amp;&amp; funcao_cara())  <span class="cmt">/* se a for falso, funcao_cara() nunca é chamada */</span></pre>
+    <p>
+      Expressões conectadas por <code>&amp;&amp;</code> ou <code>||</code> são avaliadas da esquerda para a
+      direita, e a avaliação para assim que o resultado já está decidido — chamado de
+      <em>curto-circuito</em>: em <code>a &amp;&amp; b</code>, se <code>a</code> já for falso, <code>b</code>
+      nem chega a ser avaliado. O exemplo <em>Operadores lógicos e ternário</em> combina os três operadores
+      lógicos para decidir a elegibilidade a um benefício a partir da idade e da renda.
+    </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Na expressão <code>a || b</code>, se <code>a</code> for verdadeiro, C ainda assim avalia
+        <code>b</code> antes de decidir o resultado da expressão.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O curto-circuito vale para os dois operadores: em <code>a || b</code>, se <code>a</code> já for verdadeiro, o resultado já está decidido (verdadeiro), então <code>b</code> nem chega a ser avaliado — o mesmo princípio de <code>a &amp;&amp; b</code>, só que no lado oposto.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Assim como em <code>a &amp;&amp; b</code>, <code>a || b</code> também usa curto-circuito: se <code>a</code> já for verdadeiro, o resultado da expressão já está decidido, e <code>b</code> nem chega a ser avaliado.</p>
+      </div>
+    </div>
 
     <h4>Operador sizeof</h4>
     <p>
@@ -796,6 +1014,22 @@
       está rodando.
     </p>
 
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        <code>sizeof</code> pode devolver valores diferentes para o mesmo tipo (como <code>int</code>),
+        dependendo da plataforma em que o programa é compilado.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> O tamanho de um tipo primitivo pode variar entre plataformas — por isso <code>sizeof(int)</code> não tem um valor universal fixo; é assim que o exemplo <em>Tipos de dados</em> descobre, na prática, quanto cada tipo ocupa na máquina onde o programa está rodando.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> <code>sizeof(int)</code> pode, sim, variar entre plataformas — o tamanho de um tipo primitivo não é universal; é por isso que <code>sizeof</code> existe, para consultar o valor real na plataforma atual.</p>
+      </div>
+    </div>
+
     <h4>Conversão de tipo</h4>
     <p>
       Quando uma expressão mistura tipos diferentes, o C converte automaticamente os valores para um tipo
@@ -804,11 +1038,33 @@
       números inteiros. Também é possível forçar uma conversão explicitamente com um modelador
       (<em>cast</em>): <code>(float)a / b</code> converte <code>a</code> para <code>float</code> antes da
       divisão, garantindo um resultado com casas decimais mesmo que <code>a</code> e <code>b</code> sejam
-      <code>int</code>. O exemplo <em>Conversão e variável indefinida</em> deixa a pegadinha lado a lado: uma
-      divisão entre dois <code>int</code> trunca o resultado antes mesmo de ser guardada numa variável
-      <code>float</code>, e só o <em>cast</em> aplicado a um operando, antes da divisão acontecer, preserva as
-      casas decimais.
+      <code>int</code>.
     </p>
+    <pre class="mini-code"><span class="kw">int</span> a = <span class="num">7</span>, b = <span class="num">2</span>;
+<span class="kw">float</span> r1 = a / b;          <span class="cmt">/* 3.0 — divisão inteira truncada, só depois virou float */</span>
+<span class="kw">float</span> r2 = (<span class="kw">float</span>)a / b;   <span class="cmt">/* 3.5 — cast antes da divisão */</span></pre>
+    <p>
+      O exemplo <em>Conversão e variável indefinida</em> deixa a pegadinha lado a lado: uma divisão entre dois
+      <code>int</code> trunca o resultado antes mesmo de ser guardada numa variável <code>float</code>, e só o
+      <em>cast</em> aplicado a um operando, antes da divisão acontecer, preserva as casas decimais.
+    </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Na expressão <code>(float)a / b</code>, mesmo que <code>b</code> continue sendo <code>int</code>, a
+        divisão inteira nunca chega a acontecer, porque um dos operandos (<code>a</code>, já convertido) é
+        <code>float</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Basta um operando de ponto flutuante para a divisão deixar de ser inteira — como o cast converte <code>a</code> para <code>float</code> antes da divisão, <code>b</code> continuar <code>int</code> não importa: o resultado já sai com casas decimais.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> Um único operando de ponto flutuante já evita a divisão inteira — como <code>a</code> virou <code>float</code> pelo cast, a divisão não é mais entre dois inteiros, mesmo que <code>b</code> continue <code>int</code>.</p>
+      </div>
+    </div>
 
     <h3>Entrada e saída básicas</h3>
     <p>
@@ -816,18 +1072,59 @@
       <code>stdio.h</code>.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        As funções <code>printf</code> e <code>scanf</code> fazem parte da linguagem C em si — nenhuma
+        diretiva <code>#include</code> é necessária para usá-las.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> <code>printf</code> e <code>scanf</code> não são parte do núcleo da linguagem — são funções da biblioteca padrão, declaradas em <code>stdio.h</code>; sem o <code>#include &lt;stdio.h&gt;</code>, o compilador não conhece seus protótipos.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> São funções da biblioteca padrão, não da linguagem em si — declaradas em <code>stdio.h</code>, exigem o <code>#include</code> correspondente.</p>
+      </div>
+    </div>
+
     <h4>Função printf</h4>
     <p>
       <code>printf</code> formata e imprime valores na tela, usando especificadores de formato que indicam o
       tipo e a formatação de cada valor — <code>%d</code> para inteiros, <code>%f</code> para ponto
-      flutuante, <code>%c</code> para caracteres, <code>%s</code> para strings. É possível controlar a
-      largura mínima do campo e, para pontos flutuantes, o número de casas decimais, como em
-      <code>%7.2f</code>.
+      flutuante, <code>%c</code> para caracteres, <code>%s</code> para strings. Cada <code>%</code> no texto
+      de formato é um espaço reservado, preenchido pelo valor correspondente na mesma ordem em que os valores
+      aparecem depois da vírgula.
+    </p>
+    <pre class="mini-code"><span class="kw">int</span> idade = <span class="num">20</span>;
+<span class="kw">float</span> altura = <span class="num">1.75</span>;
+
+<span class="fn">printf</span>(<span class="str">"%d anos, %f m\n"</span>, idade, altura);</pre>
+    <pre class="console-block">20 anos, 1.750000 m</pre>
+    <p>
+      Além do tipo, o especificador controla a <strong>largura mínima do campo</strong> e, para pontos
+      flutuantes, o número de casas decimais — como em <code>%7.2f</code>.
     </p>
     <figure class="resumo-fig">
       <img src="figs/fig2-1.jpg" alt="Dois especificadores de formato do printf com largura de campo: %4d reserva 4 posições para o inteiro 23, alinhado à direita; %7.2f reserva 7 posições (2 delas para casas decimais) para o valor 5.30, também alinhado à direita.">
       <figcaption><code>%4d</code> e <code>%7.2f</code>: a largura de campo reserva um número mínimo de posições, alinhando o valor à direita e completando com espaços à esquerda.</figcaption>
     </figure>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        O especificador <code>%7.2f</code> imprime um valor de ponto flutuante usando exatamente 7 casas
+        decimais.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Em <code>%7.2f</code>, o 7 é a largura total do campo (quantas posições reservar ao todo), e o 2 depois do ponto define as casas decimais — não são 7 casas decimais, são 7 posições no total, incluindo sinal, dígitos inteiros, ponto e as 2 decimais.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O 7 é a largura total do campo, não o número de casas decimais — quem define as casas decimais é o número depois do ponto (2, neste caso).</p>
+      </div>
+    </div>
 
     <h4>Função scanf</h4>
     <p>
@@ -839,6 +1136,27 @@
       de <code>%c</code> descarta qualquer espaço em branco ou quebra de linha deixada no buffer pela leitura
       anterior.
     </p>
+    <p>
+      Esse endereço passado ao <code>scanf</code> é, na prática, um <strong>ponteiro</strong> — um tipo com
+      regras próprias, estudado mais adiante no curso. Por ora basta reter que é o <code>&amp;</code> que
+      permite ao <code>scanf</code> escrever o valor lido dentro da variável.
+    </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Assim como <code>printf</code>, <code>scanf</code> recebe o valor da variável diretamente, sem
+        precisar do operador <code>&amp;</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Ao contrário de <code>printf</code>, <code>scanf</code> sempre precisa do endereço da variável, não do seu valor — por isso é quase sempre chamado com <code>&amp;</code> antes do nome da variável, como em <code>scanf("%d", &amp;idade)</code>.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>scanf</code> precisa do endereço da variável (por isso o <code>&amp;</code> antes do nome), justamente para poder escrever o valor lido dentro dela — diferente de <code>printf</code>, que só lê o valor.</p>
+      </div>
+    </div>
 
     <h2>Condicionais</h2>
 
@@ -849,6 +1167,21 @@
       <em>Fahrenheit para Celsius</em> decide entre "congelando" e "não congelando".
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        A cláusula <code>else</code> é obrigatória sempre que se usa um <code>if</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O <code>else</code> é opcional — um <code>if</code> sozinho, sem <code>else</code>, é perfeitamente válido; o <code>else</code> só entra quando existe mesmo um bloco alternativo para o caso da condição ser falsa.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>else</code> é opcional; um <code>if</code> sem <code>else</code> simplesmente não faz nada quando a condição é falsa.</p>
+      </div>
+    </div>
+
     <h4>Expressões booleanas</h4>
     <p>
       O C não tem um tipo booleano dedicado: qualquer expressão numérica pode ser usada como condição — zero
@@ -856,6 +1189,22 @@
       <code>if (x)</code> e <code>if (x != 0)</code> são equivalentes, assim como <code>if (!x)</code> e
       <code>if (x == 0)</code>.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Em C, <code>if (x)</code> e <code>if (x == 1)</code> sempre produzem o mesmo resultado, para qualquer
+        valor de <code>x</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> <code>if (x)</code> é verdadeiro para qualquer valor diferente de zero (equivale a <code>if (x != 0)</code>, não a <code>if (x == 1)</code>) — se <code>x</code> valer 5, por exemplo, <code>if (x)</code> é verdadeiro, mas <code>if (x == 1)</code> é falso.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>if (x)</code> equivale a <code>if (x != 0)</code>, não a <code>if (x == 1)</code> — um valor como 5 faz <code>if (x)</code> ser verdadeiro, mas <code>if (x == 1)</code> seria falso.</p>
+      </div>
+    </div>
 
     <h4>Blocos de comandos</h4>
     <p>
@@ -865,6 +1214,22 @@
       adicionar uma segunda linha ao "corpo" do <code>if</code> sem perceber que, sem chaves, ela na verdade
       já está fora dele.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Quando o corpo de um <code>if</code> tem um único comando, as chaves são opcionais e nunca causam
+        confusão, então dispensá-las é sempre uma boa prática.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> É o oposto: mesmo quando as chaves são opcionais, usá-las é a prática recomendada — sem elas, é fácil adicionar sem perceber uma segunda linha que parece fazer parte do <code>if</code>, mas na verdade já está fora dele.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> É o oposto — mesmo opcionais, usar as chaves é a prática recomendada, justamente para evitar o erro comum de uma linha extra parecer parte do <code>if</code> sem estar.</p>
+      </div>
+    </div>
 
     <h4>Operador condicional</h4>
     <p>
@@ -876,6 +1241,22 @@
       <em>Operadores lógicos e ternário</em> (visto na seção de Operadores) usa um ternário dentro de outro
       para classificar uma idade em três faixas.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        O operador ternário <code>condição ? valor_se_verdadeiro : valor_se_falso</code> substitui qualquer
+        tipo de comando <code>if-else</code>, não só os que decidem entre dois valores.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O ternário só serve para escolher entre dois valores dentro de uma expressão — um <code>if-else</code> que executa comandos além de atribuir um valor (como imprimir algo ou chamar uma função com efeito colateral) não pode, em geral, virar um ternário.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O ternário só substitui um <code>if-else</code> que decide entre dois valores; um <code>if-else</code> que executa comandos (não só atribui um valor) não pode, em geral, virar um ternário.</p>
+      </div>
+    </div>
 
     <h3>Seleção</h3>
     <p>
@@ -889,6 +1270,22 @@
       cláusula <code>default</code>, opcional, é executada quando nenhum <code>case</code> corresponde ao
       valor testado.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Sem um <code>break</code> no final do <code>case</code>, o <code>switch</code> para automaticamente
+        ali, sem executar o <code>case</code> seguinte.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> É o contrário: sem <code>break</code>, a execução não para — ela "cai" para o <code>case</code> seguinte (<em>fall-through</em>) mesmo que a condição dele não bata, um comportamento às vezes proposital, mas fonte comum de bugs quando esquecido.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Sem <code>break</code>, a execução continua para o <code>case</code> seguinte (<em>fall-through</em>), mesmo que sua condição não bata — não para automaticamente.</p>
+      </div>
+    </div>
 
   </div>
 

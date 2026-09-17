@@ -160,6 +160,68 @@
   }
   .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
   .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+  .roadmap.is-compact { gap: 0.8vw; }
+  .roadmap.is-compact li { padding-bottom: 0.8vw; }
+  .roadmap.is-compact .n { font-size: clamp(1.4rem, 2.6vw, 2.2rem); }
+  .roadmap.is-compact .t { font-size: clamp(1.1rem, 2vw, 1.6rem); }
+  .roadmap.is-compact .d { font-size: clamp(0.85rem, 1.2vw, 1rem); margin-top: 0.15vw; }
+
+  /* ---- pergunta de V ou F (par de slides, sem JS) ---- */
+
+  .vf-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+    text-align: center;
+    width: 100%;
+  }
+  .vf-label {
+    font-size: 1.1vw;
+    min-font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .vf-statement {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    line-height: 1.3;
+    max-width: 62vw;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .vf-options { display: flex; gap: 1.6vw; }
+  .vf-option {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 0.8vw 2.4vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .vf-answer {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    padding: 0.4vw 2vw;
+    border-radius: 1vw;
+  }
+  .vf-answer.is-accent { color: #fff; background: var(--accent); }
+  .vf-explanation {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 56vw;
+    margin: 0;
+  }
+  .vf-statement .mono, .vf-explanation .mono { font-family: var(--font-mono); color: var(--ink); }
 
   /* ---- flow (transformação em passos) ---- */
 
@@ -196,6 +258,10 @@
     font-size: clamp(1.4rem, 2.6vw, 2.1rem);
     color: var(--ink-soft);
   }
+  .flow.is-stack { flex-direction: column; gap: 0.35vw; }
+  .flow.is-stack .box { font-size: clamp(0.95rem, 1.7vw, 1.3rem); padding: 0.4vw 1.3vw; }
+  .flow.is-stack .box .tag { font-size: 0.72rem; margin-top: 0.15vw; }
+  .flow.is-stack .arrow { transform: rotate(90deg); font-size: clamp(0.95rem, 1.4rem, 1.2rem); }
 
   /* ---- figura em tela cheia ---- */
 
@@ -262,12 +328,12 @@
   .cards .card .fn {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    font-size: clamp(1.5rem, 2.7vw, 2.2rem);
     color: var(--accent);
     display: block;
-    margin-bottom: 0.6vw;
+    margin-bottom: 0.7vw;
   }
-  .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
+  .cards .card p { font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
 
   /* ---- tamanho dos tipos primitivos ---- */
 
@@ -304,12 +370,12 @@
     background: var(--code-bg);
     border-radius: 0.8vw;
     padding: 1vw 1.4vw 1.3vw;
-    max-width: 38vw;
+    max-width: 44vw;
     box-shadow: 0 0.3vw 0 var(--line);
   }
   .code-panel .file-tag {
     font-family: var(--font-body);
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: rgba(231, 236, 241, 0.5);
@@ -318,7 +384,7 @@
   .code-panel pre {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    font-size: clamp(0.95rem, 1.5vw, 1.3rem);
     line-height: 1.5;
     color: var(--code-ink);
     white-space: pre;
@@ -331,6 +397,41 @@
   .code-panel .num  { color: #C792EA; }
   .code-panel .cmt  { color: #8A96A3; font-style: italic; }
   .code-panel .pp   { color: #E2685A; }
+
+  .code-panel.is-file { background: var(--surface); border: 1px solid var(--line); box-shadow: 0 0.3vw 0 var(--line); }
+  .code-panel.is-file .file-tag { color: var(--accent); }
+  .code-panel.is-file pre { color: var(--ink); }
+  .code-panel.is-file .cmt { color: var(--ink-faint); font-style: italic; }
+  .code-panel.is-file .kw { color: #1B5FA8; }
+  .code-panel.is-file .fn { color: #B1752F; }
+  .code-panel.is-file .str { color: #A0562E; }
+  .code-panel.is-file .num { color: #7B4FA8; }
+  .code-panel.is-file .dim { color: var(--ink-faint); font-style: italic; }
+
+  /* saída de programa: sempre no mesmo terminal escuro */
+  .code-panel.is-term { background: #0D1117; border: 1px solid #2A313B; }
+  .code-panel.is-term .file-tag { color: #8FB3D9; }
+  .code-panel.is-term .file-tag::before { content: "\25CF \25CF \25CF"; color: #454D59; margin-right: 0.6vw; letter-spacing: 0.1em; }
+  .code-panel.is-term pre { color: #D7DEE6; }
+  .code-panel.is-term .prompt { color: #6FD08C; }
+  .code-panel.is-term .in { color: #E8C15A; }
+  .code-panel.is-term .cmt { color: #7C8894; font-style: italic; }
+  .code-panel.is-term .dim { color: #7C8894; font-style: italic; }
+
+  .fig-inline img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 1vw;
+  }
+
+  .io { display: flex; flex-direction: column; gap: 1vw; align-items: stretch; width: 100%; }
+  .io .code-panel { max-width: none; padding: 0.7vw 1.2vw 0.9vw; }
+  .io .code-panel .file-tag { font-size: 0.72rem; margin-bottom: 0.35vw; }
+  .io .code-panel pre { font-size: clamp(0.78rem, 1.15vw, 1rem); line-height: 1.4; }
 
   .concept-split {
     display: flex;
@@ -434,6 +535,8 @@
     .compare { grid-template-columns: 1fr; }
     .code-panel { max-width: 90vw; }
     .concept-split { flex-direction: column; }
+    .vf-options { flex-direction: column; }
+    .vf-statement, .vf-explanation { max-width: 90vw; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -492,20 +595,53 @@
     <div class="kicker">Nesta aula</div>
     <h1>O que vamos ver</h1>
     <div class="body">
-      <ul class="roadmap">
-        <li><span class="n">01</span><div><div class="t">Do código ao executável</div><div class="d">como um programa em C nasce, compila e roda</div></div></li>
-        <li><span class="n">02</span><div><div class="t">Variáveis e tipos</div><div class="d">onde os dados moram na memória e quanto espaço ocupam</div></div></li>
-        <li><span class="n">03</span><div><div class="t">Operadores e E/S</div><div class="d">como transformar valores e conversar com quem usa o programa</div></div></li>
-        <li><span class="n">04</span><div><div class="t">Decisões</div><div class="d">como o programa escolhe o que fazer com if e switch</div></div></li>
+      <ul class="roadmap is-compact">
+        <li><span class="n">01</span><div><div class="t">O que é programar</div><div class="d">o computador, o ciclo de desenvolvimento, a compilação</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Estrutura de um programa em C</div><div class="d">o esqueleto que todo programa segue</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Variáveis e tipos</div><div class="d">onde os dados moram na memória e quanto espaço ocupam</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Operadores</div><div class="d">como transformar e comparar valores</div></div></li>
+        <li><span class="n">05</span><div><div class="t">Entrada e saída</div><div class="d">como conversar com quem usa o programa</div></div></li>
+        <li><span class="n">06</span><div><div class="t">Condicionais</div><div class="d">como o programa escolhe o que fazer com if e switch</div></div></li>
       </ul>
     </div>
     <div class="footer"><span>Primeiros programas em C</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 3. CICLO DE DESENVOLVIMENTO -->
+  <!-- ===== BLOCO 0 — O QUE É PROGRAMAR ===== -->
+
+  <!-- 3. O QUE É UM COMPUTADOR -->
   <section class="slide fig-slide" data-slide>
     <div class="fig-head">
-      <div class="kicker">Do código ao executável</div>
+      <div class="kicker">O que é programar</div>
+      <h1>Um computador processa dados através de instruções</h1>
+      <p class="sub">CPU, memória principal, memória secundária e dispositivos de E/S — tudo ligado por um barramento comum.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig1-1.jpg" alt="Diagrama da arquitetura básica de um computador: CPU, memória principal, memória secundária e dispositivos de entrada e saída, todos ligados a um barramento comum.">
+    </div>
+  </section>
+
+  <!-- 4. PROGRAMA = SEQUÊNCIA DE INSTRUÇÕES -->
+  <section class="slide" data-slide>
+    <div class="kicker">O que é programar</div>
+    <h1>Programar é escrever uma sequência de instruções</h1>
+    <p class="sub">Cada instrução é executada em ordem, para produzir o resultado esperado a partir dos dados de entrada.</p>
+    <div class="body">
+      <div class="flow is-stack">
+        <div class="box">dados de entrada<span class="tag">números, texto...</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">sequência de instruções<span class="tag">o programa</span></div>
+        <div class="arrow">→</div>
+        <div class="box">resultado esperado<span class="tag">a saída</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é programar</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. CICLO DE DESENVOLVIMENTO -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">O que é programar</div>
       <h1>Editar, compilar, testar — em ciclo</h1>
       <p class="sub">Um erro de compilação ou de execução manda de volta para o editor.</p>
     </div>
@@ -514,9 +650,53 @@
     </div>
   </section>
 
-  <!-- 4. ANATOMIA DE UM PROGRAMA -->
+  <!-- 6. SUB-ETAPAS DA COMPILAÇÃO -->
   <section class="slide" data-slide>
-    <div class="kicker">Do código ao executável</div>
+    <div class="kicker">O que é programar</div>
+    <h1>Compilar tem três sub-etapas</h1>
+    <p class="sub">Pré-processamento resolve #include/#define; a compilação traduz para código objeto; a linkagem junta as bibliotecas usadas.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">código-fonte<span class="tag">.c</span></div>
+        <div class="arrow">→</div>
+        <div class="box">pré-processado<span class="tag">#include, #define resolvidos</span></div>
+        <div class="arrow">→</div>
+        <div class="box">código objeto<span class="tag">compilação</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">executável<span class="tag">linkagem com stdio etc.</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é programar</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 0 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">O que é programar</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Um erro de execução (o programa roda, mas produz um resultado errado) é sinalizado pelo compilador da mesma forma que um erro de sintaxe.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>O que é programar</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">O que é programar</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">O compilador só detecta erros de sintaxe (erros de compilação); um erro de execução passa despercebido por ele — só aparece quando se compara a saída do programa com o resultado esperado.</p>
+    </div>
+    <div class="footer"><span>O que é programar</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 1 — ESTRUTURA DE UM PROGRAMA EM C ===== -->
+
+  <!-- 9. ANATOMIA DE UM PROGRAMA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
     <h1>A mesma anatomia, sempre</h1>
     <p class="sub">Todo programa em C segue este esqueleto.</p>
     <div class="body">
@@ -525,16 +705,156 @@
         <div class="card"><span class="fn">int main()</span><p>ponto de entrada obrigatório — é daqui que a execução começa</p></div>
         <div class="card"><span class="fn">{ }</span><p>delimitam o corpo: comandos executados em ordem, de cima a baixo</p></div>
         <div class="card"><span class="fn">return 0;</span><p>encerra a função e devolve um status ao sistema operacional</p></div>
+        <div class="card"><span class="fn">// ou /* */</span><p>comentários documentam o código — o compilador os ignora por completo</p></div>
       </div>
     </div>
-    <div class="footer"><span>Do código ao executável</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 5. TIPOS PRIMITIVOS -->
+  <!-- 9a. UM EXEMPLO COM TUDO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
+    <h1>Um exemplo com #include, #define e comentários</h1>
+    <p class="sub">printf escreve na tela, scanf lê o que o usuário digita — os dois voltam em detalhe mais adiante.</p>
+    <div class="body">
+      <div class="code-panel" style="max-width: 50vw; margin: 0 auto; padding: 0.7vw 1.4vw 0.9vw;">
+        <div class="file-tag" style="margin-bottom: 0.4vw;">exemplo.c (ilustrativo)</div>
+        <pre style="font-size: clamp(0.75rem, 1.15vw, 0.98rem); line-height: 1.3;"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#define</span> IDADE_ADULTA <span class="num">18</span>  <span class="cmt">/* apelido para 18 */</span>
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> idade;                 <span class="cmt">// idade lida</span>
+    <span class="kw">int</span> limite = IDADE_ADULTA; <span class="cmt">// vira "= 18;"</span>
+    <span class="fn">printf</span>(<span class="str">"Digite sua idade: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;idade);
+    <span class="fn">printf</span>(<span class="str">"Voce tem %d anos.\n"</span>, idade);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+      </div>
+    </div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9b. #include E #define, NESSE MESMO CÓDIGO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
+    <h1>#include e #define acontecem antes da compilação</h1>
+    <p class="sub">Diretivas de pré-processador: começam com # e são resolvidas antes de qualquer código ser traduzido.</p>
+    <div class="body">
+      <div class="cards" style="grid-template-columns: repeat(2, 1fr); max-width: 56vw;">
+        <div class="card is-accent"><span class="fn">#include &lt;stdio.h&gt;</span><p>traz as declarações de printf e scanf, usadas duas linhas abaixo no exemplo anterior</p></div>
+        <div class="card"><span class="fn">#define IDADE_ADULTA 18</span><p>cria um apelido de texto — <span class="mono" style="font-size:0.8em;">limite = IDADE_ADULTA;</span> vira <span class="mono" style="font-size:0.8em;">limite = 18;</span> antes de compilar</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9c. PIPELINE CONCRETO: COMANDO REAL -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
+    <h1>Um comando revela os arquivos por trás da compilação</h1>
+    <p class="sub">gcc --save-temps preserva os arquivos intermediários que normalmente são apagados sozinhos.</p>
+    <div class="body">
+      <div class="code-panel is-term" style="max-width: 62vw; margin: 0 auto;">
+        <div class="file-tag">terminal — dentro de 01_first_program/</div>
+        <pre><code><span class="prompt">$ gcc --save-temps main.c -o program</span>
+<span class="prompt">$ ls</span>
+main.c  program  program-main.i  program-main.o  program-main.s</code></pre>
+      </div>
+    </div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9d. PIPELINE CONCRETO: CONTEÚDO DE CADA ARQUIVO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
+    <h1>Em cada arquivo, uma tradução do mesmo código</h1>
+    <p class="sub">program-main.i → program-main.s → program-main.o/./program: cada um é uma versão mais próxima da máquina.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">program-main.i — #include já expandido</div>
+              <pre><code><span class="cmt">/* ...milhares de linhas de stdio.h expandidas aqui... */</span>
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">int</span> age;
+    <span class="fn">printf</span>(<span class="str">"How old are you?: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;age);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel is-file">
+              <div class="file-tag">program-main.s — instruções de máquina (assembly)</div>
+              <pre><code>call    __isoc99_scanf@PLT
+<span class="cmt">...</span>
+call    printf@PLT
+<span class="cmt">...</span>
+ret</code></pre>
+            </div>
+            <div class="code-panel is-file" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.8vw 1.4vw; gap: 0.3vw;">
+              <div class="file-tag" style="margin-bottom: 0;">program-main.o e ./program</div>
+              <pre style="text-align: center;"><code><span class="dim">binário — já não é texto legível</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 1 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Comentários (<span class="mono">/* ... */</span> ou <span class="mono">//</span>) podem ser removidos do código-fonte sem alterar em nada o comportamento do programa compilado.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Estrutura de um programa em C</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Verdadeiro</div>
+      <p class="vf-explanation">Comentários são pura documentação, ignorados pelo compilador — removê-los do código-fonte não muda em nada o programa compilado, só a legibilidade para quem lê o código.</p>
+    </div>
+    <div class="footer"><span>Estrutura de um programa em C</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 2 — VARIÁVEIS E TIPOS ===== -->
+
+  <!-- 12. O QUE É UMA VARIÁVEL -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <h1>Uma variável é um espaço nomeado na memória</h1>
+    <p class="sub">Guarda um valor de um tipo específico — e esse valor pode mudar ao longo da execução do programa.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">idade<span class="tag">nome</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">int idade = 20;<span class="tag">tipo + valor</span></div>
+        <div class="arrow">→</div>
+        <div class="box">idade = 21;<span class="tag">valor pode mudar</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 13. TIPOS PRIMITIVOS -->
   <section class="slide" data-slide>
     <div class="kicker">Variáveis e tipos</div>
     <h1>Cada tipo ocupa um número fixo de bytes</h1>
-    <p class="sub">char, int, float, double e void — <code>sizeof</code> revela o tamanho de cada um.</p>
+    <p class="sub">char, int, float, double e void — cada um com seu tamanho na memória.</p>
     <div class="body">
       <div class="sizes">
         <div class="row is-accent">
@@ -562,7 +882,53 @@
     <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 6. DECLARAR != INICIALIZAR -->
+  <!-- 14. DECLARAÇÃO DE VARIÁVEIS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <h1>Toda variável precisa ser declarada antes de usada</h1>
+    <p class="sub">A forma geral é <span class="mono">tipo nome;</span> — e dá para inicializar no mesmo passo.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr; max-width: 27vw; gap: 0.6vw;">
+            <div class="card is-accent" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">tipo nome;</span><p>declaração simples</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">float base, altura;</span><p>várias do mesmo tipo, com vírgula</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">int contador = 0;</span><p>declarar e já inicializar</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_first_program/main.c</div>
+            <pre><code><span class="kw">int</span> age;
+
+<span class="fn">printf</span>(<span class="str">"How old are you?: "</span>);
+<span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;age);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 15. VALORES CONSTANTES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <h1>Constantes são valores fixos no código</h1>
+    <p class="sub">Cada notação diz ao compilador que tipo de constante é aquela.</p>
+    <div class="body">
+      <div class="cards" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="card"><span class="fn">42</span><p>inteira</p></div>
+        <div class="card"><span class="fn">3.14</span><p>ponto flutuante</p></div>
+        <div class="card is-accent"><span class="fn">'a'</span><p>caractere</p></div>
+        <div class="card"><span class="fn">"Ola"</span><p>string</p></div>
+        <div class="card"><span class="fn">0x1F</span><p>hexadecimal</p></div>
+        <div class="card"><span class="fn">013</span><p>octal</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 16. DECLARAR != INICIALIZAR -->
   <section class="slide" data-slide>
     <div class="kicker">Variáveis e tipos</div>
     <h1>Declarar não é inicializar</h1>
@@ -591,9 +957,34 @@
     <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 7. DIVISÃO INTEIRA VS PONTO FLUTUANTE -->
+  <!-- VF BLOCO 2 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Em C, uma variável recém-declarada, sem inicialização explícita, sempre começa automaticamente com o valor zero.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Variáveis e tipos</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Ao contrário do que se poderia esperar, o C não zera automaticamente uma variável recém-declarada — seu valor inicial é indefinido, o que estiver por acaso naquele endereço de memória.</p>
+    </div>
+    <div class="footer"><span>Variáveis e tipos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 3 — OPERADORES ===== -->
+
+  <!-- 19. DIVISÃO INTEIRA VS PONTO FLUTUANTE -->
   <section class="slide" data-slide>
-    <div class="kicker">Operadores e E/S</div>
+    <div class="kicker">Operadores</div>
     <h1>Nem toda divisão sobra decimais</h1>
     <p class="sub">O tipo dos operandos decide se o resultado trunca — o cast explícito força a conversão.</p>
     <div class="body">
@@ -613,7 +1004,7 @@
           </div>
         </div>
         <div class="code-col">
-          <div class="code-panel">
+          <div class="code-panel" style="max-width: 44vw;">
             <div class="file-tag">07_conversion_and_uninitialized/main.c</div>
             <pre><code><span class="cmt">// os dois sao int: trunca</span>
 <span class="kw">float</span> media_errada =
@@ -625,12 +1016,31 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 8. PRÉ VS PÓS-INCREMENTO -->
+  <!-- 20. ATRIBUIÇÃO COMPOSTA -->
   <section class="slide" data-slide>
-    <div class="kicker">Operadores e E/S</div>
+    <div class="kicker">Operadores</div>
+    <h1>Atribuição composta combina operação e atribuição</h1>
+    <p class="sub"><span class="mono">x += 3;</span> equivale a <span class="mono">x = x + 3;</span> — mesmo padrão para -=, *=, /= e %=.</p>
+    <div class="body">
+      <div class="code-panel" style="max-width: 40vw; margin: 0 auto;">
+        <div class="file-tag">atribuição composta</div>
+        <pre><code><span class="kw">int</span> x = <span class="num">10</span>;
+
+x += <span class="num">3</span>;   <span class="cmt">// x = x + 3  → 13</span>
+x -= <span class="num">2</span>;   <span class="cmt">// x = x - 2  → 11</span>
+x *= <span class="num">4</span>;   <span class="cmt">// x = x * 4  → 44</span>
+x /= <span class="num">4</span>;   <span class="cmt">// x = x / 4  → 11 (int!)</span></code></pre>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 21. PRÉ VS PÓS-INCREMENTO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Operadores</div>
     <h1>++x e x++ não são a mesma coisa</h1>
     <p class="sub">A diferença aparece quando o operador está dentro de uma expressão maior.</p>
     <div class="body">
@@ -661,48 +1071,18 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 9. PRINTF: LARGURA DE CAMPO -->
-  <section class="slide fig-slide" data-slide>
-    <div class="fig-head">
-      <div class="kicker">Operadores e E/S</div>
-      <h1>printf também controla a largura</h1>
-      <p class="sub"><code>%4d</code> e <code>%7.2f</code> reservam um número mínimo de posições, alinhadas à direita.</p>
-    </div>
-    <div class="fig-wrap">
-      <img src="figs/fig2-1.jpg" alt="Dois especificadores de formato do printf com largura de campo: %4d reserva 4 posições para o inteiro 23, alinhado à direita; %7.2f reserva 7 posições (2 delas para casas decimais) para o valor 5.30, também alinhado à direita.">
-    </div>
-  </section>
-
-  <!-- 10. SCANF PRECISA DO ENDEREÇO -->
+  <!-- 22. OPERADORES LÓGICOS -->
   <section class="slide" data-slide>
-    <div class="kicker">Operadores e E/S</div>
-    <h1>scanf sempre pede o endereço</h1>
-    <p class="sub">Sem o <code>&amp;</code>, scanf não sabe onde guardar o valor lido.</p>
-    <div class="body">
-      <div class="flow">
-        <div class="box">idade<span class="tag">variável</span></div>
-        <div class="op">&amp;</div>
-        <div class="arrow">→</div>
-        <div class="box is-accent">&amp;idade<span class="tag">endereço na memória</span></div>
-        <div class="arrow">→</div>
-        <div class="box">scanf<span class="tag">escreve aqui</span></div>
-      </div>
-    </div>
-    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
-  </section>
-
-  <!-- 11. OPERADORES LÓGICOS E TERNÁRIO -->
-  <section class="slide" data-slide>
-    <div class="kicker">Operadores e E/S</div>
-    <h1>&amp;&amp;, || e ! combinam condições</h1>
-    <p class="sub">E o operador <code>?:</code> escolhe um valor sem precisar de if-else.</p>
+    <div class="kicker">Operadores</div>
+    <h1>&amp;&amp;, || e ! combinam expressões booleanas</h1>
+    <p class="sub">Curto-circuito: para assim que o resultado já está decidido — e o resultado (0/1) é um int comum, C não tem tipo booleano.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="cards" style="grid-template-columns: repeat(3, 1fr); max-width: 34vw;">
+          <div class="cards" style="grid-template-columns: repeat(3, 1fr); max-width: 42vw;">
             <div class="card is-accent"><span class="fn">a &amp;&amp; b</span><p>verdadeiro só se os dois lados forem verdadeiros</p></div>
             <div class="card"><span class="fn">a || b</span><p>verdadeiro se pelo menos um lado for</p></div>
             <div class="card"><span class="fn">!a</span><p>inverte um valor lógico</p></div>
@@ -712,23 +1092,248 @@
           <div class="code-panel">
             <div class="file-tag">06_logical_and_ternary/main.c</div>
             <pre><code><span class="kw">int</span> elegivel =
-    maior_de_idade &amp;&amp; renda_baixa;
-
-<span class="kw">const</span> <span class="kw">char</span> *faixa =
-    idade &lt; <span class="num">18</span> ? <span class="str">"menor de idade"</span> :
-    (idade &lt; <span class="num">60</span> ? <span class="str">"adulto"</span> : <span class="str">"idoso"</span>);</code></pre>
+    maior_de_idade &amp;&amp; renda_baixa;</code></pre>
           </div>
         </div>
       </div>
     </div>
-    <div class="footer"><span>Operadores e E/S</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 12. TODA CONDIÇÃO É UM NÚMERO -->
+  <!-- 23. SIZEOF -->
   <section class="slide" data-slide>
-    <div class="kicker">Decisões</div>
+    <div class="kicker">Operadores</div>
+    <h1>sizeof consulta o tamanho em tempo de compilação</h1>
+    <p class="sub">Funciona para qualquer tipo ou variável — e o resultado pode variar entre plataformas.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr; max-width: 22vw;">
+            <div class="card is-accent"><span class="fn">sizeof(tipo)</span><p>tamanho de um tipo</p></div>
+            <div class="card"><span class="fn">sizeof(variavel)</span><p>tamanho de uma variável</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">02_types/main.c</div>
+            <pre><code><span class="fn">printf</span>(<span class="str">"Size of int: %lu bytes\n"</span>,
+    <span class="kw">sizeof</span>(<span class="kw">int</span>));
+<span class="fn">printf</span>(<span class="str">"Size of double: %lu bytes\n"</span>,
+    <span class="kw">sizeof</span>(<span class="kw">double</span>));</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 24. CONVERSÃO IMPLÍCITA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Operadores</div>
+    <h1>Ler como double já evita a divisão inteira</h1>
+    <p class="sub">Quando os dois operandos já nascem de ponto flutuante, a conversão implícita nem precisa de cast.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-stack">
+            <div class="box">"10", "3"<span class="tag">digitado</span></div>
+            <div class="arrow">→</div>
+            <div class="box is-accent">num1, num2<span class="tag">lidos como double</span></div>
+            <div class="arrow">→</div>
+            <div class="box">10.0 / 3.0<span class="tag">= 3.333...</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel" style="max-width: 40vw;">
+            <div class="file-tag">04_calculator/main.c</div>
+            <pre><code><span class="kw">double</span> num1, num2, result;
+
+<span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;num1);
+<span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;num2);
+result = num1 / num2;  <span class="cmt">// já com decimais</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 3 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Operadores</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Na expressão <span class="mono">(float)a / b</span>, mesmo que <span class="mono">b</span> continue sendo <span class="mono">int</span>, a divisão inteira nunca chega a acontecer, porque um dos operandos (<span class="mono">a</span>, já convertido) é <span class="mono">float</span>.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Operadores</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Verdadeiro</div>
+      <p class="vf-explanation">Basta um operando de ponto flutuante para a divisão deixar de ser inteira — como o cast converte <span class="mono">a</span> para <span class="mono">float</span> antes da divisão, <span class="mono">b</span> continuar <span class="mono">int</span> não importa: o resultado já sai com casas decimais.</p>
+    </div>
+    <div class="footer"><span>Operadores</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 4 — ENTRADA E SAÍDA ===== -->
+
+  <!-- 27a. PRINTF: ASSINATURA E ESPECIFICADORES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Entrada e saída</div>
+    <h1>printf(formato, valores...) — um especificador por valor</h1>
+    <p class="sub">Cada % no texto de formato é um placeholder, preenchido pelo valor correspondente na mesma ordem.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: repeat(2, 1fr); max-width: 30vw; gap: 0.8vw;">
+            <div class="card is-accent" style="padding: 0.7vw 1vw;"><span class="fn">%d</span><p>inteiro</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn">%f</span><p>ponto flutuante</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn">%c</span><p>caractere</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn">%s</span><p>string</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">exemplo.c (ilustrativo)</div>
+              <pre><code><span class="kw">int</span> idade = <span class="num">20</span>;
+<span class="kw">float</span> altura = <span class="num">1.75</span>;
+
+<span class="fn">printf</span>(<span class="str">"%d anos, %f m\n"</span>, idade, altura);</code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">saída do programa</div>
+              <pre><code><span class="prompt">$ ./exemplo</span>
+20 anos, 1.750000 m</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Entrada e saída</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 27b. PRINTF: LARGURA DE CAMPO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Entrada e saída</div>
+    <h1>printf também controla a largura</h1>
+    <p class="sub"><span class="mono">%4d</span> e <span class="mono">%7.2f</span> reservam um número mínimo de posições, alinhadas à direita.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col fig-inline" style="max-height: 26vh;">
+          <img src="figs/fig2-1.jpg" alt="Dois especificadores de formato do printf com largura de campo: %4d reserva 4 posições para o inteiro 23, alinhado à direita; %7.2f reserva 7 posições (2 delas para casas decimais) para o valor 5.30, também alinhado à direita.">
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">exemplo.c (ilustrativo)</div>
+              <pre><code><span class="fn">printf</span>(<span class="str">"[%4d]\n"</span>, <span class="num">23</span>);
+<span class="fn">printf</span>(<span class="str">"[%7.2f]\n"</span>, <span class="num">5.3</span>);</code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">saída do programa</div>
+              <pre><code><span class="prompt">$ ./exemplo</span>
+[  23]
+[   5.30]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Entrada e saída</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 28. SCANF PRECISA DO ENDEREÇO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Entrada e saída</div>
+    <h1>scanf sempre pede o endereço</h1>
+    <p class="sub">Sem o <span class="mono">&amp;</span>, scanf não sabe onde guardar o valor lido. Esse endereço é um <strong>ponteiro</strong> — tipo com regras próprias, que veremos mais adiante no curso.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-stack">
+            <div class="box">idade<span class="tag">variável</span></div>
+            <div class="arrow">→</div>
+            <div class="box is-accent">&amp;idade<span class="tag">endereço na memória</span></div>
+            <div class="arrow">→</div>
+            <div class="box">scanf<span class="tag">escreve aqui</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">exemplo.c (ilustrativo)</div>
+              <pre><code><span class="kw">int</span> idade;
+<span class="fn">printf</span>(<span class="str">"Digite sua idade: "</span>);
+<span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;idade);
+<span class="fn">printf</span>(<span class="str">"Voce tem %d anos.\n"</span>, idade);</code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">saída do programa</div>
+              <pre><code><span class="prompt">$ ./exemplo</span>
+Digite sua idade: <span class="in">20</span>
+Voce tem 20 anos.</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Entrada e saída</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 4 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Entrada e saída</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Assim como <span class="mono">printf</span>, <span class="mono">scanf</span> recebe o valor da variável diretamente, sem precisar do operador <span class="mono">&amp;</span>.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Entrada e saída</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Entrada e saída</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Ao contrário de <span class="mono">printf</span>, <span class="mono">scanf</span> sempre precisa do endereço da variável, não do seu valor — por isso é quase sempre chamado com <span class="mono">&amp;</span> antes do nome da variável.</p>
+    </div>
+    <div class="footer"><span>Entrada e saída</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 5 — CONDICIONAIS ===== -->
+
+  <!-- 31. IF/ELSE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Condicionais</div>
+    <h1>if executa um bloco só quando a condição é verdadeira</h1>
+    <p class="sub">O else, opcional, executa um bloco alternativo quando ela é falsa.</p>
+    <div class="body">
+      <div class="code-panel" style="max-width: 44vw; margin: 0 auto;">
+        <div class="file-tag">03_fahrenheit2celsius/main.c</div>
+        <pre><code><span class="kw">if</span> (celsius &lt; <span class="num">0</span>)
+    <span class="fn">printf</span>(<span class="str">"It's freezing outside!\n"</span>);
+<span class="kw">else</span>
+    <span class="fn">printf</span>(<span class="str">"It's not freezing outside.\n"</span>);</code></pre>
+      </div>
+    </div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 32. TODA CONDIÇÃO É UM NÚMERO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Condicionais</div>
     <h1>C não tem um tipo booleano</h1>
-    <p class="sub">Qualquer expressão numérica pode ser usada como condição de um if.</p>
+    <p class="sub">Qualquer expressão numérica pode ser usada como condição de um if — para tipos primitivos, a regra é sempre esta.</p>
     <div class="body">
       <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 52vw;">
         <div class="col is-bad">
@@ -743,27 +1348,109 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Decisões</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 13. SWITCH: DECISÃO EM CASCATA -->
+  <!-- 33. BLOCOS DE COMANDOS -->
   <section class="slide" data-slide>
-    <div class="kicker">Decisões</div>
+    <div class="kicker">Condicionais</div>
+    <h1>Chaves agrupam comandos num bloco só</h1>
+    <p class="sub">Opcionais para um único comando — mas usá-las sempre evita um erro comum.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="code-panel" style="max-width: 40vw;">
+            <div class="file-tag">com chaves — claro</div>
+            <pre><code><span class="kw">if</span> (nota &gt;= <span class="num">7</span>)
+{
+    <span class="fn">printf</span>(<span class="str">"Aprovado\n"</span>);
+    total_aprovados++;
+}</code></pre>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel" style="max-width: 40vw; border: 1px solid var(--accent);">
+            <div class="file-tag">sem chaves — armadilha</div>
+            <pre><code><span class="kw">if</span> (nota &gt;= <span class="num">7</span>)
+    <span class="fn">printf</span>(<span class="str">"Aprovado\n"</span>);
+    total_aprovados++;  <span class="cmt">// roda sempre!</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 34. TERNÁRIO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Condicionais</div>
+    <h1>O operador ?: escolhe um valor sem if-else</h1>
+    <p class="sub">condição ? valor_se_verdadeiro : valor_se_falso — substitui um if-else de quatro linhas por uma expressão.</p>
+    <div class="body">
+      <div class="code-panel" style="max-width: 34vw; margin: 0 auto;">
+        <div class="file-tag">operador condicional</div>
+        <pre><code><span class="kw">int</span> maior = (a &gt; b) ? a : b;</code></pre>
+      </div>
+    </div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 35. SWITCH: DECISÃO EM CASCATA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Condicionais</div>
     <h1>switch testa em cascata, até bater</h1>
     <p class="sub">Sem <code>break</code>, a execução "cai" para o case seguinte (fall-through).</p>
     <div class="body">
-      <div class="caseflow">
-        <div class="case">case '+'</div>
-        <div class="case">case '-'</div>
-        <div class="case">case '*'</div>
-        <div class="case is-match">case '/' <span class="note">← bate aqui, executa até o break</span></div>
-        <div class="case is-default">default <span class="note">só roda se nenhum case bater</span></div>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="caseflow">
+            <div class="case">case '+'</div>
+            <div class="case">case '-'</div>
+            <div class="case">case '*'</div>
+            <div class="case is-match">case '/' <span class="note">← bate aqui</span></div>
+            <div class="case is-default">default</div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel" style="max-width: 40vw;">
+            <div class="file-tag">04_calculator/main.c</div>
+            <pre><code><span class="kw">switch</span> (operator)
+{
+<span class="kw">case</span> <span class="str">'+'</span>: result = num1 + num2; <span class="kw">break</span>;
+<span class="kw">case</span> <span class="str">'/'</span>: result = num1 / num2; <span class="kw">break</span>;
+<span class="kw">default</span>: <span class="fn">printf</span>(<span class="str">"Error\n"</span>);
+}</code></pre>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="footer"><span>Decisões</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 14. FECHAMENTO -->
+  <!-- VF BLOCO 5 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Condicionais</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Sem um <span class="mono">break</span> no final do <span class="mono">case</span>, o <span class="mono">switch</span> para automaticamente ali, sem executar o <span class="mono">case</span> seguinte.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Condicionais</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">É o contrário: sem <span class="mono">break</span>, a execução não para — ela "cai" para o <span class="mono">case</span> seguinte (<em>fall-through</em>) mesmo que a condição dele não bata, um comportamento às vezes proposital, mas fonte comum de bugs quando esquecido.</p>
+    </div>
+    <div class="footer"><span>Condicionais</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 38. FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>
