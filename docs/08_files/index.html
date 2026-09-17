@@ -565,6 +565,120 @@
     max-width: 40rem;
   }
   footer.closing strong { color: var(--ink-soft); }
+
+  /* ---- diagramas didáticos (copiados de slides.html deste módulo, sem
+     reescrita — feature 008-lecture-notes-format-rework) ---- */
+
+  .diagram { margin: 1.1rem 0 1.3rem; display: flex; justify-content: center; }
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .compare .col.is-accent { border-color: var(--accent); }
+  .compare .col .col-title {
+    display: block;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.6rem; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+    display: block;
+  }
+  @media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2vw;
+    flex-wrap: wrap;
+  }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(0.85rem, 1.6vw, 1.2rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 0.8vw 1.2vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.3vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .flow .arrow { font-size: clamp(1.2rem, 2vw, 1.7rem); color: var(--ink-faint); }
+
+  .duel { display: flex; align-items: center; justify-content: center; gap: 3vw; flex-wrap: wrap; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 0.8vw; }
+  .duel .item .demo { display: flex; gap: 0.4vw; }
+  .duel .item .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.6vw, 1.3rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.5vw;
+    min-width: clamp(1.9rem, 3vw, 2.5rem);
+    height: clamp(2.1rem, 3.3vw, 2.7rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.3vw;
+  }
+  .duel .item.is-bin .cell { background: var(--code-bg); color: var(--accent); border-color: var(--code-bg); }
+  .duel .item .tag { font-size: clamp(0.78rem, 1.1vw, 0.95rem); color: var(--ink-soft); text-align: center; max-width: 16vw; }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--ink-faint); }
+
+  .recordstrip { display: flex; flex-direction: column; align-items: center; gap: 1.4vw; width: 100%; }
+  .recordstrip .track { display: flex; gap: 0.7vw; flex-wrap: wrap; justify-content: center; }
+  .recordstrip .rec {
+    font-family: var(--font-mono);
+    font-size: clamp(0.78rem, 1.15vw, 0.98rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.9vw 1.2vw;
+    text-align: center;
+  }
+  .recordstrip .rec .off {
+    display: block;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.68em;
+    color: var(--ink-faint);
+    margin-top: 0.35vw;
+  }
+  .recordstrip .rec.is-skip { opacity: 0.45; border-style: dashed; }
+  .recordstrip .rec.is-target { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.3vw 0 var(--accent); }
+  .recordstrip .jump {
+    font-family: var(--font-mono);
+    font-size: clamp(0.78rem, 1.15vw, 0.95rem);
+    color: var(--accent);
+    font-weight: 700;
+    text-align: center;
+    max-width: 46vw;
+  }
 </style>
 </head>
 <body>
@@ -626,16 +740,32 @@
     </p>
     <p>
       Cada arquivo é identificado por um nome (geralmente com uma extensão, como <code>.txt</code> ou
-      <code>.c</code>, que indica o tipo de conteúdo ou o programa que o interpreta) dentro de um diretório.
-      Um arquivo pode ser tratado de duas formas: em <strong>modo texto</strong>, como uma sequência de
-      caracteres legível por um editor comum, ou em <strong>modo binário</strong>, como uma sequência de bytes
-      que só faz sentido para o programa que sabe interpretá-la. Arquivos texto são mais fáceis de inspecionar
-      e editar à mão; arquivos binários costumam ser mais compactos e eficientes para grandes volumes de
-      dados, por dispensar qualquer conversão entre a representação em memória e a representação salva. Um
-      conceito importante em ambos os casos é o <strong>cursor</strong>: uma posição de trabalho, mantida pelo
-      sistema operacional, que indica de onde a próxima leitura vai começar (ou onde a próxima escrita vai
-      acontecer). O cursor avança automaticamente a cada leitura ou escrita bem-sucedida, e pode também ser
-      reposicionado manualmente, como veremos na seção sobre arquivos binários.
+      <code>.c</code>) dentro de um diretório. Ele pode ser tratado de duas formas: em <strong>modo
+      texto</strong>, como uma sequência de caracteres legível por um editor comum, ou em <strong>modo
+      binário</strong>, como uma sequência de bytes que só faz sentido para o programa que sabe interpretá-la.
+    </p>
+
+    <div class="diagram">
+      <div class="duel">
+        <div class="item">
+          <div class="demo"><div class="cell">1</div><div class="cell">2</div><div class="cell">.</div><div class="cell">5</div></div>
+          <div class="tag">modo texto — "12.5", legível, 4 bytes</div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="item is-bin">
+          <div class="demo"><div class="cell">41</div><div class="cell">48</div><div class="cell">00</div><div class="cell">00</div></div>
+          <div class="tag">modo binário — os 4 bytes brutos do float 12.5</div>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      Arquivos texto são mais fáceis de inspecionar e editar à mão; arquivos binários costumam ser mais
+      compactos e eficientes para grandes volumes de dados, por dispensar qualquer conversão entre a
+      representação em memória e a representação salva. Um conceito importante em ambos os casos é o
+      <strong>cursor</strong>: uma posição de trabalho, mantida pelo sistema operacional, que indica de onde a
+      próxima leitura ou escrita vai acontecer. Ele avança automaticamente a cada operação bem-sucedida, e
+      também pode ser reposicionado manualmente — como veremos na seção sobre arquivos binários.
     </p>
 
     <h3>Funções para abrir e fechar arquivos</h3>
@@ -671,6 +801,22 @@
       retorno de <code>fopen</code> antes de prosseguir.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Chamar <code>fclose(fp)</code> sobre um arquivo que foi aberto só para leitura (modo <code>"r"</code>)
+        não tem nenhum efeito, já que não há dado pendente de gravação para proteger.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Mesmo sem dado pendente de escrita, <code>fclose</code> ainda libera a área de memória reservada para o buffer e o recurso do sistema operacional associado ao arquivo — por isso vale chamá-lo mesmo depois de só ler um arquivo.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Independentemente do modo de abertura, <code>fclose</code> sempre libera a memória do buffer e o recurso do sistema operacional associado ao arquivo — só a garantia de "gravação pendente" é exclusiva de arquivos abertos para escrita.</p>
+      </div>
+    </div>
+
     <h3>Arquivos em modo texto</h3>
     <p>
       Em modo texto, o conteúdo do arquivo é interpretado como uma sequência de caracteres — os mesmos
@@ -678,6 +824,22 @@
       específicas para ler e escrever nesse modo, próximas das já conhecidas <code>scanf</code> e
       <code>printf</code>, mas operando sobre um arquivo em vez da entrada e saída padrão.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Em modo texto, o conteúdo gravado é sempre uma cópia byte a byte da representação que os dados tinham
+        na memória do programa.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Essa é a característica do modo <em>binário</em>, não do texto. Em modo texto os dados passam por conversão/formatação (um número vira uma sequência de dígitos legíveis, por exemplo); a cópia byte a byte é exclusividade do modo binário, que vem mais adiante nesta página.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O modo texto formata os dados como caracteres legíveis (um número vira dígitos, por exemplo); é o modo binário que copia os bytes da memória diretamente, sem tradução.</p>
+      </div>
+    </div>
 
     <h4>Funções para ler dados</h4>
     <p>
@@ -705,91 +867,234 @@
       mesmo trecho duas vezes.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Se a linha do arquivo for mais longa que o limite passado para <code>fgets</code>, os caracteres que não
+        couberam são descartados — a próxima chamada de <code>fgets</code> continua a partir da linha seguinte,
+        ignorando o restante daquela linha.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> <code>fgets</code> simplesmente para de ler ao atingir o limite, sem descartar nada — o cursor do arquivo fica exatamente onde a leitura parou, então a próxima chamada continua a partir do restante daquela mesma linha, não da linha seguinte.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Nada é descartado: <code>fgets</code> só para de ler ao atingir o limite, deixando o cursor no meio da linha — a próxima chamada continua exatamente dali, capturando o restante daquela mesma linha, não pulando para a linha seguinte.</p>
+      </div>
+    </div>
+
     <h4>Funções para escrever dados</h4>
     <p>
       As funções de escrita em modo texto espelham as de leitura. <code>fprintf</code> é a versão de
       <code>printf</code> que escreve num arquivo em vez da tela, recebendo o ponteiro do arquivo como
-      primeiro parâmetro; seu retorno é o número de bytes escritos. <code>fputc</code> escreve um único
-      caractere no arquivo, devolvendo o próprio caractere escrito (ou <code>EOF</code>, se a escrita falhar).
-      O exemplo <em>Três arquivos abertos ao mesmo tempo</em>, mais adiante, usa <code>fprintf</code> para
-      gravar o resultado da soma.
+      primeiro parâmetro; seu retorno é o número de bytes escritos.
+    </p>
+    <p>
+      <code>fputc</code> escreve um único caractere no arquivo, devolvendo o próprio caractere escrito (ou
+      <code>EOF</code>, se a escrita falhar). O exemplo <em>Três arquivos abertos ao mesmo tempo</em>, mais
+      adiante, usa <code>fprintf</code> para gravar o resultado da soma.
     </p>
     <pre class="mini-code"><span class="kw">int</span> <span class="fn">fprintf</span>(<span class="type">FILE</span> *fp, <span class="kw">char</span> *formato, ...);
 <span class="kw">int</span> <span class="fn">fputc</span>(<span class="kw">int</span> c, <span class="type">FILE</span> *fp);</pre>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        O retorno de <code>fputc</code> é do tipo <code>int</code> (não <code>char</code>) pelo mesmo motivo do
+        retorno de <code>fgetc</code>: para conseguir representar também a constante <code>EOF</code> em caso de
+        falha.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Assim como <code>fgetc</code>, <code>fputc</code> devolve <code>int</code> para poder representar, além dos códigos de caractere possíveis, a constante <code>EOF</code> quando a escrita falha — daí a assinatura <code>int fputc(int c, FILE *fp)</code>, com <code>c</code> também <code>int</code>, não <code>char</code>.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> É exatamente o mesmo motivo do retorno <code>int</code> de <code>fgetc</code>: como <code>EOF</code> não é um valor de caractere válido, <code>fputc</code> precisa de um tipo que caiba tanto os códigos de caractere quanto essa constante extra — por isso sua assinatura usa <code>int</code>, não <code>char</code>.</p>
+      </div>
+    </div>
 
     <h3>Estruturação de dados em arquivos textos</h3>
     <p>
       Um arquivo texto não impõe nenhuma estrutura por si só — cabe a quem escreve o programa decidir como
       organizar os dados dentro dele, de um jeito que depois possa ser lido de volta sem ambiguidade. Três
-      estratégias aparecem com frequência: processar o conteúdo caractere a caractere, linha a linha, ou
-      dividido em palavras-chave que identificam o tipo de cada registro.
+      estratégias aparecem com frequência:
     </p>
+
+    <div class="diagram">
+      <div class="compare">
+        <div class="col">
+          <span class="col-title">Caractere a caractere</span>
+          <p><code>fgetc</code> num laço até <code>EOF</code> — ideal para contar ou classificar caracteres individuais.</p>
+          <span class="cap">01_count_chars</span>
+        </div>
+        <div class="col is-accent">
+          <span class="col-title">Linha a linha</span>
+          <p><code>fgets</code> até <code>NULL</code> — cada linha vira uma unidade, útil combinada com <code>sscanf</code>.</p>
+          <span class="cap">03_count_lines</span>
+        </div>
+        <div class="col">
+          <span class="col-title">Palavras-chave</span>
+          <p><code>fscanf</code> com <code>%s</code> captura um token por vez — a base para despachar por tipo de registro.</p>
+          <span class="cap">02_count_words</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Um programa que lê um arquivo linha a linha com <code>fgets</code> só funciona corretamente se o
+        arquivo tiver sido <em>gravado</em> com uma linha por registro — essa correspondência não é garantida
+        automaticamente pelo formato texto.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Como o arquivo texto não impõe nenhuma estrutura por si só, cabe a quem grava os dados garantir esse alinhamento — se a escrita não seguir "uma linha por registro", a leitura por <code>fgets</code> não vai corresponder aos registros esperados.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A correspondência entre "uma linha" e "um registro" não vem de graça: é o programa que grava o arquivo que precisa seguir essa convenção para que a leitura linha a linha, com <code>fgets</code>, funcione como esperado.</p>
+      </div>
+    </div>
 
     <h4>Acesso caractere a caractere</h4>
     <p>
       A estratégia mais granular é varrer o arquivo um caractere por vez com <code>fgetc</code>, dentro de um
       laço que só para quando encontra <code>EOF</code>. É a abordagem certa quando o que importa é contar ou
-      classificar caracteres individuais — por exemplo, contar quantas linhas um arquivo tem contando as
-      ocorrências de <code>'\n'</code>, ou converter cada letra minúscula para maiúscula com a função
-      <code>toupper</code> da biblioteca <code>ctype.h</code>, lendo de um arquivo de entrada e escrevendo,
-      caractere a caractere, num arquivo de saída. O exemplo <em>Contagem de caracteres</em> deste módulo
-      aplica exatamente essa técnica, usando <code>fgetc</code> dentro de uma condição de laço que já
-      aproveita o fato de a atribuição em C também ser uma expressão: <code>while ((c = fgetc(fp)) != EOF)</code>
-      lê e testa o caractere na mesma linha. Vale registrar também a função <code>ungetc</code>, que permite
-      "devolver" o último caractere lido, fazendo-o ser capturado de novo na próxima leitura — útil quando o
-      programa precisa "espiar" o próximo caractere sem avançar o cursor de fato, antes de decidir o que
-      fazer.
+      classificar caracteres individuais — por exemplo, contar ocorrências de <code>'\n'</code>, ou converter
+      cada letra minúscula para maiúscula com <code>toupper</code> (<code>ctype.h</code>), lendo de um arquivo
+      de entrada e escrevendo, caractere a caractere, num arquivo de saída.
     </p>
+    <pre class="mini-code"><span class="kw">int</span> c;
+<span class="kw">while</span> ((c = <span class="fn">fgetc</span>(fp)) != <span class="kw">EOF</span>)
+{
+    <span class="cmt">/* processa c */</span>
+}</pre>
+    <p>
+      O exemplo <em>Contagem de caracteres</em> deste módulo aplica exatamente essa técnica, aproveitando o
+      fato de a atribuição em C também ser uma expressão: <code>c = fgetc(fp)</code> já vale como o próprio
+      valor comparado com <code>EOF</code> na mesma condição. Vale registrar também <code>ungetc</code>, que
+      "devolve" o último caractere lido para ser capturado de novo na próxima chamada — útil quando o
+      programa precisa "espiar" o próximo caractere sem avançar o cursor de fato.
+    </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Um laço que conta caracteres com <code>fgetc</code>, e usa <code>ungetc</code> para "devolver" um
+        caractere logo depois de inspecioná-lo, contaria esse caractere duas vezes se o contador for
+        incrementado antes da decisão de usar <code>ungetc</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Como a chamada de <code>fgetc</code> seguinte a um <code>ungetc</code> devolve de novo o mesmo caractere, incrementar o contador antes de decidir usar <code>ungetc</code> conta esse caractere duas vezes — uma na primeira leitura, outra quando ele é lido de novo depois do <code>ungetc</code>.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Acontece sim: a chamada de <code>fgetc</code> seguinte a um <code>ungetc</code> devolve de novo o mesmo caractere — se o contador já tiver sido incrementado antes dessa decisão, ele seria contado duas vezes.</p>
+      </div>
+    </div>
 
     <h4>Acesso linha a linha</h4>
     <p>
       Muitas aplicações fazem mais sentido processando o arquivo uma linha inteira de cada vez, com
       <code>fgets</code> dentro de um laço que termina quando a função devolve <code>NULL</code>. É o caso,
-      por exemplo, de um programa que busca a primeira linha de um arquivo que contém uma certa subcadeia
-      (usando <code>strstr</code> sobre cada linha lida) — o análogo em C do utilitário <code>grep</code>. O
-      exemplo <em>Contagem de linhas</em> deste módulo usa essa técnica para contar quantas linhas um arquivo
-      tem, imprimindo cada uma conforme é lida.
+      por exemplo, de um programa que busca a primeira linha contendo uma certa subcadeia (usando
+      <code>strstr</code>) — o análogo em C do utilitário <code>grep</code>. O exemplo <em>Contagem de
+      linhas</em> deste módulo usa essa técnica para contar e imprimir cada linha conforme é lida.
     </p>
     <p>
       A leitura linha a linha também combina bem com <code>sscanf</code>, uma função irmã de
-      <code>fscanf</code> que, em vez de ler de um arquivo, lê valores formatados de dentro de uma cadeia de
-      caracteres já em memória (o par inverso, <code>sprintf</code>, escreve valores formatados numa string em
-      vez de imprimi-los na tela):
+      <code>fscanf</code> que lê valores formatados de dentro de uma cadeia de caracteres já em memória, em
+      vez de ler de um arquivo:
     </p>
-    <pre class="mini-code"><span class="kw">int</span> <span class="fn">sscanf</span>(<span class="kw">char</span> *s, <span class="kw">char</span> *formato, ...);</pre>
+    <pre class="mini-code"><span class="kw">int</span> <span class="fn">sscanf</span>(<span class="kw">char</span> *s, <span class="kw">char</span> *formato, ...);
+<span class="kw">int</span> <span class="fn">sprintf</span>(<span class="kw">char</span> *s, <span class="kw">char</span> *formato, ...); <span class="cmt">/* caminho inverso */</span></pre>
     <p>
-      O padrão típico é: ler uma linha inteira com <code>fgets</code> e, em seguida, usar <code>sscanf</code>
-      para extrair os campos daquela linha — por exemplo, um caractere que identifica o tipo de uma figura
-      geométrica (<code>r</code> para retângulo, <code>c</code> para círculo, <code>t</code> para triângulo)
-      seguido dos parâmetros numéricos que a descrevem, cada tipo de figura com sua própria quantidade de
-      valores esperados. O valor de retorno de <code>sscanf</code> (quantos itens foram lidos com sucesso)
-      permite ainda detectar linhas vazias ou mal formatadas, sem que isso interrompa a leitura do restante do
-      arquivo. O exemplo <em>Parser com sscanf</em> deste módulo isola esse mecanismo: extrai um nome, uma
-      idade e uma altura de dentro de uma única string já lida, exatamente o passo que viria depois de um
-      <code>fgets</code> num cenário real de arquivo.
+      O padrão típico é ler uma linha inteira com <code>fgets</code> e, em seguida, usar <code>sscanf</code>
+      para extrair os campos daquela linha — por exemplo, um caractere de tipo (<code>r</code> para retângulo,
+      <code>c</code> para círculo) seguido dos parâmetros numéricos da figura. O retorno de <code>sscanf</code>
+      (quantos itens foram lidos com sucesso) ainda permite detectar linhas vazias ou mal formatadas sem
+      interromper a leitura do restante do arquivo. O exemplo <em>Parser com sscanf</em> deste módulo isola
+      esse mecanismo: extrai nome, idade e altura de dentro de uma string já lida — o passo que viria depois
+      de um <code>fgets</code> num cenário real de arquivo.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        O exemplo <em>Parser com sscanf</em> deste módulo usa <code>sscanf</code> para gravar valores
+        formatados dentro de uma string, do mesmo jeito que <code>sprintf</code> faria.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O exemplo <em>Parser com sscanf</em> usa <code>sscanf</code> para extrair (ler) nome, idade e altura de dentro de uma string já lida — quem faria o caminho inverso, escrevendo valores formatados numa string, seria <code>sprintf</code>, não usado nesse exemplo.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>sscanf</code> lê (extrai) valores de dentro de uma string — é isso que o exemplo <em>Parser com sscanf</em> faz com nome, idade e altura. Gravar valores formatados numa string é papel de <code>sprintf</code>, o caminho inverso.</p>
+      </div>
+    </div>
 
     <h4>Acesso via palavras-chave</h4>
     <p>
       Quando os registros de um arquivo têm tamanhos variáveis — um polígono pode ter qualquer número de
-      vértices, por exemplo — é comum precedê-los de uma palavra-chave que identifica o tipo do registro
-      (<code>RETANGULO</code>, <code>CIRCULO</code>, <code>POLIGONO</code>). A leitura passa a girar em torno
-      de capturar uma palavra por vez com <code>fscanf(fp, "%s", palavra)</code> — que já ignora
-      automaticamente espaços e quebras de linha entre uma palavra e outra — e decidir, a partir do conteúdo
-      lido (comparado com <code>strcmp</code>), como interpretar o que vem a seguir. O exemplo <em>Contagem de
-      palavras</em> deste módulo isola justamente esse mecanismo de leitura: cada chamada de
-      <code>fscanf(file, "%s", word)</code> captura a próxima sequência de caracteres não separada por espaço
+      vértices, por exemplo — é comum precedê-los de uma palavra-chave que identifica o tipo
+      (<code>RETANGULO</code>, <code>CIRCULO</code>, <code>POLIGONO</code>).
+    </p>
+    <pre class="mini-code"><span class="kw">char</span> palavra[<span class="num">50</span>];
+<span class="fn">fscanf</span>(fp, <span class="str">"%s"</span>, palavra); <span class="cmt">/* ignora espaços/quebras antes */</span>
+<span class="kw">if</span> (<span class="fn">strcmp</span>(palavra, <span class="str">"RETANGULO"</span>) == <span class="num">0</span>) { <span class="cmt">/* ... */</span> }</pre>
+    <p>
+      A leitura gira em torno de capturar uma palavra por vez com <code>fscanf(fp, "%s", palavra)</code> e
+      decidir, a partir do conteúdo lido (comparado com <code>strcmp</code>), como interpretar o que vem a
+      seguir. O exemplo <em>Contagem de palavras</em> deste módulo isola justamente esse mecanismo de leitura
       — a mesma primitiva usada para reconhecer palavras-chave num arquivo real, mesmo sem o
       <code>strcmp</code> de despacho por tipo.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        <code>fscanf(fp, "%s", palavra)</code> captura a palavra inteira mesmo que ela contenha um espaço no
+        meio, como em "RIO DE JANEIRO".
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> <code>fscanf</code> com <code>%s</code> para de capturar assim que encontra o primeiro espaço — em "RIO DE JANEIRO", a variável <code>palavra</code> receberia só "RIO"; capturar o nome inteiro exigiria uma abordagem diferente (como <code>fgets</code> seguido de outro processamento).</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> <code>%s</code> para no primeiro espaço que encontrar — em "RIO DE JANEIRO", <code>palavra</code> ficaria só com "RIO", não a cadeia inteira; espaços no meio quebram a captura de uma palavra-chave só de uma peça.</p>
+      </div>
+    </div>
 
     <h3>Arquivos em modo binário</h3>
     <p>
       Um arquivo binário guarda o conteúdo da memória diretamente, byte a byte, sem nenhuma conversão para
       texto — o mesmo bloco de bytes que representa uma struct em RAM é copiado, tal como está, para o disco.
       Isso torna a gravação e a recuperação de grandes volumes de dados bem mais eficientes do que passar por
-      formatação e interpretação de texto, ao custo de o arquivo deixar de ser legível por um editor comum.
+      formatação de texto, ao custo de o arquivo deixar de ser legível por um editor comum.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Se alguém abrir, num editor de texto comum, um arquivo binário que contém o float 12.5 gravado com
+        <code>fwrite</code>, o editor mostraria exatamente os caracteres "1", "2", ".", "5", só que sem
+        formatação bonita.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Um editor de texto tentaria interpretar os bytes brutos (<code>41 48 00 00</code>, no exemplo do float 12.5 visto no início da página) como caracteres — o resultado seria algo ilegível ou cheio de símbolos estranhos, nada parecido com o texto "12.5" que aparece no modo texto.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Os bytes brutos do float (<code>41 48 00 00</code>, no exemplo visto no início da página) não correspondem aos caracteres "1", "2", ".", "5" — um editor de texto exibiria algo ilegível, não os dígitos formatados que aparecem no modo texto.</p>
+      </div>
+    </div>
 
     <h4>Funções para salvar e recuperar</h4>
     <p>
@@ -799,32 +1104,55 @@
     <pre class="mini-code"><span class="kw">int</span> <span class="fn">fwrite</span>(<span class="kw">void</span> *p, <span class="kw">int</span> tam, <span class="kw">int</span> nelem, <span class="type">FILE</span> *fp);
 <span class="kw">int</span> <span class="fn">fread</span>(<span class="kw">void</span> *p, <span class="kw">int</span> tam, <span class="kw">int</span> nelem, <span class="type">FILE</span> *fp);</pre>
     <p>
-      Em ambas, <code>p</code> é o endereço do bloco de memória (de onde ler, no caso de <code>fwrite</code>,
-      ou para onde copiar, no caso de <code>fread</code>), <code>tam</code> é o tamanho em bytes de cada
-      elemento (tipicamente obtido com <code>sizeof</code>) e <code>nelem</code> é a quantidade de elementos —
-      permitindo gravar ou recuperar um vetor inteiro de uma só vez, não apenas um valor isolado. O exemplo
-      <em>Registros binários</em> deste módulo aplica exatamente esse par de funções a um vetor de structs
-      <code>Produto</code>, gravando os três de uma vez com <code>fwrite(produtos, sizeof(Produto), n, fp)</code>
-      e recuperando-os da mesma forma com <code>fread</code>.
+      <code>p</code> é o endereço do bloco de memória, <code>tam</code> é o tamanho em bytes de cada elemento
+      (tipicamente <code>sizeof</code>) e <code>nelem</code> é a quantidade de elementos — permitindo gravar
+      ou recuperar um vetor inteiro de uma só vez. O exemplo <em>Registros binários</em> aplica esse par a um
+      vetor de structs <code>Produto</code>:
     </p>
+    <pre class="mini-code"><span class="fn">fwrite</span>(produtos, <span class="kw">sizeof</span>(<span class="type">Produto</span>), n, fp); <span class="cmt">/* grava os n de uma vez */</span></pre>
+
     <p>
-      Uma vantagem exclusiva do modo binário é a possibilidade de acessar diretamente um registro específico,
-      sem precisar ler tudo o que vem antes dele — algo que não é natural em modo texto, onde o tamanho de
-      cada linha ou registro pode variar. Isso é possível porque, em modo binário, o programador sabe
-      exatamente quantos bytes cada registro ocupa, e pode reposicionar o cursor do arquivo com
-      <code>fseek</code>:
+      Uma vantagem exclusiva do modo binário é acessar diretamente um registro específico, sem ler tudo o que
+      vem antes dele — algo que não é natural em modo texto, onde o tamanho de cada linha pode variar. Isso é
+      possível porque, em modo binário, cada registro ocupa sempre o mesmo número de bytes, e o programador
+      pode reposicionar o cursor com <code>fseek</code>:
     </p>
     <pre class="mini-code"><span class="kw">int</span> <span class="fn">fseek</span>(<span class="type">FILE</span> *fp, <span class="kw">long</span> offset, <span class="kw">int</span> origem);</pre>
+
+    <div class="diagram">
+      <div class="recordstrip">
+        <div class="track">
+          <div class="rec is-skip">Produto[0]<span class="off">offset 0</span></div>
+          <div class="rec is-target">Produto[1]<span class="off">offset sizeof(Produto)</span></div>
+          <div class="rec">Produto[2]<span class="off">offset 2×sizeof(Produto)</span></div>
+        </div>
+        <div class="jump">fseek(fp, 1 × sizeof(Produto), SEEK_SET) → salta direto para Produto[1], sem ler Produto[0]</div>
+      </div>
+    </div>
+
     <p>
-      O parâmetro <code>offset</code> indica quantos bytes avançar, e <code>origem</code> indica a referência
-      desse deslocamento: <code>SEEK_SET</code> (a partir do início do arquivo), <code>SEEK_CUR</code> (a
-      partir da posição atual do cursor) ou <code>SEEK_END</code> (a partir do final do arquivo). Para chegar
-      direto ao registro de índice <code>i</code> de um arquivo com registros de tamanho fixo, basta
-      <code>fseek(fp, i * sizeof(Tipo), SEEK_SET)</code> antes de um único <code>fread</code>. O exemplo
-      <em>Registros binários</em> usa exatamente essa combinação para recuperar só o segundo produto do
-      arquivo, sem ler o primeiro — a mesma técnica que o material de referência ilustra para acessar um ponto
-      específico dentro de um arquivo de pontos 3D.
+      O parâmetro <code>offset</code> indica quantos bytes avançar, e <code>origem</code> indica a referência:
+      <code>SEEK_SET</code> (início do arquivo), <code>SEEK_CUR</code> (posição atual) ou <code>SEEK_END</code>
+      (final do arquivo). O exemplo <em>Registros binários</em> usa <code>fseek(fp, i * sizeof(Produto),
+      SEEK_SET)</code> para recuperar só o segundo produto do arquivo, sem ler o primeiro.
     </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Trocar <code>fwrite(produtos, sizeof(Produto), n, fp)</code> por <code>fwrite(produtos,
+        sizeof(Produto), 1, fp)</code> dentro de um laço que repete <code>n</code> vezes produziria, no arquivo
+        final, o mesmo conjunto de bytes gravado pela chamada original com <code>nelem = n</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> O resultado final no arquivo é o mesmo — <code>nelem</code> só controla quantos elementos são copiados por chamada; gravar <code>n</code> vezes com <code>nelem = 1</code> dentro de um laço produz a mesma sequência de bytes que uma única chamada com <code>nelem = n</code>, só que com mais chamadas (menos eficiente).</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Os bytes gravados são idênticos nos dois casos — <code>nelem = n</code> numa chamada só ou <code>nelem = 1</code> repetido <code>n</code> vezes num laço escrevem exatamente a mesma sequência de bytes; a diferença é só o número de chamadas feitas, não o conteúdo do arquivo.</p>
+      </div>
+    </div>
 
   </div>
 
