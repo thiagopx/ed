@@ -111,52 +111,26 @@
   .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
   .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
 
-  .string-strip {
-    display: flex;
-    gap: 0.6vw;
-    margin-top: 3vw;
-  }
-  .string-strip .chip {
-    font-family: var(--font-mono);
-    font-size: clamp(1.4rem, 3vw, 2.4rem);
-    font-weight: 700;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 0.5vw;
-    padding: 0.6vw 1vw;
-    box-shadow: 0 0.3vw 0 var(--line);
-  }
-  .string-strip .chip.is-null { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  /* ---- pipeline de compilação (assinatura da capa) ---- */
 
-  /* ---- ponteiro em miniatura (assinatura visual da capa) ---- */
-
-  .ptr-mini {
+  .pipeline-strip {
     display: flex;
     align-items: center;
-    gap: 1.4vw;
+    gap: 0.9vw;
     margin-top: 3vw;
   }
-  .ptr-mini .box {
+  .pipeline-strip .chip {
     font-family: var(--font-mono);
+    font-size: clamp(1rem, 2.1vw, 1.6rem);
     font-weight: 700;
-    font-size: clamp(1.4rem, 3vw, 2.4rem);
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 0.5vw;
-    padding: 0.6vw 1.2vw;
+    padding: 0.6vw 1.1vw;
     box-shadow: 0 0.3vw 0 var(--line);
-    text-align: center;
   }
-  .ptr-mini .box .tag {
-    display: block;
-    font-family: var(--font-body);
-    font-size: 0.5em;
-    font-weight: 600;
-    color: var(--ink-faint);
-    margin-top: 0.3vw;
-  }
-  .ptr-mini .box.is-accent { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); box-shadow: 0 0.3vw 0 var(--accent); }
-  .ptr-mini .arrow { font-size: clamp(1.6rem, 3.4vw, 2.6rem); color: var(--accent); font-weight: 700; }
+  .pipeline-strip .chip.is-accent { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .pipeline-strip .arrow { font-size: clamp(1.2rem, 2.2vw, 1.7rem); color: var(--ink-faint); }
 
   /* ---- roteiro ---- */
 
@@ -166,30 +140,88 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5vw;
+    gap: 1.4vw;
     width: 100%;
   }
   .roadmap li {
     display: flex;
     align-items: baseline;
     gap: 1.4vw;
-    padding-bottom: 0.5vw;
+    padding-bottom: 1.4vw;
     border-bottom: 1px solid var(--line);
   }
   .roadmap .n {
     font-family: var(--font-display);
-    font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
     color: var(--accent-soft);
     -webkit-text-stroke: 1.5px var(--accent);
     font-weight: 700;
-    min-width: 3vw;
+    min-width: 3.2vw;
   }
-  .roadmap .t { font-size: clamp(0.95rem, 1.6vw, 1.35rem); font-weight: 700; line-height: 1.25; }
-  .roadmap .d { font-size: clamp(0.75rem, 1.05vw, 0.92rem); color: var(--ink-soft); margin-top: 0.2vw; line-height: 1.35; }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+  .roadmap.is-compact { gap: 0.8vw; }
+  .roadmap.is-compact li { padding-bottom: 0.8vw; }
+  .roadmap.is-compact .n { font-size: clamp(1.4rem, 2.6vw, 2.2rem); }
+  .roadmap.is-compact .t { font-size: clamp(1.1rem, 2vw, 1.6rem); }
+  .roadmap.is-compact .d { font-size: clamp(0.85rem, 1.2vw, 1rem); margin-top: 0.15vw; }
 
-  /* roteiro com muitos itens: ancorar no topo do body em vez de centralizar,
-     para nunca sobrepor o h1 acima se o conteúdo for alto */
-  .body.is-top { align-items: flex-start; justify-content: flex-start; padding-top: 0.6vw; }
+  /* ---- pergunta de V ou F (par de slides, sem JS) ---- */
+
+  .vf-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vw;
+    text-align: center;
+    width: 100%;
+  }
+  .vf-label {
+    font-size: 1.1vw;
+    min-font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .vf-statement {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    line-height: 1.3;
+    max-width: 62vw;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .vf-options { display: flex; gap: 1.6vw; }
+  .vf-option {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 0.8vw 2.4vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .vf-answer {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    padding: 0.4vw 2vw;
+    border-radius: 1vw;
+  }
+  .vf-answer.is-accent { color: #fff; background: var(--accent); }
+  .vf-explanation {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 56vw;
+    margin: 0;
+  }
+  .vf-statement .mono, .vf-explanation .mono { font-family: var(--font-mono); color: var(--ink); }
 
   /* ---- flow (transformação em passos) ---- */
 
@@ -203,7 +235,7 @@
   .flow .box {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    font-size: clamp(1.5rem, 3.6vw, 2.8rem);
     background: var(--surface);
     border: 2px solid var(--line);
     border-radius: 1vw;
@@ -223,11 +255,13 @@
   .flow .arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
   .flow .op {
     font-family: var(--font-mono);
-    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
     color: var(--ink-soft);
-    text-align: center;
-    max-width: 12vw;
   }
+  .flow.is-stack { flex-direction: column; gap: 0.35vw; }
+  .flow.is-stack .box { font-size: clamp(0.95rem, 1.7vw, 1.3rem); padding: 0.4vw 1.3vw; }
+  .flow.is-stack .box .tag { font-size: 0.72rem; margin-top: 0.15vw; }
+  .flow.is-stack .arrow { transform: rotate(90deg); font-size: clamp(0.95rem, 1.4rem, 1.2rem); }
 
   /* ---- figura em tela cheia ---- */
 
@@ -253,76 +287,9 @@
     padding: 1.4vw;
   }
 
-  /* ---- cadeia de caracteres (boxes) ---- */
-
-  .chain { display: flex; flex-direction: column; align-items: center; gap: 1.4vw; }
-  .chain .strip { display: flex; gap: 0.7vw; }
-  .chain .cell {
-    font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: clamp(1.6rem, 3.4vw, 2.8rem);
-    background: var(--surface);
-    border: 2px solid var(--line);
-    border-radius: 0.6vw;
-    width: clamp(3rem, 6vw, 5rem);
-    height: clamp(3rem, 6vw, 5rem);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .chain .cell.is-null { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-  .chain .label { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--ink-soft); }
-  .chain .label strong { color: var(--ink); }
-
-  /* ---- code panel (trecho de código real) ---- */
-
-  .code-panel {
-    background: var(--code-bg);
-    border-radius: 0.8vw;
-    padding: 1vw 1.4vw 1.3vw;
-    max-width: 38vw;
-    box-shadow: 0 0.3vw 0 var(--line);
-  }
-  .code-panel .file-tag {
-    font-family: var(--font-body);
-    font-size: 0.68rem;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: rgba(231, 236, 241, 0.5);
-    margin-bottom: 0.7vw;
-  }
-  .code-panel pre {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: clamp(0.68rem, 1vw, 0.92rem);
-    line-height: 1.5;
-    color: var(--code-ink);
-    white-space: pre;
-    overflow-x: auto;
-  }
-  .code-panel .kw   { color: var(--code-kw); }
-  .code-panel .type { color: #4FD9C4; }
-  .code-panel .fn   { color: #E8C15A; }
-  .code-panel .str  { color: var(--code-str); }
-  .code-panel .num  { color: #C792EA; }
-  .code-panel .cmt  { color: #8A96A3; font-style: italic; }
-  .code-panel .pp   { color: #E2685A; }
-
-  .concept-split {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3vw;
-    width: 100%;
-    flex-wrap: wrap;
-  }
-  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
-  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
-
-  /* ---- comparação 2 ou 3 colunas ---- */
+  /* ---- comparação 2/3 colunas ---- */
 
   .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
-  .compare.cols-2 { grid-template-columns: repeat(2, 1fr); max-width: 62vw; margin: 0 auto; }
   .compare .col {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -330,7 +297,6 @@
     padding: 1.6vw;
   }
   .compare .col.is-bad { border-color: var(--accent); }
-  .compare .col.is-highlight { border-color: var(--accent); box-shadow: 0 0.3vw 0 var(--accent); }
   .compare .col h3 {
     font-family: var(--font-mono);
     font-size: clamp(1.1rem, 1.7vw, 1.4rem);
@@ -340,6 +306,7 @@
   .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.8vw; }
   .compare .col .cap {
     font-family: var(--font-mono);
+    font-weight: 700;
     font-size: clamp(0.95rem, 1.4vw, 1.15rem);
     background: var(--code-bg);
     color: var(--code-ink);
@@ -347,52 +314,6 @@
     padding: 0.5vw 0.7vw;
     display: block;
   }
-  .compare .col .cap .kept { color: #7fd99a; }
-  .compare .col .cap .lost { color: var(--ink-faint); text-decoration: line-through; }
-
-  /* ---- leituras em cascata (buffer) ---- */
-
-  .cascade { display: flex; gap: 2.2vw; width: 100%; justify-content: center; }
-  .cascade .card {
-    flex: 1;
-    max-width: 27vw;
-    background: var(--surface);
-    border: 2px solid var(--line);
-    border-radius: 1vw;
-    padding: 1.6vw;
-  }
-  .cascade .card.is-bad { border-color: var(--accent); }
-  .cascade .card.is-good { border-color: #1e8449; }
-  .cascade .card .lines {
-    font-family: var(--font-mono);
-    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
-    background: var(--code-bg);
-    color: var(--code-ink);
-    border-radius: 0.5vw;
-    padding: 0.8vw 1vw;
-    margin-bottom: 1.2vw;
-    line-height: 1.6;
-  }
-  .cascade .card .lines .hl { color: var(--code-str); font-weight: 700; }
-  .cascade .buf-label { font-size: clamp(0.75rem, 1.1vw, 0.95rem); color: var(--ink-faint); margin-bottom: 0.5vw; text-transform: uppercase; letter-spacing: 0.05em; }
-  .cascade .buf { display: flex; gap: 0.4vw; margin-bottom: 1.2vw; }
-  .cascade .buf .bit {
-    font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: clamp(1rem, 1.7vw, 1.35rem);
-    width: clamp(2rem, 3.2vw, 2.7rem);
-    height: clamp(2rem, 3.2vw, 2.7rem);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface-2);
-    border-radius: 0.4vw;
-  }
-  .cascade .buf .bit.is-flag { background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent); }
-  .cascade .buf .bit.is-skip { background: var(--surface-2); color: var(--ink-faint); border: 2px dashed var(--ink-faint); text-decoration: line-through; }
-  .cascade .verdict { font-size: clamp(0.95rem, 1.5vw, 1.2rem); font-weight: 700; }
-  .cascade .verdict.is-bad { color: var(--accent); }
-  .cascade .verdict.is-good { color: #1e8449; }
 
   /* ---- cards paralelos ---- */
 
@@ -407,106 +328,153 @@
   .cards .card .fn {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: clamp(1.1rem, 1.9vw, 1.5rem);
+    font-size: clamp(1.5rem, 2.7vw, 2.2rem);
     color: var(--accent);
     display: block;
-    margin-bottom: 0.6vw;
+    margin-bottom: 0.7vw;
   }
-  .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
+  .cards .card p { font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
 
-  /* ---- estrutura aninhada/recursiva ---- */
+  /* ---- tamanho dos tipos primitivos ---- */
 
-  .nest { display: flex; align-items: center; justify-content: center; }
-  .nest .ring {
-    border: 2px solid var(--line);
-    border-radius: 1vw;
-    padding: 1.6vw;
-    display: flex;
-    align-items: center;
-    gap: 1vw;
-    background: var(--surface);
-  }
-  .nest .ring .head {
+  .sizes { display: flex; flex-direction: column; gap: 1.3vw; width: 100%; max-width: 54vw; margin: 0 auto; }
+  .sizes .row { display: flex; align-items: center; gap: 1.2vw; }
+  .sizes .row .type {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+    font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+    width: 8vw;
+    flex: none;
   }
-  .nest .ring.is-accent { border-color: var(--accent); background: var(--accent-soft); }
-  .nest .ring.is-accent .head { color: var(--accent); }
-
-  /* ---- duelo de dois itens ---- */
-
-  .duel { display: flex; align-items: center; justify-content: center; gap: 4vw; }
-  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 1vw; }
-  .duel .item .demo { display: flex; gap: 0.6vw; }
-  .duel .item .cell {
-    font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: clamp(1.6rem, 3vw, 2.4rem);
+  .sizes .row .units { display: flex; gap: 0.4vw; flex-wrap: wrap; }
+  .sizes .row .unit {
+    width: clamp(1.5rem, 2.4vw, 2.1rem);
+    height: clamp(1.5rem, 2.4vw, 2.1rem);
     background: var(--surface);
     border: 2px solid var(--line);
+    border-radius: 0.3vw;
+  }
+  .sizes .row.is-accent .type { color: var(--accent); }
+  .sizes .row.is-accent .unit { border-color: var(--accent); background: var(--accent-soft); }
+  .sizes .row .bytes {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
+    color: var(--ink-faint);
+    margin-left: 0.6vw;
+    white-space: nowrap;
+  }
+
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 44vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.5vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: #4FD9C4; }
+  .code-panel .fn   { color: #E8C15A; }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: #C792EA; }
+  .code-panel .cmt  { color: #8A96A3; font-style: italic; }
+  .code-panel .pp   { color: #E2685A; }
+
+  .code-panel.is-file { background: var(--surface); border: 1px solid var(--line); box-shadow: 0 0.3vw 0 var(--line); }
+  .code-panel.is-file .file-tag { color: var(--accent); }
+  .code-panel.is-file pre { color: var(--ink); }
+  .code-panel.is-file .cmt { color: var(--ink-faint); font-style: italic; }
+  .code-panel.is-file .kw { color: #1B5FA8; }
+  .code-panel.is-file .fn { color: #B1752F; }
+  .code-panel.is-file .str { color: #A0562E; }
+  .code-panel.is-file .num { color: #7B4FA8; }
+  .code-panel.is-file .dim { color: var(--ink-faint); font-style: italic; }
+
+  /* saída de programa: sempre no mesmo terminal escuro */
+  .code-panel.is-term { background: #0D1117; border: 1px solid #2A313B; }
+  .code-panel.is-term .file-tag { color: #8FB3D9; }
+  .code-panel.is-term .file-tag::before { content: "\25CF \25CF \25CF"; color: #454D59; margin-right: 0.6vw; letter-spacing: 0.1em; }
+  .code-panel.is-term pre { color: #D7DEE6; }
+  .code-panel.is-term .prompt { color: #6FD08C; }
+  .code-panel.is-term .in { color: #E8C15A; }
+  .code-panel.is-term .cmt { color: #7C8894; font-style: italic; }
+  .code-panel.is-term .dim { color: #7C8894; font-style: italic; }
+
+  .fig-inline img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
     border-radius: 0.6vw;
-    width: clamp(2.6rem, 5vw, 4rem);
-    height: clamp(2.6rem, 5vw, 4rem);
+    padding: 1vw;
+  }
+
+  .io { display: flex; flex-direction: column; gap: 1vw; align-items: stretch; width: 100%; }
+  .io .code-panel { max-width: none; padding: 0.7vw 1.2vw 0.9vw; }
+  .io .code-panel .file-tag { font-size: 0.72rem; margin-bottom: 0.35vw; }
+  .io .code-panel pre { font-size: clamp(0.78rem, 1.15vw, 1rem); line-height: 1.4; }
+
+  .concept-split {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
   }
-  .duel .item .cell.is-null { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-  .duel .item .tag { font-family: var(--font-mono); font-size: clamp(1.1rem, 1.9vw, 1.6rem); color: var(--ink-soft); }
-  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); }
+  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
 
-  /* ---- vetor de ponteiros ---- */
+  /* ---- switch: decisão em cascata ---- */
 
-  .ptrgrid { display: flex; align-items: flex-start; justify-content: center; gap: 3vw; width: 100%; }
-  .ptrgrid .col-ptrs { display: flex; flex-direction: column; gap: 0.5vw; }
-  .ptrgrid .ptr {
-    font-family: var(--font-mono);
-    font-size: clamp(0.95rem, 1.5vw, 1.25rem);
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 0.4vw;
-    padding: 0.5vw 0.9vw;
+  .caseflow { display: flex; flex-direction: column; gap: 0.75vw; align-items: flex-start; margin: 0 auto; }
+  .caseflow .case {
     display: flex;
     align-items: center;
-    gap: 0.6vw;
-  }
-  .ptrgrid .ptr .idx { color: var(--ink-faint); }
-  .ptrgrid .col-strs { display: flex; flex-direction: column; gap: 0.5vw; justify-content: space-between; }
-  .ptrgrid .str-blob {
+    gap: 1vw;
     font-family: var(--font-mono);
-    font-size: clamp(0.95rem, 1.5vw, 1.25rem);
-    background: var(--accent-soft);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    border-radius: 999px;
-    padding: 0.5vw 1.1vw;
-  }
-
-  /* ---- terminal / argv ---- */
-
-  .term {
-    font-family: var(--font-mono);
-    background: var(--code-bg);
-    color: var(--code-ink);
-    border-radius: 0.7vw;
-    padding: 1.6vw 2vw;
-    font-size: clamp(1.1rem, 2.1vw, 1.7rem);
-    width: 100%;
-    max-width: 50vw;
-  }
-  .argv-row { display: flex; gap: 0.5vw; margin-top: 2.2vw; flex-wrap: wrap; }
-  .argv-row .tok { display: flex; flex-direction: column; align-items: center; gap: 0.5vw; }
-  .argv-row .tok .word {
-    font-family: var(--font-mono);
-    font-size: clamp(1rem, 1.8vw, 1.5rem);
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
     background: var(--surface);
     border: 2px solid var(--line);
-    border-radius: 0.5vw;
-    padding: 0.5vw 0.9vw;
+    border-radius: 0.6vw;
+    padding: 0.7vw 1.4vw;
+    opacity: 0.5;
   }
-  .argv-row .tok.is-0 .word { border-color: var(--accent); color: var(--accent); }
-  .argv-row .tok .idx { font-family: var(--font-mono); font-size: clamp(0.8rem, 1.2vw, 1rem); color: var(--ink-faint); }
+  .caseflow .case.is-match {
+    opacity: 1;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    box-shadow: 0 0.35vw 0 var(--accent);
+  }
+  .caseflow .case .note {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+    color: var(--ink-soft);
+  }
+  .caseflow .case.is-match .note { color: var(--accent); }
+  .caseflow .case.is-default { border-style: dashed; }
 
   /* ---- closing ---- */
 
@@ -525,6 +493,73 @@
   .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
 
   .cta-row { display: flex; flex-direction: column; gap: 1vw; align-items: flex-start; }
+
+
+  /* ---- roteiro de 8 itens: mais denso que o is-compact ---- */
+
+  .roadmap.is-dense { gap: 0.45vw; }
+  .roadmap.is-dense li { padding-bottom: 0.45vw; }
+  .roadmap.is-dense .n { font-size: clamp(1.1rem, 2vw, 1.7rem); min-width: 2.8vw; }
+  .roadmap.is-dense .t { font-size: clamp(0.95rem, 1.6vw, 1.3rem); }
+  .roadmap.is-dense .d { font-size: clamp(0.78rem, 1.1vw, 0.95rem); margin-top: 0.1vw; }
+
+  /* ---- ponteiro em miniatura (assinatura visual da capa) ---- */
+
+  .ptr-mini { display: flex; align-items: center; gap: 1.4vw; margin-top: 3vw; }
+  .ptr-mini .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.6vw 1.2vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+    text-align: center;
+  }
+  .ptr-mini .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.5em;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.3vw;
+  }
+  .ptr-mini .box.is-accent { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); box-shadow: 0 0.3vw 0 var(--accent); }
+  .ptr-mini .arrow { font-size: clamp(1.6rem, 3.4vw, 2.6rem); color: var(--accent); font-weight: 700; }
+
+  /* ---- ajustes de comparação usados neste módulo ---- */
+
+  .compare.cols-2 { grid-template-columns: repeat(2, 1fr); max-width: 62vw; margin: 0 auto; }
+  .compare .col.is-highlight { border-color: var(--accent); box-shadow: 0 0.3vw 0 var(--accent); }
+  .compare .col.is-good { border-color: #1e8449; }
+  .compare .col .cap + .cap { margin-top: 0.5vw; }
+  .compare .col .cap .kept { color: #7fd99a; }
+  .compare .col .cap .lost { color: var(--ink-faint); text-decoration: line-through; }
+  .compare .col .cap .hl { color: var(--code-str); }
+
+  /* ---- correspondência entre chamada e cabeçalho ---- */
+
+  .argmap { display: flex; flex-direction: column; gap: 1.6vw; width: 100%; max-width: 54vw; margin: 0 auto; }
+  .argmap .row { display: flex; flex-direction: column; gap: 0.4vw; }
+  .argmap .lbl { font-size: clamp(0.8rem, 1.15vw, 0.98rem); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); font-weight: 700; }
+  .argmap .line {
+    font-family: var(--font-mono);
+    font-size: clamp(0.9rem, 1.65vw, 1.3rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.7vw 1.1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .argmap .line .a1 { color: var(--accent); font-weight: 700; }
+  .argmap .line .a2 { color: #1e8449; font-weight: 700; }
+  .argmap .link { text-align: center; font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); }
+
+  /* ---- roteiro com muitos itens: ancorar no topo do body ---- */
+
+  .body.is-top { align-items: flex-start; justify-content: flex-start; padding-top: 0.6vw; }
+
   .cta-note { font-size: clamp(0.9rem, 1.4vw, 1.1rem); color: var(--ink-faint); }
 
   /* ---- navegação ---- */
@@ -567,10 +602,10 @@
     .cards { grid-template-columns: repeat(2, 1fr); }
     .compare { grid-template-columns: 1fr; }
     .compare.cols-2 { grid-template-columns: 1fr; }
-    .duel { flex-direction: column; gap: 1.5vw; }
-    .ptrgrid { flex-direction: column; align-items: center; }
     .code-panel { max-width: 90vw; }
     .concept-split { flex-direction: column; }
+    .vf-options { flex-direction: column; }
+    .vf-statement, .vf-explanation { max-width: 90vw; }
   }
 
   /* ---- impressão / PDF ---- */
@@ -627,24 +662,140 @@
     <div class="kicker">Nesta aula</div>
     <h1>O que vamos ver</h1>
     <div class="body is-top">
-      <ul class="roadmap">
-        <li><span class="n">01</span><div><div class="t">Funções</div><div class="d">dividir o programa em blocos reutilizáveis, com parâmetros e retorno</div></div></li>
-        <li><span class="n">02</span><div><div class="t">Pilha de execução</div><div class="d">o que acontece na memória a cada chamada de função</div></div></li>
-        <li><span class="n">03</span><div><div class="t">Ponteiros</div><div class="d">uma variável que guarda o endereço de outra</div></div></li>
-        <li><span class="n">04</span><div><div class="t">Ponteiros como parâmetro</div><div class="d">como uma função "retorna" mais de um valor</div></div></li>
-        <li><span class="n">05</span><div><div class="t">static e variáveis globais</div><div class="d">memória que sobrevive entre chamadas</div></div></li>
-        <li><span class="n">06</span><div><div class="t">Recursão</div><div class="d">uma função que chama a si mesma até um caso-base</div></div></li>
-        <li><span class="n">07</span><div><div class="t">Pré-processador e macros</div><div class="d">texto substituído antes mesmo da compilação</div></div></li>
+      <ul class="roadmap is-compact is-dense">
+        <li><span class="n">01</span><div><div class="t">Criação de novas funções</div><div class="d">dividir o programa em blocos pequenos, com nome, corpo e protótipo</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Parâmetros e valor de retorno</div><div class="d">o que entra na função, e o único valor que sai pelo return</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Escopo de variáveis</div><div class="d">onde cada variável é visível — e o modelo de pilha por trás</div></div></li>
+        <li><span class="n">04</span><div><div class="t">Ponteiro de variáveis</div><div class="d">uma variável que guarda o endereço de outra, com &amp; e *</div></div></li>
+        <li><span class="n">05</span><div><div class="t">Passando ponteiros para funções</div><div class="d">como uma função "devolve" mais de um valor</div></div></li>
+        <li><span class="n">06</span><div><div class="t">Variáveis globais e estáticas</div><div class="d">memória que sobrevive entre chamadas</div></div></li>
+        <li><span class="n">07</span><div><div class="t">Recursão</div><div class="d">uma função que chama a si mesma até o caso-base</div></div></li>
+        <li><span class="n">08</span><div><div class="t">Pré-processador e macros</div><div class="d">texto substituído antes mesmo da compilação</div></div></li>
       </ul>
     </div>
     <div class="footer"><span>Funções e ponteiros</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 3. FUNÇÃO COMO CAIXA -->
+  <!-- ===== BLOCO 1 — CRIAÇÃO DE NOVAS FUNÇÕES ===== -->
+
+  <!-- 3. POR QUE DIVIDIR EM FUNÇÕES -->
   <section class="slide" data-slide>
-    <div class="kicker">Funções</div>
+    <div class="kicker">Criação de novas funções</div>
+    <h1>Um programa bom é feito de funções pequenas</h1>
+    <p class="sub">Cada função implementa uma funcionalidade específica — e o programa principal só a chama.</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card"><span class="fn">mais fácil</span><p>codificar várias funções pequenas é mais simples que uma função gigante</p></div>
+        <div class="card"><span class="fn">reutilizável</span><p>uma função correta serve em qualquer outro programa que precise dela</p></div>
+        <div class="card"><span class="fn">sem repetição</span><p>trecho que se repete vira função, chamada quantas vezes for preciso</p></div>
+        <div class="card"><span class="fn">esconde detalhes</span><p>quem chama só quer o resultado, não como ele foi calculado</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Criação de novas funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. A FORMA GERAL DE UMA FUNÇÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Criação de novas funções</div>
+    <h1>Toda função tem quatro partes</h1>
+    <p class="sub"><span class="mono">tipo_do_retorno nome(lista_de_parâmetros) { corpo }</span></p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr; max-width: 27vw; gap: 0.6vw;">
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">double</span><p>tipo do valor devolvido</p></div>
+            <div class="card is-accent" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">cylinder_volume</span><p>nome — único no programa</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">(double radius, double height)</span><p>parâmetros, com tipo e nome</p></div>
+            <div class="card" style="padding: 0.7vw 1vw;"><span class="fn" style="font-size: clamp(1rem, 1.7vw, 1.3rem);">{ ... return ...; }</span><p>corpo, entre chaves</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_cylinder/cylinder.c</div>
+            <pre><code><span class="cmt">// Function to calculate volume of a cylinder</span>
+<span class="kw">double</span> <span class="fn">cylinder_volume</span>(<span class="kw">double</span> radius,
+                       <span class="kw">double</span> height)
+{
+    <span class="kw">return</span> M_PI * <span class="fn">pow</span>(radius, <span class="num">2</span>) * height;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Criação de novas funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. O FLUXO DE EXECUÇÃO DESVIA E VOLTA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Criação de novas funções</div>
+    <h1>Chamar uma função desvia o fluxo — e ele volta</h1>
+    <p class="sub">A execução começa sempre em <span class="mono">main</span>, qualquer que seja a ordem das funções no arquivo.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">main<span class="tag">executando</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">cylinder_volume<span class="tag">corpo da função</span></div>
+        <div class="arrow">↩</div>
+        <div class="box">main<span class="tag">continua onde parou</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Criação de novas funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. PROTÓTIPO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Criação de novas funções</div>
+    <h1>Uma função precisa ser conhecida antes de ser usada</h1>
+    <p class="sub">Ou ela vem escrita antes de quem a chama, ou seu protótipo é declarado no topo do arquivo.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-highlight">
+          <h3>definição antes</h3>
+          <p>A função inteira aparece acima de <code>main</code> — é o que os exemplos deste módulo fazem.</p>
+          <span class="cap">double cylinder_volume(...) { ... }</span>
+          <span class="cap">int main() { ... }</span>
+        </div>
+        <div class="col">
+          <h3>protótipo antes</h3>
+          <p>Só o cabeçalho, com ponto-e-vírgula: o compilador já sabe os tipos e a definição pode vir depois.</p>
+          <span class="cap">double cylinder_volume(double, double);</span>
+          <span class="cap">int main() { ... }</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Criação de novas funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 1 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Criação de novas funções</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">A execução de um programa em C começa pela primeira função escrita no arquivo.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Criação de novas funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Criação de novas funções</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">A execução começa sempre pela função <span class="mono">main</span>, não importa a ordem em que as funções aparecem no código. A ordem só importa para o compilador saber o cabeçalho de quem é chamado — e o protótipo resolve isso.</p>
+    </div>
+    <div class="footer"><span>Criação de novas funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 2 — PARÂMETROS E VALOR DE RETORNO ===== -->
+
+  <!-- 9. FUNÇÃO COMO CAIXA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Parâmetros e valor de retorno</div>
     <h1>Uma função é uma caixa</h1>
-    <p class="sub">Parâmetros entram por cópia; o <code>return</code> devolve um único valor a quem chamou.</p>
+    <p class="sub">Zero ou mais parâmetros entram por cópia; o <span class="mono">return</span> devolve um único valor a quem chamou.</p>
     <div class="body">
       <div class="flow">
         <div class="box">radius, height<span class="tag">parâmetros</span></div>
@@ -654,13 +805,151 @@
         <div class="box">volume<span class="tag">retorno (return)</span></div>
       </div>
     </div>
-    <div class="footer"><span>Funções</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Parâmetros e valor de retorno</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 4. PILHA DE EXECUÇÃO -->
+  <!-- 10. ORDEM, NÚMERO E TIPO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Parâmetros e valor de retorno</div>
+    <h1>Os argumentos casam em ordem, número e tipo</h1>
+    <p class="sub">O primeiro valor da chamada vira o primeiro parâmetro; o segundo, o segundo — e os tipos têm de corresponder.</p>
+    <div class="body">
+      <div class="argmap">
+        <div class="row">
+          <div class="lbl">na chamada, dentro de main</div>
+          <div class="line">volume = cylinder_volume(<span class="a1">radius</span>, <span class="a2">height</span>);</div>
+        </div>
+        <div class="link">↓ &nbsp; os valores são copiados, na ordem &nbsp; ↓</div>
+        <div class="row">
+          <div class="lbl">no cabeçalho da função</div>
+          <div class="line">double cylinder_volume(double <span class="a1">radius</span>, double <span class="a2">height</span>)</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Parâmetros e valor de retorno</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. VOID NOS DOIS LUGARES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Parâmetros e valor de retorno</div>
+    <h1>void aparece nos dois lugares — e quer dizer coisas diferentes</h1>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-highlight">
+          <h3>void antes do nome</h3>
+          <p>A função <strong>não devolve</strong> valor nenhum pelo <code>return</code>.</p>
+          <span class="cap">void calculate_sum_and_difference(...)</span>
+        </div>
+        <div class="col">
+          <h3>void entre os parênteses</h3>
+          <p>A função <strong>não recebe</strong> parâmetro nenhum — como <code>count_calls()</code>, do exemplo de variáveis estáticas.</p>
+          <span class="cap">int nome(void)</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Parâmetros e valor de retorno</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. A CHAMADA É UMA EXPRESSÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Parâmetros e valor de retorno</div>
+    <h1>A chamada é uma expressão que vale o retorno</h1>
+    <p class="sub">Por isso ela pode aparecer dentro de uma expressão maior, como <span class="mono">cylinder_volume(radius, height) / 2.0</span>.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow" style="flex-direction: column; gap: 0.8vw;">
+            <div class="box">cylinder_volume(4, 2)<span class="tag">chamada</span></div>
+            <div class="arrow">↓</div>
+            <div class="box is-accent">100.53<span class="tag">o valor da expressão</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">01_cylinder/cylinder.c — dentro de main</div>
+              <pre><code><span class="kw">double</span> volume = <span class="fn">cylinder_volume</span>(radius, height);
+<span class="fn">printf</span>(<span class="str">"Volume: %.2lf\n"</span>, volume);</code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">execução — raio 4, altura 2</div>
+              <pre><code>Radius: 4.00
+Height: 2.00
+Volume: 100.53</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Parâmetros e valor de retorno</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 2 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Parâmetros e valor de retorno</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Uma função pode devolver, num único <span class="mono">return</span>, dois valores de uma vez.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Parâmetros e valor de retorno</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Parâmetros e valor de retorno</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">O <span class="mono">return</span> devolve <strong>um</strong> valor, do tipo declarado antes do nome da função. Para entregar mais de um resultado a quem chamou, é preciso outro mecanismo — e é aí que entram os ponteiros.</p>
+    </div>
+    <div class="footer"><span>Parâmetros e valor de retorno</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 3 — ESCOPO DE VARIÁVEIS ===== -->
+
+  <!-- 15. CADA FUNÇÃO SÓ VÊ AS SUAS VARIÁVEIS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Escopo de variáveis</div>
+    <h1>Cada função só vê as variáveis que ela declara</h1>
+    <p class="sub">Nomes iguais em funções diferentes são variáveis distintas, em áreas de memória distintas.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col">
+          <h3>main</h3>
+          <p>Declara <code>radius</code>, <code>height</code> e <code>volume</code> — e não alcança nada de dentro da função auxiliar.</p>
+          <span class="cap">double radius, height, volume;</span>
+        </div>
+        <div class="col is-highlight">
+          <h3>cylinder_volume</h3>
+          <p>Seus parâmetros <code>radius</code> e <code>height</code> são <strong>outras</strong> variáveis, inicializadas com cópias dos valores passados.</p>
+          <span class="cap">double radius, double height</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Escopo de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 16. MODELO DE PILHA: SÓ O TOPO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Escopo de variáveis · Modelo de pilha</div>
+    <h1>Como uma pilha de pratos: entra e sai pelo topo</h1>
+    <p class="sub">Variáveis locais e parâmetros são alocados no topo da pilha de execução e liberados quando o tempo de vida termina.</p>
+    <div class="body">
+      <div class="flow is-stack">
+        <div class="box is-accent">cylinder_volume: radius, height<span class="tag">topo — moldura da chamada atual</span></div>
+        <div class="arrow">←</div>
+        <div class="box">main: radius, height, volume<span class="tag">base — suspensa, ainda viva</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Escopo de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 17. FIGURA DA PILHA -->
   <section class="slide fig-slide" data-slide>
     <div class="fig-head">
-      <div class="kicker">Escopo de variáveis</div>
+      <div class="kicker">Escopo de variáveis · Modelo de pilha</div>
       <h1>Cada chamada empilha uma moldura</h1>
       <p class="sub">Parâmetros e variáveis locais vivem numa região de memória que desaparece quando a função retorna.</p>
     </div>
@@ -669,21 +958,168 @@
     </div>
   </section>
 
-  <!-- 5. PONTEIRO = ENDEREÇO -->
+  <!-- VF BLOCO 3 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Escopo de variáveis</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Uma variável local continua existindo na memória depois que a função que a declarou retorna.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Escopo de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Escopo de variáveis</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Variáveis locais são <strong>automáticas</strong>: o espaço é reservado no topo da pilha quando a declaração é executada e liberado assim que a função retorna. A cada nova chamada, o espaço é reservado de novo — e o valor anterior não volta.</p>
+    </div>
+    <div class="footer"><span>Escopo de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 4 — PONTEIRO DE VARIÁVEIS ===== -->
+
+  <!-- 20. O PROBLEMA: UM VALOR SÓ -->
+  <section class="slide" data-slide>
+    <div class="kicker">Ponteiro de variáveis</div>
+    <h1>E quando a função precisa devolver dois valores?</h1>
+    <p class="sub">Alterar os parâmetros não resolve: eles são cópias, e quem chamou não vê a mudança.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-good">
+          <h3>um resultado</h3>
+          <p>A soma de dois números sai pelo <code>return</code>, sem dificuldade nenhuma.</p>
+          <span class="cap">return a + b;</span>
+        </div>
+        <div class="col is-bad">
+          <h3>dois resultados</h3>
+          <p>Soma <em>e</em> diferença: escrever nos parâmetros não funciona — quem chamou continua com lixo.</p>
+          <span class="cap"><span class="lost">sum = a + b; difference = a - b;</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Ponteiro de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 21. FIGURA: PONTEIRO NA PILHA -->
   <section class="slide fig-slide" data-slide>
     <div class="fig-head">
-      <div class="kicker">Ponteiro de variáveis</div>
+      <div class="kicker">Ponteiro de variáveis · Variáveis do tipo ponteiro</div>
       <h1>Um ponteiro guarda um endereço</h1>
-      <p class="sub"><code>&amp;</code> obtém o endereço de uma variável; <code>*</code> acessa — ou altera — o valor guardado nele.</p>
+      <p class="sub"><span class="mono">&amp;</span> obtém o endereço de uma variável; <span class="mono">*</span> acessa — ou altera — o valor guardado nele.</p>
     </div>
     <div class="fig-wrap">
       <img src="figs/fig4-2.jpg" alt="Quatro painéis mostrando a mecânica de ponteiros: declaração de int a e int *p sem valor; a recebe 5; p recebe o endereço de a (p = &a); *p = 6 altera o conteúdo de a através do ponteiro.">
     </div>
   </section>
 
-  <!-- 6. POR VALOR VS POR ENDEREÇO -->
+  <!-- 22. & E * -->
   <section class="slide" data-slide>
+    <div class="kicker">Ponteiro de variáveis · Variáveis do tipo ponteiro</div>
+    <h1>Dois operadores, e nada mais</h1>
+    <p class="sub">Para cada tipo existe um tipo ponteiro: <span class="mono">int *</span>, <span class="mono">double *</span>, <span class="mono">char *</span>...</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cards" style="grid-template-columns: 1fr; max-width: 26vw; gap: 0.8vw;">
+            <div class="card is-accent" style="padding: 0.9vw 1vw;"><span class="fn">&amp;num</span><p>"endereço de" — resulta no endereço da variável</p></div>
+            <div class="card" style="padding: 0.9vw 1vw;"><span class="fn">*ptr</span><p>"conteúdo de" — acessa o valor guardado naquele endereço</p></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">02_pointer/pointer.c</div>
+              <pre><code><span class="kw">int</span> num = <span class="num">42</span>;
+<span class="kw">int</span> *ptr;
+
+ptr = &amp;num;      <span class="cmt">// ptr guarda o endereço de num</span>
+<span class="fn">printf</span>(<span class="str">"Value pointed to by ptr: %d\n"</span>, *ptr);
+
+*ptr = <span class="num">100</span>;      <span class="cmt">// altera num pelo ponteiro</span></code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">execução</div>
+              <pre><code>Original num value: 42
+Value pointed to by ptr: 42
+Updated num value: 100
+<span class="dim">(as linhas de endereço mudam a cada execução)</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Ponteiro de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 23. FIGURA: A SETA -->
+  <section class="slide fig-slide" data-slide>
+    <div class="fig-head">
+      <div class="kicker">Ponteiro de variáveis · Variáveis do tipo ponteiro</div>
+      <h1>"p aponta para a" — daí o nome ponteiro</h1>
+      <p class="sub">Em vez de escrever o endereço fictício, desenha-se uma seta: acessar <span class="mono">a</span> é o mesmo que acessar <span class="mono">*p</span>.</p>
+    </div>
+    <div class="fig-wrap">
+      <img src="figs/fig4-3.jpg" alt="Representação gráfica do valor de um ponteiro: a variável p, à esquerda, com uma seta curva apontando para a variável a, que guarda o valor 6 — ilustrando que o conteúdo de p é o endereço de a.">
+    </div>
+  </section>
+
+  <!-- 24. PONTEIRO NÃO INICIALIZADO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Ponteiro de variáveis · Variáveis do tipo ponteiro</div>
+    <h1>Ponteiro não inicializado guarda um endereço-lixo</h1>
+    <p class="sub">O ponteiro é uma variável como outra qualquer: sem atribuição, seu conteúdo é indefinido.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-bad">
+          <h3>erro típico</h3>
+          <p>Escrever pelo ponteiro antes de apontá-lo para algum espaço válido grava num endereço desconhecido — e o programa pode "voar".</p>
+          <span class="cap">int *p;</span>
+          <span class="cap"><span class="lost">*p = 3;</span></span>
+        </div>
+        <div class="col is-good">
+          <h3>correto</h3>
+          <p>Primeiro o ponteiro passa a apontar para um espaço que já existe; só então se escreve no conteúdo.</p>
+          <span class="cap">int a; int *p;</span>
+          <span class="cap"><span class="kept">p = &amp;a; *p = 3;</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Ponteiro de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 4 -->
+  <section class="slide vf-slide" data-slide>
     <div class="kicker">Ponteiro de variáveis</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Depois de <span class="mono">p = &amp;a;</span>, o comando <span class="mono">*p = 6;</span> altera o valor da variável <span class="mono">a</span>.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Ponteiro de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Ponteiro de variáveis</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Verdadeiro</div>
+      <p class="vf-explanation">Como <span class="mono">p</span> guarda o endereço de <span class="mono">a</span>, escrever em <span class="mono">*p</span> é escrever no espaço de memória de <span class="mono">a</span> — acessar <span class="mono">a</span> e acessar <span class="mono">*p</span> passam a ser a mesma coisa.</p>
+    </div>
+    <div class="footer"><span>Ponteiro de variáveis</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 5 — PASSANDO PONTEIROS PARA FUNÇÕES ===== -->
+
+  <!-- 27. POR CÓPIA OU PELO ENDEREÇO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Passando ponteiros para funções</div>
     <h1>Por cópia, ou pelo endereço?</h1>
     <p class="sub">Uma função só altera o que recebeu por endereço — nunca uma cópia.</p>
     <div class="body">
@@ -700,22 +1136,111 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Ponteiro de variáveis</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Passando ponteiros para funções</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 7. PONTEIRO COMO PARÂMETRO DE SAÍDA -->
+  <!-- 28. FIGURA: PARÂMETROS DE SAÍDA -->
   <section class="slide fig-slide" data-slide>
     <div class="fig-head">
       <div class="kicker">Passando ponteiros para funções</div>
       <h1>A porta dos fundos para retornar mais de um valor</h1>
-      <p class="sub">Recebendo os endereços de <code>sum</code> e <code>difference</code>, a função escreve os dois resultados diretamente neles.</p>
+      <p class="sub">Recebendo os endereços das variáveis de <span class="mono">main</span>, a função escreve os dois resultados diretamente nelas.</p>
     </div>
     <div class="fig-wrap">
       <img src="figs/fig4-4.jpg" alt="Quatro painéis mostrando a pilha de execução de uma função que recebe ponteiros para dois parâmetros de saída: declaração das variáveis em main sem valor, chamada da função passando valores e endereços, escrita dos resultados diretamente nos endereços recebidos, e retorno com os resultados já presentes em main.">
     </div>
   </section>
 
-  <!-- 8. LOCAL / STATIC / GLOBAL -->
+  <!-- 29. DOIS RESULTADOS, NA PRÁTICA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Passando ponteiros para funções</div>
+    <h1>Dois resultados, sem nenhum return</h1>
+    <p class="sub">A função é <span class="mono">void</span>: os resultados saem pelos endereços que ela recebeu.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">03_sum_and_difference/sum_and_difference.c</div>
+              <pre><code><span class="kw">void</span> <span class="fn">calculate_sum_and_difference</span>(
+    <span class="kw">double</span> a, <span class="kw">double</span> b, <span class="kw">double</span> *sum, <span class="kw">double</span> *difference)
+{
+    *sum = a + b;
+    *difference = a - b;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">dentro de main — passando os endereços</div>
+              <pre><code><span class="fn">calculate_sum_and_difference</span>(num1, num2, &amp;sum, &amp;difference);</code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">execução — entradas 7.5 e 2.5</div>
+              <pre><code>Sum: 10.00
+Difference: 5.00</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Passando ponteiros para funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 30. O & DO SCANF -->
+  <section class="slide" data-slide>
+    <div class="kicker">Passando ponteiros para funções</div>
+    <h1>Agora dá para explicar o &amp; do scanf</h1>
+    <p class="sub">O <span class="mono">scanf</span> precisa gravar na <em>sua</em> variável — e só consegue isso recebendo o endereço dela.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow" style="flex-direction: column; gap: 0.8vw;">
+            <div class="box">&amp;radius<span class="tag">o endereço vai para o scanf</span></div>
+            <div class="arrow">↓</div>
+            <div class="box is-accent">radius = 4.0<span class="tag">o scanf escreve lá dentro</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_cylinder/cylinder.c</div>
+            <pre><code><span class="fn">printf</span>(<span class="str">"Enter the radius of the cylinder: "</span>);
+<span class="fn">scanf</span>(<span class="str">"%lf"</span>, &amp;radius);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Passando ponteiros para funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 5 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Passando ponteiros para funções</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Se o parâmetro fosse declarado <span class="mono">double sum</span> (sem o <span class="mono">*</span>), a função ainda conseguiria devolver a soma gravando em <span class="mono">sum</span>.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Passando ponteiros para funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Passando ponteiros para funções</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Sem o <span class="mono">*</span>, <span class="mono">sum</span> seria uma variável local da função, inicializada com uma cópia — e desempilhada no retorno. A variável de <span class="mono">main</span> continuaria com lixo. É o ponteiro que dá acesso ao espaço de memória original.</p>
+    </div>
+    <div class="footer"><span>Passando ponteiros para funções</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 6 — VARIÁVEIS GLOBAIS E ESTÁTICAS ===== -->
+
+  <!-- 33. ONDE CADA VARIÁVEL MORA -->
   <section class="slide" data-slide>
     <div class="kicker">Variáveis globais e estáticas</div>
     <h1>Onde cada variável mora — e por quanto tempo</h1>
@@ -723,17 +1248,17 @@
       <div class="compare">
         <div class="col">
           <h3>local</h3>
-          <p>Nasce e morre a cada chamada da função — some quando ela retorna.</p>
+          <p>Nasce e morre a cada chamada da função — vive na pilha e some quando ela retorna.</p>
           <span class="cap">vida: 1 chamada</span>
         </div>
         <div class="col is-highlight">
           <h3>static (local)</h3>
-          <p>Inicializada uma única vez; preserva o valor entre chamadas, mas continua visível só ali.</p>
+          <p>Fora da pilha, inicializada uma única vez; preserva o valor entre chamadas, mas continua visível só ali.</p>
           <span class="cap">vida: todo o programa</span>
         </div>
         <div class="col">
           <h3>global</h3>
-          <p>Existe do início ao fim do programa, visível — e alterável — por qualquer função.</p>
+          <p>Declarada fora de qualquer função: existe do início ao fim do programa, visível a todas as funções seguintes.</p>
           <span class="cap">vida: todo o programa</span>
         </div>
       </div>
@@ -741,27 +1266,154 @@
     <div class="footer"><span>Variáveis globais e estáticas</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 9. RECURSÃO -->
+  <!-- 34. STATIC NA PRÁTICA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis globais e estáticas</div>
+    <h1>static: a memória que lembra da última chamada</h1>
+    <p class="sub">Sem inicialização explícita, uma variável estática começa em zero — e o valor sobrevive ao retorno da função.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="code-panel">
+            <div class="file-tag">04_count_calls/count_calls.c</div>
+            <pre><code><span class="kw">int</span> <span class="fn">count_calls</span>()
+{
+    <span class="kw">static</span> <span class="kw">int</span> counter = <span class="num">0</span>; <span class="cmt">// Local static variable</span>
+
+    counter++; <span class="cmt">// Increment the counter</span>
+    <span class="kw">return</span> counter;
+}</code></pre>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel is-term">
+            <div class="file-tag">execução — cinco chamadas seguidas</div>
+            <pre><code>Function has been called 1 times.
+Function has been called 2 times.
+Function has been called 3 times.
+Function has been called 4 times.
+Function has been called 5 times.</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis globais e estáticas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 35. GLOBAL COM CRITÉRIO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Variáveis globais e estáticas</div>
+    <h1>Global resolve — e cria dependência</h1>
+    <p class="sub">Duas funções podem se comunicar por uma variável global, mas o preço é alto.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-bad">
+          <h3>global</h3>
+          <p>Visível — e alterável — por qualquer função seguinte, e por qualquer arquivo do programa. Alto grau de interdependência entre as funções.</p>
+          <span class="cap">int s, p;</span>
+        </div>
+        <div class="col">
+          <h3>static global</h3>
+          <p>Visível apenas dentro do arquivo que a declara: o nome não é exportado. Ameniza o problema, mas ainda pede critério.</p>
+          <span class="cap">static int s, p;</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis globais e estáticas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 6 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Variáveis globais e estáticas</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Uma variável <span class="mono">static</span> declarada dentro de uma função pode ser lida por outra função do mesmo arquivo.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Variáveis globais e estáticas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Variáveis globais e estáticas</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">O <span class="mono">static</span> local muda o <strong>tempo de vida</strong> (passa a durar todo o programa), não o <strong>escopo</strong>: a variável continua visível só dentro da função que a declara. Quem quer visibilidade geral usa variável global — com critério.</p>
+    </div>
+    <div class="footer"><span>Variáveis globais e estáticas</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 7 — RECURSÃO ===== -->
+
+  <!-- 38. DIRETA E INDIRETA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Recursão</div>
+    <h1>Uma função pode chamar a si mesma</h1>
+    <p class="sub">Direta, quando A chama A; indireta, quando A chama B e B chama A de volta.</p>
+    <div class="body">
+      <div style="display:flex; flex-direction:column; gap:1.8vw; align-items:center;">
+        <div class="flow">
+          <div class="box is-accent">A<span class="tag">recursão direta</span></div>
+          <div class="arrow">↻</div>
+          <div class="box is-accent">A<span class="tag">a própria função</span></div>
+        </div>
+        <div class="flow">
+          <div class="box">A<span class="tag">recursão indireta</span></div>
+          <div class="arrow">→</div>
+          <div class="box is-accent">B<span class="tag">outra função</span></div>
+          <div class="arrow">→</div>
+          <div class="box">A<span class="tag">volta à primeira</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Recursão</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 39. FIGURA: PILHA RECURSIVA -->
   <section class="slide fig-slide" data-slide>
     <div class="fig-head">
       <div class="kicker">Recursão</div>
-      <h1>Uma função que chama a si mesma</h1>
-      <p class="sub">Cada chamada recursiva empilha sua própria moldura — até um caso-base interromper a cadeia.</p>
+      <h1>Cada chamada recursiva tem o seu próprio n</h1>
+      <p class="sub">As variáveis locais de cada chamada são independentes — como se fossem funções diferentes.</p>
     </div>
     <div class="fig-wrap">
       <img src="figs/fig4-5.jpg" alt="Quatro painéis mostrando a pilha de execução de uma função recursiva func(n): pilha após a chamada func(4); nova moldura empilhada em func(3); pilha na profundidade máxima com uma moldura para cada chamada até o caso-base func(0); desempilhamento de func(0) de volta ao contexto de func(1).">
     </div>
   </section>
 
-  <!-- 10. FATORIAL RECURSIVO -->
+  <!-- 40. CONDIÇÃO DE CONTORNO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Recursão</div>
+    <h1>Sem condição de contorno, a pilha estoura</h1>
+    <p class="sub">A chamada recursiva precisa caminhar para um caso em que ela não acontece mais.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-bad">
+          <h3>sem caso-base</h3>
+          <p>A função chama a si mesma com o mesmo valor: o programa nunca termina e é interrompido quando a pilha chega ao limite.</p>
+          <span class="cap"><span class="lost">func(n); // sempre</span></span>
+        </div>
+        <div class="col is-good">
+          <h3>com caso-base</h3>
+          <p>O argumento diminui a cada chamada e existe um valor em que a recursão para — a execução tem fim.</p>
+          <span class="cap"><span class="kept">if (n &lt;= 1) return 1;</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Recursão</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 41. FATORIAL -->
   <section class="slide" data-slide>
     <div class="kicker">Recursão</div>
     <h1>Fatorial: a tradução quase direta da definição</h1>
-    <p class="sub"><code>n! = n × (n−1)!</code>, com caso-base <code>0! = 1! = 1</code> — a mesma ideia já vista de forma <em>iterativa</em> no módulo de repetições.</p>
+    <p class="sub"><span class="mono">n! = n × (n−1)!</span>, com caso-base <span class="mono">0! = 1! = 1</span> — a mesma ideia já vista de forma <em>iterativa</em> no módulo de repetições.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div style="display:flex; flex-direction:column; gap:1.6vw; align-items:center;">
+          <div style="display:flex; flex-direction:column; gap:1.2vw; align-items:center;">
             <div class="flow">
               <div class="box">n!<span class="tag">n &gt; 1</span></div>
               <div class="arrow">=</div>
@@ -775,9 +1427,10 @@
           </div>
         </div>
         <div class="code-col">
-          <div class="code-panel">
-            <div class="file-tag">06_recursive_factorial/main.c</div>
-            <pre><code><span class="kw">long long</span> <span class="fn">factorial</span>(<span class="kw">int</span> n)
+          <div class="io">
+            <div class="code-panel">
+              <div class="file-tag">06_recursive_factorial/main.c</div>
+              <pre><code><span class="kw">long long</span> <span class="fn">factorial</span>(<span class="kw">int</span> n)
 {
     <span class="kw">if</span> (n &lt;= <span class="num">1</span>)
     {
@@ -785,6 +1438,11 @@
     }
     <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>);
 }</code></pre>
+            </div>
+            <div class="code-panel is-term">
+              <div class="file-tag">execução — entrada 5</div>
+              <pre><code>Digite um numero: 5! = 120</code></pre>
+            </div>
           </div>
         </div>
       </div>
@@ -792,11 +1450,36 @@
     <div class="footer"><span>Recursão</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 11. MACRO -->
+  <!-- VF BLOCO 7 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Recursão</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Numa função recursiva, todas as chamadas compartilham a mesma variável <span class="mono">n</span>.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Recursão</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Recursão</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">Cada chamada — recursiva ou não — empilha a sua própria moldura, com parâmetros e variáveis locais independentes. É por isso que <span class="mono">factorial(5)</span> pode estar esperando o resultado de <span class="mono">factorial(4)</span> sem que um valor atropele o outro.</p>
+    </div>
+    <div class="footer"><span>Recursão</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- ===== BLOCO 8 — PRÉ-PROCESSADOR E MACROS ===== -->
+
+  <!-- 44. TEXTO SUBSTITUÍDO -->
   <section class="slide" data-slide>
     <div class="kicker">Pré-processador e macros</div>
     <h1>Texto substituído antes de compilar</h1>
-    <p class="sub"><code>#define</code> não é uma função — não existe chamada, parâmetro ou retorno de verdade.</p>
+    <p class="sub"><span class="mono">#define</span> não é uma função — não existe chamada, parâmetro ou retorno de verdade.</p>
     <div class="body">
       <div class="flow">
         <div class="box">SQUARE(num)<span class="tag">código-fonte</span></div>
@@ -808,17 +1491,104 @@
     <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 12. FECHAMENTO -->
+  <!-- 45. AS DUAS DIRETIVAS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Pré-processador e macros</div>
+    <h1>Duas diretivas já usadas em todo exemplo</h1>
+    <div class="body">
+      <div class="cards" style="grid-template-columns: repeat(2, 1fr); max-width: 56vw;">
+        <div class="card is-accent"><span class="fn">#include &lt;stdio.h&gt;</span><p>o pré-processador substitui a linha pelo corpo do arquivo — entre <span class="mono" style="font-size:0.85em;">&lt; &gt;</span> não procura no diretório local; entre <span class="mono" style="font-size:0.85em;">" "</span>, procura</p></div>
+        <div class="card"><span class="fn">#define SQUARE(x) ((x) * (x))</span><p>definição com parâmetros — uma <strong>macro</strong>: toda ocorrência de <span class="mono" style="font-size:0.85em;">SQUARE(...)</span> é trocada pelo texto correspondente</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 46. MACRO NA PRÁTICA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Pré-processador e macros</div>
+    <h1>Uma macro no exemplo do módulo</h1>
+    <p class="sub">Não há chamada de função em tempo de execução: o compilador só vê <span class="mono">((num) * (num))</span>.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="code-panel">
+            <div class="file-tag">05_square_macro/square_macro.c</div>
+            <pre><code><span class="cmt">// Define a macro to calculate the square of a number</span>
+<span class="pp">#define</span> SQUARE(x) ((x) * (x))
+
+<span class="kw">int</span> num = <span class="num">5</span>;
+<span class="kw">int</span> squared = SQUARE(num);</code></pre>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel is-term">
+            <div class="file-tag">execução</div>
+            <pre><code>The square of 5 is 25</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 47. PARÊNTESES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Pré-processador e macros</div>
+    <h1>Cada parâmetro entre parênteses — e a macro toda também</h1>
+    <p class="sub">Substituição é texto puro: sem parênteses, a precedência dos operadores muda o resultado.</p>
+    <div class="body">
+      <div class="compare cols-2">
+        <div class="col is-bad">
+          <h3>#define SQUARE(x) x * x</h3>
+          <p>Com <code>SQUARE(2 + 3)</code>, o compilador vê o texto trocado cru:</p>
+          <span class="cap">2 + 3 * 2 + 3</span>
+          <span class="cap"><span class="lost">resultado 11</span></span>
+        </div>
+        <div class="col is-good">
+          <h3>#define SQUARE(x) ((x) * (x))</h3>
+          <p>Com os parênteses, a expressão passada é avaliada antes da multiplicação:</p>
+          <span class="cap">((2 + 3) * (2 + 3))</span>
+          <span class="cap"><span class="kept">resultado 25</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- VF BLOCO 8 -->
+  <section class="slide vf-slide" data-slide>
+    <div class="kicker">Pré-processador e macros</div>
+    <div class="vf-body">
+      <div class="vf-label">Verdadeiro ou Falso</div>
+      <p class="vf-statement">Como <span class="mono">SQUARE(num)</span> se parece com uma chamada de função, existe uma chamada de função quando o programa roda.</p>
+      <div class="vf-options">
+        <div class="vf-option">Verdadeiro</div>
+        <div class="vf-option">Falso</div>
+      </div>
+    </div>
+    <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <section class="slide vf-reveal" data-slide>
+    <div class="kicker">Pré-processador e macros</div>
+    <div class="vf-body">
+      <div class="vf-answer is-accent">Falso</div>
+      <p class="vf-explanation">A macro é resolvida pelo pré-processador, <strong>antes</strong> da compilação: o texto é substituído no código-fonte e o compilador nunca vê <span class="mono">SQUARE</span>. Não há empilhamento de moldura, nem parâmetro, nem retorno.</p>
+    </div>
+    <div class="footer"><span>Pré-processador e macros</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 50. FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>
     <p class="sub">Código-fonte, explicação linha a linha e simulação da execução passo a passo — sem precisar compilar nada. Depois, teste o que aprendeu no quiz.</p>
     <div class="cta-row">
       <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/02_functions_and_pointers</span></div>
-      <div class="cta-note">🎯 O quiz de fixação está na mesma página.</div>
+      <div class="cta">🎯 Quiz de fixação<span class="url">thiagopx.github.io/ed/02_functions_and_pointers/quiz</span></div>
     </div>
   </section>
-
 </div>
 
 <div class="nav-controls">

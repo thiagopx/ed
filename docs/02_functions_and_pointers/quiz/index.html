@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Quiz — Ponteiros em C</title>
+<title>Quiz — Funções e ponteiros em C</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -121,6 +121,7 @@
   }
   pre.code-block .kw   { color: #74b9ff; }
   pre.code-block .type { color: #55efc4; }
+  pre.code-block .str  { color: #ffeaa7; }
   pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
 
   .options {
@@ -298,8 +299,8 @@
 <div class="quiz-card">
 
   <div class="quiz-header">
-    <h2>🧠 Quiz — Ponteiros em C</h2>
-    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 11</span>
+    <h2>🧠 Quiz — Funções e ponteiros em C</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 22</span>
   </div>
 
   <div class="progress-bar-track">
@@ -310,7 +311,7 @@
 
   <div class="result-screen" id="result-screen">
     <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz!</div>
-    <div class="result-score" id="result-score">0 / 11</div>
+    <div class="result-score" id="result-score">0 / 22</div>
     <div class="result-msg" id="result-msg"></div>
     <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
   </div>
@@ -322,222 +323,452 @@ const questions = [
   {
     difficulty: "basico",
     diffLabel: "Básico",
-    tag: "Ponteiros & Funções",
-    text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *p) {
-    *p = *p * 2;
-}
-
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> x = 7;
-    f(&amp;x);
-    printf(<span class="cmt">"%d"</span>, x);
-    <span class="kw">return</span> 0;
-}`,
-    options: ["7", "14", "Erro de compilação", "Endereço de memória de x"],
-    correctIndex: 1,
-    explainCorrect: 'Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x. Por isso x passa de 7 para 14, e é esse valor alterado que aparece no printf do main.',
-    explainIncorrect: 'A resposta certa é 14. Como "p" recebe o endereço de x (&x), a expressão *p acessa e altera diretamente o valor de x dentro de f(). Isso é passagem por referência: a alteração feita através do ponteiro persiste depois que a função retorna.'
+    tag: "Criação de funções",
+    text: "No código abaixo, por que a linha 3 é necessária?",
+    code: `<span class="cmt">/* 1 */</span> #include &lt;stdio.h&gt;
+<span class="cmt">/* 2 */</span>
+<span class="cmt">/* 3 */</span> <span class="type">double</span> cylinder_volume(<span class="type">double</span> radius, <span class="type">double</span> height);
+<span class="cmt">/* 4 */</span>
+<span class="cmt">/* 5 */</span> <span class="type">int</span> main(<span class="kw">void</span>) {
+<span class="cmt">/* 6 */</span>     printf(<span class="str">"%.2lf\\n"</span>, cylinder_volume(2.0, 5.0));
+<span class="cmt">/* 7 */</span>     <span class="kw">return</span> 0;
+<span class="cmt">/* 8 */</span> }
+<span class="cmt">/* 9 */</span>
+<span class="cmt">/* 10 */</span> <span class="type">double</span> cylinder_volume(<span class="type">double</span> radius, <span class="type">double</span> height) { <span class="cmt">/* ... */</span> }`,
+    options: [
+      "Porque toda função em C precisa ser declarada duas vezes: uma para o compilador e outra para o ligador.",
+      "Porque ela reserva memória para os parâmetros radius e height antes de main começar.",
+      "Porque a função é usada em main antes de ser definida, e o compilador precisa conhecer antes os tipos dos parâmetros e do retorno.",
+      "Porque sem ela a função seria executada antes de main, invertendo a ordem do programa."
+    ],
+    correctIndex: 2,
+    explainCorrect: "Exato. A linha 3 é o protótipo: o cabeçalho da função seguido de ponto-e-vírgula. Ele não gera código nem reserva memória — apenas informa ao compilador a assinatura da função, para que ele consiga verificar a chamada da linha 6 mesmo com a definição só aparecendo na linha 10.",
+    explainIncorrect: "A resposta certa é: a função é usada em main antes de ser definida, e o compilador precisa conhecer antes os tipos dos parâmetros e do retorno. Sem o protótipo, a alternativa seria escrever a definição completa acima de main. O protótipo não reserva memória nem altera a ordem de execução."
   },
   {
     difficulty: "basico",
     diffLabel: "Básico",
-    tag: "Ponteiros básicos",
-    text: "O que a variável p armazena após esse trecho de código?",
-    code: `<span class="kw">int</span> x = 10;
-<span class="kw">int</span> *p = &amp;x;`,
-    options: ["O valor de x (10)", "O endereço de memória de x", "Uma cópia de x", "O valor de p"],
-    correctIndex: 1,
-    explainCorrect: 'Um ponteiro não guarda o valor da variável, guarda o endereço de memória onde ela está armazenada. O operador & retorna justamente esse endereço.',
-    explainIncorrect: 'A resposta certa é "o endereço de memória de x". O operador & não copia o valor de x — ele retorna a posição na memória onde x está guardado, e é isso que p armazena.'
-  },
-  {
-    difficulty: "basico",
-    diffLabel: "Básico",
-    tag: "Parâmetros de função",
-    text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> n) {
-    n = n + 1;
+    tag: "Criação de funções",
+    text: "Qual é a saída do programa abaixo? Note que a função auxiliar aparece no arquivo antes de main.",
+    code: `#include &lt;stdio.h&gt;
+
+<span class="kw">void</span> a(<span class="kw">void</span>) {
+    printf(<span class="str">"A"</span>);
 }
 
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> x = 5;
-    f(x);
-    printf(<span class="cmt">"%d"</span>, x);
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"M"</span>);
+    a();
     <span class="kw">return</span> 0;
 }`,
-    options: ["5", "6", "Erro de compilação", "Endereço de x"],
-    correctIndex: 0,
-    explainCorrect: 'Como f() recebe "n" por valor (uma cópia de x, não um ponteiro), qualquer alteração em n dentro da função não afeta x no main. Por isso x continua 5.',
-    explainIncorrect: 'A resposta certa é 5. A função recebe "n" por valor — ou seja, n é uma cópia de x. Alterar n dentro da função não muda x no main, pois não há ponteiro envolvido aqui.'
+    options: ["AM", "MA", "A", "M"],
+    correctIndex: 1,
+    explainCorrect: "Certo: a saída é MA. A ordem em que as funções são escritas no arquivo não tem relação com a ordem de execução — o programa sempre começa por main. A função a() só executa quando é chamada, depois do printf(\"M\").",
+    explainIncorrect: "A resposta certa é MA. Estar escrita antes no arquivo não faz a função a() executar primeiro: a execução sempre se inicia em main, e a() só roda no momento em que é chamada."
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
-    tag: "Parâmetros de função",
+    tag: "Parâmetros e retorno",
+    text: "Qual é a saída do programa abaixo? Preste atenção na ordem dos argumentos da chamada.",
+    code: `<span class="type">int</span> resto(<span class="type">int</span> a, <span class="type">int</span> b) {
+    <span class="kw">return</span> a % b;
+}
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"%d"</span>, resto(3, 17));
+    <span class="kw">return</span> 0;
+}`,
+    options: ["2", "3", "5", "Erro de compilação: os argumentos estão na ordem errada"],
+    correctIndex: 1,
+    explainCorrect: "Certo: imprime 3. Os argumentos são associados aos parâmetros por posição, não por intenção: a recebe 3 e b recebe 17. Logo, a função calcula 3 % 17, cujo resto é 3 (pois 3 é menor que 17). Trocar a ordem dos argumentos não é erro de compilação — os tipos casam —, é um bug silencioso.",
+    explainIncorrect: "A resposta certa é 3. Como a correspondência é posicional, a = 3 e b = 17, e 3 % 17 vale 3. O valor 2 seria o resultado de 17 % 3, isto é, da chamada com os argumentos na outra ordem."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Parâmetros e retorno",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> n) {
+    code: `<span class="type">int</span> dobro(<span class="type">int</span> x) {
+    <span class="kw">return</span> 2 * x;
+}
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"%d"</span>, dobro(3) + dobro(4));
+    <span class="kw">return</span> 0;
+}`,
+    options: ["14", "7", "24", "Erro: não se pode chamar a mesma função duas vezes na mesma expressão"],
+    correctIndex: 0,
+    explainCorrect: "Certo: imprime 14. A chamada de uma função com valor de retorno é uma expressão, que ao ser avaliada resulta no valor retornado. Assim, dobro(3) vale 6, dobro(4) vale 8, e a soma das duas é 14 — as chamadas podem compor expressões maiores livremente.",
+    explainIncorrect: "A resposta certa é 14. Cada chamada é uma expressão que resulta no valor retornado: dobro(3) = 6 e dobro(4) = 8, logo 6 + 8 = 14. Nada impede chamar a mesma função várias vezes numa mesma expressão; cada chamada é independente."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Escopo de variáveis",
+    text: "O que acontece ao compilar e executar o programa abaixo?",
+    code: `<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> i = 0;
+    {
+        <span class="type">int</span> t = 5;
+        i = t;
+    }
+    printf(<span class="str">"%d %d"</span>, i, t);
+    <span class="kw">return</span> 0;
+}`,
+    options: [
+      "Imprime 5 5, pois t continua válida depois do bloco.",
+      "Imprime 5 0, pois t é zerada ao sair do bloco.",
+      "Compila com aviso e imprime 5 seguido de um valor de lixo.",
+      "Não compila: t não existe fora do bloco em que foi declarada."
+    ],
+    correctIndex: 3,
+    explainCorrect: "Certo: o gcc acusa erro (\"'t' undeclared\"). O escopo de uma variável declarada dentro de um bloco é o próprio bloco: fora dele, o nome t simplesmente não existe para o compilador. Note que i, declarada na função, é visível dentro do bloco — a visibilidade vai de fora para dentro, nunca de dentro para fora.",
+    explainIncorrect: "A resposta certa é que o programa não compila: t não existe fora do bloco que a declara. Não é aviso nem lixo de memória — é erro de compilação, porque o nome t não está no escopo da linha do printf."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Escopo de variáveis",
+    text: "Qual é a saída do programa abaixo? Há duas variáveis chamadas x.",
+    code: `<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> x = 1;
+    {
+        <span class="type">int</span> x = 2;
+        printf(<span class="str">"%d "</span>, x);
+    }
+    printf(<span class="str">"%d"</span>, x);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["2 1", "1 2", "2 2", "1 1"],
+    correctIndex: 0,
+    explainCorrect: "Certo: a saída é \"2 1\". São duas variáveis distintas, em espaços de memória diferentes. Dentro do bloco, o x mais interno é o visível, então o primeiro printf mostra 2. Ao sair do bloco, esse x deixa de existir e o x externo — nunca alterado — volta a ser o visível, valendo 1.",
+    explainIncorrect: "A resposta certa é \"2 1\". A declaração interna cria uma segunda variável, que apenas oculta a externa enquanto o bloco executa; o x externo continua valendo 1 depois do bloco."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Modelo de pilha",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> f(<span class="kw">void</span>) {
+    <span class="type">int</span> n = 0;
+    n++;
+    printf(<span class="str">"%d "</span>, n);
+}
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    f();
+    f();
+    f();
+    <span class="kw">return</span> 0;
+}`,
+    options: ["1 2 3", "3 3 3", "1 1 1", "0 0 0"],
+    correctIndex: 2,
+    explainCorrect: "Certo: a saída é \"1 1 1\". n é uma variável automática (local): a cada chamada de f(), um novo espaço é alocado no topo da pilha, inicializado com 0, e liberado quando a função retorna. Nada é preservado de uma chamada para a outra, então n sempre vale 1 no printf.",
+    explainIncorrect: "A resposta certa é \"1 1 1\". Cada chamada de f() aloca um n novo na pilha e o inicializa com 0; o valor da chamada anterior já foi descartado. Para acumular entre chamadas seria preciso outro mecanismo, não uma variável local comum."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Modelo de pilha",
+    text: "Qual é o problema com o código abaixo?",
+    code: `<span class="type">int</span>* f(<span class="kw">void</span>) {
+    <span class="type">int</span> v = 42;
+    <span class="kw">return</span> &amp;v;
+}
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> *p = f();
+    printf(<span class="str">"%d"</span>, *p);
+    <span class="kw">return</span> 0;
+}`,
+    options: [
+      "Funciona normalmente e imprime 42.",
+      "Comportamento indefinido: v deixa de existir quando f() retorna.",
+      "Erro obrigatório de compilação.",
+      "Imprime o endereço de v, não seu valor."
+    ],
+    correctIndex: 1,
+    explainCorrect: "Certo. v é uma variável automática, alocada na pilha: seu espaço é liberado assim que f() retorna. O endereço devolvido passa a ser um ponteiro pendente (dangling), e pode até \"parecer funcionar\" num teste, mas a memória pode ser reaproveitada por outra chamada a qualquer momento.",
+    explainIncorrect: "A resposta certa é que há comportamento indefinido: v existe apenas durante a execução de f(). Ao retornar, sua moldura é desempilhada e o endereço se torna inválido. O programa pode imprimir 42 por sorte, mas isso não é garantido."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Ponteiro de variáveis",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> a = 5;
+    <span class="type">int</span> *p = &amp;a;
+    *p = 6;
+    printf(<span class="str">"%d"</span>, a);
+    <span class="kw">return</span> 0;
+}`,
+    options: ["5", "Um endereço de memória", "Lixo de memória, pois a nunca é atribuída de novo", "6"],
+    correctIndex: 3,
+    explainCorrect: "Certo: imprime 6. Como p guarda o endereço de a, acessar *p é equivalente a acessar a. A atribuição *p = 6 escreve no espaço de memória de a — alteração indireta, sem mencionar o nome da variável.",
+    explainIncorrect: "A resposta certa é 6. A atribuição *p = 6 não altera p: ela escreve no endereço que p armazena, que é justamente o de a. Por isso a passa a valer 6."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Ponteiro de variáveis",
+    text: "O que a variável p armazena após esse trecho de código?",
+    code: `<span class="type">int</span> x = 10;
+<span class="type">int</span> *p = &amp;x;`,
+    options: ["O valor de x (10)", "O endereço de memória de x", "Uma cópia de x", "O valor de p"],
+    correctIndex: 1,
+    explainCorrect: "Um ponteiro não guarda o valor da variável, guarda o endereço de memória onde ela está armazenada. O operador & retorna justamente esse endereço.",
+    explainIncorrect: "A resposta certa é \"o endereço de memória de x\". O operador & não copia o valor de x — ele retorna a posição na memória onde x está guardado, e é isso que p armazena."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Variáveis do tipo ponteiro",
+    text: "Na declaração abaixo, quais são os tipos de p e de q?",
+    code: `<span class="type">int</span> *p, q;`,
+    options: [
+      "Ambos são ponteiros para int.",
+      "Ambos são variáveis int comuns; o * é apenas decorativo.",
+      "p é int e q é ponteiro para int.",
+      "p é ponteiro para int e q é um int comum."
+    ],
+    correctIndex: 3,
+    explainCorrect: "Certo. O * pertence ao declarador de cada variável, não ao tipo da linha inteira: só p é ponteiro para int; q é um int comum. Para declarar dois ponteiros, seria preciso repetir o asterisco: int *p, *q;",
+    explainIncorrect: "A resposta certa é: p é ponteiro para int e q é um int comum. O asterisco se aplica apenas ao nome que ele precede — declarar dois ponteiros exige int *p, *q;"
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Variáveis do tipo ponteiro",
+    text: "O que acontece ao executar o programa abaixo?",
+    code: `<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> a = 2, b, *p;
+    *p = 3;
+    b = a + (*p);
+    printf(<span class="str">"%d"</span>, b);
+    <span class="kw">return</span> 0;
+}`,
+    options: [
+      "Imprime 5, pois *p = 3 cria o espaço de memória apontado por p.",
+      "Imprime 2, pois *p vale 0 quando p não foi inicializado.",
+      "Comportamento indefinido: p não foi inicializado, então *p = 3 escreve num endereço desconhecido.",
+      "Erro obrigatório de compilação, pois p não foi inicializado."
+    ],
+    correctIndex: 2,
+    explainCorrect: "Certo. Declarar int *p apenas reserva espaço para guardar um endereço — e esse espaço começa com lixo. A atribuição *p = 3 escreve 3 no endereço que estiver lá por acaso: pode ser memória não usada (e o programa parece funcionar), pode ser o espaço de outra variável, pode derrubar o programa. Só se pode preencher *p depois de p apontar para um espaço válido.",
+    explainIncorrect: "A resposta certa é comportamento indefinido: p não foi inicializado, então *p = 3 escreve num endereço desconhecido. O compilador não é obrigado a barrar isso (no máximo emite um aviso), e *p não vale 0 por padrão — a atribuição não cria memória nenhuma."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Passando ponteiros",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="kw">void</span> f(<span class="type">int</span> n) {
     n = n * 10;
 }
 
-<span class="kw">void</span> <span class="type">g</span>(<span class="kw">int</span> *p) {
+<span class="kw">void</span> g(<span class="type">int</span> *p) {
     *p = *p * 10;
 }
 
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> a = 2, b = 2;
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> a = 2, b = 2;
     f(a);
     g(&amp;b);
-    printf(<span class="cmt">"%d %d"</span>, a, b);
+    printf(<span class="str">"%d %d"</span>, a, b);
     <span class="kw">return</span> 0;
 }`,
     options: ["2 2", "20 20", "2 20", "20 2"],
     correctIndex: 2,
-    explainCorrect: 'f(a) recebe uma cópia de a, então a alteração não sai da função — a continua 2. g(&b) recebe o endereço de b, então *p = *p * 10 altera diretamente b, que vira 20.',
-    explainIncorrect: 'A resposta certa é "2 20". f(a) trabalha sobre uma cópia de a, então a não muda. Já g(&b) recebe o endereço de b e altera o valor original através de *p, então b vira 20.'
+    explainCorrect: "f(a) recebe uma cópia de a, então a alteração não sai da função — a continua 2. g(&b) recebe o endereço de b, então *p = *p * 10 altera diretamente b, que vira 20.",
+    explainIncorrect: "A resposta certa é \"2 20\". f(a) trabalha sobre uma cópia de a, então a não muda. Já g(&b) recebe o endereço de b e altera o valor original através de *p, então b vira 20."
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
-    tag: "Parâmetros por ponteiro",
+    tag: "Passando ponteiros",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *a, <span class="kw">int</span> *b) {
-    <span class="kw">int</span> temp = *a;
+    code: `<span class="kw">void</span> f(<span class="type">int</span> *a, <span class="type">int</span> *b) {
+    <span class="type">int</span> temp = *a;
     *a = *b;
     *b = temp;
 }
 
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> x = 3, y = 8;
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> x = 3, y = 8;
     f(&amp;x, &amp;y);
-    printf(<span class="cmt">"%d %d"</span>, x, y);
+    printf(<span class="str">"%d %d"</span>, x, y);
     <span class="kw">return</span> 0;
 }`,
     options: ["3 8", "8 3", "3 3", "8 8"],
     correctIndex: 1,
-    explainCorrect: 'A função recebe os endereços de x e y. Usando um ponteiro auxiliar (temp), ela troca os valores apontados por a e b diretamente na memória original. Por isso x passa a valer 8 e y passa a valer 3.',
-    explainIncorrect: 'A resposta certa é "8 3". Como f() recebe &x e &y, ela manipula os valores originais através dos ponteiros a e b, efetivamente trocando o conteúdo de x e y.'
-  },
-  {
-    difficulty: "intermediario",
-    diffLabel: "Intermediário",
-    tag: "Parâmetros de função",
-    text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
-    <span class="kw">int</span> temp = a;
-    a = b;
-    b = temp;
-}
-
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> x = 3, y = 8;
-    f(x, y);
-    printf(<span class="cmt">"%d %d"</span>, x, y);
-    <span class="kw">return</span> 0;
-}`,
-    options: ["8 3", "3 8", "3 3", "Erro de compilação"],
-    correctIndex: 1,
-    explainCorrect: 'Sem ponteiros, f() recebe cópias de x e y (a e b). A troca acontece só entre essas cópias locais — x e y no main permanecem intocados. Este é o erro clássico de tentar trocar valores sem usar ponteiros.',
-    explainIncorrect: 'A resposta certa é "3 8" (inalterado). Como a e b são cópias de x e y, trocar seus valores dentro da função não tem efeito nenhum sobre as variáveis originais no main.'
+    explainCorrect: "A função recebe os endereços de x e y. Usando uma variável auxiliar (temp), ela troca os valores apontados por a e b diretamente na memória original. Por isso x passa a valer 8 e y passa a valer 3.",
+    explainIncorrect: "A resposta certa é \"8 3\". Como f() recebe &x e &y, ela manipula os valores originais através dos ponteiros a e b, efetivamente trocando o conteúdo de x e y."
   },
   {
     difficulty: "avancado",
     diffLabel: "Avançado",
-    tag: "Chamadas sucessivas",
+    tag: "Passando ponteiros",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *p, <span class="kw">int</span> v) {
+    code: `<span class="kw">void</span> f(<span class="type">int</span> *p, <span class="type">int</span> v) {
     *p = *p + v;
 }
 
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> x = 10;
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    <span class="type">int</span> x = 10;
     f(&amp;x, 5);
     f(&amp;x, 3);
-    printf(<span class="cmt">"%d"</span>, x);
+    printf(<span class="str">"%d"</span>, x);
     <span class="kw">return</span> 0;
 }`,
     options: ["10", "15", "18", "13"],
     correctIndex: 2,
-    explainCorrect: 'Cada chamada a f() recebe o endereço de x e altera seu valor diretamente. Primeiro x vira 15 (10+5), depois 18 (15+3). Como as duas chamadas operam sobre o mesmo endereço, os efeitos se acumulam.',
-    explainIncorrect: 'A resposta certa é 18. A primeira chamada f(&x, 5) leva x a 15. A segunda, f(&x, 3), parte desse novo valor e leva x a 18 — as alterações via ponteiro se acumulam entre as chamadas.'
+    explainCorrect: "Cada chamada a f() recebe o endereço de x e altera seu valor diretamente. Primeiro x vira 15 (10+5), depois 18 (15+3). Como as duas chamadas operam sobre o mesmo endereço, os efeitos se acumulam.",
+    explainIncorrect: "A resposta certa é 18. A primeira chamada f(&x, 5) leva x a 15. A segunda, f(&x, 3), parte desse novo valor e leva x a 18 — as alterações via ponteiro se acumulam entre as chamadas."
   },
   {
-    difficulty: "avancado",
-    diffLabel: "Avançado",
-    tag: "Ponteiro nulo",
-    text: "O que acontece ao executar o programa abaixo?",
-    code: `<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> *p = NULL;
-    printf(<span class="cmt">"%d"</span>, *p);
-    <span class="kw">return</span> 0;
-}`,
-    options: ["Imprime 0", "Imprime o endereço nulo", "Comportamento indefinido (o programa pode falhar em tempo de execução)", "Erro obrigatório de compilação"],
-    correctIndex: 2,
-    explainCorrect: 'NULL representa "nenhum endereço válido". Tentar dereferenciar (*p) um ponteiro nulo não é um erro detectado em tempo de compilação — é comportamento indefinido, e na prática costuma causar uma falha em tempo de execução (segmentation fault).',
-    explainIncorrect: 'A resposta certa é "comportamento indefinido". O compilador aceita o código normalmente, mas em tempo de execução, acessar *p quando p é NULL não aponta para nenhuma variável válida — isso tipicamente derruba o programa.'
-  },
-  {
-    difficulty: "avancado",
-    diffLabel: "Avançado",
-    tag: "Ponteiros entre funções",
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Variáveis estáticas",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">void</span> <span class="type">f</span>(<span class="kw">int</span> *p) {
-    *p = 100;
+    code: `<span class="type">int</span> prox(<span class="kw">void</span>) {
+    <span class="kw">static</span> <span class="type">int</span> n = 10;
+    n += 5;
+    <span class="kw">return</span> n;
 }
 
-<span class="kw">void</span> <span class="type">g</span>(<span class="kw">int</span> *p) {
-    f(p);
-}
-
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> x = 1;
-    g(&amp;x);
-    printf(<span class="cmt">"%d"</span>, x);
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"%d "</span>, prox());
+    printf(<span class="str">"%d "</span>, prox());
+    printf(<span class="str">"%d"</span>, prox());
     <span class="kw">return</span> 0;
 }`,
-    options: ["1", "100", "Erro de compilação", "Endereço de x"],
-    correctIndex: 1,
-    explainCorrect: 'O endereço de x é passado para g(), que repassa esse mesmo endereço para f() sem copiar o valor apontado. f() então altera x diretamente através de p, resultando em 100.',
-    explainIncorrect: 'A resposta certa é 100. Mesmo passando por duas funções, o ponteiro p continua apontando para o endereço original de x em todas elas. Quando f() faz *p = 100, é x no main que é alterado.'
+    options: ["15 20 25", "15 15 15", "10 15 20", "25 25 25"],
+    correctIndex: 0,
+    explainCorrect: "Certo: a saída é \"15 20 25\". A inicialização de uma variável estática acontece uma única vez, não a cada chamada: n não volta a 10. Ela vive numa área de memória estática que existe durante todo o programa, então o valor deixado por uma chamada é o ponto de partida da próxima.",
+    explainIncorrect: "A resposta certa é \"15 20 25\". static int n = 10; inicializa n uma única vez; a partir daí cada chamada parte do valor deixado pela anterior (10→15→20→25). Se n fosse uma local comum, a saída seria \"15 15 15\"."
   },
   {
     difficulty: "avancado",
     diffLabel: "Avançado",
-    tag: "Retorno de ponteiro",
-    text: "Qual é o problema com o código abaixo?",
-    code: `<span class="kw">int</span>* <span class="type">f</span>() {
-    <span class="kw">int</span> v = 42;
-    <span class="kw">return</span> &amp;v;
-}
+    tag: "Variáveis globais e estáticas",
+    text: "Um programa é dividido em dois arquivos, contador.c e main.c, compilados juntos. Qual é o efeito da palavra static na declaração destacada, feita fora de qualquer função em contador.c?",
+    code: `<span class="cmt">/* contador.c */</span>
+<span class="kw">static</span> <span class="type">int</span> total;   <span class="cmt">/* fora de qualquer função */</span>
 
-<span class="kw">int</span> <span class="type">main</span>() {
-    <span class="kw">int</span> *p = f();
-    printf(<span class="cmt">"%d"</span>, *p);
-    <span class="kw">return</span> 0;
+<span class="kw">void</span> soma(<span class="type">int</span> v) {
+    total += v;
 }`,
-    options: ["Funciona normalmente e imprime 42", "Comportamento indefinido: 'v' deixa de existir quando f() retorna", "Erro obrigatório de compilação", "Imprime o endereço de v, não seu valor"],
+    options: [
+      "total deixa de ser global e passa a viver na pilha, como as variáveis locais.",
+      "total continua existindo durante todo o programa, mas seu nome não é exportado: só o código de contador.c pode acessá-la.",
+      "total passa a ser somente leitura: soma() não conseguiria alterá-la.",
+      "static não tem efeito fora de funções; o nome continua acessível a partir de main.c."
+    ],
     correctIndex: 1,
-    explainCorrect: '"v" é uma variável automática (da pilha), que deixa de existir assim que f() termina. O endereço retornado (um ponteiro pendente/dangling) pode até "parecer funcionar" às vezes, mas o comportamento é indefinido — a memória pode ser reaproveitada por outra coisa a qualquer momento.',
-    explainIncorrect: 'A resposta certa é que há comportamento indefinido. "v" existe apenas durante a execução de f(); ao retornar, seu endereço se torna inválido (ponteiro pendente). O programa pode imprimir 42 por "sorte" em alguns testes, mas isso não é garantido.'
+    explainCorrect: "Certo. Numa variável global, static restringe a visibilidade ao arquivo que a declara — o nome não se torna um símbolo externo, então main.c não tem como acessá-la. O tempo de vida não muda: variáveis globais e estáticas não ficam na pilha e existem enquanto o programa executa (e, sem inicialização explícita, começam em zero).",
+    explainIncorrect: "A resposta certa é: total continua existindo durante todo o programa, mas seu nome não é exportado — só o código de contador.c pode acessá-la. static não a move para a pilha nem a torna somente leitura; e tem efeito bem definido fora de funções, justamente o de limitar a visibilidade ao arquivo."
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
     tag: "Recursão",
     text: "Qual é a saída do programa abaixo?",
-    code: `<span class="kw">int</span> <span class="type">soma</span>(<span class="kw">int</span> n) {
+    code: `<span class="type">int</span> soma(<span class="type">int</span> n) {
     <span class="kw">if</span> (n &lt;= 0) <span class="kw">return</span> 0;
     <span class="kw">return</span> n + soma(n - 1);
 }
 
-<span class="kw">int</span> <span class="type">main</span>() {
-    printf(<span class="cmt">"%d"</span>, soma(4));
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"%d"</span>, soma(4));
     <span class="kw">return</span> 0;
 }`,
     options: ["4", "24", "10", "Erro de compilação: função recursiva sem protótipo"],
     correctIndex: 2,
-    explainCorrect: 'Certo! soma(4) chama soma(3), que chama soma(2), que chama soma(1), que chama soma(0) — o caso-base, que retorna 0 sem nenhuma chamada nova. Voltando: soma(1) = 1+0 = 1, soma(2) = 2+1 = 3, soma(3) = 3+3 = 6, soma(4) = 4+6 = 10.',
-    explainIncorrect: 'A resposta certa é 10. Cada chamada soma(n) devolve n + soma(n-1), até o caso-base soma(0), que retorna 0: 4 + 3 + 2 + 1 + 0 = 10. (Não há erro de compilação: uma função pode ser usada dentro do seu próprio corpo sem protótipo, desde que já tenha sido declarada/definida antes de main.)'
+    explainCorrect: "Certo! soma(4) chama soma(3), que chama soma(2), que chama soma(1), que chama soma(0) — o caso-base, que retorna 0 sem nenhuma chamada nova. Voltando: soma(1) = 1+0 = 1, soma(2) = 2+1 = 3, soma(3) = 3+3 = 6, soma(4) = 4+6 = 10.",
+    explainIncorrect: "A resposta certa é 10. Cada chamada soma(n) devolve n + soma(n-1), até o caso-base soma(0), que retorna 0: 4 + 3 + 2 + 1 + 0 = 10. (Não há erro de compilação: uma função pode ser usada dentro do seu próprio corpo sem protótipo, desde que já tenha sido declarada/definida antes de main.)"
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Recursão",
+    text: "Qual é a saída do programa abaixo? Note que há um printf depois da chamada recursiva.",
+    code: `<span class="kw">void</span> func(<span class="type">int</span> n) {
+    printf(<span class="str">"%d "</span>, n);
+    <span class="kw">if</span> (n &gt; 0) {
+        func(n - 1);
+        printf(<span class="str">"* "</span>);
+    }
+}
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    func(3);
+    <span class="kw">return</span> 0;
+}`,
+    options: [
+      "3 2 1 0",
+      "3 * 2 * 1 * 0 *",
+      "3 2 1 0 * * * *",
+      "3 2 1 0 * * *"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Certo: \"3 2 1 0 * * *\". Na descida, cada chamada imprime seu n antes de recorrer: 3 2 1 0. Em func(0) a condição n > 0 é falsa, então nem a chamada recursiva nem o asterisco acontecem ali. Na volta, os asteriscos são impressos pelas chamadas que estavam suspensas — func(1), func(2) e func(3) —, três asteriscos, um por contexto empilhado.",
+    explainIncorrect: "A resposta certa é \"3 2 1 0 * * *\": quatro números e apenas três asteriscos. func(0) imprime o 0 e retorna sem entrar no if, portanto não imprime asterisco; só os três contextos suspensos (func(1), func(2), func(3)) imprimem o seu ao retomar a execução."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Pré-processador",
+    text: "Considere a definição abaixo, no início de um arquivo. O que o pré-processador faz com ela?",
+    code: `#define PI 3.14159
+
+<span class="type">double</span> area(<span class="type">double</span> r) {
+    <span class="kw">return</span> PI * r * r;
+}`,
+    options: [
+      "Cria uma variável global PI, inicializada com 3.14159 e protegida contra alteração.",
+      "Substitui textualmente cada ocorrência de PI por 3.14159 antes de o código ir ao compilador.",
+      "Avalia PI * r * r em tempo de compilação, dispensando a multiplicação em tempo de execução.",
+      "Nada: #define só tem efeito dentro de funções, e esta está fora de qualquer função."
+    ],
+    correctIndex: 1,
+    explainCorrect: "Certo. O pré-processador roda antes do compilador e faz substituição de texto: o compilador nunca vê o símbolo PI, e sim 3.14159 no lugar de cada ocorrência (exceto dentro de aspas). Não há variável, nem tipo, nem espaço de memória associado a PI.",
+    explainIncorrect: "A resposta certa é: o pré-processador substitui textualmente cada ocorrência de PI por 3.14159 antes de o código ir ao compilador. Não é uma variável global nem um cálculo antecipado — é troca de texto, e ela vale do ponto do #define em diante, dentro ou fora de funções."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Macros",
+    text: "Qual é a saída do programa abaixo? Cuidado: a macro foi definida sem parênteses.",
+    code: `#include &lt;stdio.h&gt;
+#define DIF(a,b) a - b
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"%d"</span>, 4 * DIF(5, 3));
+    <span class="kw">return</span> 0;
+}`,
+    options: ["8", "12", "2", "17"],
+    correctIndex: 3,
+    explainCorrect: "Certo: imprime 17. Depois da substituição textual, o compilador vê 4 * 5 - 3. Como a multiplicação tem precedência sobre a subtração, o resultado é 20 - 3 = 17, e não os 8 que 4 * (5 - 3) daria. É o efeito colateral clássico da macro sem parênteses.",
+    explainIncorrect: "A resposta certa é 17. A macro não calcula nada: ela só troca texto, e o que sobra é 4 * 5 - 3. A multiplicação vem antes da subtração, logo 20 - 3 = 17. Envolver a definição em parênteses — #define DIF(a,b) ((a) - (b)) — é o que faria a saída ser 8."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Macros",
+    text: "Qual é a saída do programa abaixo? Note que a macro já tem parênteses envolvendo a expressão inteira.",
+    code: `#include &lt;stdio.h&gt;
+#define PROD(a,b) (a * b)
+
+<span class="type">int</span> main(<span class="kw">void</span>) {
+    printf(<span class="str">"%d"</span>, PROD(3 + 4, 2));
+    <span class="kw">return</span> 0;
+}`,
+    options: ["11", "14", "24", "9"],
+    correctIndex: 0,
+    explainCorrect: "Certo: imprime 11. A substituição é literal, argumento por argumento: PROD(3 + 4, 2) vira (3 + 4 * 2). Os parênteses externos não protegem os parâmetros, então 4 * 2 é avaliado primeiro e o resultado é 3 + 8 = 11, não os 14 esperados. A regra é envolver cada parâmetro, além da macro inteira: #define PROD(a,b) ((a) * (b)).",
+    explainIncorrect: "A resposta certa é 11. Após a substituição o compilador vê (3 + 4 * 2): como a multiplicação tem precedência, dá 3 + 8 = 11. Para obter 14 seria preciso envolver também cada parâmetro — #define PROD(a,b) ((a) * (b)) —, e é por isso que a macro SQUARE(x) do módulo é escrita como ((x) * (x))."
   }
 ];
 
@@ -679,10 +910,10 @@ function showResult() {
   resultScreen.classList.add('show');
   resultScore.textContent = `${score} / ${questions.length}`;
   let msg;
-  if (score === questions.length) msg = '🎉 Excelente! Você dominou os conceitos básicos de ponteiros.';
+  if (score === questions.length) msg = '🎉 Excelente! Você dominou funções, ponteiros, recursão e macros.';
   else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões erradas para fixar os detalhes.';
-  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale revisar os conceitos de referência e passagem por ponteiro.';
-  else msg = '🔁 Releia o material sobre ponteiros e tente novamente.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale revisar escopo, modelo de pilha e passagem por ponteiro.';
+  else msg = '🔁 Releia as notas de aula do módulo (funções, ponteiros e macros) e tente novamente.';
   resultMsg.textContent = msg;
 }
 

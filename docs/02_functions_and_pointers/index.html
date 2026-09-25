@@ -665,6 +665,23 @@
       partir de <code>main()</code> sempre que o volume precisa ser calculado.
     </p>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Chamar a mesma função em cinco pontos diferentes do programa faz o compilador copiar o corpo
+        dela cinco vezes no código-fonte — é por isso que funções economizam digitação, mas não
+        organização.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O corpo da função é escrito <em>uma única vez</em>; cada chamada apenas desvia a execução para esse mesmo bloco e volta depois. É justamente essa ausência de duplicação que faz uma correção feita na função valer imediatamente para todos os pontos que a chamam.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O corpo da função aparece uma vez só; as chamadas desviam a execução para ele e retornam. Não há cópia do código a cada chamada — por isso corrigir a função conserta de uma vez todos os lugares que a usam.</p>
+      </div>
+    </div>
+
     <h3>Parâmetros e valor de retorno</h3>
     <p>
       Parâmetros são as variáveis que a função declara para receber os dados de que precisa
@@ -678,6 +695,22 @@
       resultados por outro caminho: parâmetros que são ponteiros, como veremos adiante.
     </p>
 
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Se um <code>return</code> for executado no meio do corpo de uma função, os comandos escritos
+        abaixo dele naquela função não chegam a ser executados naquela chamada.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> O <code>return</code> faz duas coisas ao mesmo tempo: define o valor devolvido e <em>encerra</em> a função ali mesmo. O que vem depois dele no corpo só rodaria se um caminho diferente da execução (por exemplo, outro ramo de um <code>if</code>) chegasse até lá.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> O <code>return</code> encerra a função imediatamente, além de devolver o valor: nenhum comando depois dele é executado naquela chamada.</p>
+      </div>
+    </div>
+
     <h3>Escopo de variáveis</h3>
     <p>
       Cada variável só existe — só é visível — dentro de uma região do código, chamada seu
@@ -686,6 +719,22 @@
       mesmo nome. Isso permite que <code>main()</code> e <code>cylinder_volume()</code>, por exemplo,
       usem nomes de variáveis parecidos sem qualquer conflito entre si.
     </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Duas funções diferentes podem declarar variáveis locais com o mesmo nome sem que uma
+        interfira no valor da outra.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Cada variável local pertence ao escopo da função onde foi declarada. Mesmo nome, variáveis distintas: nada em uma delas afeta a outra, e nenhuma das duas é visível de fora da sua função.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> O nome de uma variável local só tem significado dentro do escopo em que foi declarada; duas funções podem usar <code>i</code>, <code>total</code> ou <code>radius</code> sem qualquer conflito entre si.</p>
+      </div>
+    </div>
 
     <h4>Modelo de pilha</h4>
     <p>
@@ -703,11 +752,43 @@
       <figcaption>A pilha de execução ao chamar uma função: uma moldura nova é empilhada com os parâmetros e variáveis locais, e desempilhada ao retornar.</figcaption>
     </figure>
 
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Depois que uma função retorna, suas variáveis locais continuam existindo na pilha, então o
+        chamador pode voltar a lê-las mais tarde sem problema.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Ao retornar, a moldura da função é desempilhada e o espaço que ela ocupava passa a estar livre para a próxima chamada reutilizar. As variáveis locais deixam de existir — contar com o valor delas depois do retorno é apostar em memória que já não é mais sua.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A moldura é desempilhada no retorno e sua memória fica livre para ser reaproveitada pela próxima chamada. Quem precisa de um valor produzido pela função tem que recebê-lo pelo <code>return</code> (ou por um endereço que o chamador forneceu) — não "olhando" para a moldura que já foi embora.</p>
+      </div>
+    </div>
+
     <h3>Ponteiro de variáveis</h3>
     <p>
       Um ponteiro é uma variável cujo valor não é um dado comum, mas o <em>endereço</em> de memória de
       outra variável.
     </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Um ponteiro é uma variável comum sob todos os aspectos — ocupa memória e tem seu próprio
+        endereço; o que muda é o tipo de valor que ele guarda.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Ponteiro não é uma criatura de outra natureza: é uma variável que existe na memória como qualquer outra. A diferença está no que ela armazena — um endereço de memória, em vez de um número, um caractere ou um valor real.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> Um ponteiro é uma variável como outra qualquer: ocupa espaço na memória e tem endereço próprio. A particularidade é apenas o conteúdo que ele guarda — o endereço de outra variável.</p>
+      </div>
+    </div>
 
     <h4>Variáveis do tipo ponteiro</h4>
     <p>
@@ -723,6 +804,22 @@
       <img src="figs/fig4-2.jpg" alt="Quatro painéis mostrando a mecânica de ponteiros: declaração de int a e int *p sem valor; a recebe 5; p recebe o endereço de a (p = &a); *p = 6 altera o conteúdo de a através do ponteiro.">
       <figcaption>Um ponteiro guarda um endereço; atribuir através dele (<code>*p = 6;</code>) altera a variável apontada, não o ponteiro em si.</figcaption>
     </figure>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        O asterisco de <code>int *ptr;</code> e o asterisco de <code>*ptr = 100;</code> fazem a mesma
+        coisa: os dois dereferenciam o ponteiro.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> O mesmo símbolo tem dois papéis distintos: na <em>declaração</em>, o <code>*</code> faz parte do tipo — anuncia que <code>ptr</code> guarda o endereço de um <code>int</code>; num <em>comando</em>, aplicado a um ponteiro já existente, ele dereferencia, isto é, acessa o valor que está no endereço apontado.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Na declaração, o <code>*</code> faz parte do tipo ("ponteiro para <code>int</code>") e não dereferencia nada — nem existe ainda um endereço para acessar. Só em um comando posterior, aplicado a um ponteiro que já aponta para algo, o <code>*</code> passa a significar "o conteúdo apontado".</p>
+      </div>
+    </div>
 
     <h4>Passando ponteiros para funções</h4>
     <p>
@@ -740,6 +837,22 @@
       <figcaption>Passando endereços como parâmetro, a função escreve diretamente nas variáveis de quem a chamou — os resultados já aparecem em <code>main</code> antes mesmo do retorno.</figcaption>
     </figure>
 
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Passar <code>&amp;sum</code> para uma função continua sendo passagem por valor: o que é copiado
+        para o parâmetro é o endereço de <code>sum</code>.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> C só tem passagem por valor — o que muda é <em>qual</em> valor se copia. Copiando o endereço, a função passa a saber onde a variável do chamador mora e pode escrever lá com <code>*</code>; a variável em si nunca foi copiada. (Como o ponteiro recebido é uma cópia, a função pode alterar o que ele aponta, mas não pode fazer o ponteiro do chamador apontar para outro lugar.)</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> Não existe outra forma de passagem em C: o argumento é sempre copiado. Passar <code>&amp;sum</code> copia o <em>endereço</em> de <code>sum</code> para o parâmetro, e é por meio desse endereço que a função escreve na variável do chamador.</p>
+      </div>
+    </div>
+
     <h3>Variáveis globais e estáticas</h3>
     <p>
       Uma variável <em>global</em> é declarada fora de qualquer função e existe durante todo o
@@ -750,6 +863,22 @@
       <em>Contador de chamadas</em> faz com <code>static int counter = 0;</code>, para lembrar quantas
       vezes a função já foi chamada.
     </p>
+
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Uma variável global pode ser lida e alterada por qualquer função do programa — e é justamente
+        isso que a torna uma fonte comum de bugs difíceis de rastrear.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Como qualquer função pode escrever numa global, descobrir <em>quem</em> deixou nela um valor errado exige inspecionar o programa todo. Por isso a recomendação é preferir parâmetros e retorno (ou uma local <code>static</code>, quando só uma função precisa lembrar algo) e reservar globais para casos realmente justificados.</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> A global é visível e alterável por todas as funções; essa é ao mesmo tempo sua conveniência e seu risco — qualquer ponto do programa pode ser o culpado por um valor inesperado nela.</p>
+      </div>
+    </div>
 
     <h3>Recursão</h3>
     <p>
@@ -777,6 +906,22 @@
       (<code>n &lt;= 1</code>) resolver sozinha.
     </p>
 
+    <div class="check-question" data-correct="0">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Uma função recursiva cujo caso-base nunca é alcançado compila normalmente; o problema só
+        aparece durante a execução.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo!</strong> Sintaticamente não há nada de errado em uma função que chama a si mesma, e o compilador não tem como decidir se o caso-base será alcançado. O programa compila, roda, empilha molduras até esgotar a memória da pilha e trava com estouro de pilha (<em>stack overflow</em>).</p>
+        <p class="feedback-incorrect" hidden><strong>É verdadeiro, sim.</strong> O compilador só verifica a sintaxe — e chamar a si mesma é sintaticamente válido. A falta de um caso-base alcançável se manifesta em tempo de execução, como estouro de pilha.</p>
+      </div>
+    </div>
+
     <h3>Pré-processador e macros</h3>
     <p>
       Antes mesmo da compilação começar, o pré-processador do C resolve as diretivas que começam com
@@ -788,6 +933,22 @@
       como <code>SQUARE(a + b)</code> se expandiria para <code>a + b * a + b</code>, um resultado bem
       diferente do esperado.
     </p>
+
+    <div class="check-question" data-correct="1">
+      <div class="check-question-head">Verdadeiro ou Falso</div>
+      <p class="check-question-text">
+        Chamar <code>SQUARE(num)</code> é chamar uma função: em tempo de execução, uma moldura é
+        empilhada com o parâmetro <code>x</code>, como em qualquer outra chamada.
+      </p>
+      <ul class="check-options">
+        <li class="check-option" data-idx="0"><span class="check-letter">V</span><span>Verdadeiro</span></li>
+        <li class="check-option" data-idx="1"><span class="check-letter">F</span><span>Falso</span></li>
+      </ul>
+      <div class="check-feedback">
+        <p class="feedback-correct" hidden><strong>Certo, é falso.</strong> Não há chamada nem moldura: o pré-processador substitui o texto <code>SQUARE(num)</code> por <code>((num) * (num))</code> <em>antes</em> de a compilação começar, e o compilador só vê a expressão já expandida. É exatamente por ser substituição textual que os parênteses ao redor de cada parâmetro importam tanto.</p>
+        <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Macro não é função: a expansão acontece antes da compilação, por substituição de texto, e não existe chamada nem moldura na pilha em tempo de execução — o compilador enxerga apenas <code>((num) * (num))</code> no lugar de <code>SQUARE(num)</code>.</p>
+      </div>
+    </div>
 
   </div>
 
