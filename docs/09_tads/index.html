@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tipo abstrato de dados — Estruturas de Dados</title>
-<meta name="description" content="Módulos e compilação em separado, tipo abstrato de dados (TAD) e dois exemplos de TAD em C com projetos multi-arquivo: Ponto e Círculo. Código comentado, explicação e simulação da execução. Estruturas de Dados, Ifes Campus Serra.">
+<meta name="description" content="Abstração de dados, módulos e compilação em separado, tipo abstrato de dados (TAD) e três exemplos em C com projetos multi-arquivo: módulo my_string, TAD Ponto e TAD Círculo, e TAD Matriz. Código comentado, explicação e simulação da execução. Estruturas de Dados, Ifes Campus Serra.">
 <style>
   :root {
     --ink: #121821;
@@ -150,28 +150,6 @@
   }
 
   .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
-
-  .resumo-fig {
-    margin: 0.5rem 0 1.5rem;
-    max-width: 100%;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 1rem;
-  }
-  .resumo-fig img { display: block; width: 100%; height: auto; }
-  .resumo-fig figcaption {
-    margin-top: 0.6rem;
-    font-size: 0.82rem;
-    line-height: 1.5;
-    color: var(--ink-soft);
-  }
-  .resumo-fig .fig-credit {
-    margin: 0.3rem 0 0;
-    font-size: 0.75rem;
-    font-style: italic;
-    color: var(--ink-soft);
-  }
 
   /* ---- notas de aula ---- */
 
@@ -352,6 +330,7 @@
     top: 1rem;
   }
   @media (max-width: 760px) { pre.code-block { position: static; } }
+  .explain pre.code-block { position: static; }
 
   .code-block .kw   { color: var(--code-kw); }
   .code-block .type { color: var(--code-type); }
@@ -386,6 +365,12 @@
     border-radius: 3px;
     padding: 0.05em 0.35em;
     color: var(--ink);
+  }
+
+  .file-label {
+    font-size: 0.85rem;
+    margin: 1.2rem 0 0.4rem !important;
+    color: var(--ink-soft);
   }
 
   .stepper-controls {
@@ -647,85 +632,184 @@
     <div class="eyebrow">Módulos e tipos abstratos de dados</div>
     <h1>Tipo abstrato de dados</h1>
     <p class="lede">
-      Estas são as notas da aula sobre módulos e tipos abstratos de dados: como dividir um programa em arquivos
-      de interface e de implementação, e como um TAD esconde a forma concreta de um tipo atrás de um conjunto de
-      operações. Os dois exemplos abaixo são projetos com vários arquivos e Makefile.
+      Estas são as notas da aula sobre abstração, módulos e tipos abstratos de dados: como dividir um programa em
+      arquivos de interface e de implementação, e como um TAD esconde a forma concreta de um tipo atrás de um
+      conjunto de operações. Os três exemplos abaixo são projetos com vários arquivos e Makefile.
     </p>
   </div>
 
   <div class="notes">
 
+    <h2>Antes do capítulo: o que é abstrair</h2>
+
+    <p>
+      Abstrair é deixar de lado os detalhes que não importam para aquilo que se quer fazer. Você dirige um carro sem
+      saber como o motor queima combustível, e usa um telefone sem conhecer a rede que transporta a sua voz. Nos dois
+      casos você depende de um conjunto de operações bem definido (girar a chave, discar um número) e não da maneira
+      como cada uma delas é realizada por dentro.
+    </p>
+    <p>
+      Em programação, a abstração tem o mesmo papel. Um programa grande tem milhares de linhas, e muitas pessoas
+      trabalham nele. Se cada parte precisasse conhecer os detalhes internos de todas as outras, qualquer mudança
+      pequena se espalharia pelo código inteiro, e ninguém conseguiria raciocinar sobre uma parte sem entender o
+      resto. Abstrair permite usar uma parte confiando no que ela promete, e não no modo como ela faz o que promete.
+    </p>
+
+    <h3>Abstração de dados</h3>
+    <p>
+      Quando a abstração recai sobre um tipo de dado, falamos em abstração de dados. A pergunta muda: deixamos de
+      perguntar "como este tipo guarda as informações?" e passamos a perguntar "o que este tipo faz com elas?". Para
+      um ponto no plano, o que importa a quem usa é conseguir calcular a distância até outro ponto. Se as coordenadas
+      ficam em dois campos separados ou num vetor de dois elementos, isso é um detalhe.
+    </p>
+    <p>
+      Separamos, então, duas coisas. <strong>O que o tipo faz</strong> são as suas operações, o contrato que ele
+      cumpre. <strong>Como ele faz</strong> é a estrutura interna e o código que implementa cada operação. Quem escreve
+      o programa cliente depende apenas da primeira. Quem escreve o tipo cuida da segunda, e pode mudá-la sem alterar o
+      contrato, sem que o cliente precise saber disso.
+    </p>
+
     <h2>Tipo abstrato de dados</h2>
+
+    <p>
+      Esta seção trata da técnica de definir um tipo estruturado junto com as operações que o manipulam, escondendo a
+      sua implementação. Começamos pelo mecanismo que a linguagem C oferece para isso: os módulos.
+    </p>
 
     <h3>Módulos e compilação em separado</h3>
     <p>
-      Um programa em C pode ser dividido em vários arquivos-fonte. Quando um arquivo reúne funções que formam uma
-      parte coesa do programa, ele é um <strong>módulo</strong>. Cada módulo é compilado separadamente, gerando um
-      arquivo objeto (<code>.o</code>). Depois, o <strong>ligador</strong> (linker) junta os objetos num único
-      executável, e é nessa etapa que o código das funções da biblioteca padrão entra no programa. Mesmo um programa
-      de um único arquivo passa pela ligação.
+      Um programa em C pode ser dividido em vários arquivos-fonte, com extensão <code>.c</code>. Quando um arquivo reúne
+      funções que formam uma parte coesa do programa, ele é um <strong>módulo</strong>. Cada módulo é compilado
+      separadamente, e o resultado é um arquivo objeto (<code>.o</code>). Depois, o <strong>ligador</strong> (linker)
+      junta os objetos num único executável. É nessa etapa que o código das funções da biblioteca padrão entra no
+      programa. Mesmo um programa de um único arquivo passa pela ligação.
     </p>
     <p>
-      Para que um módulo seja usado por outro, o cliente precisa conhecer as funções que ele oferece. Isso é feito
-      por um arquivo de <strong>interface</strong>, o cabeçalho (<code>.h</code>), que contém os protótipos, os tipos
-      exportados e a documentação de cada função. O cliente inclui o cabeçalho com aspas (<code>#include "modulo.h"</code>)
-      quando ele é do projeto, e com <code>&lt;...&gt;</code> quando é da biblioteca padrão.
+      A divisão em módulos se justifica quando o programa cresce. Uma tarefa grande vira tarefas menores, que são mais
+      fáceis de implementar e de testar. Além disso, um módulo bem feito pode ser reaproveitado em outros programas sem
+      copiar código.
+    </p>
+
+    <h4>Programa cliente e módulo: quem usa e quem oferece</h4>
+    <p>
+      Em todo módulo há dois papéis. O <strong>programa cliente</strong>, que tem o <code>main</code> e o código que o
+      sustenta, usa o que o módulo oferece. O <strong>módulo</strong> oferece funções e tipos, e esconde como eles são
+      feitos. O cliente conhece o contrato. O módulo guarda a implementação.
     </p>
     <p>
-      O conteúdo do cabeçalho deve ficar entre <strong>guardas de inclusão</strong> (<code>#ifndef</code>, <code>#define</code>
-      e <code>#endif</code>). Se o mesmo arquivo for incluído duas vezes na mesma compilação, a segunda inclusão é ignorada,
-      e nenhuma definição é repetida. Na prática, o <strong>Makefile</strong> cuida de recompilar só o que mudou e de
-      fazer a ligação. Os três projetos desta página têm Makefile, e <code>make run</code> compila e executa.
+      O contrato fica no arquivo de interface, o cabeçalho (<code>.h</code>). Ele contém os protótipos das funções
+      exportadas, os tipos que o cliente precisa conhecer e a documentação de cada função. A implementação fica no
+      arquivo <code>.c</code>, que inclui o próprio cabeçalho e define as funções. O cliente inclui o cabeçalho e não
+      precisa abrir o <code>.c</code> para usar o módulo.
+    </p>
+    <p>
+      O projeto <code>01_modules</code> mostra essa separação. O <code>main.c</code> inclui apenas
+      <code>my_string.h</code> e chama <code>my_strlen</code>, <code>my_strcpy</code>, <code>my_strcat</code> e
+      <code>my_strcmp</code>. Ele não sabe se essas funções usam um laço, recursão ou outra técnica. As definições estão
+      em <code>my_string.c</code>. Se o <code>main.c</code> chamasse uma função que o cabeçalho não declara, o
+      compilador reclamaria. Se o cabeçalho declarasse uma função que ninguém define, o erro só apareceria na ligação,
+      porque o linker não encontra o código correspondente.
+    </p>
+    <p>
+      O cabeçalho deve ter <strong>guardas de inclusão</strong> (<code>#ifndef</code>, <code>#define</code> e
+      <code>#endif</code>), para que uma inclusão repetida não redefina nada. Cabeçalhos do projeto são incluídos com
+      aspas, como em <code>#include "my_string.h"</code>. Cabeçalhos da biblioteca padrão usam <code>&lt;...&gt;</code>.
     </p>
 
     <h3>Tipo abstrato de dados</h3>
     <p>
-      Quando um módulo define um <strong>novo tipo</strong> e as operações que o manipulam, ele representa um
-      <strong>tipo abstrato de dados</strong> (TAD). "Abstrato" quer dizer que o TAD é descrito pelo que o tipo representa
-      e pelo que as operações fazem, não pela forma como ele foi implementado.
+      Quando um módulo define um <strong>novo tipo</strong> e o conjunto de operações que o manipula, ele representa um
+      <strong>tipo abstrato de dados</strong> (TAD). "Abstrato" quer dizer que o TAD é descrito pela finalidade do tipo
+      e das suas operações, e não pela forma como foi implementado.
     </p>
     <p>
       O mecanismo central é o <strong>encapsulamento</strong>. No cabeçalho, a struct só é declarada, por exemplo com
       <code>typedef struct circle Circle;</code>. A definição <code>struct circle { ... }</code> fica no arquivo
       <code>.c</code>. Quem usa o TAD manipula apenas ponteiros, como <code>Circle *</code>, e chama as funções
-      exportadas. Sem acesso aos campos, a implementação pode mudar (de vetor simples para vetor de ponteiros, por
-      exemplo) sem que o código cliente precise mudar.
-    </p>
-    <p>
-      Por convenção, as funções exportadas levam o <strong>nome do tipo</strong> no próprio nome (<code>create_point</code>,
-      <code>free_point</code>, <code>create_circle</code>), o que evita colisão de nomes quando vários TADs são usados
-      juntos. Funções e variáveis auxiliares do módulo são declaradas como <code>static</code>, e ficam visíveis só no
-      arquivo que as define. Variáveis globais exportadas devem ser evitadas.
+      exportadas. Como não enxerga os campos, o cliente não pode depender deles, e a implementação pode mudar sem que o
+      código cliente mude.
     </p>
     <p>
       Em geral, um TAD oferece uma operação de <strong>criação</strong>, que aloca e inicializa o objeto e devolve um
       ponteiro; uma de <strong>liberação</strong>, que desaloca o que foi criado; operações de acesso e atribuição; e
-      operações de consulta ou cálculo. Quando uma operação usa outro tipo, o cabeçalho do TAD inclui o cabeçalho do
-      outro, como o círculo faz com o ponto.
+      operações de consulta ou cálculo. Quando uma operação recebe outro tipo, o cabeçalho do TAD inclui o cabeçalho
+      desse tipo, como o círculo faz com o ponto.
+    </p>
+    <p>
+      Para que vários TADs possam ser usados no mesmo programa, as funções exportadas levam o nome do tipo como prefixo
+      (<code>create_point</code>, <code>free_point</code>, <code>create_circle</code>). Assim, funções de tipos
+      diferentes não colidem. Funções auxiliares do módulo são declaradas como <code>static</code> e ficam visíveis só
+      no arquivo que as define. Variáveis globais exportadas devem ser evitadas, porque elas quebram o encapsulamento.
+    </p>
+    <p>
+      O material de referência usa outra convenção de nomes, com prefixos curtos como <code>pto_cria</code> e
+      <code>circ_cria</code>. Os exemplos desta página usam inglês no código, com <code>create_point</code> e
+      <code>create_circle</code>. A estrutura é a mesma nos dois casos.
     </p>
 
     <h4>Exemplo 1: TAD Ponto</h4>
     <p>
-      O TAD Ponto representa um ponto no plano. A lista de operações do material de referência inclui criação,
-      liberação, acesso, atribuição e distância. Na versão do projeto <code>02_circle</code>, a interface exporta
-      <code>create_point</code>, <code>free_point</code> e <code>euclidean_distance</code>. Como a struct é opaca, o acesso
-      direto às coordenadas não existe fora de <code>point2d.c</code>.
+      O TAD Ponto representa um ponto no plano. O material de referência define cinco operações: <code>cria</code>,
+      <code>libera</code>, <code>acessa</code>, <code>atribui</code> e <code>distancia</code>. O projeto
+      <code>02_circle</code> implementa três delas: <code>create_point</code> (cria), <code>free_point</code> (libera)
+      e <code>euclidean_distance</code> (distância). A struct <code>point2d</code> é definida só em
+      <code>point2d.c</code>, e o cliente recebe apenas <code>Point2D *</code>.
+    </p>
+    <p>
+      <strong>Operações conceituais.</strong> O TAD Ponto também prevê <code>acessa</code> (devolver as coordenadas) e
+      <code>atribui</code> (trocar as coordenadas). <strong>O exemplo não as implementa.</strong> No projeto não existe
+      função para ler nem para alterar <code>x</code> e <code>y</code> depois da criação. Essas operações entram aqui
+      para completar o conceito do TAD, mas não há código correspondente para executar.
     </p>
 
     <h4>Exemplo 2: TAD Círculo</h4>
     <p>
-      O TAD Círculo usa o TAD Ponto para representar o centro. <code>create_circle</code> cria o centro com
-      <code>create_point</code>, e <code>free_circle</code> libera o centro antes da própria struct. A operação
-      <code>is_point_inside_circle</code> compara a distância entre o ponto e o centro com o raio, e o cabeçalho
-      <code>circle.h</code> inclui <code>point2d.h</code> por causa disso. O projeto não exporta uma operação de área.
+      O TAD Círculo usa o TAD Ponto para representar o centro. O material de referência prevê as operações
+      <code>cria</code>, <code>libera</code>, <code>area</code> e <code>interior</code>. O projeto implementa
+      <code>create_circle</code>, <code>free_circle</code> e <code>is_point_inside_circle</code>.
+    </p>
+    <p>
+      <code>create_circle</code> cria o centro com <code>create_point</code> e guarda o ponteiro na struct
+      <code>circle</code>. <code>free_circle</code> libera primeiro o centro e depois o próprio círculo.
+      <code>is_point_inside_circle</code> calcula a distância entre o ponto e o centro e a compara com o raio: se a
+      distância for menor, o ponto está dentro.
+    </p>
+    <p>
+      A função de consulta recebe um <code>Point2D *</code>, por isso <code>circle.h</code> inclui
+      <code>point2d.h</code>. Um programa que usa o círculo também precisa do ponto, e por isso o
+      <code>test_circle.c</code> inclui os dois cabeçalhos.
+    </p>
+    <p>
+      <strong>Operação conceitual.</strong> O TAD Círculo também prevê <code>area</code>, o cálculo da área do círculo.
+      <strong>O exemplo não a implementa:</strong> não há função de área no projeto. Ela aparece aqui apenas para
+      completar o conceito do TAD.
     </p>
 
-
+    <h4>Exemplo 3: TAD Matriz</h4>
+    <p>
+      Este exemplo mostra o encapsulamento de forma mais completa: a mesma interface pode ser implementada de maneiras
+      diferentes. A matriz tem <em>m</em> linhas e <em>n</em> colunas, com dimensões escolhidas em tempo de execução. As
+      seis operações do material de referência estão implementadas: <code>matrix_create</code> (cria),
+      <code>matrix_free</code> (libera), <code>matrix_get</code> (acessa), <code>matrix_set</code> (atribui),
+      <code>matrix_rows</code> (linhas) e <code>matrix_cols</code> (colunas).
+    </p>
+    <p>
+      O projeto usa um <strong>vetor simples</strong>. A struct guarda o número de linhas, o número de colunas e um
+      ponteiro <code>float *data</code> para um bloco contíguo de <em>m</em> × <em>n</em> elementos. O elemento
+      <code>(i, j)</code> fica na posição <code>i * cols + j</code>. Essa é uma escolha interna de
+      <code>matrix.c</code>. O material de referência também descreve a estratégia com vetor de ponteiros
+      (<code>float **</code>), em que cada linha é alocada separadamente. A interface é a mesma nas duas estratégias.
+    </p>
+    <p>
+      O <code>test_matrix.c</code> não toca nos campos da struct. Ele preenche, percorre e imprime a matriz usando só as
+      funções de <code>matrix.h</code>. Por isso, trocar o vetor simples por vetor de ponteiros não exige mudança nesse
+      arquivo. Muda apenas o conteúdo de <code>matrix.c</code>.
+    </p>
   </div>
 
   <p class="lede">
-    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a
-    simulação da execução passo a passo. Os projetos são compilados com <code>make</code> e executados com <code>make run</code>.
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a simulação
+    da execução passo a passo. Os projetos são compilados com <code>make</code> e executados com <code>make run</code>.
   </p>
 
   <p class="section-label">Exemplos</p>
@@ -741,6 +825,12 @@
         <span class="row-title"><span class="row-icon">🔗</span>TAD Ponto e TAD Círculo</span>
       </div>
       <p class="row-desc">Dois TADs no mesmo projeto: o círculo usa o ponto para o centro, e a interface do círculo inclui a do ponto.</p>
+    </li>
+    <li class="example-row" data-target="matriz" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>TAD Matriz</span>
+      </div>
+      <p class="row-desc">Matriz m por n com vetor simples por trás de seis operações. O programa de teste usa matrix_get e matrix_set sem conhecer o vetor interno.</p>
     </li>
   </ul>
 
@@ -965,6 +1055,12 @@ str1 is less than str2 (result = -1)</pre>
           O programa de teste usa somente os headers. Ele cria um círculo e um ponto, consulta se o ponto está dentro,
           e libera os dois blocos que criou.
         </p>
+        <p>
+          <strong>Operações conceituais, não implementadas no exemplo.</strong> O TAD Ponto também prevê
+          <code>acessa</code> e <code>atribui</code>, e o TAD Círculo prevê <code>area</code>. <strong>O projeto não
+          implementa nenhuma dessas três</strong>: não há função para ler ou alterar as coordenadas do ponto, nem para
+          calcular a área do círculo. Elas não aparecem na simulação abaixo.
+        </p>
 
         <h3>Execução passo a passo</h3>
         <div class="stepper" data-stepper="circulo-ponto">
@@ -1089,18 +1185,18 @@ The point is inside the circle.</pre>
     <span class="fn">free_point</span>(circle-&gt;center);
     <span class="fn">free</span>(circle);
 }</code></pre>
-        <div class="check-question" data-correct="0">
+        <div class="check-question" data-correct="1">
           <div class="check-question-head">Pergunta de checagem</div>
-          <p class="check-question-text">O que aconteceria se <code>free_circle</code> deixasse de chamar <code>free_point(circle-&gt;center)</code>?</p>
+          <p class="check-question-text">O que aconteceria se <code>create_circle</code> recebesse raio 2, em vez de 5, mantendo o ponto (2, 1)?</p>
           <ul class="check-options">
-            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Haveria vazamento de memória: o ponto do centro continuaria alocado, sem ninguém para liberá-lo. A saída do programa não mudaria.</span></li>
-            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa não compilaria, porque <code>free_circle</code> precisa do ponto do centro para existir.</span></li>
-            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>free_circle</code> liberaria o centro automaticamente ao fim do programa.</span></li>
-            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>A saída mudaria, porque a consulta de <code>is_point_inside_circle</code> passaria a usar outro centro.</span></li>
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>O ponto continuaria dentro, porque suas coordenadas não mudaram.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O ponto passaria a ficar fora, porque a distância até o centro, cerca de 2,236, não é menor que 2.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa não compilaria, porque o raio precisa ser um número inteiro.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>A consulta passaria a usar o raio para calcular a área, e a saída não mudaria.</span></li>
           </ul>
           <div class="check-feedback">
-            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem essa chamada, o bloco do centro nunca é liberado. O programa continua funcionando e imprimindo o mesmo resultado, mas com memória vazando.</p>
-            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O efeito é um vazamento de memória, não um erro de compilação nem uma mudança na saída. O bloco do centro fica alocado sem ser liberado.</p>
+            <p class="feedback-correct" hidden><strong>Certo!</strong> A comparação é <code>distance &lt; radius</code>. Com raio 2, a distância de aproximadamente 2,236 não é menor, então a função devolve 0 e a saída seria "outside".</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A consulta compara a distância até o centro com o raio. Com raio 2, a distância de cerca de 2,236 não é menor, e o ponto passa a ficar fora do círculo.</p>
           </div>
         </div>
         <div class="callout">
@@ -1112,7 +1208,180 @@ The point is inside the circle.</pre>
     </div>
   </section>
 
-  
+  <!-- ================= TAD MATRIZ ================= -->
+  <section class="detail" id="panel-matriz" data-panel hidden>
+    <div class="detail-head">
+      <h2>TAD Matriz</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/09_tads/03_matrix" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include "matrix.h"</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cmt">// Create a 3x4 matrix</span>
+    <span class="type">Matrix</span> *mat = <span class="fn">matrix_create</span>(<span class="num">3</span>, <span class="num">4</span>);
+
+    <span class="cmt">// Fill it: element (i, j) receives the value i * 10 + j</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">matrix_rows</span>(mat); i++) {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; <span class="fn">matrix_cols</span>(mat); j++) {
+            <span class="fn">matrix_set</span>(mat, i, j, i * <span class="num">10</span> + j);
+        }
+    }
+
+    <span class="cmt">// Print using only the ADT interface; this code never touches</span>
+    <span class="cmt">// the fields of struct matrix directly.</span>
+    <span class="fn">printf</span>(<span class="str">"Matrix %d x %d:\n"</span>, <span class="fn">matrix_rows</span>(mat), <span class="fn">matrix_cols</span>(mat));
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">matrix_rows</span>(mat); i++) {
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; <span class="fn">matrix_cols</span>(mat); j++) {
+            <span class="fn">printf</span>(<span class="str">"%5.1f "</span>, <span class="fn">matrix_get</span>(mat, i, j));
+        }
+        <span class="fn">printf</span>(<span class="str">"\n"</span>);
+    }
+
+    <span class="fn">matrix_free</span>(mat);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o TAD Matriz</h3>
+        <p>
+          <code>matrix.h</code> é a <strong>interface</strong>. Declara o tipo opaco <code>Matrix</code> e as seis operações:
+          <code>matrix_create</code>, <code>matrix_free</code>, <code>matrix_get</code>, <code>matrix_set</code>,
+          <code>matrix_rows</code> e <code>matrix_cols</code>. Não há nenhum campo visível para o cliente.
+        </p>
+        <p>
+          <code>matrix.c</code> é a <strong>implementação</strong>. A struct guarda <code>rows</code>, <code>cols</code>
+          e um ponteiro <code>data</code> para um bloco contíguo de floats, alocado com <code>calloc</code>, então todos os
+          elementos começam em 0. O elemento <code>(i, j)</code> fica em <code>data[i * cols + j]</code>.
+        </p>
+        <p>
+          <code>test_matrix.c</code> cria uma matriz 3 × 4, preenche cada elemento com <code>i * 10 + j</code>, imprime
+          a matriz e libera a memória. Ele usa somente as funções do header, e por isso a implementação pode trocar o
+          vetor simples por vetor de ponteiros sem mudança neste arquivo.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="matriz">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">./test_matrix
+Matrix 3 x 4:
+  0.0   1.0   2.0   3.0
+ 10.0  11.0  12.0  13.0
+ 20.0  21.0  22.0  23.0 </pre>
+
+        <h3>Outros arquivos do projeto</h3>
+<p class="file-label"><code>03_matrix/include/matrix.h</code></p><pre class="code-block"><code><span class="pp">#ifndef MATRIX_H</span>
+<span class="pp">#define MATRIX_H</span>
+
+<span class="cmt">// ADT: m-by-n matrix, dynamically allocated</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span> matrix <span class="type">Matrix</span>;
+
+<span class="cmt">// Creates and returns an m-by-n matrix with all elements set to 0</span>
+<span class="type">Matrix</span> *<span class="fn">matrix_create</span>(<span class="kw">int</span> m, <span class="kw">int</span> n);
+
+<span class="cmt">// Frees the memory allocated for the matrix</span>
+<span class="kw">void</span> <span class="fn">matrix_free</span>(<span class="type">Matrix</span> *mat);
+
+<span class="cmt">// Returns the element at row i and column j</span>
+<span class="kw">float</span> <span class="fn">matrix_get</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j);
+
+<span class="cmt">// Sets the element at row i and column j to v</span>
+<span class="kw">void</span> <span class="fn">matrix_set</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j, <span class="kw">float</span> v);
+
+<span class="cmt">// Returns the number of rows</span>
+<span class="kw">int</span> <span class="fn">matrix_rows</span>(<span class="type">Matrix</span> *mat);
+
+<span class="cmt">// Returns the number of columns</span>
+<span class="kw">int</span> <span class="fn">matrix_cols</span>(<span class="type">Matrix</span> *mat);
+
+<span class="pp">#endif</span></code></pre>
+<p class="file-label"><code>03_matrix/src/matrix.c</code></p><pre class="code-block"><code><span class="pp">#include "matrix.h"</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="cmt">// Implementation with a flat array: all elements live in one contiguous</span>
+<span class="cmt">// block, and element (i, j) is stored at data[i * cols + j].</span>
+<span class="cmt">// This is an internal detail of the module; clients never need to know it.</span>
+<span class="kw">struct</span> matrix {
+    <span class="kw">int</span> rows;
+    <span class="kw">int</span> cols;
+    <span class="kw">float</span> *data;
+};
+
+<span class="type">Matrix</span> *<span class="fn">matrix_create</span>(<span class="kw">int</span> m, <span class="kw">int</span> n) {
+    <span class="type">Matrix</span> *mat = (<span class="type">Matrix</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Matrix</span>));
+    <span class="kw">if</span> (mat == NULL) {
+        <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Matrix"</span>);
+        <span class="fn">exit</span>(EXIT_FAILURE);
+    }
+
+    mat-&gt;rows = m;
+    mat-&gt;cols = n;
+    mat-&gt;data = (<span class="kw">float</span> *)<span class="fn">calloc</span>(m * n, <span class="kw">sizeof</span>(<span class="kw">float</span>));
+    <span class="kw">if</span> (mat-&gt;data == NULL) {
+        <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Matrix elements"</span>);
+        <span class="fn">exit</span>(EXIT_FAILURE);
+    }
+
+    <span class="kw">return</span> mat;
+}
+
+<span class="kw">void</span> <span class="fn">matrix_free</span>(<span class="type">Matrix</span> *mat) {
+    <span class="fn">free</span>(mat-&gt;data);
+    <span class="fn">free</span>(mat);
+}
+
+<span class="kw">float</span> <span class="fn">matrix_get</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j) {
+    <span class="kw">return</span> mat-&gt;data[i * mat-&gt;cols + j];
+}
+
+<span class="kw">void</span> <span class="fn">matrix_set</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j, <span class="kw">float</span> v) {
+    mat-&gt;data[i * mat-&gt;cols + j] = v;
+}
+
+<span class="kw">int</span> <span class="fn">matrix_rows</span>(<span class="type">Matrix</span> *mat) {
+    <span class="kw">return</span> mat-&gt;rows;
+}
+
+<span class="kw">int</span> <span class="fn">matrix_cols</span>(<span class="type">Matrix</span> *mat) {
+    <span class="kw">return</span> mat-&gt;cols;
+}</code></pre>
+        <div class="check-question" data-correct="2">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">Por que <code>test_matrix.c</code> não precisaria mudar se a implementação trocasse o vetor simples por um vetor de ponteiros?</p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Porque o compilador converte automaticamente <code>float **</code> em <code>float *</code> em cada chamada.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Porque o programa só imprime valores inteiros, e a representação interna não afeta a saída.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Porque o programa usa só as funções de <code>matrix.h</code> e não acessa os campos da struct, então a mudança fica restrita a <code>matrix.c</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>Porque <code>test_matrix.c</code> inclui o arquivo <code>matrix.c</code> diretamente, e nele a mudança é invisível.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> O cliente depende só do contrato. Como ele não toca em <code>rows</code>, <code>cols</code> nem em <code>data</code>, a forma de armazenamento fica restrita a <code>matrix.c</code>.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O ponto é o encapsulamento: o programa de teste só chama <code>matrix_create</code>, <code>matrix_set</code>, <code>matrix_get</code> e as demais funções do header. A mudança de armazenamento fica dentro de <code>matrix.c</code>.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <code>test_matrix.c</code> nunca lê os campos da struct: usa só as seis funções de <code>matrix.h</code>. O exemplo
+          compila sem nenhum aviso com <code>-Wall</code>, e a saída é a mesma que o material de referência descreve para
+          uma matriz 3 × 4 preenchida com <em>i</em> × 10 + <em>j</em>.
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer class="closing">
     <strong>Para lembrar.</strong> Um módulo tem uma interface (<code>.h</code>) e uma implementação (<code>.c</code>)
     compiladas em separado. Um TAD esconde a struct atrás de ponteiros opacos, e o cliente depende só das operações
@@ -1197,6 +1466,20 @@ The point is inside the circle.</pre>
         { line: 27, vars: { my_point: "liberado" }, desc: "free_point libera o ponto da consulta. O cliente libera os blocos que ele mesmo criou." },
         { line: 29, vars: {}, desc: "return 0; — o programa termina." }
       ]
+    },
+    "matriz": {
+      vars: ["mat", "i", "j"],
+      steps: [
+        { line: 6, vars: { mat: "3 x 4, zerada" }, desc: "matrix_create(3, 4) aloca a struct matrix e um vetor de 12 floats, todos zerados por calloc. Quem chama recebe só um ponteiro Matrix *." },
+        { line: 9, vars: { i: "0" }, desc: "Laço externo: i começa em 0. A condição i < matrix_rows(mat) é 0 < 3, verdadeira." },
+        { line: 10, vars: { j: "0" }, desc: "Laço interno: j começa em 0. A condição j < matrix_cols(mat) é 0 < 4, verdadeira." },
+        { line: 11, vars: {}, desc: "matrix_set(mat, 0, 0, 0 * 10 + 0) grava 0.0 no elemento (0, 0). O mesmo laço grava os 12 elementos; a última gravação é (2, 3), com valor 23.0." },
+        { line: 17, vars: { i: "fora do laço", j: "fora do laço" }, desc: "Os dois laços terminaram. printf imprime o cabeçalho com as dimensões obtidas por matrix_rows e matrix_cols: “Matrix 3 x 4:”." },
+        { line: 20, vars: { i: "0", j: "0" }, desc: "No laço de impressão, matrix_get(mat, 0, 0) devolve 0.0, e printf imprime esse valor com largura 5 e uma casa decimal." },
+        { line: 22, vars: { j: "4" }, desc: "O laço interno terminou com j = 4. printf(\"\\n\") encerra a primeira linha impressa da matriz." },
+        { line: 25, vars: { mat: "liberada" }, desc: "matrix_free libera o vetor de dados e depois a struct. O programa cliente não precisa saber que existe um vetor interno." },
+        { line: 27, vars: {}, desc: "return 0; — o programa termina." }
+      ]
     }
   };
 
@@ -1206,7 +1489,6 @@ The point is inside the circle.</pre>
     var varsOrder = config.vars;
     var elDesc = root.querySelector("[data-desc]");
     var elVars = root.querySelector("[data-vars]");
-    var elLog = root.querySelector("[data-log]");
     var elNow = root.querySelector(".step-now");
     var elTotal = root.querySelector(".step-total");
     var btnPrev = root.querySelector('[data-action="prev"]');
@@ -1241,26 +1523,6 @@ The point is inside the circle.</pre>
         .join("");
 
       elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
-
-      if (elLog) {
-        var rowsHtml = [];
-        for (var m = 0; m <= current; m++) {
-          if (steps[m].row) rowsHtml.push(steps[m]);
-        }
-        elLog.innerHTML = rowsHtml
-          .map(function (s) {
-            return (
-              "<tr" + (s.win ? ' class="win"' : "") + ">" +
-              s.row
-                .map(function (cell, idx) {
-                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
-                })
-                .join("") +
-              "</tr>"
-            );
-          })
-          .join("");
-      }
 
       elNow.textContent = current < 0 ? 0 : current + 1;
       btnPrev.disabled = current < 0;
@@ -1309,7 +1571,6 @@ The point is inside the circle.</pre>
 
     question.querySelectorAll(".check-option").forEach(function (o) {
       var idx = parseInt(o.getAttribute("data-idx"), 10);
-      o.classList.add("disabled");
       if (idx === correct) o.classList.add("correct");
       else if (o === opt) o.classList.add("incorrect");
     });

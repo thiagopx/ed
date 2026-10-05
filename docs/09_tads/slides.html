@@ -140,14 +140,14 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.4vw;
+    gap: 1.2vw;
     width: 100%;
   }
   .roadmap li {
     display: flex;
     align-items: baseline;
     gap: 1.4vw;
-    padding-bottom: 1.4vw;
+    padding-bottom: 1.2vw;
     border-bottom: 1px solid var(--line);
   }
   .roadmap .n {
@@ -170,6 +170,7 @@
     gap: 1.6vw;
     flex-wrap: wrap;
   }
+  .flow.is-column { flex-direction: column; }
   .flow .box {
     font-family: var(--font-mono);
     font-weight: 700;
@@ -218,7 +219,27 @@
   .chain .label { font-size: clamp(1rem, 1.6vw, 1.3rem); color: var(--ink-soft); }
   .chain .label strong { color: var(--ink); }
 
-  /* ---- comparação 3 colunas ---- */
+  /* ---- grade de matriz ---- */
+
+  .mgrid {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 0.6vw;
+    justify-content: center;
+  }
+  .mgrid .cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 0.6vw;
+    padding: 0.8vw 1.2vw;
+    text-align: center;
+  }
+  .mgrid .cell.is-null { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  /* ---- comparação lado a lado ---- */
 
   .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
   .compare .col {
@@ -284,12 +305,26 @@
     padding: 1.6vw 1.2vw;
     text-align: center;
   }
+  .cards .card.is-concept { border-style: dashed; background: var(--surface-2); }
   .cards .card .fn {
     font-family: var(--font-mono);
     font-weight: 700;
     font-size: clamp(1.1rem, 1.9vw, 1.5rem);
     color: var(--accent);
     display: block;
+    margin-bottom: 0.6vw;
+  }
+  .cards .card.is-concept .fn { color: var(--ink-soft); }
+  .cards .card .tag-concept {
+    display: inline-block;
+    font-size: clamp(0.7rem, 1vw, 0.85rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    border: 1px solid var(--line-strong, #B9C1C2);
+    border-radius: 999px;
+    padding: 0.15vw 0.8vw;
     margin-bottom: 0.6vw;
   }
   .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
@@ -328,7 +363,7 @@
     background: var(--code-bg);
     border-radius: 0.8vw;
     padding: 1vw 1.4vw 1.3vw;
-    max-width: 38vw;
+    max-width: 42vw;
     box-shadow: 0 0.3vw 0 var(--line);
   }
   .code-panel .file-tag {
@@ -342,7 +377,7 @@
   .code-panel pre {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: clamp(0.68rem, 1vw, 0.92rem);
+    font-size: clamp(0.68rem, 0.9vw, 0.88rem);
     line-height: 1.5;
     color: var(--code-ink);
     white-space: pre;
@@ -364,8 +399,8 @@
     width: 100%;
     flex-wrap: wrap;
   }
-  .concept-split .visual-col { flex: 1 1 38%; display: flex; justify-content: center; }
-  .concept-split .code-col { flex: 1 1 38%; display: flex; justify-content: center; }
+  .concept-split .visual-col { flex: 1 1 34%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 40%; display: flex; justify-content: center; }
 
   /* ---- terminal ---- */
 
@@ -396,6 +431,7 @@
     padding: 1vw 2vw;
     border-radius: 0.7vw;
     margin-top: 2vw;
+    text-decoration: none;
   }
   .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
 
@@ -482,7 +518,7 @@
     </div>
     <div class="kicker">Capítulo 12</div>
     <h1>Tipo abstrato de dados</h1>
-    <p class="sub">Módulos em separado e um TAD que esconde a struct atrás de ponteiros: quem usa o tipo conhece só as funções exportadas.</p>
+    <p class="sub">Abstração de dados, módulos em separado e TADs que escondem a struct atrás de ponteiros: quem usa o tipo conhece só as operações.</p>
     <div class="string-strip">
       <div class="chip">main.c</div>
       <div class="chip is-null">circle.h</div>
@@ -497,64 +533,166 @@
     <h1>O que vamos ver</h1>
     <div class="body">
       <ul class="roadmap">
-        <li><span class="n">01</span><div><div class="t">Módulos e compilação em separado</div><div class="d">cada .c vira um .o, e o ligador junta tudo no executável</div></div></li>
-        <li><span class="n">02</span><div><div class="t">Interface e implementação</div><div class="d">o cabeçalho (.h) declara; o arquivo .c define</div></div></li>
-        <li><span class="n">03</span><div><div class="t">Tipo abstrato de dados</div><div class="d">esconder a struct e expor só as operações</div></div></li>
-        <li><span class="n">04</span><div><div class="t">Exemplos: Ponto e Círculo</div><div class="d">projetos com Makefile, do mais simples ao que usa outro TAD</div></div></li>
+        <li><span class="n">01</span><div><div class="t">Abstrair é esconder detalhes</div><div class="d">o que o tipo faz importa a quem usa; como ele faz, não</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Programa cliente e módulo</div><div class="d">o .h é o contrato; o .c guarda a implementação</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Módulos e compilação em separado</div><div class="d">cada .c vira um .o, e o ligador junta tudo</div></div></li>
+        <li><span class="n">04</span><div><div class="t">TAD Ponto e TAD Círculo</div><div class="d">o círculo usa o ponto para o centro</div></div></li>
+        <li><span class="n">05</span><div><div class="t">TAD Matriz</div><div class="d">a mesma interface com um vetor simples por trás</div></div></li>
       </ul>
     </div>
     <div class="footer"><span>Tipo abstrato de dados</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 3. COMPILAÇÃO EM SEPARADO -->
+  <!-- 3. ABSTRAÇÃO: O QUE × COMO -->
   <section class="slide" data-slide>
-    <div class="kicker">Módulos e compilação em separado</div>
-    <h1>Cada .c vira um .o; o ligador junta tudo</h1>
-    <p class="sub">Mesmo um programa de um único arquivo passa pela ligação.</p>
+    <div class="kicker">Abstração</div>
+    <h1>O que o tipo faz, e como ele faz</h1>
+    <p class="sub">Quem usa depende do contrato. Quem implementa pode mudar a forma sem alterar o contrato.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="tag">o que faz</div>
+          <div class="note">as operações: o contrato</div>
+        </div>
+        <div class="vs">×</div>
+        <div class="item">
+          <div class="tag">como faz</div>
+          <div class="note">a estrutura e o código interno</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Abstração</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. ABSTRAÇÃO DE DADOS: PONTO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Abstração de dados</div>
+    <h1>Para um ponto, importa a distância</h1>
+    <p class="sub">Se as coordenadas ficam em dois campos ou num vetor de dois elementos, isso é um detalhe.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="tag">x, y</div>
+          <div class="note">dois campos separados</div>
+        </div>
+        <div class="vs">ou</div>
+        <div class="item">
+          <div class="tag">[x, y]</div>
+          <div class="note">vetor de dois elementos</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Abstração de dados</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. CLIENTE × MÓDULO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Programa cliente e módulo</div>
+    <h1>Quem usa, quem oferece</h1>
+    <p class="sub">O cliente conhece o contrato. O módulo guarda a implementação.</p>
     <div class="body">
       <div class="flow">
-        <div class="box">main.c<span class="tag">fonte</span></div>
-        <div class="op">+</div>
-        <div class="box">my_string.c<span class="tag">fonte</span></div>
+        <div class="box">main.c<span class="tag">cliente: usa</span></div>
         <div class="arrow">→</div>
-        <div class="box">.o<span class="tag">objetos, um por módulo</span></div>
+        <div class="box is-accent">my_string.h<span class="tag">contrato</span></div>
         <div class="arrow">→</div>
-        <div class="box is-accent">my_program<span class="tag">executável</span></div>
+        <div class="box">my_string.c<span class="tag">implementação escondida</span></div>
       </div>
     </div>
-    <div class="footer"><span>Módulos e compilação em separado</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Programa cliente e módulo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 4. INTERFACE × IMPLEMENTAÇÃO × CLIENTE -->
+  <!-- 6. O .H É O CONTRATO -->
   <section class="slide" data-slide>
-    <div class="kicker">Interface e implementação</div>
-    <h1>Três papéis, três arquivos</h1>
-    <p class="sub">O cliente conhece o cabeçalho. O corpo das funções fica no .c.</p>
+    <div class="kicker">Programa cliente e módulo</div>
+    <h1>O .h declara; o .c define</h1>
+    <p class="sub">Os protótipos das funções exportadas ficam no cabeçalho.</p>
     <div class="body">
-      <div class="compare">
-        <div class="col">
-          <h3>my_string.h</h3>
-          <p>Interface: declara o que o módulo oferece.</p>
-          <span class="cap">int my_strlen(const char *str);</span>
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-column">
+            <div class="box">my_string.h<span class="tag">protótipos e guardas</span></div>
+            <div class="arrow">↓</div>
+            <div class="box is-accent">my_string.c<span class="tag">corpo das funções</span></div>
+          </div>
         </div>
-        <div class="col is-bad">
-          <h3>my_string.c</h3>
-          <p>Implementação: define o corpo da função.</p>
-          <span class="cap">while (str[length] != '\0')</span>
-        </div>
-        <div class="col">
-          <h3>main.c</h3>
-          <p>Cliente: inclui só o cabeçalho.</p>
-          <span class="cap">#include "my_string.h"</span>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_modules/my_string.h</div>
+<pre><code><span class="pp">#ifndef _MY_STRING_H</span>
+<span class="pp">#define _MY_STRING_H</span>
+
+<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
+<span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str);
+<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
+<span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src);
+
+<span class="pp">#endif // _MY_STRING_H</span></code></pre>
+          </div>
         </div>
       </div>
     </div>
-    <div class="footer"><span>Interface e implementação</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Programa cliente e módulo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 5. ASPAS × COLCHETES -->
+  <!-- 7. CLIENTE CHAMA O QUE O HEADER DECLARA -->
   <section class="slide" data-slide>
-    <div class="kicker">Interface e implementação</div>
+    <div class="kicker">Programa cliente e módulo</div>
+    <h1>O cliente chama o que o header declara</h1>
+    <p class="sub">main.c não sabe se my_strlen usa laço, recursão ou outra técnica.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="duel" style="flex-direction: column; gap: 1.5vw;">
+            <div class="item">
+              <div class="tag">#include "my_string.h"</div>
+              <div class="note">módulo do próprio projeto</div>
+            </div>
+            <div class="vs">e</div>
+            <div class="item">
+              <div class="tag">#include &lt;stdio.h&gt;</div>
+              <div class="note">biblioteca padrão de C</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_modules/main.c</div>
+<pre><code>    <span class="kw">int</span> length = <span class="fn">my_strlen</span>(str1);
+    <span class="fn">printf</span>(<span class="str">"Length of str1: %d\n"</span>, length);
+    <span class="fn">my_strcpy</span>(str1, str2);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Programa cliente e módulo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. ERROS: COMPILAÇÃO × LIGAÇÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Programa cliente e módulo</div>
+    <h1>Onde o erro aparece</h1>
+    <p class="sub">Chamar o que o header não declara falha na compilação. Declarar o que ninguém define falha na ligação.</p>
+    <div class="body">
+      <div class="cascade">
+        <div class="card is-bad">
+          <div class="buf-label">chamada sem declaração</div>
+          <div class="lines">main.c<br>my_strlen(...)<br>sem protótipo no header</div>
+          <div class="verdict is-bad">erro de compilação de main.c</div>
+        </div>
+        <div class="card is-bad">
+          <div class="buf-label">declaração sem definição</div>
+          <div class="lines">my_string.h<br>int my_strlen(...);<br>sem corpo em nenhum .o</div>
+          <div class="verdict is-bad">erro de ligação</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Programa cliente e módulo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. ASPAS × COLCHETES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Módulos e compilação em separado</div>
     <h1>Aspas para o projeto, colchetes para a biblioteca</h1>
     <div class="body">
       <div class="duel">
@@ -569,12 +707,81 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Interface e implementação</span><span>Estruturas de Dados</span></div>
+    <div class="footer"><span>Módulos e compilação em separado</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 6. GUARDAS DE INCLUSÃO -->
+  <!-- 10. COMPILAÇÃO EM SEPARADO -->
   <section class="slide" data-slide>
-    <div class="kicker">Interface e implementação</div>
+    <div class="kicker">Módulos e compilação em separado</div>
+    <h1>Cada .c vira um .o; o ligador junta tudo</h1>
+    <p class="sub">Mesmo um programa de um único arquivo passa pela ligação. A biblioteca padrão entra nessa etapa.</p>
+    <div class="body">
+      <div class="flow">
+        <div class="box">main.c<span class="tag">fonte</span></div>
+        <div class="op">+</div>
+        <div class="box">my_string.c<span class="tag">fonte</span></div>
+        <div class="arrow">→</div>
+        <div class="box">.o<span class="tag">objetos, um por módulo</span></div>
+        <div class="arrow">→</div>
+        <div class="box is-accent">my_program<span class="tag">executável</span></div>
+      </div>
+    </div>
+    <div class="footer"><span>Módulos e compilação em separado</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. MAKE RUN -->
+  <section class="slide" data-slide>
+    <div class="kicker">Módulos e compilação em separado</div>
+    <h1>make run compila e executa</h1>
+    <p class="sub">A saída do programa cliente, com as funções do módulo ligadas ao executável.</p>
+    <div class="body">
+      <div class="term"><span class="prompt">$</span> make run
+./my_program
+Length of str1: 7
+Copied string: World!
+Concatenated string: Hello, World!
+str1 is less than str2 (result = -1)</div>
+    </div>
+    <div class="footer"><span>Módulos e compilação em separado</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. CORPO DA FUNÇÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Módulos e compilação em separado</div>
+    <h1>O corpo fica no .c</h1>
+    <p class="sub">my_strlen percorre o vetor até o '\0' e devolve a contagem.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="chain">
+            <div class="strip">
+              <div class="cell">H</div><div class="cell">e</div><div class="cell">l</div><div class="cell">l</div><div class="cell">o</div><div class="cell is-null">\0</div>
+            </div>
+            <div class="label">o '\0' marca o fim: <strong>length = 5</strong></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">01_modules/my_string.c</div>
+<pre><code><span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str)
+{
+    <span class="kw">int</span> length = <span class="num">0</span>;
+
+    <span class="kw">while</span> (str[length] != <span class="str">'\0'</span>)
+        length++;
+
+    <span class="kw">return</span> length;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Módulos e compilação em separado</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 13. GUARDA DE INCLUSÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Módulos e compilação em separado</div>
     <h1>A guarda impede a segunda leitura</h1>
     <p class="sub">Um cabeçalho incluído mais de uma vez na mesma compilação não repete as definições.</p>
     <div class="body">
@@ -591,60 +798,10 @@
         </div>
       </div>
     </div>
-    <div class="footer"><span>Interface e implementação</span><span>Estruturas de Dados</span></div>
-  </section>
-
-  <!-- 7. IMPLEMENTAÇÃO DE UMA FUNÇÃO -->
-  <section class="slide" data-slide>
-    <div class="kicker">Implementação</div>
-    <h1>O corpo fica no .c</h1>
-    <p class="sub">my_strlen percorre o vetor até o '\0' e devolve a contagem.</p>
-    <div class="body">
-      <div class="concept-split">
-        <div class="visual-col">
-          <div class="chain">
-            <div class="strip">
-              <div class="cell">H</div><div class="cell">e</div><div class="cell">l</div><div class="cell">l</div><div class="cell">o</div><div class="cell is-null">\0</div>
-            </div>
-            <div class="label">o '\0' marca o fim: <strong>length = 5</strong></div>
-          </div>
-        </div>
-        <div class="code-col">
-          <div class="code-panel">
-            <div class="file-tag">01_modules/my_string.c</div>
-            <pre><code><span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str)
-{
-    <span class="kw">int</span> length = <span class="num">0</span>;
-
-    <span class="kw">while</span> (str[length] != <span class="str">'\0'</span>)
-        length++;
-
-    <span class="kw">return</span> length;
-}</code></pre>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="footer"><span>Implementação</span><span>Estruturas de Dados</span></div>
-  </section>
-
-  <!-- 8. EXECUÇÃO -->
-  <section class="slide" data-slide>
-    <div class="kicker">Módulos e compilação em separado</div>
-    <h1>make run compila e executa</h1>
-    <p class="sub">A saída do programa cliente, com as funções do módulo ligadas ao executável.</p>
-    <div class="body">
-      <div class="term"><span class="prompt">$</span> make run
-./my_program
-Length of str1: 7
-Copied string: World!
-Concatenated string: Hello, World!
-str1 is less than str2 (result = -1)</div>
-    </div>
     <div class="footer"><span>Módulos e compilação em separado</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 9. ENCAPSULAMENTO -->
+  <!-- 14. ENCAPSULAMENTO -->
   <section class="slide" data-slide>
     <div class="kicker">Tipo abstrato de dados</div>
     <h1>O cliente vê só o ponteiro</h1>
@@ -663,7 +820,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Tipo abstrato de dados</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 10. DECLARAR NO .H, DEFINIR NO .C -->
+  <!-- 15. DECLARADO NO .H, DEFINIDO NO .C -->
   <section class="slide" data-slide>
     <div class="kicker">Tipo abstrato de dados</div>
     <h1>Declarado no .h, definido no .c</h1>
@@ -671,7 +828,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="flow" style="flex-direction:column;">
+          <div class="flow is-column">
             <div class="box">circle.h<span class="tag">typedef struct circle Circle;</span></div>
             <div class="arrow">↓</div>
             <div class="box is-accent">circle.c<span class="tag">struct circle { … }</span></div>
@@ -680,7 +837,7 @@ str1 is less than str2 (result = -1)</div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/src/circle.c</div>
-            <pre><code><span class="kw">struct</span> circle
+<pre><code><span class="kw">struct</span> circle
 {
     <span class="type">Point2D</span> *center;
     <span class="kw">double</span> radius;
@@ -692,30 +849,48 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Tipo abstrato de dados</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 11. OPERAÇÕES DO TAD -->
+  <!-- 16. OPERAÇÕES DE UM TAD (CONCEITUAL) -->
   <section class="slide" data-slide>
     <div class="kicker">Tipo abstrato de dados</div>
-    <h1>O TAD Círculo expõe três operações</h1>
-    <p class="sub">Criar, consultar e liberar. Nenhuma delas revela os campos.</p>
+    <h1>Um TAD reúne criação, acesso e cálculo</h1>
+    <p class="sub">Operações tracejadas são conceituais: fazem parte do tipo, mas não têm código nos exemplos.</p>
     <div class="body">
-      <div class="cards" style="grid-template-columns: repeat(3, 1fr);">
-        <div class="card"><span class="fn">create_circle</span><p>aloca o círculo e cria o centro</p></div>
-        <div class="card"><span class="fn">is_point_inside_circle</span><p>diz se um ponto está dentro</p></div>
-        <div class="card"><span class="fn">free_circle</span><p>libera o centro e depois o círculo</p></div>
+      <div class="cards">
+        <div class="card"><span class="fn">cria</span><p>aloca e inicializa, e devolve um ponteiro</p></div>
+        <div class="card"><span class="fn">libera</span><p>desaloca o que foi criado</p></div>
+        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">acessa</span><p>devolve os dados do tipo</p></div>
+        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">atribui</span><p>altera os dados do tipo</p></div>
       </div>
     </div>
     <div class="footer"><span>Tipo abstrato de dados</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 12. TAD PONTO: OPACO -->
+  <!-- 17. TAD PONTO: CINCO OPERAÇÕES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 1: TAD Ponto</div>
+    <h1>Cinco operações, três implementadas</h1>
+    <p class="sub">create_point, free_point e euclidean_distance estão no projeto. acessa e atribui são conceituais.</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card"><span class="fn">create_point</span><p>cria (implementada)</p></div>
+        <div class="card"><span class="fn">free_point</span><p>libera (implementada)</p></div>
+        <div class="card"><span class="fn">euclidean_distance</span><p>distância (implementada)</p></div>
+        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">acessa</span><p>devolve as coordenadas</p></div>
+        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">atribui</span><p>troca as coordenadas</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 1: TAD Ponto</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 18. POINT2D: OPACO -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 1: TAD Ponto</div>
     <h1>Point2D é opaco para o cliente</h1>
-    <p class="sub">O header expõe o tipo e três funções. Os campos x e y ficam só no point2d.c.</p>
+    <p class="sub">O header expõe o tipo e as funções. Os campos x e y ficam só no point2d.c.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="flow" style="flex-direction:column;">
+          <div class="flow is-column">
             <div class="box">main.c<span class="tag">usa Point2D *</span></div>
             <div class="arrow">↓</div>
             <div class="box is-accent">point2d.c<span class="tag">struct point2d { x, y }</span></div>
@@ -724,15 +899,12 @@ str1 is less than str2 (result = -1)</div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/include/point2d.h</div>
-            <pre style="font-size: 0.85vw;"><code><span class="pp">#ifndef POINT2D</span>
+<pre><code><span class="pp">#ifndef POINT2D</span>
 <span class="pp">#define POINT2D</span>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> point2d <span class="type">Point2D</span>;
 
-<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);
-<span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2);
-<span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point);
-<span class="pp">#endif</span></code></pre>
+<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);</code></pre>
           </div>
         </div>
       </div>
@@ -740,7 +912,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Exemplo 1: TAD Ponto</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 13. CRIAÇÃO DO PONTO -->
+  <!-- 19. CREATE_POINT -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 1: TAD Ponto</div>
     <h1>create_point aloca e preenche</h1>
@@ -748,8 +920,8 @@ str1 is less than str2 (result = -1)</div>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="flow" style="flex-direction:column;">
-            <div class="box">malloc<span class="tag">aloca sizeof(Point2D); se NULL, perror e exit</span></div>
+          <div class="flow is-column">
+            <div class="box">malloc<span class="tag">aloca sizeof(Point2D)</span></div>
             <div class="arrow">↓</div>
             <div class="box is-accent">return<span class="tag">ponteiro para o novo ponto</span></div>
           </div>
@@ -757,7 +929,7 @@ str1 is less than str2 (result = -1)</div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/src/point2d.c</div>
-            <pre><code><span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y) {
+<pre><code><span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y) {
   <span class="type">Point2D</span> *new_point = (<span class="type">Point2D</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Point2D</span>));
   <span class="kw">if</span> (new_point == NULL) {
     <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Point2D"</span>);
@@ -774,48 +946,27 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Exemplo 1: TAD Ponto</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 14. CONSULTA: DENTRO OU FORA -->
+  <!-- 20. TAD CÍRCULO: CINCO... QUATRO OPERAÇÕES -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 2: TAD Círculo</div>
-    <h1>Dentro quando a distância é menor que o raio</h1>
-    <p class="sub">A consulta usa o TAD Ponto para medir a distância até o centro.</p>
+    <h1>Três operações no projeto, uma conceitual</h1>
+    <p class="sub">A área do círculo faz parte do TAD, mas não há função de área no projeto.</p>
     <div class="body">
-      <div class="concept-split">
-        <div class="visual-col">
-          <div class="flow" style="flex-direction:column;">
-            <div class="box">distância<span class="tag">euclidean_distance(point, center)</span></div>
-            <div class="op">&lt; raio ?</div>
-            <div class="box is-accent">1 ou 0<span class="tag">dentro ou fora</span></div>
-          </div>
-        </div>
-        <div class="code-col">
-          <div class="code-panel">
-            <div class="file-tag">02_circle/src/circle.c</div>
-            <pre style="font-size: 0.85vw;"><code><span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle)
-{
-    <span class="kw">double</span> distance = <span class="fn">euclidean_distance</span>(point, circle-&gt;center);
-
-    <span class="kw">if</span> (distance &lt; circle-&gt;radius)
-    {
-        <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Inside</span>
-    }
-    <span class="kw">else</span>
-    {
-        <span class="kw">return</span> <span class="num">0</span>; <span class="cmt">// Outside</span>
-    }
-}</code></pre>
-          </div>
-        </div>
+      <div class="cards" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="card"><span class="fn">create_circle</span><p>cria o círculo e o centro</p></div>
+        <div class="card"><span class="fn">is_point_inside_circle</span><p>diz se um ponto está dentro</p></div>
+        <div class="card"><span class="fn">free_circle</span><p>libera o centro e o círculo</p></div>
+        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">area</span><p>calcula a área do círculo</p></div>
       </div>
     </div>
     <div class="footer"><span>Exemplo 2: TAD Círculo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 15. CÍRCULO CONTÉM UM PONTO -->
+  <!-- 21. CÍRCULO CONTÉM UM PONTO -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 2: TAD Círculo</div>
     <h1>O círculo guarda um ponto como centro</h1>
-    <p class="sub">A struct do círculo tem um Point2D * e um double para o raio.</p>
+    <p class="sub">A struct do círculo tem um Point2D * para o centro e um double para o raio.</p>
     <div class="body">
       <div class="nest">
         <div class="ring">
@@ -828,7 +979,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Exemplo 2: TAD Círculo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 16. DEPENDÊNCIA ENTRE TADS -->
+  <!-- 22. CIRCLE.H INCLUI POINT2D.H -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 2: TAD Círculo</div>
     <h1>circle.h inclui point2d.h</h1>
@@ -836,7 +987,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="flow" style="flex-direction:column;">
+          <div class="flow is-column">
             <div class="box">test_circle.c<span class="tag">inclui os dois headers</span></div>
             <div class="arrow">↓</div>
             <div class="box is-accent">circle.h<span class="tag">inclui point2d.h</span></div>
@@ -845,7 +996,7 @@ str1 is less than str2 (result = -1)</div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/include/circle.h</div>
-            <pre><code><span class="pp">#ifndef CIRCLE</span>
+<pre><code><span class="pp">#ifndef CIRCLE</span>
 <span class="pp">#define CIRCLE</span>
 
 <span class="pp">#include "point2d.h"</span>
@@ -858,7 +1009,38 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Exemplo 2: TAD Círculo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 17. LIBERAÇÃO NA ORDEM CERTA -->
+  <!-- 23. CONSULTA: DENTRO OU FORA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: TAD Círculo</div>
+    <h1>Dentro quando a distância é menor que o raio</h1>
+    <p class="sub">A consulta usa o TAD Ponto para medir a distância até o centro.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-column">
+            <div class="box">distância<span class="tag">euclidean_distance(point, center)</span></div>
+            <div class="op">&lt; raio ?</div>
+            <div class="box is-accent">1 ou 0<span class="tag">dentro ou fora</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">02_circle/src/circle.c</div>
+<pre><code><span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle)
+{
+    <span class="kw">double</span> distance = <span class="fn">euclidean_distance</span>(point, circle-&gt;center);
+
+    <span class="kw">if</span> (distance &lt; circle-&gt;radius)
+    {
+        <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Inside</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 2: TAD Círculo</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 24. LIBERAÇÃO NA ORDEM CERTA -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 2: TAD Círculo</div>
     <h1>free_circle libera o centro primeiro</h1>
@@ -866,7 +1048,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
-          <div class="flow" style="flex-direction:column;">
+          <div class="flow is-column">
             <div class="box">free_point<span class="tag">o centro</span></div>
             <div class="arrow">↓</div>
             <div class="box is-accent">free<span class="tag">a struct circle</span></div>
@@ -875,7 +1057,7 @@ str1 is less than str2 (result = -1)</div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/src/circle.c</div>
-            <pre><code><span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle)
+<pre><code><span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle)
 {
     <span class="fn">free_point</span>(circle-&gt;center);
     <span class="fn">free</span>(circle);
@@ -887,7 +1069,7 @@ str1 is less than str2 (result = -1)</div>
     <div class="footer"><span>Exemplo 2: TAD Círculo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 18. CLIENTE: SÓ OS HEADERS -->
+  <!-- 25. CLIENTE: SÓ OS HEADERS -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 2: TAD Círculo</div>
     <h1>O cliente usa só os headers</h1>
@@ -902,16 +1084,9 @@ The point is inside the circle.</div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/test_circle.c</div>
-            <pre><code>    <span class="type">Circle</span> *my_circle = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
+<pre><code>    <span class="type">Circle</span> *my_circle = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
     <span class="type">Point2D</span> *my_point = <span class="fn">create_point</span>(<span class="num">2</span>, <span class="num">1</span>);
     <span class="kw">if</span> (<span class="fn">is_point_inside_circle</span>(my_point, my_circle))
-    {
-        <span class="fn">printf</span>(<span class="str">"The point is inside the circle.\n"</span>);
-    }
-    <span class="kw">else</span>
-    {
-        <span class="fn">printf</span>(<span class="str">"The point is outside the circle.\n"</span>);
-    }
     <span class="fn">free_circle</span>(my_circle);
     <span class="fn">free_point</span>(my_point);</code></pre>
           </div>
@@ -921,13 +1096,145 @@ The point is inside the circle.</div>
     <div class="footer"><span>Exemplo 2: TAD Círculo</span><span>Estruturas de Dados</span></div>
   </section>
 
-  <!-- 19. FECHAMENTO -->
+  <!-- 26. TAD MATRIZ: GRADE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 3: TAD Matriz</div>
+    <h1>Uma matriz m × n com dimensões em tempo de execução</h1>
+    <p class="sub">Seis operações: matrix_create, matrix_free, matrix_get, matrix_set, matrix_rows e matrix_cols.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="mgrid">
+            <div class="cell">0.0</div><div class="cell">1.0</div><div class="cell">2.0</div><div class="cell">3.0</div>
+            <div class="cell">10.0</div><div class="cell">11.0</div><div class="cell">12.0</div><div class="cell">13.0</div>
+            <div class="cell">20.0</div><div class="cell">21.0</div><div class="cell">22.0</div><div class="cell">23.0</div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_matrix/src/matrix.c</div>
+<pre><code><span class="kw">struct</span> matrix {
+    <span class="kw">int</span> rows;
+    <span class="kw">int</span> cols;
+    <span class="kw">float</span> *data;
+};</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 3: TAD Matriz</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 27. ELEMENTO (I, J) NO VETOR -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 3: TAD Matriz</div>
+    <h1>O elemento (i, j) fica em i × cols + j</h1>
+    <p class="sub">Vetor simples: um bloco contíguo de m × n floats. O elemento (1, 2) é o índice 6, com valor 12.0.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="chain">
+            <div class="strip">
+              <div class="cell">0</div><div class="cell">1</div><div class="cell">2</div><div class="cell">3</div>
+              <div class="cell">10</div><div class="cell">11</div><div class="cell is-null">12</div><div class="cell">13</div>
+              <div class="cell">20</div><div class="cell">21</div><div class="cell">22</div><div class="cell">23</div>
+            </div>
+            <div class="label">data[<strong>1 × 4 + 2</strong>] = data[<strong>6</strong>]</div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_matrix/src/matrix.c</div>
+<pre><code><span class="kw">float</span> <span class="fn">matrix_get</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j) {
+    <span class="kw">return</span> mat-&gt;data[i * mat-&gt;cols + j];
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 3: TAD Matriz</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 28. ALOCAÇÃO DO VETOR -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 3: TAD Matriz</div>
+    <h1>matrix_create zera o vetor</h1>
+    <p class="sub">calloc devolve os m × n elementos já em 0. Quem chama recebe só um ponteiro Matrix *.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-column">
+            <div class="box">calloc<span class="tag">m × n floats, zerados</span></div>
+            <div class="arrow">↓</div>
+            <div class="box is-accent">return mat<span class="tag">ponteiro Matrix *</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_matrix/src/matrix.c</div>
+<pre><code>    mat-&gt;data = (<span class="kw">float</span> *)<span class="fn">calloc</span>(m * n, <span class="kw">sizeof</span>(<span class="kw">float</span>));</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 3: TAD Matriz</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 29. CLIENTE USA SÓ AS FUNÇÕES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 3: TAD Matriz</div>
+    <h1>O teste não toca nos campos</h1>
+    <p class="sub">Trocar o vetor simples por vetor de ponteiros muda só matrix.c. test_matrix.c fica igual.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="duel" style="flex-direction: column; gap: 1.5vw;">
+            <div class="item">
+              <div class="tag">float *data</div>
+              <div class="note">vetor simples (este projeto)</div>
+            </div>
+            <div class="vs">ou</div>
+            <div class="item">
+              <div class="tag">float **</div>
+              <div class="note">vetor de ponteiros (alternativa)</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">03_matrix/test_matrix.c</div>
+<pre><code>            <span class="fn">matrix_set</span>(mat, i, j, i * <span class="num">10</span> + j);
+            <span class="fn">printf</span>(<span class="str">"%5.1f "</span>, <span class="fn">matrix_get</span>(mat, i, j));</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 3: TAD Matriz</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 30. MAKE RUN: MATRIZ -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 3: TAD Matriz</div>
+    <h1>make run mostra a matriz 3 × 4</h1>
+    <p class="sub">O programa imprime as dimensões com matrix_rows e matrix_cols, e os valores com matrix_get.</p>
+    <div class="body">
+      <div class="term"><span class="prompt">$</span> make run
+./test_matrix
+Matrix 3 x 4:
+  0.0   1.0   2.0   3.0
+ 10.0  11.0  12.0  13.0
+ 20.0  21.0  22.0  23.0</div>
+    </div>
+    <div class="footer"><span>Exemplo 3: TAD Matriz</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 31. FECHAMENTO -->
   <section class="slide cover" data-slide>
     <div class="kicker">Agora é com você</div>
     <h1>Explore os exemplos, no seu ritmo</h1>
     <p class="sub">Código-fonte, notas completas e simulação da execução passo a passo estão na página do módulo.</p>
-    <div class="cta">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/09_tads</span></div>
-    <div class="cta">🎯 Quiz do módulo<span class="url">thiagopx.github.io/ed/09_tads/quiz</span></div>
+    <a class="cta" href="https://thiagopx.github.io/ed/09_tads">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/09_tads</span></a>
+    <a class="cta" href="https://thiagopx.github.io/ed/09_tads/quiz">🎯 Quiz do módulo<span class="url">thiagopx.github.io/ed/09_tads/quiz</span></a>
   </section>
 
 </div>
