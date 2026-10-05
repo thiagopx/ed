@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Tipo abstrato de dados</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #0984e3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(9, 132, 227, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #0984e3;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #0984e3;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #0984e3;
+    width: 10%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #0984e3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #0984e3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .fn   { color: #ffeaa7; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .num  { color: #d6a2e8; }
+  pre.code-block .pp   { color: #fab1a0; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #0984e3;
+    background-color: #f0f8ff;
+  }
+
+  .option.selected {
+    border-color: #0984e3;
+    background-color: #eaf4fd;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #0984e3;
+    background-color: #0984e3;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #0984e3;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #b2cdf0;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #0984e3;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>Quiz — Tipo abstrato de dados</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de módulos e TAD!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Interface (.h) e implementação (.c)",
+    text: "Em main.c, a função my_strlen é chamada, mas o arquivo não contém nenhum protótipo dela. De onde vem a declaração que o compilador usa?",
+    code: `<span class="pp">#include "my_string.h"</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="fn">main</span>()
+{
+    <span class="type">int</span> length = <span class="fn">my_strlen</span>(<span class="str">"abc"</span>);
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, length);
+}`,
+    options: [
+      "Do próprio main.c, que escreve o protótipo sozinho",
+      "Do cabeçalho my_string.h, incluído com #include \"my_string.h\"",
+      "Da biblioteca padrão &lt;string.h&gt;",
+      "Do arquivo my_string.o, que o compilador lê antes da compilação"
+    ],
+    correctIndex: 1,
+    explainCorrect: "O #include traz para main.c o conteúdo de my_string.h, onde estão os protótipos das funções exportadas. Por isso main.c compila mesmo sem a implementação, que só entra na ligação.",
+    explainIncorrect: "A resposta correta é 'Do cabeçalho my_string.h, incluído com #include \"my_string.h\"'. O header declara as funções exportadas; a definição fica em my_string.c e entra só na ligação."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Compilação em separado",
+    text: "O Makefile compila my_string.c em separado. Qual é o resultado deste comando?",
+    code: `<span class="fn">gcc</span> -Wall -c my_string.c -o my_string.o`,
+    options: [
+      "Um executável pronto para ser rodado",
+      "A biblioteca padrão completa, copiada para dentro do arquivo",
+      "O cabeçalho my_string.h com a implementação embutida",
+      "Um arquivo objeto com o código de máquina de my_string.c, que ainda precisa ser ligado"
+    ],
+    correctIndex: 3,
+    explainCorrect: "A opção -c faz o gcc parar depois da compilação: o resultado é my_string.o, com o código de máquina daquele arquivo. Só o linker, no fim, junta os objetos num executável.",
+    explainIncorrect: "A resposta correta é o arquivo objeto (.o), que ainda precisa ser ligado. A opção -c interrompe o gcc antes da ligação; o executável só surge quando os objetos são unidos."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Ligação (linker)",
+    text: "Suponha que alguém tente gerar o programa só com o objeto main.o, sem my_string.o. Qual é o resultado?",
+    code: `<span class="fn">gcc</span> -Wall -o my_program main.o`,
+    options: [
+      "Compila e roda normalmente, usando as funções de string.h",
+      "Erro na compilação de main.c, porque o header não tem o corpo das funções",
+      "Erro na ligação, com referências não definidas para my_strlen, my_strcpy e as demais",
+      "Compila, mas o printf deixa de funcionar"
+    ],
+    correctIndex: 2,
+    explainCorrect: "O linker não encontra o código de my_strlen e das outras funções, que existe só em my_string.o. O erro é de ligação (undefined reference), e o executável não é gerado.",
+    explainIncorrect: "A resposta correta é o erro de ligação, com referências não definidas para my_strlen e as demais funções. main.c compila, porque o header já declara essas funções; a falta está na ligação."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Guardas de inclusão",
+    text: "O que acontece se my_string.h for incluído duas vezes na mesma compilação?",
+    code: `<span class="pp">#include "my_string.h"</span>
+<span class="pp">#include "my_string.h"</span>`,
+    options: [
+      "Nada de errado: a guarda #ifndef _MY_STRING_H faz a segunda inclusão ser ignorada",
+      "Erro de redefinição de my_strlen",
+      "Erro de compilação, porque um header não pode ser incluído duas vezes",
+      "A segunda inclusão substitui a implementação de my_strlen"
+    ],
+    correctIndex: 0,
+    explainCorrect: "A guarda de inclusão faz o compilador ignorar a segunda ocorrência do header, então o conteúdo do arquivo não é processado de novo na mesma compilação.",
+    explainIncorrect: "A resposta correta é: nada de errado, porque a guarda #ifndef _MY_STRING_H faz a segunda inclusão ser ignorada. Sem a guarda, o conteúdo do header seria processado de novo, e o compilador poderia reclamar de repetições."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Encapsulamento (struct opaca)",
+    text: "Um cliente do TAD Círculo escreve o código abaixo. O que acontece?",
+    code: `<span class="type">Circle</span> *c = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
+<span class="fn">printf</span>(<span class="str">"%f"</span>, c-&gt;radius);`,
+    options: [
+      "Imprime 5.000000",
+      "Erro de compilação: o tipo Circle é incompleto para o cliente, então c->radius não pode ser acessado",
+      "Imprime um valor de lixo de memória, sem nenhum erro",
+      "Imprime 0.000000, porque os campos começam zerados"
+    ],
+    correctIndex: 1,
+    explainCorrect: "A struct circle é definida só em circle.c. No header ela aparece apenas como typedef, então o cliente não conhece os campos e o compilador recusa o acesso a c->radius.",
+    explainIncorrect: "A resposta correta é o erro de compilação: o tipo é incompleto para o cliente. Os campos ficam escondidos em circle.c, e o cliente deve usar só as funções exportadas, como is_point_inside_circle."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Onde fica a struct",
+    text: "No cabeçalho point2d.h, a única linha que trata do tipo é a abaixo. Em qual arquivo fica a definição de struct point2d, com os campos x e y?",
+    code: `<span class="kw">typedef</span> <span class="kw">struct</span> point2d <span class="type">Point2D</span>;`,
+    options: [
+      "point2d.h, logo abaixo do typedef",
+      "test_circle.c, o programa de teste",
+      "point2d.c, a implementação do TAD Ponto",
+      "circle.h, que inclui point2d.h"
+    ],
+    correctIndex: 2,
+    explainCorrect: "A definição fica em point2d.c. O header só dá um nome ao tipo; os campos ficam na implementação, e é isso que mantém a estrutura oculta dos clientes.",
+    explainIncorrect: "A resposta correta é point2d.c. O header tem apenas o typedef; a struct point2d com x e y é definida na implementação e não é visível para quem inclui o header."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Dependência entre headers",
+    text: "O cabeçalho circle.h contém o include e o protótipo abaixo. Por que o include é necessário?",
+    code: `<span class="pp">#include "point2d.h"</span>
+
+<span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle);`,
+    options: [
+      "Porque a assinatura de is_point_inside_circle usa o tipo Point2D, que precisa ser conhecido ali",
+      "Porque a struct circle guarda os campos x e y do ponto",
+      "Porque sem o include o compilador não encontra sqrt para calcular a distância",
+      "Porque todo header de TAD precisa incluir outro, por convenção do compilador"
+    ],
+    correctIndex: 0,
+    explainCorrect: "O protótipo recebe um Point2D *. Para declarar essa assinatura, o compilador precisa conhecer o nome Point2D, e por isso circle.h inclui point2d.h.",
+    explainIncorrect: "A resposta correta é: a assinatura usa Point2D. Sem o include, o nome do tipo não existe quando o protótipo é lido, e a compilação falha. A struct circle não guarda x e y; o centro é um Point2D separado."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Alocação e tipo incompleto",
+    text: "Qual é o erro no trecho abaixo?",
+    code: `<span class="type">Point2D</span> p;
+p.x = <span class="num">1.0</span>;`,
+    options: [
+      "Falta o ponto e vírgula depois de p.x = 1.0",
+      "Falta #include &lt;math.h&gt; para usar Point2D",
+      "A variável p deveria ser inicializada com NULL, senão o programa trava",
+      "O compilador não sabe o tamanho de Point2D, então não consegue reservar espaço para p"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Para o cliente, struct point2d é opaca: o compilador não conhece o tamanho nem os campos, e não reserva espaço para p. O TAD exige criar objetos com create_point, que devolve um ponteiro para memória alocada.",
+    explainIncorrect: "A resposta correta é a última: o tamanho de Point2D é desconhecido fora de point2d.c, então p não pode ser declarado por valor. O correto é Point2D *p = create_point(...), que aloca no heap."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Comparação estrita com o raio",
+    text: "Qual é a saída do programa abaixo?",
+    code: `<span class="type">Circle</span> *c = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
+<span class="type">Point2D</span> *p = <span class="fn">create_point</span>(<span class="num">3</span>, <span class="num">4</span>);
+<span class="fn">printf</span>(<span class="str">"%d"</span>, <span class="fn">is_point_inside_circle</span>(p, c));`,
+    options: [
+      "Imprime 1 (o ponto está dentro)",
+      "Imprime 0 (o ponto está fora)",
+      "Imprime 5, que é a distância até o centro",
+      "Erro de compilação"
+    ],
+    correctIndex: 1,
+    explainCorrect: "A distância de (3, 4) até (0, 0) é √(3² + 4²) = 5. A função compara de forma estrita (distance &lt; radius): 5 &lt; 5 é falso, então devolve 0, e printf imprime 0.",
+    explainIncorrect: "A resposta correta é 'Imprime 0 (o ponto está fora)'. A distância é exatamente 5, igual ao raio. Como is_point_inside_circle usa &lt;, um ponto na borda é considerado fora e a função devolve 0."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Memória e liberação",
+    text: "Após as duas criações abaixo, quantos blocos de memória estão alocados, e quais liberações evitam vazamento?",
+    code: `<span class="type">Circle</span> *c = <span class="fn">create_circle</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">3</span>);
+<span class="type">Point2D</span> *p = <span class="fn">create_point</span>(<span class="num">2</span>, <span class="num">1</span>);`,
+    options: [
+      "2 blocos; basta free_circle(c)",
+      "3 blocos; basta free_circle(c), porque ela libera o centro e o círculo",
+      "3 blocos; é preciso free_circle(c) e free_point(p)",
+      "2 blocos; é preciso free_circle(c) e free_point(p)"
+    ],
+    correctIndex: 2,
+    explainCorrect: "São três blocos: a struct do círculo, o centro criado dentro de create_circle e o ponto p. free_circle(c) libera o centro e o círculo, e free_point(p) libera o ponto separado.",
+    explainIncorrect: "A resposta correta é: 3 blocos, com free_circle(c) e free_point(p). O ponto p é independente do círculo e precisa ser liberado à parte; sem isso, o valgrind aponta vazamento."
+  }
+];
+
+let current = 0;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const saved = userAnswers[current];
+  answered = saved !== null;
+  let selectedIndex = answered ? saved.selected : null;
+
+  const optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = saved.correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  const progressLabel = answered
+    ? (saved.correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação')
+    : 'Selecione uma alternativa';
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      <pre class="code-block">${q.code}</pre>
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${progressLabel}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers(selectedIndex);
+}
+
+function attachHandlers(initialSelected) {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+  let selectedIndex = initialSelected;
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const isCorrect = selectedIndex === questions[current].correctIndex;
+      if (userAnswers[current] === null && isCorrect) score++;
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você domina ligação em separado, headers e TAD com struct opaca.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou, principalmente as de encapsulamento e memória.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale revisar a diferença entre header e implementação e o papel do linker.';
+  else msg = '🔁 Releia a seção de módulos e compilação em separado e tente novamente.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>

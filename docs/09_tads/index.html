@@ -1,0 +1,1326 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tipo abstrato de dados — Estruturas de Dados</title>
+<meta name="description" content="Módulos e compilação em separado, tipo abstrato de dados (TAD) e dois exemplos de TAD em C com projetos multi-arquivo: Ponto e Círculo. Código comentado, explicação e simulação da execução. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #2F6FB1;
+    --accent-soft: #DCE7F4;
+    --wash: rgba(47, 111, 177, 0.06);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #6FA8FF;
+      --accent-soft: #1C2A3A;
+      --wash: rgba(111, 168, 255, 0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #6FA8FF;
+    --accent-soft: #1C2A3A;
+    --wash: rgba(111, 168, 255, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  .resumo-fig {
+    margin: 0.5rem 0 1.5rem;
+    max-width: 100%;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .resumo-fig img { display: block; width: 100%; height: auto; }
+  .resumo-fig figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .resumo-fig .fig-credit {
+    margin: 0.3rem 0 0;
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(111, 168, 255, 0.16);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Módulos e tipos abstratos de dados</div>
+    <h1>Tipo abstrato de dados</h1>
+    <p class="lede">
+      Estas são as notas da aula sobre módulos e tipos abstratos de dados: como dividir um programa em arquivos
+      de interface e de implementação, e como um TAD esconde a forma concreta de um tipo atrás de um conjunto de
+      operações. Os dois exemplos abaixo são projetos com vários arquivos e Makefile.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Tipo abstrato de dados</h2>
+
+    <h3>Módulos e compilação em separado</h3>
+    <p>
+      Um programa em C pode ser dividido em vários arquivos-fonte. Quando um arquivo reúne funções que formam uma
+      parte coesa do programa, ele é um <strong>módulo</strong>. Cada módulo é compilado separadamente, gerando um
+      arquivo objeto (<code>.o</code>). Depois, o <strong>ligador</strong> (linker) junta os objetos num único
+      executável, e é nessa etapa que o código das funções da biblioteca padrão entra no programa. Mesmo um programa
+      de um único arquivo passa pela ligação.
+    </p>
+    <p>
+      Para que um módulo seja usado por outro, o cliente precisa conhecer as funções que ele oferece. Isso é feito
+      por um arquivo de <strong>interface</strong>, o cabeçalho (<code>.h</code>), que contém os protótipos, os tipos
+      exportados e a documentação de cada função. O cliente inclui o cabeçalho com aspas (<code>#include "modulo.h"</code>)
+      quando ele é do projeto, e com <code>&lt;...&gt;</code> quando é da biblioteca padrão.
+    </p>
+    <p>
+      O conteúdo do cabeçalho deve ficar entre <strong>guardas de inclusão</strong> (<code>#ifndef</code>, <code>#define</code>
+      e <code>#endif</code>). Se o mesmo arquivo for incluído duas vezes na mesma compilação, a segunda inclusão é ignorada,
+      e nenhuma definição é repetida. Na prática, o <strong>Makefile</strong> cuida de recompilar só o que mudou e de
+      fazer a ligação. Os três projetos desta página têm Makefile, e <code>make run</code> compila e executa.
+    </p>
+
+    <h3>Tipo abstrato de dados</h3>
+    <p>
+      Quando um módulo define um <strong>novo tipo</strong> e as operações que o manipulam, ele representa um
+      <strong>tipo abstrato de dados</strong> (TAD). "Abstrato" quer dizer que o TAD é descrito pelo que o tipo representa
+      e pelo que as operações fazem, não pela forma como ele foi implementado.
+    </p>
+    <p>
+      O mecanismo central é o <strong>encapsulamento</strong>. No cabeçalho, a struct só é declarada, por exemplo com
+      <code>typedef struct circle Circle;</code>. A definição <code>struct circle { ... }</code> fica no arquivo
+      <code>.c</code>. Quem usa o TAD manipula apenas ponteiros, como <code>Circle *</code>, e chama as funções
+      exportadas. Sem acesso aos campos, a implementação pode mudar (de vetor simples para vetor de ponteiros, por
+      exemplo) sem que o código cliente precise mudar.
+    </p>
+    <p>
+      Por convenção, as funções exportadas levam o <strong>nome do tipo</strong> no próprio nome (<code>create_point</code>,
+      <code>free_point</code>, <code>create_circle</code>), o que evita colisão de nomes quando vários TADs são usados
+      juntos. Funções e variáveis auxiliares do módulo são declaradas como <code>static</code>, e ficam visíveis só no
+      arquivo que as define. Variáveis globais exportadas devem ser evitadas.
+    </p>
+    <p>
+      Em geral, um TAD oferece uma operação de <strong>criação</strong>, que aloca e inicializa o objeto e devolve um
+      ponteiro; uma de <strong>liberação</strong>, que desaloca o que foi criado; operações de acesso e atribuição; e
+      operações de consulta ou cálculo. Quando uma operação usa outro tipo, o cabeçalho do TAD inclui o cabeçalho do
+      outro, como o círculo faz com o ponto.
+    </p>
+
+    <h4>Exemplo 1: TAD Ponto</h4>
+    <p>
+      O TAD Ponto representa um ponto no plano. A lista de operações do material de referência inclui criação,
+      liberação, acesso, atribuição e distância. Na versão do projeto <code>02_circle</code>, a interface exporta
+      <code>create_point</code>, <code>free_point</code> e <code>euclidean_distance</code>. Como a struct é opaca, o acesso
+      direto às coordenadas não existe fora de <code>point2d.c</code>.
+    </p>
+
+    <h4>Exemplo 2: TAD Círculo</h4>
+    <p>
+      O TAD Círculo usa o TAD Ponto para representar o centro. <code>create_circle</code> cria o centro com
+      <code>create_point</code>, e <code>free_circle</code> libera o centro antes da própria struct. A operação
+      <code>is_point_inside_circle</code> compara a distância entre o ponto e o centro com o raio, e o cabeçalho
+      <code>circle.h</code> inclui <code>point2d.h</code> por causa disso. O projeto não exporta uma operação de área.
+    </p>
+
+
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a
+    simulação da execução passo a passo. Os projetos são compilados com <code>make</code> e executados com <code>make run</code>.
+  </p>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="modulos" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Módulo my_string</span>
+      </div>
+      <p class="row-desc">Três arquivos compilados em separado: a interface my_string.h, a implementação my_string.c e um main.c que só usa o header. O Makefile liga tudo.</p>
+    </li>
+    <li class="example-row" data-target="circulo-ponto" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>TAD Ponto e TAD Círculo</span>
+      </div>
+      <p class="row-desc">Dois TADs no mesmo projeto: o círculo usa o ponto para o centro, e a interface do círculo inclui a do ponto.</p>
+    </li>
+  </ul>
+
+  <!-- ================= MÓDULO MY_STRING ================= -->
+  <section class="detail" id="panel-modulos" data-panel>
+    <div class="detail-head">
+      <h2>Módulo my_string</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/09_tads/01_modules" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include "my_string.h"</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="kw">char</span> str1[<span class="num">50</span>] = <span class="str">"Hello, "</span>;
+    <span class="kw">char</span> str2[] = <span class="str">"World!"</span>;
+
+    <span class="cmt">// my_strlen</span>
+    <span class="kw">int</span> length = <span class="fn">my_strlen</span>(str1);
+    <span class="fn">printf</span>(<span class="str">"Length of str1: %d\n"</span>, length);
+
+    <span class="cmt">// my_strcpy</span>
+    <span class="fn">my_strcpy</span>(str1, str2);
+    <span class="fn">printf</span>(<span class="str">"Copied string: %s\n"</span>, str1);
+
+    <span class="cmt">// my_strcat</span>
+    <span class="kw">char</span> str3[<span class="num">50</span>] = <span class="str">"Hello, "</span>;
+    <span class="fn">my_strcat</span>(str3, str2);
+    <span class="fn">printf</span>(<span class="str">"Concatenated string: %s\n"</span>, str3);
+
+    <span class="cmt">// my_strcmp</span>
+    <span class="kw">int</span> result = <span class="fn">my_strcmp</span>(<span class="str">"apple"</span>, <span class="str">"banana"</span>);
+    <span class="kw">if</span> (result == <span class="num">0</span>)
+        <span class="fn">printf</span>(<span class="str">"Strings are equal\n"</span>);
+    <span class="kw">else</span> <span class="kw">if</span> (result &lt; <span class="num">0</span>)
+        <span class="fn">printf</span>(<span class="str">"str1 is less than str2 (result = %d)\n"</span>, result);
+    <span class="kw">else</span>
+        <span class="fn">printf</span>(<span class="str">"str1 is greater than str2 (result = %d)\n"</span>, result);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o projeto</h3>
+        <p>
+          O projeto tem dois módulos. <code>my_string.h</code> é a <strong>interface</strong>: declara as
+          quatro funções exportadas (<code>my_strlen</code>, <code>my_strcpy</code>, <code>my_strcat</code>,
+          <code>my_strcmp</code>) e tem guarda de inclusão. <code>my_string.c</code> é a <strong>implementação</strong>,
+          compilada separadamente. <code>main.c</code> inclui só o header, com aspas, e não conhece o corpo das funções.
+        </p>
+        <p>
+          O <code>Makefile</code> compila cada <code>.c</code> em um <code>.o</code> com <code>gcc -Wall -c</code> e
+          depois liga os dois objetos num único executável. <code>make run</code> faz a compilação e roda o programa.
+          Qualquer cliente de <code>my_string.h</code> poderia reutilizar <code>my_string.c</code> sem copiá-lo.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="modulos">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">./my_program
+Length of str1: 7
+Copied string: World!
+Concatenated string: Hello, World!
+str1 is less than str2 (result = -1)</pre>
+
+        <h3>Outros arquivos do projeto</h3>
+<p class="file-label"><code>01_modules/my_string.h</code></p><pre class="code-block"><code><span class="pp">#ifndef _MY_STRING_H</span>
+<span class="pp">#define _MY_STRING_H</span>
+
+<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
+<span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str);
+<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
+<span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src);
+<span class="cmt">// Function to concatenate two strings (analogous to strcat)</span>
+<span class="kw">void</span> <span class="fn">my_strcat</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src);
+<span class="cmt">// Function to compare two strings (analogous to strcmp)</span>
+<span class="kw">int</span> <span class="fn">my_strcmp</span>(<span class="kw">const</span> <span class="kw">char</span> *str1, <span class="kw">const</span> <span class="kw">char</span> *str2);
+
+<span class="pp">#endif // _MY_STRING_H</span></code></pre>
+<p class="file-label"><code>01_modules/my_string.c</code></p><pre class="code-block"><code><span class="pp">#include "my_string.h"</span>
+
+<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
+<span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str)
+{
+    <span class="kw">int</span> length = <span class="num">0</span>;
+
+    <span class="kw">while</span> (str[length] != <span class="str">'\0'</span>)
+        length++;
+
+    <span class="kw">return</span> length;
+}
+
+<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
+<span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src)
+{
+    <span class="kw">int</span> i = <span class="num">0</span>;
+
+    <span class="kw">while</span> (src[i] != <span class="str">'\0'</span>)
+    {
+        dest[i] = src[i];
+        i++;
+    }
+
+    dest[i] = <span class="str">'\0'</span>; <span class="cmt">// Null-terminate the destination string</span>
+}
+
+<span class="cmt">// Function to concatenate two strings (analogous to strcat)</span>
+<span class="kw">void</span> <span class="fn">my_strcat</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src)
+{
+    <span class="kw">int</span> dest_len = <span class="fn">my_strlen</span>(dest);
+    <span class="kw">int</span> i = <span class="num">0</span>;
+
+    <span class="kw">while</span> (src[i] != <span class="str">'\0'</span>)
+    {
+        dest[dest_len + i] = src[i];
+        i++;
+    }
+
+    dest[dest_len + i] = <span class="str">'\0'</span>; <span class="cmt">// Null-terminate the concatenated string</span>
+}
+
+<span class="cmt">// Function to compare two strings (analogous to strcmp)</span>
+<span class="kw">int</span> <span class="fn">my_strcmp</span>(<span class="kw">const</span> <span class="kw">char</span> *str1, <span class="kw">const</span> <span class="kw">char</span> *str2)
+{
+    <span class="kw">int</span> i;
+
+    <span class="kw">for</span> (i = <span class="num">0</span>; str1[i] != <span class="str">'\0'</span> &amp;&amp; str2[i] != <span class="str">'\0'</span>; ++i)
+    {
+        <span class="kw">int</span> d = str1[i] - str2[i];
+
+        <span class="kw">if</span> (d != <span class="num">0</span>)
+            <span class="kw">return</span> d;
+    }
+
+    <span class="kw">return</span> (str1[i] - str2[i]);
+}</code></pre>
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">O que aconteceria se o executável fosse gerado só com <code>main.o</code>, sem <code>my_string.o</code>?</p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>A ligação falharia com erro de referência não resolvida para <code>my_strlen</code> e as demais funções.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa compilaria e rodaria, usando as funções de <code>string.h</code> da biblioteca padrão.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O erro apareceria na compilação de <code>main.c</code>, porque o header não tem a implementação.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>O programa rodaria, mas sem a linha de <code>printf</code> que usa <code>my_strlen</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Na ligação, o linker não encontra o código de <code>my_strlen</code>, <code>my_strcpy</code>, <code>my_strcat</code> e <code>my_strcmp</code>: o header só declara, não define.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> Sem <code>my_string.o</code>, o linker não encontra as definições das funções declaradas no header. O erro acontece na ligação, não na compilação de <code>main.c</code>, e o executável não é gerado.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <code>main.c</code> não contém nenhum protótipo: a declaração das funções vem do header, e a definição,
+          do arquivo objeto ligado no fim. O exemplo compila sem nenhum aviso com <code>-Wall</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAD PONTO E TAD CÍRCULO ================= -->
+  <section class="detail" id="panel-circulo-ponto" data-panel hidden>
+    <div class="detail-head">
+      <h2>TAD Ponto e TAD Círculo</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/09_tads/02_circle" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+<span class="pp">#include "point2d.h"</span>
+<span class="pp">#include "circle.h"</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+    <span class="cmt">// Create a circle with center (0, 0) and radius 5</span>
+    <span class="type">Circle</span> *my_circle = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
+
+    <span class="cmt">// Create a point with coordinates (2, 1)</span>
+    <span class="type">Point2D</span> *my_point = <span class="fn">create_point</span>(<span class="num">2</span>, <span class="num">1</span>);
+
+    <span class="cmt">// Check if the point is inside the circle</span>
+    <span class="kw">if</span> (<span class="fn">is_point_inside_circle</span>(my_point, my_circle))
+    {
+        <span class="fn">printf</span>(<span class="str">"The point is inside the circle.\n"</span>);
+    }
+    <span class="kw">else</span>
+    {
+        <span class="fn">printf</span>(<span class="str">"The point is outside the circle.\n"</span>);
+    }
+
+    <span class="cmt">// Deallocate memory</span>
+    <span class="fn">free_circle</span>(my_circle);
+    <span class="fn">free_point</span>(my_point);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funcionam o TAD Ponto e o TAD Círculo</h3>
+        <p>
+          O <strong>TAD Ponto</strong> (<code>point2d.h</code>) exporta <code>create_point</code>, <code>euclidean_distance</code>
+          e <code>free_point</code>. A <code>struct point2d</code> é definida só em <code>point2d.c</code>; o cliente recebe
+          apenas <code>Point2D *</code>, sem acesso aos campos <code>x</code> e <code>y</code>.
+        </p>
+        <p>
+          O <strong>TAD Círculo</strong> (<code>circle.h</code>) inclui <code>point2d.h</code>, porque sua operação
+          <code>is_point_inside_circle</code> recebe um ponto. Internamente, a <code>struct circle</code> guarda um
+          <code>Point2D *</code> para o centro e um <code>double</code> para o raio. <code>create_circle</code> cria
+          o centro com <code>create_point</code>, e <code>free_circle</code> libera esse centro antes da própria struct.
+        </p>
+        <p>
+          O programa de teste usa somente os headers. Ele cria um círculo e um ponto, consulta se o ponto está dentro,
+          e libera os dois blocos que criou.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="circulo-ponto">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">./test_circle
+The point is inside the circle.</pre>
+
+        <h3>Outros arquivos do projeto</h3>
+<p class="file-label"><code>02_circle/include/point2d.h</code></p><pre class="code-block"><code><span class="pp">#ifndef POINT2D</span>
+<span class="pp">#define POINT2D</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span> point2d <span class="type">Point2D</span>;
+
+<span class="cmt">// Function to create a new Point2D</span>
+<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);
+<span class="cmt">// Function to calculate the Euclidean distance between two points</span>
+<span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2);
+<span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point);
+<span class="pp">#endif</span></code></pre>
+<p class="file-label"><code>02_circle/include/circle.h</code></p><pre class="code-block"><code><span class="pp">#ifndef CIRCLE</span>
+<span class="pp">#define CIRCLE</span>
+
+<span class="pp">#include "point2d.h"</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span> circle <span class="type">Circle</span>;
+
+<span class="cmt">// Function to create a new Circle</span>
+<span class="type">Circle</span> *<span class="fn">create_circle</span>(<span class="kw">double</span> center_x, <span class="kw">double</span> center_y, <span class="kw">double</span> radius);
+<span class="cmt">// Function to check if a point is inside a circle</span>
+<span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle);
+<span class="cmt">// Function to deallocate a Circle</span>
+<span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle);
+<span class="pp">#endif</span></code></pre>
+<p class="file-label"><code>02_circle/src/point2d.c</code></p><pre class="code-block"><code><span class="pp">#include "point2d.h"</span>
+<span class="pp">#include &lt;math.h&gt;</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="cmt">// Define a Point2D structure</span>
+<span class="kw">struct</span> point2d {
+  <span class="kw">double</span> x;
+  <span class="kw">double</span> y;
+};
+
+<span class="cmt">// Function to calculate the Euclidean distance between two points</span>
+<span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2) {
+  <span class="kw">double</span> dx = point1-&gt;x - point2-&gt;x;
+  <span class="kw">double</span> dy = point1-&gt;y - point2-&gt;y;
+  <span class="kw">return</span> <span class="fn">sqrt</span>(dx * dx + dy * dy);
+}
+
+<span class="cmt">// Function to create a new Point2D</span>
+<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y) {
+  <span class="type">Point2D</span> *new_point = (<span class="type">Point2D</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Point2D</span>));
+  <span class="kw">if</span> (new_point == NULL) {
+    <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Point2D"</span>);
+    <span class="fn">exit</span>(EXIT_FAILURE);
+  }
+  new_point-&gt;x = x;
+  new_point-&gt;y = y;
+  <span class="kw">return</span> new_point;
+}
+
+<span class="cmt">// Function to deallocate a Point2D</span>
+<span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point)
+{
+    <span class="fn">free</span>(point);
+}</code></pre>
+<p class="file-label"><code>02_circle/src/circle.c</code></p><pre class="code-block"><code><span class="pp">#include "circle.h"</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kw">struct</span> circle
+{
+    <span class="type">Point2D</span> *center;
+    <span class="kw">double</span> radius;
+};
+
+<span class="cmt">// Function to create a new Circle</span>
+<span class="type">Circle</span> *<span class="fn">create_circle</span>(<span class="kw">double</span> center_x, <span class="kw">double</span> center_y, <span class="kw">double</span> radius)
+{
+    <span class="type">Circle</span> *new_circle = (<span class="type">Circle</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Circle</span>));
+    <span class="kw">if</span> (new_circle == NULL)
+    {
+        <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Circle"</span>);
+        <span class="fn">exit</span>(EXIT_FAILURE);
+    }
+    new_circle-&gt;center = <span class="fn">create_point</span>(center_x, center_y);
+    new_circle-&gt;radius = radius;
+    <span class="kw">return</span> new_circle;
+}
+
+<span class="cmt">// Function to check if a point is inside a circle</span>
+<span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle)
+{
+    <span class="kw">double</span> distance = <span class="fn">euclidean_distance</span>(point, circle-&gt;center);
+
+    <span class="cmt">// If the distance is less than the radius, the point is inside the circle</span>
+    <span class="kw">if</span> (distance &lt; circle-&gt;radius)
+    {
+        <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Inside</span>
+    }
+    <span class="kw">else</span>
+    {
+        <span class="kw">return</span> <span class="num">0</span>; <span class="cmt">// Outside</span>
+    }
+}
+
+<span class="cmt">// Function to deallocate a Circle</span>
+<span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle)
+{
+    <span class="fn">free_point</span>(circle-&gt;center);
+    <span class="fn">free</span>(circle);
+}</code></pre>
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">O que aconteceria se <code>free_circle</code> deixasse de chamar <code>free_point(circle-&gt;center)</code>?</p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Haveria vazamento de memória: o ponto do centro continuaria alocado, sem ninguém para liberá-lo. A saída do programa não mudaria.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>O programa não compilaria, porque <code>free_circle</code> precisa do ponto do centro para existir.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span><code>free_circle</code> liberaria o centro automaticamente ao fim do programa.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span>A saída mudaria, porque a consulta de <code>is_point_inside_circle</code> passaria a usar outro centro.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> Sem essa chamada, o bloco do centro nunca é liberado. O programa continua funcionando e imprimindo o mesmo resultado, mas com memória vazando.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O efeito é um vazamento de memória, não um erro de compilação nem uma mudança na saída. O bloco do centro fica alocado sem ser liberado.</p>
+          </div>
+        </div>
+        <div class="callout">
+          O cliente nunca acessa <code>circle-&gt;center</code> nem <code>circle-&gt;radius</code>: usa só as funções
+          exportadas pelos headers. O exemplo compila sem nenhum aviso com <code>-Wall</code> e liga a biblioteca
+          matemática por <code>-lm</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <footer class="closing">
+    <strong>Para lembrar.</strong> Um módulo tem uma interface (<code>.h</code>) e uma implementação (<code>.c</code>)
+    compiladas em separado. Um TAD esconde a struct atrás de ponteiros opacos, e o cliente depende só das operações
+    exportadas, não da forma como o tipo é armazenado.
+  </footer>
+</main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    "modulos": {
+      vars: ["str1", "str2", "str3", "length", "result"],
+      steps: [
+        { line: 6, vars: { str1: "“Hello, ”" }, desc: "char str1[50] = “Hello, ”; inicializa o vetor com o texto. Os bytes restantes do vetor ficam zerados." },
+        { line: 7, vars: { str2: "“World!”" }, desc: "char str2[] = “World!”; sem tamanho explícito, o vetor tem 7 bytes: 6 letras mais o '\\0' final." },
+        { line: 10, vars: { length: "7" }, desc: "my_strlen(str1) conta caracteres até o '\\0': “Hello, ” tem 7 caracteres, então length = 7." },
+        { line: 11, vars: {}, desc: "printf exibe: “Length of str1: 7”." },
+        { line: 14, vars: { str1: "“World!”" }, desc: "my_strcpy copia str2 para str1 caractere a caractere, incluindo o '\\0' final. str1 passa a ser “World!”." },
+        { line: 15, vars: {}, desc: "printf exibe: “Copied string: World!”." },
+        { line: 18, vars: { str3: "“Hello, ”" }, desc: "str3 recebe “Hello, ”. É outro vetor, independente de str1." },
+        { line: 19, vars: { str3: "“Hello, World!”" }, desc: "my_strcat percorre str3 até achar o '\\0' (posição 7) e copia “World!” a partir dali." },
+        { line: 20, vars: {}, desc: "printf exibe: “Concatenated string: Hello, World!”." },
+        { line: 23, vars: { result: "-1" }, desc: "my_strcmp compara “apple” com “banana”. No primeiro caractere, 'a' (97) − 'b' (98) = −1, e a função devolve esse valor." },
+        { line: 24, vars: {}, desc: "result == 0 é falso, então o programa passa para o próximo teste." },
+        { line: 26, vars: {}, desc: "result < 0 é verdadeiro: −1 < 0. Entra no ramo correspondente." },
+        { line: 27, vars: {}, desc: "printf exibe: “str1 is less than str2 (result = -1)”. O valor -1 vem de 'a' − 'b' = 97 − 98." },
+        { line: 31, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    },
+    "circulo-ponto": {
+      vars: ["my_circle", "my_point", "resultado"],
+      steps: [
+        { line: 10, vars: { my_circle: "círculo (0, 0), raio 5" }, desc: "create_circle(0, 0, 5) aloca a struct circle e, dentro dela, cria o centro com create_point. São dois blocos alocados: o círculo e seu centro." },
+        { line: 13, vars: { my_point: "ponto (2, 1)" }, desc: "create_point(2, 1) aloca um ponto independente do círculo, usado apenas na consulta." },
+        { line: 16, vars: { resultado: "1" }, desc: "is_point_inside_circle calcula a distância entre (2, 1) e o centro (0, 0): √(2² + 1²) = √5 ≈ 2,236. Como 2,236 < 5, o ponto está dentro e a função devolve 1." },
+        { line: 18, vars: {}, desc: "A condição é verdadeira: printf exibe “The point is inside the circle.”." },
+        { line: 26, vars: { my_circle: "liberado" }, desc: "free_circle libera primeiro o centro (free_point) e depois a struct do círculo. O programa cliente não precisa conhecer essa ordem." },
+        { line: 27, vars: { my_point: "liberado" }, desc: "free_point libera o ponto da consulta. O cliente libera os blocos que ele mesmo criou." },
+        { line: 29, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elLog = root.querySelector("[data-log]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      if (elLog) {
+        var rowsHtml = [];
+        for (var m = 0; m <= current; m++) {
+          if (steps[m].row) rowsHtml.push(steps[m]);
+        }
+        elLog.innerHTML = rowsHtml
+          .map(function (s) {
+            return (
+              "<tr" + (s.win ? ' class="win"' : "") + ">" +
+              s.row
+                .map(function (cell, idx) {
+                  return "<td" + ((s.fail && idx > 0) || s.skip ? ' class="fail"' : "") + ">" + cell + "</td>";
+                })
+                .join("") +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      o.classList.add("disabled");
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
