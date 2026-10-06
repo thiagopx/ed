@@ -751,15 +751,15 @@
     <p>
       O TAD Ponto representa um ponto no plano. O material de referência define cinco operações: <code>cria</code>,
       <code>libera</code>, <code>acessa</code>, <code>atribui</code> e <code>distancia</code>. O projeto
-      <code>02_circle</code> implementa três delas: <code>create_point</code> (cria), <code>free_point</code> (libera)
-      e <code>euclidean_distance</code> (distância). A struct <code>point2d</code> é definida só em
+      <code>02_circle</code> implementa todas elas: <code>create_point</code> (cria), <code>free_point</code> (libera),
+      <code>get_point</code> (acessa), <code>set_point</code> (atribui) e <code>euclidean_distance</code> (distância). A struct <code>point2d</code> é definida só em
       <code>point2d.c</code>, e o cliente recebe apenas <code>Point2D *</code>.
     </p>
     <p>
-      <strong>Operações conceituais.</strong> O TAD Ponto também prevê <code>acessa</code> (devolver as coordenadas) e
-      <code>atribui</code> (trocar as coordenadas). <strong>O exemplo não as implementa.</strong> No projeto não existe
-      função para ler nem para alterar <code>x</code> e <code>y</code> depois da criação. Essas operações entram aqui
-      para completar o conceito do TAD, mas não há código correspondente para executar.
+      <strong>Acesso e atribuição.</strong> As operações <code>acessa</code> (devolver as coordenadas) e
+      <code>atribui</code> (trocar as coordenadas) são implementadas como <code>get_point</code> e
+      <code>set_point</code>. Assim, o cliente lê e altera <code>x</code> e <code>y</code> sem acessar a struct
+      diretamente.
     </p>
 
     <h4>Exemplo 2: TAD Círculo</h4>
@@ -1021,7 +1021,26 @@ str1 is less than str2 (result = -1)</pre>
     <span class="cmt">// Create a point with coordinates (2, 1)</span>
     <span class="type">Point2D</span> *my_point = <span class="fn">create_point</span>(<span class="num">2</span>, <span class="num">1</span>);
 
+    <span class="cmt">// Read the coordinates back with get_point</span>
+    <span class="kw">double</span> x, y;
+    <span class="fn">get_point</span>(my_point, &amp;x, &amp;y);
+    <span class="fn">printf</span>(<span class="str">"Point: (%.1f, %.1f)\n"</span>, x, y);
+
     <span class="cmt">// Check if the point is inside the circle</span>
+    <span class="kw">if</span> (<span class="fn">is_point_inside_circle</span>(my_point, my_circle))
+    {
+        <span class="fn">printf</span>(<span class="str">"The point is inside the circle.\n"</span>);
+    }
+    <span class="kw">else</span>
+    {
+        <span class="fn">printf</span>(<span class="str">"The point is outside the circle.\n"</span>);
+    }
+
+    <span class="cmt">// Move the point to (6, 0) with set_point and check again</span>
+    <span class="fn">set_point</span>(my_point, <span class="num">6</span>, <span class="num">0</span>);
+    <span class="fn">get_point</span>(my_point, &amp;x, &amp;y);
+    <span class="fn">printf</span>(<span class="str">"Point: (%.1f, %.1f)\n"</span>, x, y);
+
     <span class="kw">if</span> (<span class="fn">is_point_inside_circle</span>(my_point, my_circle))
     {
         <span class="fn">printf</span>(<span class="str">"The point is inside the circle.\n"</span>);
@@ -1041,9 +1060,10 @@ str1 is less than str2 (result = -1)</pre>
       <div class="explain">
         <h3>Como funcionam o TAD Ponto e o TAD Círculo</h3>
         <p>
-          O <strong>TAD Ponto</strong> (<code>point2d.h</code>) exporta <code>create_point</code>, <code>euclidean_distance</code>
-          e <code>free_point</code>. A <code>struct point2d</code> é definida só em <code>point2d.c</code>; o cliente recebe
-          apenas <code>Point2D *</code>, sem acesso aos campos <code>x</code> e <code>y</code>.
+          O <strong>TAD Ponto</strong> (<code>point2d.h</code>) exporta <code>create_point</code>, <code>euclidean_distance</code>,
+          <code>get_point</code>, <code>set_point</code> e <code>free_point</code>. A <code>struct point2d</code> é definida só em
+          <code>point2d.c</code>; o cliente recebe apenas <code>Point2D *</code>, sem acesso direto aos campos <code>x</code>
+          e <code>y</code>. Para ler e alterar as coordenadas, ele usa <code>get_point</code> e <code>set_point</code>.
         </p>
         <p>
           O <strong>TAD Círculo</strong> (<code>circle.h</code>) inclui <code>point2d.h</code>, porque sua operação
@@ -1056,10 +1076,9 @@ str1 is less than str2 (result = -1)</pre>
           e libera os dois blocos que criou.
         </p>
         <p>
-          <strong>Operações conceituais, não implementadas no exemplo.</strong> O TAD Ponto também prevê
-          <code>acessa</code> e <code>atribui</code>, e o TAD Círculo prevê <code>area</code>. <strong>O projeto não
-          implementa nenhuma dessas três</strong>: não há função para ler ou alterar as coordenadas do ponto, nem para
-          calcular a área do círculo. Elas não aparecem na simulação abaixo.
+          <strong>Operação conceitual, não implementada no exemplo.</strong> O TAD Círculo também prevê
+          <code>area</code>, o cálculo da área do círculo. <strong>O projeto não tem essa função</strong>, por isso ela
+          não aparece na simulação abaixo.
         </p>
 
         <h3>Execução passo a passo</h3>
@@ -1076,7 +1095,10 @@ str1 is less than str2 (result = -1)</pre>
 
         <h3>Saída no terminal</h3>
         <pre class="console-block">./test_circle
-The point is inside the circle.</pre>
+Point: (2.0, 1.0)
+The point is inside the circle.
+Point: (6.0, 0.0)
+The point is outside the circle.</pre>
 
         <h3>Outros arquivos do projeto</h3>
 <p class="file-label"><code>02_circle/include/point2d.h</code></p><pre class="code-block"><code><span class="pp">#ifndef POINT2D</span>
@@ -1088,6 +1110,10 @@ The point is inside the circle.</pre>
 <span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);
 <span class="cmt">// Function to calculate the Euclidean distance between two points</span>
 <span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2);
+<span class="cmt">// Function to read the coordinates of a Point2D</span>
+<span class="kw">void</span> <span class="fn">get_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> *x, <span class="kw">double</span> *y);
+<span class="cmt">// Function to set the coordinates of a Point2D</span>
+<span class="kw">void</span> <span class="fn">set_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> x, <span class="kw">double</span> y);
 <span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point);
 <span class="pp">#endif</span></code></pre>
 <p class="file-label"><code>02_circle/include/circle.h</code></p><pre class="code-block"><code><span class="pp">#ifndef CIRCLE</span>
@@ -1132,6 +1158,18 @@ The point is inside the circle.</pre>
   new_point-&gt;x = x;
   new_point-&gt;y = y;
   <span class="kw">return</span> new_point;
+}
+
+<span class="cmt">// Function to read the coordinates of a Point2D</span>
+<span class="kw">void</span> <span class="fn">get_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> *x, <span class="kw">double</span> *y) {
+  *x = point-&gt;x;
+  *y = point-&gt;y;
+}
+
+<span class="cmt">// Function to set the coordinates of a Point2D</span>
+<span class="kw">void</span> <span class="fn">set_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> x, <span class="kw">double</span> y) {
+  point-&gt;x = x;
+  point-&gt;y = y;
 }
 
 <span class="cmt">// Function to deallocate a Point2D</span>
@@ -1456,15 +1494,23 @@ Matrix 3 x 4:
       ]
     },
     "circulo-ponto": {
-      vars: ["my_circle", "my_point", "resultado"],
+      vars: ["my_circle", "my_point", "x", "y", "resultado"],
       steps: [
         { line: 10, vars: { my_circle: "círculo (0, 0), raio 5" }, desc: "create_circle(0, 0, 5) aloca a struct circle e, dentro dela, cria o centro com create_point. São dois blocos alocados: o círculo e seu centro." },
-        { line: 13, vars: { my_point: "ponto (2, 1)" }, desc: "create_point(2, 1) aloca um ponto independente do círculo, usado apenas na consulta." },
-        { line: 16, vars: { resultado: "1" }, desc: "is_point_inside_circle calcula a distância entre (2, 1) e o centro (0, 0): √(2² + 1²) = √5 ≈ 2,236. Como 2,236 < 5, o ponto está dentro e a função devolve 1." },
-        { line: 18, vars: {}, desc: "A condição é verdadeira: printf exibe “The point is inside the circle.”." },
-        { line: 26, vars: { my_circle: "liberado" }, desc: "free_circle libera primeiro o centro (free_point) e depois a struct do círculo. O programa cliente não precisa conhecer essa ordem." },
-        { line: 27, vars: { my_point: "liberado" }, desc: "free_point libera o ponto da consulta. O cliente libera os blocos que ele mesmo criou." },
-        { line: 29, vars: {}, desc: "return 0; — o programa termina." }
+        { line: 13, vars: { my_point: "ponto (2, 1)" }, desc: "create_point(2, 1) aloca um ponto independente do círculo, usado na consulta e na leitura." },
+        { line: 16, vars: { x: "não inicializado", y: "não inicializado" }, desc: "double x, y; declara duas variáveis locais para receber as coordenadas. Até aqui elas não têm valor definido." },
+        { line: 17, vars: { x: "2.0", y: "1.0" }, desc: "get_point(my_point, &x, &y) copia as coordenadas do ponto para x e y. O cliente passa os endereços das variáveis, e a função preenche as duas sem conhecer a struct." },
+        { line: 18, vars: {}, desc: "printf exibe “Point: (2.0, 1.0)”." },
+        { line: 21, vars: { resultado: "1" }, desc: "is_point_inside_circle calcula a distância entre (2, 1) e o centro (0, 0): √(2² + 1²) = √5 ≈ 2,236. Como 2,236 < 5, o ponto está dentro e a função devolve 1." },
+        { line: 23, vars: {}, desc: "A condição é verdadeira: printf exibe “The point is inside the circle.”." },
+        { line: 31, vars: { my_point: "ponto (6, 0)" }, desc: "set_point(my_point, 6, 0) altera as coordenadas do ponto que já existe. O cliente usa a operação do TAD e não toca nos campos da struct." },
+        { line: 32, vars: { x: "6.0", y: "0.0" }, desc: "get_point lê de novo as coordenadas do ponto, agora (6, 0), e atualiza x e y." },
+        { line: 33, vars: {}, desc: "printf exibe “Point: (6.0, 0.0)”." },
+        { line: 35, vars: { resultado: "0" }, desc: "A distância entre (6, 0) e o centro (0, 0) é 6. Como 6 > 5, o ponto está fora e a função devolve 0." },
+        { line: 41, vars: {}, desc: "A condição é falsa, então o ramo else executa e printf exibe “The point is outside the circle.”." },
+        { line: 45, vars: { my_circle: "liberado" }, desc: "free_circle libera primeiro o centro (free_point) e depois a struct do círculo. O programa cliente não precisa conhecer essa ordem." },
+        { line: 46, vars: { my_point: "liberado" }, desc: "free_point libera o ponto da consulta. O cliente libera os blocos que ele mesmo criou." },
+        { line: 48, vars: {}, desc: "return 0; — o programa termina." }
       ]
     },
     "matriz": {

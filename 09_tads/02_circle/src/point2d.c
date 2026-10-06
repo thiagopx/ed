@@ -28,6 +28,18 @@ Point2D *create_point(double x, double y) {
   return new_point;
 }
 
+// Function to read the coordinates of a Point2D
+void get_point(Point2D *point, double *x, double *y) {
+  *x = point->x;
+  *y = point->y;
+}
+
+// Function to set the coordinates of a Point2D
+void set_point(Point2D *point, double x, double y) {
+  point->x = x;
+  point->y = y;
+}
+
 // Function to deallocate a Point2D
 void free_point(Point2D *point)
 {

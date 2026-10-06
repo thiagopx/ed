@@ -853,13 +853,13 @@ str1 is less than str2 (result = -1)</div>
   <section class="slide" data-slide>
     <div class="kicker">Tipo abstrato de dados</div>
     <h1>Um TAD reúne criação, acesso e cálculo</h1>
-    <p class="sub">Operações tracejadas são conceituais: fazem parte do tipo, mas não têm código nos exemplos.</p>
+    <p class="sub">No TAD Ponto, acessa e atribui existem como get_point e set_point, com código no exemplo 1.</p>
     <div class="body">
       <div class="cards">
         <div class="card"><span class="fn">cria</span><p>aloca e inicializa, e devolve um ponteiro</p></div>
         <div class="card"><span class="fn">libera</span><p>desaloca o que foi criado</p></div>
-        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">acessa</span><p>devolve os dados do tipo</p></div>
-        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">atribui</span><p>altera os dados do tipo</p></div>
+        <div class="card"><span class="fn">acessa</span><p>devolve os dados do tipo</p></div>
+        <div class="card"><span class="fn">atribui</span><p>altera os dados do tipo</p></div>
       </div>
     </div>
     <div class="footer"><span>Tipo abstrato de dados</span><span>Estruturas de Dados</span></div>
@@ -868,15 +868,15 @@ str1 is less than str2 (result = -1)</div>
   <!-- 17. TAD PONTO: CINCO OPERAÇÕES -->
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 1: TAD Ponto</div>
-    <h1>Cinco operações, três implementadas</h1>
-    <p class="sub">create_point, free_point e euclidean_distance estão no projeto. acessa e atribui são conceituais.</p>
+    <h1>Cinco operações, todas implementadas</h1>
+    <p class="sub">Todas estão no projeto: create_point, free_point, euclidean_distance, get_point e set_point.</p>
     <div class="body">
       <div class="cards">
-        <div class="card"><span class="fn">create_point</span><p>cria (implementada)</p></div>
-        <div class="card"><span class="fn">free_point</span><p>libera (implementada)</p></div>
-        <div class="card"><span class="fn">euclidean_distance</span><p>distância (implementada)</p></div>
-        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">acessa</span><p>devolve as coordenadas</p></div>
-        <div class="card is-concept"><span class="tag-concept">conceitual</span><span class="fn">atribui</span><p>troca as coordenadas</p></div>
+        <div class="card"><span class="fn">create_point</span><p>cria</p></div>
+        <div class="card"><span class="fn">free_point</span><p>libera</p></div>
+        <div class="card"><span class="fn">euclidean_distance</span><p>distância entre dois pontos</p></div>
+        <div class="card"><span class="fn">get_point</span><p>acessa: devolve x e y</p></div>
+        <div class="card"><span class="fn">set_point</span><p>atribui: troca x e y</p></div>
       </div>
     </div>
     <div class="footer"><span>Exemplo 1: TAD Ponto</span><span>Estruturas de Dados</span></div>
@@ -886,7 +886,7 @@ str1 is less than str2 (result = -1)</div>
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 1: TAD Ponto</div>
     <h1>Point2D é opaco para o cliente</h1>
-    <p class="sub">O header expõe o tipo e as funções. Os campos x e y ficam só no point2d.c.</p>
+    <p class="sub">O header expõe o tipo e as funções, inclusive get_point e set_point. Os campos x e y ficam só no point2d.c.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
@@ -904,7 +904,16 @@ str1 is less than str2 (result = -1)</div>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> point2d <span class="type">Point2D</span>;
 
-<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);</code></pre>
+<span class="cmt">// Function to create a new Point2D</span>
+<span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);
+<span class="cmt">// Function to calculate the Euclidean distance between two points</span>
+<span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2);
+<span class="cmt">// Function to read the coordinates of a Point2D</span>
+<span class="kw">void</span> <span class="fn">get_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> *x, <span class="kw">double</span> *y);
+<span class="cmt">// Function to set the coordinates of a Point2D</span>
+<span class="kw">void</span> <span class="fn">set_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> x, <span class="kw">double</span> y);
+<span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point);
+<span class="pp">#endif</span></code></pre>
           </div>
         </div>
       </div>
@@ -1073,20 +1082,36 @@ str1 is less than str2 (result = -1)</div>
   <section class="slide" data-slide>
     <div class="kicker">Exemplo 2: TAD Círculo</div>
     <h1>O cliente usa só os headers</h1>
-    <p class="sub">O programa de teste cria, consulta e libera. Não acessa x, y, center ou radius.</p>
+    <p class="sub">O cliente lê e altera o ponto só por get_point e set_point. Não toca em x, y, center ou radius.</p>
     <div class="body">
       <div class="concept-split">
         <div class="visual-col">
           <div class="term" style="font-size: clamp(0.9rem, 1.4vw, 1.2rem);"><span class="prompt">$</span> make run
 ./test_circle
-The point is inside the circle.</div>
+Point: (2.0, 1.0)
+The point is inside the circle.
+Point: (6.0, 0.0)
+The point is outside the circle.</div>
         </div>
         <div class="code-col">
           <div class="code-panel">
             <div class="file-tag">02_circle/test_circle.c</div>
 <pre><code>    <span class="type">Circle</span> *my_circle = <span class="fn">create_circle</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">5</span>);
+
+    <span class="cmt">// Create a point with coordinates (2, 1)</span>
     <span class="type">Point2D</span> *my_point = <span class="fn">create_point</span>(<span class="num">2</span>, <span class="num">1</span>);
-    <span class="kw">if</span> (<span class="fn">is_point_inside_circle</span>(my_point, my_circle))
+
+    <span class="cmt">// Read the coordinates back with get_point</span>
+    <span class="kw">double</span> x, y;
+    <span class="fn">get_point</span>(my_point, &amp;x, &amp;y);
+    <span class="fn">printf</span>(<span class="str">"Point: (%.1f, %.1f)\n"</span>, x, y);
+
+    <span class="cmt">// Move the point to (6, 0) with set_point and check again</span>
+    <span class="fn">set_point</span>(my_point, <span class="num">6</span>, <span class="num">0</span>);
+    <span class="fn">get_point</span>(my_point, &amp;x, &amp;y);
+    <span class="fn">printf</span>(<span class="str">"Point: (%.1f, %.1f)\n"</span>, x, y);
+
+    <span class="cmt">// Deallocate memory</span>
     <span class="fn">free_circle</span>(my_circle);
     <span class="fn">free_point</span>(my_point);</code></pre>
           </div>
