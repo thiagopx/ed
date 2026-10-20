@@ -7,8 +7,7 @@
 //     ...
 // };
 
-Team *team_create(int id, const char *name, int wins, int draws, int losses,
-                   int goals_scored, int goals_conceded) {
+Team *team_create(int id, const char *name) {
 
 }
 

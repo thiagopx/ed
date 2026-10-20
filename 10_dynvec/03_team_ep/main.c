@@ -9,12 +9,10 @@ int main(void) {
 
     TeamVec *tv = tv_create();
 
-    int id, wins, draws, losses, goals_scored, goals_conceded;
+    int id;
     char name[50];
-    while (fscanf(f, "%d,%49[^,],%d,%d,%d,%d,%d", &id, name, &wins, &draws,
-                  &losses, &goals_scored, &goals_conceded) == 7) {
-        Team *t = team_create(id, name, wins, draws, losses, goals_scored,
-                               goals_conceded);
+    while (fscanf(f, "%d,%49[^\n]", &id, name) == 2) {
+        Team *t = team_create(id, name);
         tv_insert(tv, t);
     }
     fclose(f);

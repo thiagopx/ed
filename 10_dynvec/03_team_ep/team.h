@@ -6,9 +6,9 @@
 // always computed from the accessors below when needed.
 typedef struct team Team;
 
-// TODO: implemente team_create -- aloca o time e inicializa todos os campos
-Team *team_create(int id, const char *name, int wins, int draws, int losses,
-                   int goals_scored, int goals_conceded);
+// TODO: implemente team_create -- aloca o time, copia id/name e zera as 5
+// estatísticas (wins, draws, losses, goals_scored, goals_conceded)
+Team *team_create(int id, const char *name);
 
 // TODO: implemente os acessos abaixo (um por campo)
 int team_id(Team *t);
