@@ -75,68 +75,26 @@ ID  Time            V   E   D   GM  GS  S   PG
     style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
     🧩 Código Base</h3>
   <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">A leitura do
-    arquivo e a impressão da tabela já vêm prontas no <code>main</code> — o
-    que falta, e é o conteúdo deste módulo, é o próprio TAD do vetor dinâmico:
-    os campos de <code>struct teamvec</code> e o corpo das cinco funções
-    abaixo.</p>
-  <pre
-    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-
-typedef struct {
-    int id;
-    char name[50];
-    int wins, draws, losses;
-    int goals_scored, goals_conceded;
-} Team;
-
-typedef struct teamvec TeamVec;
-
-// TODO: defina aqui os campos de "struct teamvec" -- pense no que o TAD
-// precisa guardar para saber quantos times tem e quanto espaço ainda sobra
-// struct teamvec { ... };
-
-// TODO: implemente tv_create -- aloca o TAD e um vetor inicial pequeno (ex.: 4 times)
-TeamVec *tv_create(void);
-
-// TODO: implemente tv_insert -- se o vetor estiver cheio, dobre a capacidade
-// (realloc) antes de inserir o novo time
-void tv_insert(TeamVec *tv, Team t);
-
-// TODO: implemente tv_size -- retorna o número de times atualmente guardados
-int tv_size(TeamVec *tv);
-
-// TODO: implemente tv_get -- retorna o time na posição i
-Team tv_get(TeamVec *tv, int i);
-
-// TODO: implemente tv_free -- libera o vetor interno e depois o TAD
-void tv_free(TeamVec *tv);
-
-int main(void) {
-    FILE *f = fopen("teams.csv", "rt");
-    if (f == NULL)
-        return 1;
-
-    TeamVec *tv = tv_create();
-    Team t;
-    while (fscanf(f, "%d,%49[^,],%d,%d,%d,%d,%d", &amp;t.id, t.name, &amp;t.wins,
-                  &amp;t.draws, &amp;t.losses, &amp;t.goals_scored, &amp;t.goals_conceded) == 7)
-        tv_insert(tv, t);
-    fclose(f);
-
-    printf("ID  Time            V   E   D   GM  GS  S   PG\n");
-    for (int i = 0; i &lt; tv_size(tv); i++) {
-        Team t = tv_get(tv, i);
-        int goal_diff = t.goals_scored - t.goals_conceded;
-        int points = 3 * t.wins + t.draws;
-        printf("%-3d %-15s %-3d %-3d %-3d %-3d %-3d %-3d %-3d\n",
-               t.id, t.name, t.wins, t.draws, t.losses,
-               t.goals_scored, t.goals_conceded, goal_diff, points);
-    }
-
-    tv_free(tv);
-    return 0;
-}</pre>
+    arquivo e a impressão da tabela já vêm prontas no <code>main.c</code> — o
+    que falta, e é o conteúdo deste módulo, é o próprio TAD do vetor dinâmico,
+    em <code>team.c</code>: os campos de <code>struct teamvec</code> e o corpo
+    das cinco funções declaradas em <code>team.h</code>.</p>
+  <div style="margin: 20px 0;">
+    <a style="text-decoration: none; background: #8e44ad; color: white; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; display: block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+      href="https://github.com/thiagopx/ed/tree/master/10_dynvec/03_team_ep" target="_blank" rel="noopener noreferrer">
+      📂 Acessar Código Base no GitHub (10_dynvec/03_team_ep)
+    </a>
+  </div>
+  <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <p style="margin: 0 0 8px 0;"><strong>Arquivos fornecidos:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li><code>team.h</code> — struct <code>Team</code> (visível) e o tipo opaco <code>TeamVec</code>, com as assinaturas das 5 funções do TAD.</li>
+      <li><code>team.c</code> — onde você implementa: a definição de <code>struct teamvec</code> e o corpo das 5 funções. <strong>Estrutura interna do TAD só aqui — nunca em <code>team.h</code> nem em <code>main.c</code></strong>, mesma regra do exemplo de vetor dinâmico visto em aula.</li>
+      <li><code>main.c</code> — já completo: lê <code>teams.csv</code> e imprime a tabela, usando só as funções de <code>team.h</code>.</li>
+      <li><code>Makefile</code> — compila os três arquivos juntos (<code>make</code>).</li>
+      <li><code>teams.csv</code> — arquivo de exemplo com os 4 times do "Exemplo de Execução" acima, para você testar.</li>
+    </ul>
+  </div>
   <div
     style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
     <strong>Dica:</strong> releia o exemplo de vetor dinâmico de
