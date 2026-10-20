@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides — Vetores dinâmicos</title>
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #8E3B8F;
+    --accent-soft: #F1DCF1;
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 3.2vw 4.4vw;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .slide.is-active { display: flex; }
+
+  .slide .kicker {
+    font-size: 1vw;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 1vw;
+  }
+
+  .slide h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.2rem, 5.4vw, 4rem);
+    line-height: 1.08;
+    margin: 0 0 1vw;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .slide .sub {
+    font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+    color: var(--ink-soft);
+    max-width: 44vw;
+    line-height: 1.45;
+  }
+
+  .slide .body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  .slide .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 9vw;
+    font-size: 0.85vw;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  code, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- capa e fechamento ---- */
+
+  .cover { justify-content: center; }
+  .cover .brand-row { display: flex; align-items: center; gap: 0.9vw; margin-bottom: 2.2vw; }
+  .cover .if-mark { width: 2.6vw; min-width: 30px; height: auto; display: block; }
+  .cover .brand-text { font-size: 0.95vw; color: var(--ink-soft); line-height: 1.3; }
+  .cover .brand-text strong { color: var(--ink); display: block; font-weight: 800; }
+  .cover h1 { font-size: clamp(2.6rem, 7vw, 5.2rem); }
+  .cover .sub { max-width: 52vw; font-size: clamp(1.1rem, 2.1vw, 1.65rem); }
+
+  /* ---- assinatura visual da capa: capacidade dobrando ---- */
+
+  .cap-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.9vw;
+    margin-top: 3vw;
+  }
+  .cap-strip .chip {
+    font-family: var(--font-mono);
+    font-size: clamp(1.3rem, 2.8vw, 2.2rem);
+    font-weight: 700;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.5vw;
+    padding: 0.55vw 1.1vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .cap-strip .chip.is-accent { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .cap-strip .arrow { font-size: clamp(1.1rem, 2vw, 1.6rem); color: var(--ink-faint); }
+
+  /* ---- roteiro ---- */
+
+  .roadmap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2vw;
+    width: 100%;
+  }
+  .roadmap li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4vw;
+    padding-bottom: 1.2vw;
+    border-bottom: 1px solid var(--line);
+  }
+  .roadmap .n {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    color: var(--accent-soft);
+    -webkit-text-stroke: 1.5px var(--accent);
+    font-weight: 700;
+    min-width: 3.2vw;
+  }
+  .roadmap .t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 700; }
+  .roadmap .d { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: var(--ink-soft); margin-top: 0.3vw; }
+
+  /* ---- flow (sequência de caixas com setas) ---- */
+
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6vw;
+    flex-wrap: wrap;
+  }
+  .flow.is-column { flex-direction: column; }
+  .flow .box {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.2vw 1.8vw;
+    text-align: center;
+    box-shadow: 0 0.4vw 0 var(--line);
+  }
+  .flow .box .tag {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    margin-top: 0.4vw;
+  }
+  .flow .box.is-accent { border-color: var(--accent); color: var(--accent); box-shadow: 0 0.4vw 0 var(--accent); }
+  .flow .arrow { font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--ink-faint); }
+  .flow .op {
+    font-family: var(--font-mono);
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+    color: var(--ink-soft);
+  }
+
+  /* ---- comparação lado a lado ---- */
+
+  .compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; width: 100%; }
+  .compare .col {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw;
+  }
+  .compare .col.is-bad { border-color: var(--accent); }
+  .compare .col h3 {
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    margin: 0 0 0.8vw;
+    color: var(--accent);
+  }
+  .compare .col p { font-size: clamp(0.9rem, 1.35vw, 1.1rem); color: var(--ink-soft); line-height: 1.5; margin: 0 0 0.8vw; }
+  .compare .col .cap {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.4vw;
+    padding: 0.5vw 0.7vw;
+    display: block;
+  }
+
+  /* ---- leituras em cascata (dois casos lado a lado) ---- */
+
+  .cascade { display: flex; gap: 2.2vw; width: 100%; justify-content: center; }
+  .cascade .card {
+    flex: 1;
+    max-width: 27vw;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.6vw;
+  }
+  .cascade .card.is-good { border-color: #1e8449; }
+  .cascade .card.is-bad { border-color: var(--accent); }
+  .cascade .card .lines {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 1.25vw, 1.05rem);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.5vw;
+    padding: 0.8vw 1vw;
+    margin-bottom: 1.2vw;
+    line-height: 1.6;
+  }
+  .cascade .card .lines .hl { color: var(--code-str); font-weight: 700; }
+  .cascade .buf-label { font-size: clamp(0.75rem, 1.1vw, 0.95rem); color: var(--ink-faint); margin-bottom: 0.5vw; text-transform: uppercase; letter-spacing: 0.05em; }
+  .cascade .verdict { font-size: clamp(0.95rem, 1.5vw, 1.2rem); font-weight: 700; }
+  .cascade .verdict.is-bad { color: var(--accent); }
+  .cascade .verdict.is-good { color: #1e8449; }
+
+  /* ---- cards de funções ---- */
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4vw; width: 100%; }
+  .cards .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.8vw;
+    padding: 1.6vw 1.2vw;
+    text-align: center;
+  }
+  .cards .card.is-concept { border-style: dashed; background: var(--surface-2); }
+  .cards .card .fn {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 1.9vw, 1.5rem);
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.6vw;
+  }
+  .cards .card.is-concept .fn { color: var(--ink-soft); }
+  .cards .card p { font-size: clamp(0.85rem, 1.25vw, 1.05rem); color: var(--ink-soft); margin: 0; line-height: 1.4; }
+
+  /* ---- encapsulamento (aninhado) ---- */
+
+  .nest { display: flex; align-items: center; justify-content: center; }
+  .nest .ring {
+    border: 2px solid var(--line);
+    border-radius: 1vw;
+    padding: 1.6vw;
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    background: var(--surface);
+  }
+  .nest .ring .head {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+  }
+  .nest .ring.is-accent { border-color: var(--accent); background: var(--accent-soft); }
+  .nest .ring.is-accent .head { color: var(--accent); }
+
+  /* ---- duelo entre dois itens ---- */
+
+  .duel { display: flex; align-items: center; justify-content: center; gap: 4vw; }
+  .duel .item { display: flex; flex-direction: column; align-items: center; gap: 1vw; }
+  .duel .item .tag { font-family: var(--font-mono); font-size: clamp(1.1rem, 1.9vw, 1.6rem); color: var(--ink-soft); }
+  .duel .item .note { font-size: clamp(0.95rem, 1.4vw, 1.2rem); color: var(--ink-faint); text-align: center; max-width: 18vw; }
+  .duel .vs { font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2rem); color: var(--ink-faint); }
+
+  /* ---- code panel (trecho de código real) ---- */
+
+  .code-panel {
+    background: var(--code-bg);
+    border-radius: 0.8vw;
+    padding: 1vw 1.4vw 1.3vw;
+    max-width: 42vw;
+    box-shadow: 0 0.3vw 0 var(--line);
+  }
+  .code-panel .file-tag {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(231, 236, 241, 0.5);
+    margin-bottom: 0.7vw;
+  }
+  .code-panel pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 0.9vw, 0.88rem);
+    line-height: 1.5;
+    color: var(--code-ink);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-panel pre + pre { margin-top: 0.9vw; }
+  .code-panel .kw   { color: var(--code-kw); }
+  .code-panel .type { color: var(--code-type); }
+  .code-panel .fn   { color: var(--code-fn); }
+  .code-panel .str  { color: var(--code-str); }
+  .code-panel .num  { color: var(--code-num); }
+  .code-panel .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-panel .pp   { color: var(--code-pp); }
+
+  .concept-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .concept-split .visual-col { flex: 1 1 34%; display: flex; justify-content: center; }
+  .concept-split .code-col { flex: 1 1 40%; display: flex; justify-content: center; }
+
+  /* ---- terminal ---- */
+
+  .term {
+    font-family: var(--font-mono);
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 0.7vw;
+    padding: 1.6vw 2vw;
+    font-size: clamp(0.95rem, 1.6vw, 1.3rem);
+    line-height: 1.5;
+    width: 100%;
+    max-width: 50vw;
+    white-space: pre;
+  }
+  .term .prompt { color: var(--code-fn); }
+
+  /* ---- closing ---- */
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8vw;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    padding: 1vw 2vw;
+    border-radius: 0.7vw;
+    margin-top: 2vw;
+    text-decoration: none;
+  }
+  .cta .url { font-family: var(--font-mono); font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 400; opacity: 0.9; }
+
+  /* ---- navegação ---- */
+
+  .nav-controls {
+    position: fixed;
+    right: 1.4vw;
+    bottom: 1.4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.6vw;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.5vw 0.7vw;
+    border-radius: 999px;
+    z-index: 10;
+  }
+  .nav-controls button {
+    font: inherit;
+    font-size: 0.85vw;
+    font-weight: 700;
+    padding: 0.45vw 0.9vw;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .nav-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-controls .counter {
+    font-family: var(--font-mono);
+    color: #fff;
+    font-size: 0.85vw;
+    min-width: 3.4vw;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .compare { grid-template-columns: 1fr; }
+    .duel { flex-direction: column; gap: 1.5vw; }
+    .code-panel { max-width: 90vw; }
+    .concept-split { flex-direction: column; }
+  }
+
+  /* ---- impressão / PDF ---- */
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .deck { position: static; width: auto; height: auto; overflow: visible; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      page-break-after: always;
+      break-after: page;
+    }
+    .nav-controls { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide cover is-active" data-slide>
+    <div class="brand-row">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+      <div class="brand-text"><strong>Estruturas de Dados</strong>Prof. Dr. Thiago M. Paixão</div>
+    </div>
+    <div class="kicker">Capítulo 13</div>
+    <h1>Vetores dinâmicos</h1>
+    <p class="sub">Como um vetor alocado com <code>malloc</code> cresce em tempo de execução via <code>realloc</code> — e como essa ideia dá origem a dois TADs: um vetor dinâmico de números e uma cadeia de caracteres dinâmica.</p>
+    <div class="cap-strip">
+      <div class="chip">4</div>
+      <div class="arrow">→</div>
+      <div class="chip">8</div>
+      <div class="arrow">→</div>
+      <div class="chip">16</div>
+      <div class="arrow">→</div>
+      <div class="chip is-accent">32</div>
+    </div>
+  </section>
+
+  <!-- 2. ROTEIRO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Nesta aula</div>
+    <h1>O que vamos ver</h1>
+    <div class="body">
+      <ul class="roadmap">
+        <li><span class="n">01</span><div><div class="t">Realocação de memória</div><div class="d">redimensionar um bloco já alocado, preservando o conteúdo</div></div></li>
+        <li><span class="n">02</span><div><div class="t">Vetor dinâmico — DynVec</div><div class="d">um TAD que cresce conforme insere, dobrando a capacidade (01_dynvec)</div></div></li>
+        <li><span class="n">03</span><div><div class="t">Cadeia de caracteres dinâmica — DynStr</div><div class="d">o mesmo TAD, crescendo pedaço a pedaço (02_strdin)</div></div></li>
+      </ul>
+    </div>
+    <div class="footer"><span>Vetores dinâmicos</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 3. MOTIVAÇÃO: SEMPRE ESCOLHER UM TAMANHO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Realocação de memória</div>
+    <h1>Antes de inserir, é preciso escolher um tamanho</h1>
+    <p class="sub">Em tempo de compilação, ou em tempo de execução — mas sempre escolher antecipadamente.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="tag">float vet[1000];</div>
+          <div class="note">tamanho fixo, decidido em tempo de compilação</div>
+        </div>
+        <div class="vs">×</div>
+        <div class="item">
+          <div class="tag">malloc(n * sizeof(float))</div>
+          <div class="note">tamanho decidido em tempo de execução — mas ainda decidido</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Realocação de memória</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 4. REALLOC: DOIS DESTINOS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Realocação de memória</div>
+    <h1>realloc: dois destinos possíveis</h1>
+    <p class="sub"><code>vet = realloc(vet, m * sizeof(float));</code> preserva os elementos já existentes — mas o endereço de retorno pode mudar.</p>
+    <div class="body">
+      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 56vw;">
+        <div class="col">
+          <h3>espaço livre depois do bloco</h3>
+          <p>o sistema estende o bloco no próprio lugar, sem copiar nada.</p>
+          <span class="cap">retorno == endereço antigo</span>
+        </div>
+        <div class="col">
+          <h3>sem espaço livre</h3>
+          <p>aloca um novo bloco, copia o conteúdo e libera o antigo.</p>
+          <span class="cap">retorno != endereço antigo — reatribua o ponteiro!</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Realocação de memória</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 5. DOBRAR A CAPACIDADE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Realocação de memória</div>
+    <h1>A estratégia: dobrar a capacidade</h1>
+    <p class="sub">Sempre que a capacidade se esgota, <code>n_max</code> dobra — poucas realocações no total.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-column">
+            <div class="box">n_max = 4<span class="tag">capacidade esgotada</span></div>
+            <div class="arrow">↓</div>
+            <div class="op">realloc × 2</div>
+            <div class="arrow">↓</div>
+            <div class="box is-accent">n_max = 8<span class="tag">nova capacidade</span></div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/01_dynvec/dynvec.c</div>
+<pre><code><span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynVec</span> *dv)
+{
+   dv-&gt;n_max *= <span class="num">2</span>;
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v,
+      dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Realocação de memória</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 6. POR QUE DOBRAR, NÃO +1 -->
+  <section class="slide" data-slide>
+    <div class="kicker">Realocação de memória</div>
+    <h1>Por que não crescer de 1 em 1</h1>
+    <p class="sub">Uma realocação a cada inserção pode somar um custo da ordem de n² ao inserir n elementos.</p>
+    <div class="body">
+      <div class="compare" style="grid-template-columns: repeat(2, 1fr); max-width: 56vw;">
+        <div class="col is-bad">
+          <h3>+1 por inserção</h3>
+          <p>cada nova realocação pode copiar todos os elementos já inseridos.</p>
+          <span class="cap">custo total ~ n²</span>
+        </div>
+        <div class="col">
+          <h3>dobrar a capacidade</h3>
+          <p>poucas realocações no total, ao preço de, por um tempo, até metade do vetor ficar alocada e vazia.</p>
+          <span class="cap">custo total ~ log n realocações</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Realocação de memória</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 7. DYNVEC: CINCO OPERAÇÕES -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 1: Vetor dinâmico (DynVec)</div>
+    <h1>Cinco operações, todas implementadas</h1>
+    <p class="sub">O cliente nunca escolhe uma capacidade máxima — só chama as funções exportadas por dynvec.h.</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card"><span class="fn">dv_create</span><p>cria: vetor vazio, n_max = 4</p></div>
+        <div class="card"><span class="fn">dv_insert</span><p>insere no final, realocando quando preciso</p></div>
+        <div class="card"><span class="fn">dv_size / dv_capacity</span><p>tam: elementos guardados e capacidade atual</p></div>
+        <div class="card"><span class="fn">dv_get</span><p>acessa um elemento pelo índice</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 1: Vetor dinâmico (DynVec)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 8. DYNVEC: STRUCT ESCONDIDA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 1: Vetor dinâmico (DynVec)</div>
+    <h1>A struct fica só em dynvec.c</h1>
+    <p class="sub">O cliente manipula apenas DynVec * — n, n_max e v são invisíveis fora do módulo.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="nest">
+            <div class="ring">
+              <span class="head">main.c</span>
+              <div class="ring">
+                <span class="head">DynVec *</span>
+                <div class="ring is-accent"><span class="head">struct dynvec</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/01_dynvec/dynvec.c</div>
+<pre><code><span class="kw">struct</span> dynvec
+{
+   <span class="kw">int</span> n;     <span class="cmt">// number of elements</span>
+   <span class="kw">int</span> n_max; <span class="cmt">// vector capacity</span>
+   <span class="kw">float</span> *v;  <span class="cmt">// vector data</span>
+};</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 1: Vetor dinâmico (DynVec)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 9. DV_INSERT: DECIDE ANTES DE GRAVAR -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 1: Vetor dinâmico (DynVec)</div>
+    <h1>dv_insert decide antes de gravar</h1>
+    <p class="sub">Só realoca quando o vetor já está cheio — n igual a n_max.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="cascade">
+            <div class="card">
+              <div class="buf-label">n == n_max</div>
+              <div class="lines">chama <span class="hl">reallocate(dv)</span></div>
+              <div class="verdict">n_max dobra antes de gravar</div>
+            </div>
+            <div class="card">
+              <div class="buf-label">n &lt; n_max</div>
+              <div class="lines">grava direto</div>
+              <div class="verdict">v[n++] = x, sem realocação</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/01_dynvec/dynvec.c</div>
+<pre><code><span class="kw">void</span> <span class="fn">dv_insert</span>(<span class="type">DynVec</span> *dv, <span class="kw">float</span> x)
+{
+   <span class="kw">if</span> (dv-&gt;n == dv-&gt;n_max)
+      <span class="fn">reallocate</span>(dv);
+
+   dv-&gt;v[dv-&gt;n++] = x;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 1: Vetor dinâmico (DynVec)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 10. DV_CREATE_FROM_FILE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 1: Vetor dinâmico (DynVec)</div>
+    <h1>Sem saber quantos valores tem o arquivo</h1>
+    <p class="sub">dv_create_from_file insere um a um até fscanf falhar — sem ler o arquivo duas vezes.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="term" style="font-size: clamp(0.85rem, 1.3vw, 1.1rem);"><span class="prompt">$</span> make run
+./test_dynvec
+size=1 capacity=4
+10.000000
+34.320000 4.300000 23.559999 9.330000 2.100000 9.810000
+size=6 capacity=8
+1.000000 3.000000 6.000000 10.000000 20.000000</div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/01_dynvec/dynvec.c</div>
+<pre><code><span class="type">DynVec</span> *<span class="fn">dv_create_from_file</span>(<span class="kw">const</span> <span class="kw">char</span> *filename)
+{
+   <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">"rt"</span>);
+   <span class="kw">if</span> (f == NULL)
+      <span class="kw">return</span> NULL;
+
+   <span class="type">DynVec</span> *dv = <span class="fn">dv_create</span>();
+   <span class="kw">float</span> x;
+   <span class="kw">while</span> (<span class="fn">fscanf</span>(f, <span class="str">"%f"</span>, &amp;x) == <span class="num">1</span>)
+      <span class="fn">dv_insert</span>(dv, x);
+
+   <span class="fn">fclose</span>(f);
+   <span class="kw">return</span> dv;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 1: Vetor dinâmico (DynVec)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 11. TRANSIÇÃO: MESMA IDEIA, PARA TEXTO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</div>
+    <h1>A mesma ideia, para texto</h1>
+    <p class="sub">Mau uso de memória em cadeias — copiar ou concatenar mais do que o vetor comporta — é um dos erros mais comuns em C.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="tag">DynVec</div>
+          <div class="note">vetor de float, cresce elemento a elemento</div>
+        </div>
+        <div class="vs">→</div>
+        <div class="item">
+          <div class="tag">DynStr</div>
+          <div class="note">cadeia de caracteres, cresce pedaço a pedaço</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 12. DYNSTR: STRUCT E REALLOCATE -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</div>
+    <h1>Um único campo, sempre do tamanho exato</h1>
+    <p class="sub">reallocate(ds, n) reserva n + 1 bytes — sempre espaço para o terminador '\0'.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="nest">
+            <div class="ring">
+              <span class="head">main.c</span>
+              <div class="ring">
+                <span class="head">DynStr *</span>
+                <div class="ring is-accent"><span class="head">char *v</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/02_strdin/dynstr.c</div>
+<pre><code><span class="kw">struct</span> dynstr {
+    <span class="kw">char</span> *v;
+};
+
+<span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynStr</span> *ds, <span class="kw">int</span> n) {
+    ds-&gt;v = (<span class="kw">char</span> *)<span class="fn">realloc</span>(ds-&gt;v, n + <span class="num">1</span>);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 13. DS_ASSIGN × DS_CONCAT -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</div>
+    <h1>ds_assign substitui; ds_concat anexa</h1>
+    <p class="sub">Os dois só diferem no tamanho pedido a reallocate.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="duel" style="flex-direction: column; gap: 1.5vw;">
+            <div class="item">
+              <div class="tag">ds_assign</div>
+              <div class="note">reallocate(ds, strlen(s)) + strcpy</div>
+            </div>
+            <div class="vs">×</div>
+            <div class="item">
+              <div class="tag">ds_concat</div>
+              <div class="note">reallocate(ds, strlen(ds-&gt;v)+strlen(s)) + strcat</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/02_strdin/dynstr.c</div>
+<pre><code><span class="kw">void</span> <span class="fn">ds_assign</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(s));
+    <span class="fn">strcpy</span>(ds-&gt;v, s);
+}
+
+<span class="kw">void</span> <span class="fn">ds_concat</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(ds-&gt;v) + <span class="fn">strlen</span>(s));
+    <span class="fn">strcat</span>(ds-&gt;v, s);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 14. READ_TEXT: CRESCE EM PEDAÇOS -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</div>
+    <h1>read_text cresce em pedaços</h1>
+    <p class="sub">fgets lê até 64 bytes por vez; ds_concat anexa cada pedaço, sem saber o tamanho do arquivo.</p>
+    <div class="body">
+      <div class="concept-split">
+        <div class="visual-col">
+          <div class="flow is-column">
+            <div class="box">fgets(buffer, 64, f)<span class="tag">lê um pedaço</span></div>
+            <div class="arrow">↓</div>
+            <div class="box is-accent">ds_concat(s, buffer)<span class="tag">anexa à cadeia</span></div>
+            <div style="text-align: center; color: var(--ink-faint); font-size: clamp(0.85rem, 1.3vw, 1.1rem); margin-top: 0.9vw;">↻ repete até fgets devolver NULL</div>
+          </div>
+        </div>
+        <div class="code-col">
+          <div class="code-panel">
+            <div class="file-tag">10_dynvec/02_strdin/main.c</div>
+<pre><code><span class="type">DynStr</span>* <span class="fn">read_text</span>(<span class="kw">const</span> <span class="kw">char</span> *filename) {
+    <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">"rt"</span>);
+    <span class="kw">if</span> (f == NULL)
+        <span class="kw">return</span> NULL;
+
+    <span class="type">DynStr</span> *s = <span class="fn">ds_create_empty</span>();
+    <span class="kw">char</span> buffer[<span class="num">64</span>];
+    <span class="kw">while</span> (<span class="fn">fgets</span>(buffer, <span class="kw">sizeof</span>(buffer), f) != NULL)
+        <span class="fn">ds_concat</span>(s, buffer);
+
+    <span class="fn">fclose</span>(f);
+    <span class="kw">return</span> s;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 15. SAÍDA: POEMA -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</div>
+    <h1>O poema sai como entrou</h1>
+    <p class="sub">ds_get devolve o texto acumulado, com as quebras de linha originais preservadas.</p>
+    <div class="body">
+      <div class="term"><span class="prompt">$</span> make run
+./test_dynstr
+city = Rio de Janeiro
+city = Recife
+poem =
+Structures of data, line by line,
+growing only as much as they need.
+No wasted space, no fixed confine,
+just memory that follows the deed.</div>
+    </div>
+    <div class="footer"><span>Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 16. LEITURA SIM, ESCRITA NÃO -->
+  <section class="slide" data-slide>
+    <div class="kicker">Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</div>
+    <h1>Leitura sim, escrita não</h1>
+    <p class="sub">ds_get devolve const char *: o cliente lê, mas só ds_assign e ds_concat escrevem no buffer.</p>
+    <div class="body">
+      <div class="duel">
+        <div class="item">
+          <div class="tag">const char *ds_get(DynStr *ds)</div>
+          <div class="note">o cliente só lê</div>
+        </div>
+        <div class="vs">×</div>
+        <div class="item">
+          <div class="tag">ds_assign / ds_concat</div>
+          <div class="note">únicas funções que chamam reallocate e escrevem</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Exemplo 2: Cadeia de caracteres dinâmica (DynStr)</span><span>Estruturas de Dados</span></div>
+  </section>
+
+  <!-- 17. FECHAMENTO -->
+  <section class="slide cover" data-slide>
+    <div class="kicker">Agora é com você</div>
+    <h1>Explore os exemplos, no seu ritmo</h1>
+    <p class="sub">Código-fonte, notas completas e simulação da execução passo a passo estão na página do módulo.</p>
+    <a class="cta" href="https://thiagopx.github.io/ed/10_dynvec">📘 Notas de Aula e Exemplos<span class="url">thiagopx.github.io/ed/10_dynvec</span></a>
+    <a class="cta" href="https://thiagopx.github.io/ed/10_dynvec/quiz">🎯 Quiz do módulo<span class="url">thiagopx.github.io/ed/10_dynvec/quiz</span></a>
+  </section>
+
+</div>
+
+<div class="nav-controls">
+  <button type="button" data-action="prev">◀</button>
+  <span class="counter"><span class="now">1</span>/<span class="total"></span></span>
+  <button type="button" data-action="next">▶</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var current = 0;
+  var nowEl = document.querySelector(".counter .now");
+  var totalEl = document.querySelector(".counter .total");
+  var prevBtn = document.querySelector('[data-action="prev"]');
+  var nextBtn = document.querySelector('[data-action="next"]');
+
+  totalEl.textContent = slides.length;
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+    nowEl.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    history.replaceState(null, "", "#" + (current + 1));
+  }
+
+  function go(delta) {
+    var next = current + delta;
+    if (next >= 0 && next < slides.length) {
+      current = next;
+      render();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(-1); });
+  nextBtn.addEventListener("click", function () { go(1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  });
+
+  var hashIdx = parseInt(location.hash.replace("#", ""), 10);
+  if (hashIdx >= 1 && hashIdx <= slides.length) current = hashIdx - 1;
+
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<div
+  style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <div
+    style="border-bottom: 2px solid #8e44ad; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: #2c3e50; margin: 0;">🏆 EP 10: Classificação do Campeonato</h2>
+    <span
+      style="background-color: #8e44ad; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
+      31 de Outubro</span>
+  </div>
+  <p><strong>O Cenário:</strong> Este EP é o primeiro passo rumo ao Trabalho
+    Prático "Campeonato Computacional de Futebol" — aqui você só monta a
+    estrutura que guarda os times inscritos, sem ainda processar nenhuma
+    partida. Cada time tem um registro com nome, vitórias (V), empates (E),
+    derrotas (D), gols marcados (GM) e gols sofridos (GS). O problema é que
+    você não sabe, de antemão, quantos times existem no arquivo de
+    entrada — por isso, em vez de um vetor de tamanho fixo, você vai usar a
+    mesma técnica de <strong>vetor dinâmico</strong> deste módulo, agora
+    aplicada a um registro inteiro (<code>struct</code>), e não a um
+    <code>float</code> isolado.</p>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    ⚽ Como se Calcula a Classificação</h3>
+  <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+    <div
+      style="flex: 1; background: #f4ecf7; padding: 10px; border-radius: 5px; border-left: 4px solid #8e44ad;">
+      <strong>Saldo de Gols (S)</strong><br><small><code>S = GM − GS</code> —
+        não é lido do arquivo, é calculado na hora de imprimir</small></div>
+    <div
+      style="flex: 1; background: #f4ecf7; padding: 10px; border-radius: 5px; border-left: 4px solid #8e44ad;">
+      <strong>Pontos Ganhos (PG)</strong><br><small><code>PG = 3V + E</code> —
+        também calculado, nunca armazenado no registro</small></div>
+  </div>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    📋 Requisitos Técnicos</h3>
+  <div
+    style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <ul style="margin: 0; padding-left: 20px;">
+      <li style="margin-bottom: 10px;"><strong>Registro:</strong> defina um
+        tipo <code>Team</code> com os campos <code>id</code> (int),
+        <code>name</code> (string), <code>wins</code>, <code>draws</code>,
+        <code>losses</code>, <code>goals_scored</code> e
+        <code>goals_conceded</code> (todos int). Saldo e pontos não entram no
+        registro — são calculados a partir dos outros campos.</li>
+      <li style="margin-bottom: 10px;"><strong>TAD do vetor dinâmico:</strong>
+        implemente <code>tv_create</code>, <code>tv_insert</code>,
+        <code>tv_size</code>, <code>tv_get</code> e <code>tv_free</code> para
+        um vetor dinâmico de <code>Team</code> — a mesma técnica do exemplo de
+        vetor dinâmico de <code>float</code> visto em aula, inclusive a
+        <strong>realocação automática</strong> que dobra a capacidade quando o
+        vetor enche.</li>
+      <li style="margin-bottom: 10px;"><strong>Leitura:</strong> leia os times
+        de um arquivo texto <code>teams.csv</code>, uma linha por time, no
+        formato <code>id,nome,V,E,D,GM,GS</code>, sem assumir nenhum número
+        fixo de times — insira cada time lido com <code>tv_insert</code> até o
+        arquivo acabar.</li>
+      <li style="margin-bottom: 10px;"><strong>Saída:</strong> imprima a
+        tabela de classificação (ID, Time, V, E, D, GM, GS, Saldo, Pontos) na
+        <strong>mesma ordem</strong> em que os times foram lidos do arquivo —
+        sem ordenar (ordenação é assunto de um módulo futuro).</li>
+    </ul>
+  </div>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    💻 Exemplo de Execução</h3>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">$ gcc main.c -o main
+$ ./main
+ID  Time            V   E   D   GM  GS  S   PG
+0   JAVAlis         10  0   0   45  0   45  30
+1   ESCorpioes      5   0   5   21  22  -1  15
+2   SemCTRL         7   2   1   33  6   27  23
+3   PYthons         8   2   8   47  40  7   26</pre>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    🧩 Código Base</h3>
+  <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">A leitura do
+    arquivo e a impressão da tabela já vêm prontas no <code>main</code> — o
+    que falta, e é o conteúdo deste módulo, é o próprio TAD do vetor dinâmico:
+    os campos de <code>struct teamvec</code> e o corpo das cinco funções
+    abaixo.</p>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef struct {
+    int id;
+    char name[50];
+    int wins, draws, losses;
+    int goals_scored, goals_conceded;
+} Team;
+
+typedef struct teamvec TeamVec;
+
+// TODO: defina aqui os campos de "struct teamvec" -- pense no que o TAD
+// precisa guardar para saber quantos times tem e quanto espaço ainda sobra
+// struct teamvec { ... };
+
+// TODO: implemente tv_create -- aloca o TAD e um vetor inicial pequeno (ex.: 4 times)
+TeamVec *tv_create(void);
+
+// TODO: implemente tv_insert -- se o vetor estiver cheio, dobre a capacidade
+// (realloc) antes de inserir o novo time
+void tv_insert(TeamVec *tv, Team t);
+
+// TODO: implemente tv_size -- retorna o número de times atualmente guardados
+int tv_size(TeamVec *tv);
+
+// TODO: implemente tv_get -- retorna o time na posição i
+Team tv_get(TeamVec *tv, int i);
+
+// TODO: implemente tv_free -- libera o vetor interno e depois o TAD
+void tv_free(TeamVec *tv);
+
+int main(void) {
+    FILE *f = fopen("teams.csv", "rt");
+    if (f == NULL)
+        return 1;
+
+    TeamVec *tv = tv_create();
+    Team t;
+    while (fscanf(f, "%d,%49[^,],%d,%d,%d,%d,%d", &t.id, t.name, &t.wins,
+                  &t.draws, &t.losses, &t.goals_scored, &t.goals_conceded) == 7)
+        tv_insert(tv, t);
+    fclose(f);
+
+    printf("ID  Time            V   E   D   GM  GS  S   PG\n");
+    for (int i = 0; i < tv_size(tv); i++) {
+        Team t = tv_get(tv, i);
+        int goal_diff = t.goals_scored - t.goals_conceded;
+        int points = 3 * t.wins + t.draws;
+        printf("%-3d %-15s %-3d %-3d %-3d %-3d %-3d %-3d %-3d\n",
+               t.id, t.name, t.wins, t.draws, t.losses,
+               t.goals_scored, t.goals_conceded, goal_diff, points);
+    }
+
+    tv_free(tv);
+    return 0;
+}</pre>
+  <div
+    style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
+    <strong>Dica:</strong> releia o exemplo de vetor dinâmico de
+    <code>float</code> visto em aula. A struct do TAD guarda três coisas: o
+    número atual de elementos, a capacidade do vetor e o próprio vetor
+    alocado. A inserção só faz uma coisa antes de gravar o novo elemento:
+    confere se o número atual já alcançou a capacidade e, se sim, dobra a
+    capacidade com <code>realloc</code>. Troque <code>float</code> por
+    <code>Team</code> e a lógica é exatamente a mesma.</div>
+</div>

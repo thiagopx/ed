@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vetores dinâmicos — Estruturas de Dados</title>
+<meta name="description" content="Realocação de memória com realloc, estratégias de crescimento (dobrar a capacidade), e dois TADs em C com projetos multi-arquivo: vetor dinâmico de float (DynVec) e cadeia de caracteres dinâmica (DynStr). Código comentado, explicação e simulação da execução. Estruturas de Dados, Ifes Campus Serra.">
+<style>
+  :root {
+    --ink: #121821;
+    --ink-soft: #4B5866;
+    --ink-faint: #7C8894;
+    --paper: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E9ECEC;
+    --line: #D6DBDC;
+    --line-strong: #B9C1C2;
+    --accent: #8E3B8F;
+    --accent-soft: #F1DCF1;
+    --wash: rgba(142, 59, 143, 0.06);
+
+    --code-bg: #1B222C;
+    --code-ink: #E7ECF1;
+    --code-kw: #6FA8FF;
+    --code-type: #4FD9C4;
+    --code-fn: #E8C15A;
+    --code-str: #E29A4E;
+    --code-num: #C792EA;
+    --code-cmt: #8A96A3;
+    --code-pp: #E2685A;
+
+    --font-display: "Sitka Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: Corbel, "Segoe UI", "Noto Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #E7ECF1;
+      --ink-soft: #A9B4C0;
+      --ink-faint: #74818F;
+      --paper: #0D131C;
+      --surface: #151D29;
+      --surface-2: #1B2431;
+      --line: #29323F;
+      --line-strong: #37424F;
+      --accent: #D98FDA;
+      --accent-soft: #3B2740;
+      --wash: rgba(217, 143, 218, 0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #E7ECF1;
+    --ink-soft: #A9B4C0;
+    --ink-faint: #74818F;
+    --paper: #0D131C;
+    --surface: #151D29;
+    --surface-2: #1B2431;
+    --line: #29323F;
+    --line-strong: #37424F;
+    --accent: #D98FDA;
+    --accent-soft: #3B2740;
+    --wash: rgba(217, 143, 218, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+  .brand-plate {
+    background: #FFFFFF;
+    border-radius: 6px;
+    padding: 0.3rem;
+    display: flex;
+    flex: none;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .if-mark { width: 2.3rem; height: auto; display: block; }
+
+  .brand-word .if-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .brand-word .if-sub { font-size: 0.8rem; line-height: 1.25; color: var(--ink-soft); }
+
+  .course-id { text-align: right; }
+  .masthead .course { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+  .masthead .prof {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 640px) { .course-id { text-align: left; } }
+
+  main.page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) 4rem;
+  }
+
+  .hero { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .lede { font-size: 1.1rem; color: var(--ink-soft); max-width: 42rem; }
+
+  /* ---- notas de aula ---- */
+
+  .notes { max-width: 48rem; margin-bottom: 2.5rem; }
+
+  .notes h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .notes h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .notes h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .notes h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.3rem 0 0.4rem;
+  }
+
+  .notes p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
+  }
+
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+  }
+
+  /* ---- example list ---- */
+
+  .example-list {
+    list-style: none;
+    margin: 0 0 2.75rem;
+    padding: 0;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .example-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--line-strong);
+    padding: 1.1rem 1.1rem;
+    margin: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+
+  .example-row:hover:not(.is-disabled) { background: var(--surface); }
+
+  .example-row.is-active {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent);
+  }
+  .example-row.is-active + .example-row { border-top: none; }
+
+  .example-row.is-disabled { cursor: not-allowed; opacity: 0.55; }
+
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .row-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .example-row.is-disabled .row-title { color: var(--ink-soft); }
+
+  .row-icon { font-size: 0.9rem; color: var(--ink-faint); }
+
+  .row-soon {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    flex: none;
+  }
+
+  .row-desc { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---- detail panel ---- */
+
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .source-link {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px solid transparent;
+  }
+  .source-link:hover { border-bottom-color: var(--accent); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1rem 1.1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    position: sticky;
+    top: 1rem;
+  }
+  @media (max-width: 760px) { pre.code-block { position: static; } }
+  .explain pre.code-block { position: static; }
+
+  .code-block .kw   { color: var(--code-kw); }
+  .code-block .type { color: var(--code-type); }
+  .code-block .fn   { color: var(--code-fn); }
+  .code-block .str  { color: var(--code-str); }
+  .code-block .num  { color: var(--code-num); }
+  .code-block .cmt  { color: var(--code-cmt); font-style: italic; }
+  .code-block .pp   { color: var(--code-pp); }
+
+  .code-block .line {
+    display: block;
+    margin: 0 -1.1rem;
+    padding: 0 1.1rem;
+  }
+  .code-block .line.is-current {
+    background: rgba(217, 143, 218, 0.18);
+    box-shadow: inset 3px 0 0 var(--code-kw);
+  }
+
+  .explain h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.6rem;
+  }
+  .explain h3:first-child { margin-top: 0; }
+
+  .explain p { margin: 0 0 0.7rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .explain code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 0.05em 0.35em;
+    color: var(--ink);
+  }
+
+  .file-label {
+    font-size: 0.85rem;
+    margin: 1.2rem 0 0.4rem !important;
+    color: var(--ink-soft);
+  }
+
+  .stepper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .step-btn {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-btn-icon { padding: 0.4rem 0.6rem; }
+  .step-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-btn-primary:hover:not(:disabled) { color: #fff; filter: brightness(1.08); }
+
+  .step-counter {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin: 0 0.15rem;
+  }
+
+  .step-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    min-height: 2.15rem;
+  }
+
+  .var-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.25em 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .var-name { color: var(--ink-faint); }
+  .var-val { color: var(--ink); font-weight: 700; }
+
+  .step-desc {
+    min-height: 2.6em;
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+  }
+  table.trace-table caption {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+  table.trace-table th, table.trace-table td {
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  table.trace-table thead th {
+    background: var(--surface-2);
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  table.trace-table tbody tr:last-child td { font-weight: 700; }
+  table.trace-table td.fail { color: var(--ink-faint); }
+  table.trace-table tr.win td { color: var(--accent); }
+
+  pre.console-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 0.85rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  pre.console-block .in { color: var(--code-fn); }
+
+  .callout {
+    background: var(--wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  .check-question {
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .check-question-head {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+  .check-question-text {
+    margin: 0 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .check-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .check-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .check-option:hover { border-color: var(--accent); }
+  .check-question.answered .check-option { cursor: default; }
+  .check-option .check-letter {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  .check-option.correct {
+    border-color: #2E9A5F;
+    background: rgba(46, 154, 95, 0.12);
+  }
+  .check-option.correct .check-letter {
+    border-color: #2E9A5F;
+    background: #2E9A5F;
+    color: #fff;
+  }
+  .check-option.incorrect {
+    border-color: #C0392B;
+    background: rgba(192, 57, 43, 0.10);
+  }
+  .check-option.incorrect .check-letter {
+    border-color: #C0392B;
+    background: #C0392B;
+    color: #fff;
+  }
+  .check-feedback {
+    display: none;
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .check-feedback.show { display: block; }
+  .check-feedback.state-correct {
+    background: rgba(46, 154, 95, 0.10);
+    border: 1px solid rgba(46, 154, 95, 0.4);
+  }
+  .check-feedback.state-incorrect {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.4);
+  }
+  .check-feedback strong { color: var(--ink); }
+
+  footer.closing {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    max-width: 40rem;
+  }
+  footer.closing strong { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-plate">
+      <svg class="if-mark" viewBox="0 0 114 154" role="img" aria-label="Instituto Federal do Espírito Santo">
+        <circle cx="17" cy="17" r="17" fill="#CC181F"></circle>
+        <rect x="40" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="0" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="40" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="80" y="80" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="0" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+        <rect x="40" y="120" width="34" height="34" rx="7" fill="#3F9C42"></rect>
+      </svg>
+    </div>
+    <div class="brand-word">
+      <div class="if-name">INSTITUTO FEDERAL</div>
+      <div class="if-sub">Espírito Santo</div>
+      <div class="if-sub">Campus Serra</div>
+    </div>
+  </div>
+  <div class="course-id">
+    <div class="course">Estruturas de Dados</div>
+    <div class="prof">Prof. Dr. Thiago M. Paixão</div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="hero">
+    <div class="eyebrow">Memória dinâmica e crescimento</div>
+    <h1>Vetores dinâmicos</h1>
+    <p class="lede">
+      Estas são as notas da aula sobre realocação de memória e vetores dinâmicos: como um vetor alocado com
+      <code>malloc</code> pode crescer em tempo de execução com <code>realloc</code>, e como essa ideia vira dois TADs —
+      um vetor dinâmico de números e uma cadeia de caracteres dinâmica. Os dois exemplos abaixo são projetos com vários
+      arquivos e Makefile.
+    </p>
+  </div>
+
+  <div class="notes">
+
+    <h2>Vetores dinâmicos</h2>
+
+    <p>
+      Um vetor em C é a forma mais primitiva de representar vários elementos agrupados. Para declará-lo estaticamente
+      é preciso escolher, antes de compilar, um número máximo de elementos: <code>float vet[1000];</code>. Como o vetor
+      ocupa um espaço contíguo de memória, o símbolo <code>vet</code> é o endereço do primeiro elemento, e qualquer
+      elemento é acessado diretamente por <code>vet[i]</code> — é esse acesso aleatório, sem precisar percorrer os
+      elementos anteriores, que distingue o vetor de estruturas como as listas, que veremos mais adiante.
+    </p>
+    <p>
+      A alocação dinâmica (módulo anterior) adia essa escolha para o tempo de execução: <code>float *vet =
+      malloc(n * sizeof(float));</code> permite que <code>n</code> venha, por exemplo, de um valor lido em tempo de
+      execução. Mas a necessidade de <em>escolher</em> um tamanho continua — só que agora em tempo de execução, não em
+      tempo de compilação. Em muitas aplicações nem isso é possível: para ler e armazenar um conjunto de valores de um
+      arquivo sem saber de antemão quantos valores existem, processar o arquivo duas vezes (uma para contar, outra para
+      ler) é ineficiente, e em outros casos nem existe um valor máximo razoável para estimar. A solução, sem abrir mão
+      das vantagens do vetor, é a <strong>realocação de memória</strong>.
+    </p>
+
+    <h3>Realocação de memória</h3>
+    <p>
+      A função <code>realloc</code> da biblioteca padrão redimensiona um bloco já alocado, preservando os elementos
+      existentes: <code>vet = realloc(vet, m * sizeof(float));</code> redimensiona <code>vet</code> para caber
+      <code>m</code> valores, e os elementos que já estavam lá continuam lá, inalterados. Conceitualmente,
+      <code>realloc</code> é equivalente a alocar um novo bloco, copiar o menor entre o tamanho antigo e o novo, e
+      liberar o bloco antigo — mas a implementação real pode ser mais eficiente: se houver espaço livre logo depois do
+      bloco atual, o sistema simplesmente estende o bloco no lugar, sem copiar nada, e o endereço retornado é o mesmo
+      que foi passado. Quando não há esse espaço livre, a cópia e a liberação ocorrem de fato, e o endereço muda. É por
+      isso que todo código que chama <code>realloc</code> precisa reatribuir o ponteiro ao valor de retorno — nunca
+      supor que o endereço antigo continua válido.
+    </p>
+    <p>
+      Mesmo sendo útil, uma realocação tem custo computacional (na pior hipótese, a cópia de todos os elementos). Por
+      isso, a estratégia de chamar <code>realloc</code> para crescer de um elemento por vez — sempre que um novo
+      elemento é inserido — é ruim: ao inserir <em>n</em> elementos um a um, o custo total das cópias pode chegar à
+      ordem de <em>n²</em>. A estratégia mais usada na prática é <strong>dobrar a capacidade</strong> sempre que ela se
+      esgota, o que mantém o número de realocações baixo (logarítmico em <em>n</em>) ao preço de, em algum momento, até
+      metade do vetor estar alocada e ainda vazia. Outras estratégias são possíveis — aumentar em 25%, ou em um
+      incremento fixo — e também é possível reduzir a capacidade quando a ocupação cai muito, embora isso seja raro na
+      prática: remover elementos do meio de um vetor já exige deslocar os demais, e reduzir sua capacidade a cada
+      remoção só aumentaria esse custo.
+    </p>
+
+    <h3>Vetor dinâmico</h3>
+    <p>
+      Um <strong>vetor dinâmico</strong> é um TAD — na linha do que vimos no módulo anterior sobre tipos abstratos de
+      dados — cujo vetor interno cresce conforme elementos são inseridos, sem que o cliente precise escolher uma
+      capacidade máxima. As operações típicas são <em>cria</em> (vetor vazio), <em>insere</em> (no final, com
+      realocação automática quando necessário), <em>tam</em> (número de elementos armazenados), <em>acessa</em> e
+      <em>libera</em>.
+    </p>
+    <p>
+      O projeto <code>01_dynvec</code> implementa esse TAD para valores <code>float</code>. A struct, visível só em
+      <code>dynvec.c</code>, guarda três campos: <code>n</code> (elementos armazenados), <code>n_max</code> (capacidade
+      atual) e <code>v</code> (o vetor de dados). <code>dv_create</code> começa pequeno, com <code>n_max = 4</code> —
+      o cliente não precisa estimar nada. A inserção verifica a capacidade antes de gravar, e delega o crescimento a
+      uma função auxiliar interna (<code>static</code>, portanto invisível fora do arquivo), que dobra a capacidade:
+    </p>
+    <pre class="code-block" style="position:static"><code><span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynVec</span> *dv)
+{
+   dv-&gt;n_max *= <span class="num">2</span>;
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v, dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+}</code></pre>
+    <p>
+      <code>dv_insert</code> só chama essa função quando <code>n == n_max</code>, isto é, quando o vetor está cheio.
+      Com isso, o projeto resolve exatamente o problema que abriu esta aula: <code>dv_create_from_file</code> lê
+      valores de um arquivo até o fim, chamando <code>dv_insert</code> um de cada vez, sem nunca precisar saber quantos
+      valores o arquivo tem. O cliente (em <code>main.c</code>) nunca acessa os campos <code>n</code>, <code>n_max</code>
+      ou <code>v</code> diretamente — só chama as funções exportadas por <code>dynvec.h</code>, inclusive para compor
+      operações novas a partir das já existentes, como <code>dv_concatenate</code>, que cria um terceiro vetor e insere
+      nele os elementos dos dois primeiros, usando apenas <code>dv_size</code>, <code>dv_get</code> e
+      <code>dv_insert</code>.
+    </p>
+
+    <h3>Cadeia de caracteres dinâmica</h3>
+    <p>
+      A mesma ideia de realocação se aplica a cadeias de caracteres. O mau uso de memória em cadeias — copiar ou
+      concatenar mais caracteres do que o vetor alocado comporta — é uma das fontes de erro mais comuns em programas
+      C. Um TAD que gerencia esse espaço internamente, sempre com exatamente a memória necessária para o valor atual,
+      evita esse tipo de erro: o cliente só atribui e concatena, e nunca escreve diretamente no vetor de caracteres.
+    </p>
+    <p>
+      O projeto <code>02_strdin</code> implementa esse TAD. A struct guarda um único campo, <code>char *v</code>, e
+      uma função auxiliar interna, também chamada <code>reallocate</code>, cuida de sempre reservar espaço para o
+      terminador <code>'\0'</code>: <code>ds->v = realloc(ds->v, n + 1)</code>. <code>ds_assign</code> realoca para
+      <code>strlen(s)</code> e copia com <code>strcpy</code>; <code>ds_concat</code> realoca para o tamanho atual mais
+      o de <code>s</code>, e concatena com <code>strcat</code>. Como <code>ds_get</code> devolve um
+      <code>const char *</code>, o cliente lê o valor armazenado, mas não pode alterá-lo diretamente — só através de
+      <code>ds_assign</code> ou <code>ds_concat</code>, que são as únicas operações que sabem redimensionar o buffer.
+    </p>
+    <p>
+      Isso permite tratar uma cadeia dinâmica quase como um valor comum: <code>ds_assign(city, "Recife")</code>
+      reatribui o conteúdo de <code>city</code> de forma análoga a uma atribuição numérica, mesmo que o novo texto
+      tenha um tamanho diferente do anterior — o redimensionamento do buffer fica escondido dentro do TAD. O mesmo
+      vetor interno que cresce elemento a elemento no vetor dinâmico, aqui cresce um pedaço de cada vez: a função
+      <code>read_text</code> do projeto lê um arquivo de texto inteiro para dentro de uma <code>DynStr</code>,
+      concatenando, a cada iteração, o conteúdo de um buffer fixo de leitura (<code>fgets</code>) — sem que o chamador
+      precise saber o tamanho do arquivo de antemão, exatamente como <code>dv_create_from_file</code> fazia para
+      números.
+    </p>
+  </div>
+
+  <p class="lede">
+    Escolha um exemplo abaixo: para cada um você vê o código-fonte, uma explicação da mecânica central e a simulação
+    da execução passo a passo. Os projetos são compilados com <code>make</code> e executados com <code>make run</code>.
+  </p>
+
+  <p class="section-label">Exemplos</p>
+  <ul class="example-list" id="exampleList">
+    <li class="example-row is-active" data-target="dynvec" tabindex="0" role="button" aria-pressed="true">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Vetor dinâmico (DynVec)</span>
+      </div>
+      <p class="row-desc">TAD de vetor dinâmico de float: cria, insere com realocação automática (dobrando a capacidade), lê de um arquivo sem saber o número de valores, e concatena dois vetores usando só a própria interface.</p>
+    </li>
+    <li class="example-row" data-target="dynstr" tabindex="0" role="button" aria-pressed="false">
+      <div class="row-head">
+        <span class="row-title"><span class="row-icon">🔗</span>Cadeia de caracteres dinâmica (DynStr)</span>
+      </div>
+      <p class="row-desc">TAD de cadeia dinâmica: atribui e concatena com realocação automática do buffer, e lê um arquivo de texto inteiro para dentro da cadeia sem conhecer seu tamanho.</p>
+    </li>
+  </ul>
+
+  <!-- ================= DYNVEC ================= -->
+  <section class="detail" id="panel-dynvec" data-panel>
+    <div class="detail-head">
+      <h2>Vetor dinâmico (DynVec)</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/10_dynvec/01_dynvec" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include "dynvec.h"</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>()
+{
+  <span class="type">DynVec</span> *dv = <span class="fn">dv_create</span>();
+  <span class="fn">dv_insert</span>(dv, <span class="num">10</span>);
+  <span class="fn">printf</span>(<span class="str">"size=%d capacity=%d\n"</span>, <span class="fn">dv_size</span>(dv), <span class="fn">dv_capacity</span>(dv));
+  <span class="fn">dv_print_values</span>(dv);
+  <span class="fn">dv_free</span>(dv);
+  dv = <span class="fn">dv_create_from_file</span>(<span class="str">"data.txt"</span>);
+  <span class="fn">dv_print_values</span>(dv);
+  <span class="fn">printf</span>(<span class="str">"size=%d capacity=%d\n"</span>, <span class="fn">dv_size</span>(dv), <span class="fn">dv_capacity</span>(dv));
+  <span class="fn">dv_free</span>(dv);
+
+  <span class="type">DynVec</span> *dv1 = <span class="fn">dv_create</span>();
+  <span class="type">DynVec</span> *dv2 = <span class="fn">dv_create</span>();
+  <span class="fn">dv_insert</span>(dv1, <span class="num">1</span>);
+  <span class="fn">dv_insert</span>(dv1, <span class="num">3</span>);
+  <span class="fn">dv_insert</span>(dv1, <span class="num">6</span>);
+  <span class="fn">dv_insert</span>(dv2, <span class="num">10</span>);
+  <span class="fn">dv_insert</span>(dv2, <span class="num">20</span>);
+
+  dv = <span class="fn">dv_concatenate</span>(dv1, dv2);
+  <span class="fn">dv_print_values</span>(dv);
+  <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o projeto</h3>
+        <p>
+          <code>dynvec.h</code> declara o tipo opaco <code>DynVec</code> e as operações exportadas. A struct, definida
+          só em <code>dynvec.c</code>, guarda <code>n</code> (elementos armazenados), <code>n_max</code> (capacidade) e
+          <code>v</code> (vetor de <code>float</code>). <code>dv_create</code> começa com <code>n_max = 4</code>.
+        </p>
+        <p>
+          <code>dv_insert</code> verifica, antes de gravar, se <code>n == n_max</code>; se sim, chama a função auxiliar
+          <code>static</code> <code>reallocate</code>, que dobra <code>n_max</code> e chama <code>realloc</code>. Depois
+          disso (ou se não houver necessidade), grava o valor em <code>v[n]</code> e incrementa <code>n</code>.
+        </p>
+        <p>
+          <code>dv_create_from_file</code> cria um vetor vazio e insere, um a um, os valores lidos de um arquivo texto
+          com <code>fscanf</code>, até o fim do arquivo — sem nunca precisar saber quantos valores existem. O programa
+          também mostra <code>dv_concatenate</code>, que cria um novo vetor e o preenche com os elementos de dois
+          outros, usando apenas <code>dv_size</code>, <code>dv_get</code> e <code>dv_insert</code>.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="dynvec">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">./test_dynvec
+size=1 capacity=4
+10.000000
+34.320000 4.300000 23.559999 9.330000 2.100000 9.810000
+size=6 capacity=8
+1.000000 3.000000 6.000000 10.000000 20.000000 </pre>
+
+        <h3>Outros arquivos do projeto</h3>
+<p class="file-label"><code>01_dynvec/dynvec.h</code></p><pre class="code-block"><code><span class="pp">#ifndef DYNVEC_H</span>
+<span class="pp">#define DYNVEC_H</span>
+
+<span class="cmt">// Define a forward declaration for a structure called 'dynvec.'</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> dynvec <span class="type">DynVec</span>;
+
+<span class="cmt">// Create a new dynamic vector and return a pointer to it.</span>
+<span class="type">DynVec</span> *<span class="fn">dv_create</span>();
+
+<span class="cmt">// Create a new dynamic vector from a file and return a pointer to it.</span>
+<span class="type">DynVec</span> *<span class="fn">dv_create_from_file</span>(<span class="kw">const</span> <span class="kw">char</span> *filename);
+
+<span class="cmt">// Insert a float value into the dynamic vector.</span>
+<span class="kw">void</span> <span class="fn">dv_insert</span>(<span class="type">DynVec</span> *dv, <span class="kw">float</span> x);
+
+<span class="cmt">// Get the value at a specific index 'i' in the dynamic vector.</span>
+<span class="kw">float</span> <span class="fn">dv_get</span>(<span class="type">DynVec</span> *dv, <span class="kw">int</span> i);
+
+<span class="cmt">// Get the current size (number of elements) of the dynamic vector.</span>
+<span class="kw">int</span> <span class="fn">dv_size</span>(<span class="type">DynVec</span> *dv);
+
+<span class="cmt">// Get the current capacity (maximum number of elements without resizing) of the dynamic vector.</span>
+<span class="kw">int</span> <span class="fn">dv_capacity</span>(<span class="type">DynVec</span> *dv);
+
+<span class="cmt">// Free the memory associated with the dynamic vector.</span>
+<span class="kw">void</span> <span class="fn">dv_free</span>(<span class="type">DynVec</span> *dv);
+
+<span class="cmt">// Print the values of the dynamic vector.</span>
+<span class="kw">void</span> <span class="fn">dv_print_values</span>(<span class="type">DynVec</span> *dv);
+
+<span class="cmt">// Concatenate two dynamic vectors and return a new dynamic vector.</span>
+<span class="type">DynVec</span> *<span class="fn">dv_concatenate</span>(<span class="type">DynVec</span> *dv1, <span class="type">DynVec</span> *dv2);
+
+<span class="cmt">// ... (o cabeçalho real também declara dv_is_in, dv_write_to_file, dv_union,</span>
+<span class="cmt">// dv_intersection e dv_unique -- operações propostas como exercício, ver no GitHub)</span>
+
+<span class="pp">#endif</span></code></pre>
+<p class="file-label"><code>01_dynvec/dynvec.c</code></p><pre class="code-block"><code><span class="pp">#include "dynvec.h"</span>
+<span class="pp">#include &lt;assert.h&gt;</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+
+<span class="cmt">// Define the structure for the dynamic vector</span>
+<span class="kw">struct</span> dynvec
+{
+   <span class="kw">int</span> n;     <span class="cmt">// number of elements</span>
+   <span class="kw">int</span> n_max; <span class="cmt">// vector capacity</span>
+   <span class="kw">float</span> *v;  <span class="cmt">// vector data</span>
+};
+
+<span class="cmt">// Function to create a new dynamic vector</span>
+<span class="type">DynVec</span> *<span class="fn">dv_create</span>()
+{
+   <span class="type">DynVec</span> *dv = (<span class="type">DynVec</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DynVec</span>)); <span class="cmt">// Allocate memory for the DynVec structure</span>
+
+   dv-&gt;n = <span class="num">0</span>;                                          <span class="cmt">// Initialize the number of elements to 0</span>
+   dv-&gt;n_max = <span class="num">4</span>;                                      <span class="cmt">// Allocate initially space for 4 elements</span>
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">malloc</span>(dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>)); <span class="cmt">// Allocate memory for the vector data</span>
+
+   <span class="kw">return</span> dv; <span class="cmt">// Return a pointer to the created dynamic vector</span>
+}
+
+<span class="cmt">// Function to create a new dynamic vector from a file</span>
+<span class="type">DynVec</span> *<span class="fn">dv_create_from_file</span>(<span class="kw">const</span> <span class="kw">char</span> *filename)
+{
+   <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">"rt"</span>); <span class="cmt">// Open the file for reading</span>
+   <span class="kw">if</span> (f == NULL)
+      <span class="kw">return</span> NULL; <span class="cmt">// Return NULL if the file cannot be opened</span>
+
+   <span class="cmt">// Create a new dynamic vector</span>
+   <span class="type">DynVec</span> *dv = <span class="fn">dv_create</span>();
+   <span class="kw">float</span> x;
+   <span class="kw">while</span> (<span class="fn">fscanf</span>(f, <span class="str">"%f"</span>, &amp;x) == <span class="num">1</span>) <span class="cmt">// Read and insert values from the file into the dynamic vector</span>
+      <span class="fn">dv_insert</span>(dv, x);
+
+   <span class="fn">fclose</span>(f); <span class="cmt">// Close the file</span>
+   <span class="kw">return</span> dv; <span class="cmt">// Return a pointer to the created dynamic vector</span>
+}
+
+<span class="cmt">// Helper function to reallocate memory for the dynamic vector</span>
+<span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynVec</span> *dv)
+{
+   dv-&gt;n_max *= <span class="num">2</span>;                                             <span class="cmt">// Double the capacity</span>
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v, dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>)); <span class="cmt">// Reallocate memory for the vector data</span>
+}
+
+<span class="cmt">// Function to insert a float value into the dynamic vector</span>
+<span class="kw">void</span> <span class="fn">dv_insert</span>(<span class="type">DynVec</span> *dv, <span class="kw">float</span> x)
+{
+   <span class="cmt">// Check if the capacity is enough, and if not, reallocate memory</span>
+   <span class="kw">if</span> (dv-&gt;n == dv-&gt;n_max)
+      <span class="fn">reallocate</span>(dv);
+
+   dv-&gt;v[dv-&gt;n++] = x; <span class="cmt">// Insert the value and increment the size</span>
+}
+
+<span class="cmt">// Function to get the current size (number of elements) of the dynamic vector</span>
+<span class="kw">int</span> <span class="fn">dv_size</span>(<span class="type">DynVec</span> *dv)
+{
+   <span class="kw">return</span> dv-&gt;n;
+}
+
+<span class="cmt">// Function to get the current capacity (maximum number of elements without resizing) of the dynamic vector</span>
+<span class="kw">int</span> <span class="fn">dv_capacity</span>(<span class="type">DynVec</span> *dv)
+{
+   <span class="kw">return</span> dv-&gt;n_max;
+}
+
+<span class="cmt">// Function to get the value at a specific index 'i' in the dynamic vector</span>
+<span class="kw">float</span> <span class="fn">dv_get</span>(<span class="type">DynVec</span> *dv, <span class="kw">int</span> i)
+{
+   <span class="fn">assert</span>(i &gt;= <span class="num">0</span> &amp;&amp; i &lt; dv-&gt;n); <span class="cmt">// Runtime assertion to ensure 'i' is within valid bounds</span>
+
+   <span class="kw">return</span> dv-&gt;v[i];
+}
+
+<span class="cmt">// Function to free the memory associated with the dynamic vector</span>
+<span class="kw">void</span> <span class="fn">dv_free</span>(<span class="type">DynVec</span> *dv)
+{
+   <span class="fn">free</span>(dv-&gt;v); <span class="cmt">// Free the data vector</span>
+   <span class="fn">free</span>(dv);    <span class="cmt">// Free the ADT</span>
+}
+
+<span class="cmt">// Function to print the values of the dynamic vector</span>
+<span class="kw">void</span> <span class="fn">dv_print_values</span>(<span class="type">DynVec</span> *dv)
+{
+   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">dv_size</span>(dv); i++) <span class="cmt">// Iterate through the elements of the dynamic vector</span>
+      <span class="fn">printf</span>(<span class="str">"%f "</span>, <span class="fn">dv_get</span>(dv, i));
+   <span class="fn">printf</span>(<span class="str">"\n"</span>);
+}
+
+<span class="type">DynVec</span> *<span class="fn">dv_concatenate</span>(<span class="type">DynVec</span> *dv1, <span class="type">DynVec</span> *dv2)
+{
+   <span class="type">DynVec</span> *dv = <span class="fn">dv_create</span>();
+
+   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">dv_size</span>(dv1); i++)
+   {
+      <span class="kw">float</span> v = <span class="fn">dv_get</span>(dv1, i);
+      <span class="fn">dv_insert</span>(dv, v);
+   }
+
+   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">dv_size</span>(dv2); i++)
+   {
+      <span class="kw">float</span> v = <span class="fn">dv_get</span>(dv2, i);
+      <span class="fn">dv_insert</span>(dv, v);
+   }
+
+   <span class="kw">return</span> dv;
+}</code></pre>
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">Depois de ler <code>data.txt</code>, o vetor termina com <code>n = 6</code> e <code>n_max = 8</code>. O que aconteceria se o programa chamasse <code>dv_insert</code> mais duas vezes seguidas, inserindo um 7º e um 8º valor?</p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Nenhuma realocação ocorreria: <code>n</code> ficaria em 7 e depois 8, e só na inserção seguinte (a 9ª) <code>n</code> se igualaria a <code>n_max</code>.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Uma realocação ocorreria já na 7ª inserção, porque <code>n</code> seria igual a <code>n_max</code> antes de inserir.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>O programa travaria, porque um vetor só pode ser realocado uma única vez.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>dv_insert</code> chamaria <code>reallocate</code> a cada inserção, independentemente do valor de <code>n</code>.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>dv_insert</code> só chama <code>reallocate</code> quando <code>dv->n == dv->n_max</code>. Com <code>n_max = 8</code>, isso só volta a acontecer quando <code>n</code> chegar a 8, ou seja, na 9ª inserção a partir do estado lido do arquivo.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> A condição de <code>dv_insert</code> é <code>if (dv->n == dv->n_max) reallocate(dv);</code>. Com <code>n = 6</code> e <code>n_max = 8</code>, as inserções 7 e 8 não disparam essa condição; ela só voltaria a valer na 9ª inserção.</p>
+          </div>
+        </div>
+        <div class="callout">
+          O valor <code>23.559999</code> na saída não é um erro: é o <code>4.3</code> original de <code>data.txt</code>
+          impresso com seis casas decimais por <code>%f</code>, depois de passar por <code>float</code> — a
+          representação binária de ponto flutuante não guarda 23,56 de forma exata. O exemplo compila sem nenhum aviso
+          com <code>-Wall</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DYNSTR ================= -->
+  <section class="detail" id="panel-dynstr" data-panel hidden>
+    <div class="detail-head">
+      <h2>Cadeia de caracteres dinâmica (DynStr)</h2>
+      <a class="source-link" href="https://github.com/thiagopx/ed/tree/master/10_dynvec/02_strdin" target="_blank" rel="noopener">ver no GitHub ↗</a>
+    </div>
+    <div class="detail-grid">
+      <pre class="code-block"><code><span class="pp">#include "dynstr.h"</span>
+<span class="pp">#include &lt;stdio.h&gt;</span>
+
+<span class="cmt">// Reads an entire text file into a dynamic string, growing it one buffer</span>
+<span class="cmt">// at a time via ds_concat -- the caller never needs to know the file size</span>
+<span class="cmt">// in advance.</span>
+<span class="type">DynStr</span>* <span class="fn">read_text</span>(<span class="kw">const</span> <span class="kw">char</span> *filename) {
+    <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">"rt"</span>);
+    <span class="kw">if</span> (f == NULL)
+        <span class="kw">return</span> NULL;
+
+    <span class="type">DynStr</span> *s = <span class="fn">ds_create_empty</span>();
+    <span class="kw">char</span> buffer[<span class="num">64</span>];
+    <span class="kw">while</span> (<span class="fn">fgets</span>(buffer, <span class="kw">sizeof</span>(buffer), f) != NULL)
+        <span class="fn">ds_concat</span>(s, buffer);
+
+    <span class="fn">fclose</span>(f);
+    <span class="kw">return</span> s;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cmt">// A dynamic string can be reassigned like a value, growing or</span>
+    <span class="cmt">// shrinking its internal buffer as needed.</span>
+    <span class="type">DynStr</span> *city = <span class="fn">ds_create_copy</span>(<span class="str">"Rio de Janeiro"</span>);
+    <span class="fn">printf</span>(<span class="str">"city = %s\n"</span>, <span class="fn">ds_get</span>(city));
+
+    <span class="fn">ds_assign</span>(city, <span class="str">"Recife"</span>);
+    <span class="fn">printf</span>(<span class="str">"city = %s\n"</span>, <span class="fn">ds_get</span>(city));
+    <span class="fn">ds_free</span>(city);
+
+    <span class="cmt">// Reading a whole file without knowing its size ahead of time.</span>
+    <span class="type">DynStr</span> *text = <span class="fn">read_text</span>(<span class="str">"poem.txt"</span>);
+    <span class="fn">printf</span>(<span class="str">"poem =\n%s"</span>, <span class="fn">ds_get</span>(text));
+    <span class="fn">ds_free</span>(text);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+      <div class="explain">
+        <h3>Como funciona o projeto</h3>
+        <p>
+          <code>dynstr.h</code> declara o tipo opaco <code>DynStr</code>. A struct, definida só em <code>dynstr.c</code>,
+          guarda um único campo, <code>char *v</code>. Uma função auxiliar <code>static reallocate(ds, n)</code>
+          concentra a regra de tamanho: <code>realloc(ds->v, n + 1)</code>, sempre reservando espaço extra para o
+          <code>'\0'</code>.
+        </p>
+        <p>
+          <code>ds_assign</code> realoca para <code>strlen(s)</code> e copia com <code>strcpy</code>, substituindo o
+          valor anterior; <code>ds_concat</code> realoca para o tamanho atual mais o de <code>s</code>, e concatena com
+          <code>strcat</code>. <code>ds_create_copy</code> reaproveita <code>ds_assign</code> (o ponteiro interno começa
+          em <code>NULL</code>, que é um primeiro argumento válido para <code>realloc</code>). <code>ds_get</code>
+          devolve <code>const char *</code>: o cliente lê o valor, mas não escreve diretamente nele.
+        </p>
+        <p>
+          <code>read_text</code> ilustra a cadeia dinâmica crescendo em pedaços: a cada volta do laço, <code>fgets</code>
+          lê uma linha para um buffer fixo de 64 bytes, e <code>ds_concat</code> anexa esse pedaço à cadeia acumulada —
+          sem que a função conheça o tamanho do arquivo antes de terminar de lê-lo.
+        </p>
+
+        <h3>Execução passo a passo</h3>
+        <div class="stepper" data-stepper="dynstr">
+          <div class="stepper-controls">
+            <button type="button" class="step-btn step-btn-icon" data-action="reset" title="Reiniciar">↺</button>
+            <button type="button" class="step-btn" data-action="prev">◀ Anterior</button>
+            <span class="step-counter"><span class="step-now">0</span>/<span class="step-total"></span></span>
+            <button type="button" class="step-btn step-btn-primary" data-action="next">Próximo ▶</button>
+          </div>
+          <div class="step-vars" data-vars></div>
+          <p class="step-desc" data-desc>Clique em “Próximo” para começar a simulação.</p>
+        </div>
+
+        <h3>Saída no terminal</h3>
+        <pre class="console-block">./test_dynstr
+city = Rio de Janeiro
+city = Recife
+poem =
+Structures of data, line by line,
+growing only as much as they need.
+No wasted space, no fixed confine,
+just memory that follows the deed.</pre>
+
+        <h3>Outros arquivos do projeto</h3>
+<p class="file-label"><code>02_strdin/dynstr.h</code></p><pre class="code-block"><code><span class="pp">#ifndef DYNSTR_H</span>
+<span class="pp">#define DYNSTR_H</span>
+
+<span class="cmt">// Opaque dynamic string type: always holds exactly the memory needed for</span>
+<span class="cmt">// its current value, growing or shrinking as needed via realloc.</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> dynstr <span class="type">DynStr</span>;
+
+<span class="cmt">// Create a new dynamic string, initially empty.</span>
+<span class="type">DynStr</span>* <span class="fn">ds_create_empty</span>(<span class="kw">void</span>);
+
+<span class="cmt">// Create a new dynamic string initialized with a copy of s.</span>
+<span class="type">DynStr</span>* <span class="fn">ds_create_copy</span>(<span class="kw">const</span> <span class="kw">char</span> *s);
+
+<span class="cmt">// Reassign the value of an existing dynamic string to a copy of s.</span>
+<span class="kw">void</span> <span class="fn">ds_assign</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s);
+
+<span class="cmt">// Append s to the end of the current value of ds.</span>
+<span class="kw">void</span> <span class="fn">ds_concat</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s);
+
+<span class="cmt">// Return the string currently stored (read-only: the caller must not</span>
+<span class="cmt">// modify it directly, only through ds_assign/ds_concat).</span>
+<span class="kw">const</span> <span class="kw">char</span>* <span class="fn">ds_get</span>(<span class="type">DynStr</span> *ds);
+
+<span class="cmt">// Free the memory associated with the dynamic string.</span>
+<span class="kw">void</span> <span class="fn">ds_free</span>(<span class="type">DynStr</span> *ds);
+
+<span class="pp">#endif</span></code></pre>
+<p class="file-label"><code>02_strdin/dynstr.c</code></p><pre class="code-block"><code><span class="pp">#include "dynstr.h"</span>
+<span class="pp">#include &lt;stdlib.h&gt;</span>
+<span class="pp">#include &lt;string.h&gt;</span>
+
+<span class="cmt">// Implementation of the type: the dynamic string only ever keeps a buffer</span>
+<span class="cmt">// exactly as large as it needs to hold the current value plus '\0'.</span>
+<span class="kw">struct</span> dynstr {
+    <span class="kw">char</span> *v;
+};
+
+<span class="cmt">// Resizes the internal buffer to hold n characters plus the terminator.</span>
+<span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynStr</span> *ds, <span class="kw">int</span> n) {
+    ds-&gt;v = (<span class="kw">char</span> *)<span class="fn">realloc</span>(ds-&gt;v, n + <span class="num">1</span>);
+}
+
+<span class="cmt">// Create a new dynamic string initialized with a copy of s.</span>
+<span class="type">DynStr</span>* <span class="fn">ds_create_copy</span>(<span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="type">DynStr</span> *ds = (<span class="type">DynStr</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DynStr</span>));
+
+    ds-&gt;v = NULL;
+    <span class="fn">ds_assign</span>(ds, s);
+
+    <span class="kw">return</span> ds;
+}
+
+<span class="cmt">// Create a new dynamic string, initially empty.</span>
+<span class="type">DynStr</span>* <span class="fn">ds_create_empty</span>(<span class="kw">void</span>) {
+    <span class="kw">return</span> <span class="fn">ds_create_copy</span>(<span class="str">""</span>);
+}
+
+<span class="cmt">// Reassign the value of an existing dynamic string to a copy of s.</span>
+<span class="kw">void</span> <span class="fn">ds_assign</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(s));
+    <span class="fn">strcpy</span>(ds-&gt;v, s);
+}
+
+<span class="cmt">// Append s to the end of the current value of ds.</span>
+<span class="kw">void</span> <span class="fn">ds_concat</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(ds-&gt;v) + <span class="fn">strlen</span>(s));
+    <span class="fn">strcat</span>(ds-&gt;v, s);
+}
+
+<span class="cmt">// Return the string currently stored.</span>
+<span class="kw">const</span> <span class="kw">char</span>* <span class="fn">ds_get</span>(<span class="type">DynStr</span> *ds) {
+    <span class="kw">return</span> ds-&gt;v;
+}
+
+<span class="cmt">// Free the memory associated with the dynamic string.</span>
+<span class="kw">void</span> <span class="fn">ds_free</span>(<span class="type">DynStr</span> *ds) {
+    <span class="fn">free</span>(ds-&gt;v);
+    <span class="fn">free</span>(ds);
+}</code></pre>
+        <div class="check-question" data-correct="0">
+          <div class="check-question-head">Pergunta de checagem</div>
+          <p class="check-question-text">Se, em vez de trocar a cidade, o programa chamasse <code>ds_assign(city, "Rio de Janeiro")</code> de novo — reatribuindo o mesmo texto já armazenado — o que a função <code>reallocate</code> faria?</p>
+          <ul class="check-options">
+            <li class="check-option" data-idx="0"><span class="check-letter">A</span><span>Chamaria <code>realloc</code> do mesmo jeito, com o mesmo tamanho de antes; <code>ds_assign</code> não verifica se o tamanho mudou, só se o valor precisa ser escrito de novo.</span></li>
+            <li class="check-option" data-idx="1"><span class="check-letter">B</span><span>Perceberia que o tamanho é igual ao anterior e não chamaria <code>realloc</code> nessa segunda vez.</span></li>
+            <li class="check-option" data-idx="2"><span class="check-letter">C</span><span>Causaria um vazamento de memória, porque o buffer antigo não seria liberado antes do novo <code>malloc</code>.</span></li>
+            <li class="check-option" data-idx="3"><span class="check-letter">D</span><span><code>ds_assign</code> ignoraria a chamada, porque comparar o novo valor com o antigo é parte do TAD.</span></li>
+          </ul>
+          <div class="check-feedback">
+            <p class="feedback-correct" hidden><strong>Certo!</strong> <code>ds_assign</code> sempre chama <code>reallocate(ds, strlen(s))</code>, e esta sempre chama <code>realloc</code>, independentemente de o novo tamanho coincidir com o anterior. Não há verificação de "mesmo valor" nem de "mesmo tamanho" no TAD.</p>
+            <p class="feedback-incorrect" hidden><strong>Não é isso.</strong> O código de <code>ds_assign</code> não compara tamanhos: ele sempre chama <code>reallocate</code>, que sempre chama <code>realloc(ds->v, n + 1)</code>, mesmo quando <code>n</code> é igual ao tamanho já alocado.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <code>ds_get</code> devolve <code>const char *</code>: o compilador recusa qualquer tentativa de escrever
+          através desse ponteiro (por exemplo, <code>ds_get(city)[0] = 'X';</code> não compila). Só
+          <code>ds_assign</code> e <code>ds_concat</code>, dentro do próprio módulo, têm acesso de escrita ao buffer. O
+          exemplo compila sem nenhum aviso com <code>-Wall</code>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="closing">
+    <strong>Para lembrar.</strong> <code>realloc</code> redimensiona um bloco preservando seu conteúdo, mas tem custo;
+    dobrar a capacidade a cada esgotamento é a estratégia mais comum para manter esse custo baixo. Um vetor dinâmico e
+    uma cadeia dinâmica são o mesmo TAD por trás de dois tipos diferentes: uma função auxiliar interna concentra a
+    regra de crescimento, e o cliente só vê as operações exportadas.
+  </footer>
+</main>
+
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- example list / panel switching ---- */
+
+  var rows = document.querySelectorAll(".example-row[data-target]");
+  var panels = document.querySelectorAll("[data-panel]");
+
+  function activate(target) {
+    rows.forEach(function (row) {
+      var isActive = row.getAttribute("data-target") === target;
+      row.classList.toggle("is-active", isActive);
+      row.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    panels.forEach(function (panel) {
+      panel.hidden = panel.id !== "panel-" + target;
+    });
+  }
+
+  rows.forEach(function (row) {
+    row.addEventListener("click", function () {
+      activate(row.getAttribute("data-target"));
+    });
+    row.addEventListener("keydown", function (evt) {
+      if (evt.key === "Enter" || evt.key === " ") {
+        evt.preventDefault();
+        activate(row.getAttribute("data-target"));
+      }
+    });
+  });
+
+  /* ---- code blocks: wrap each source line so it can be highlighted ---- */
+
+  document.querySelectorAll(".code-block code").forEach(function (codeEl) {
+    var lines = codeEl.innerHTML.split("\n");
+    codeEl.innerHTML = lines
+      .map(function (line, idx) {
+        return '<span class="line" data-line="' + (idx + 1) + '">' + (line.length ? line : " ") + "</span>";
+      })
+      .join("");
+  });
+
+  /* ---- step-by-step execution simulator ---- */
+
+  var STEPS = {
+    "dynvec": {
+      vars: ["dv", "dv1", "dv2"],
+      steps: [
+        { line: 6, vars: { dv: "n=0, n_max=4" }, desc: "dv_create() aloca a struct e um vetor de 4 floats; dv->n = 0 e dv->n_max = 4. O cliente só recebe um DynVec *." },
+        { line: 7, vars: { dv: "n=1, n_max=4, v=[10]" }, desc: "dv_insert(dv, 10): n (0) é diferente de n_max (4), então não há realocação. v[0] = 10 e n passa a 1." },
+        { line: 8, vars: {}, desc: "printf exibe: “size=1 capacity=4”, usando dv_size (devolve n) e dv_capacity (devolve n_max)." },
+        { line: 9, vars: {}, desc: "dv_print_values percorre os elementos com dv_get e imprime cada um com %f: “10.000000 ”." },
+        { line: 10, vars: { dv: "liberado" }, desc: "dv_free libera o vetor de dados e depois a struct." },
+        { line: 11, vars: { dv: "n=6, n_max=8" }, desc: "dv_create_from_file lê os 6 valores de data.txt, chamando dv_insert um a um. Nas 4 primeiras inserções n_max=4 basta; na 5ª inserção n (4) se iguala a n_max (4), reallocate dobra n_max para 8; a 6ª inserção cabe sem nova realocação. Resultado: n=6, n_max=8." },
+        { line: 12, vars: {}, desc: "dv_print_values imprime os 6 valores lidos do arquivo, nessa ordem: 34.320000 4.300000 23.559999 9.330000 2.100000 9.810000." },
+        { line: 13, vars: {}, desc: "printf exibe: “size=6 capacity=8”." },
+        { line: 14, vars: { dv: "liberado" }, desc: "dv_free libera esse segundo vetor." },
+        { line: 16, vars: { dv1: "n=0, n_max=4" }, desc: "dv_create() para dv1: outro vetor vazio, independente do anterior." },
+        { line: 17, vars: { dv2: "n=0, n_max=4" }, desc: "dv_create() para dv2: um terceiro vetor vazio." },
+        { line: 18, vars: { dv1: "n=1, v=[1]" }, desc: "dv_insert(dv1, 1): n(0) != n_max(4), insere direto. dv1 passa a ter 1 elemento." },
+        { line: 19, vars: { dv1: "n=2, v=[1,3]" }, desc: "dv_insert(dv1, 3): ainda sem realocação. dv1 agora tem 2 elementos." },
+        { line: 20, vars: { dv1: "n=3, v=[1,3,6]" }, desc: "dv_insert(dv1, 6): dv1 chega a 3 elementos, ainda dentro de n_max=4." },
+        { line: 21, vars: { dv2: "n=1, v=[10]" }, desc: "dv_insert(dv2, 10): dv2 passa a ter 1 elemento." },
+        { line: 22, vars: { dv2: "n=2, v=[10,20]" }, desc: "dv_insert(dv2, 20): dv2 chega a 2 elementos." },
+        { line: 24, vars: { dv: "n=5, n_max=8, v=[1,3,6,10,20]" }, desc: "dv_concatenate(dv1, dv2) cria um quarto vetor vazio e insere nele os 3 elementos de dv1 e depois os 2 de dv2, só com dv_size, dv_get e dv_insert. A 5ª inserção (o valor 20) encontra n(4) == n_max(4) e dispara uma realocação para n_max=8." },
+        { line: 25, vars: {}, desc: "dv_print_values imprime o vetor concatenado: 1.000000 3.000000 6.000000 10.000000 20.000000." },
+        { line: 26, vars: {}, desc: "return 0; — o programa termina. (dv1, dv2 e o vetor concatenado não são liberados neste programa de teste.)" }
+      ]
+    },
+    "dynstr": {
+      vars: ["city", "texto"],
+      steps: [
+        { line: 24, vars: { city: "“Rio de Janeiro”" }, desc: "ds_create_copy(\"Rio de Janeiro\") aloca a struct (ds->v = NULL) e chama ds_assign, que realoca ds->v para 15 bytes (14 caracteres + '\\0') e copia o texto." },
+        { line: 25, vars: {}, desc: "printf exibe: “city = Rio de Janeiro”, usando ds_get para ler o valor." },
+        { line: 27, vars: { city: "“Recife”" }, desc: "ds_assign(city, \"Recife\") chama reallocate(ds, 6), encolhendo o buffer para 7 bytes, e copia o novo texto por cima do antigo." },
+        { line: 28, vars: {}, desc: "printf exibe: “city = Recife”." },
+        { line: 29, vars: { city: "liberado" }, desc: "ds_free libera o buffer interno e depois a struct." },
+        { line: 8, vars: {}, desc: "Dentro de read_text: fopen(\"poem.txt\", \"rt\") abre o arquivo de 4 linhas para leitura." },
+        { line: 12, vars: { texto: "“”" }, desc: "s = ds_create_empty() cria uma cadeia vazia (ds_create_copy(\"\")): buffer de 1 byte, só o '\\0'." },
+        { line: 14, vars: { texto: "“Structures of data, line by line,\\n”" }, desc: "1ª iteração: fgets lê a primeira linha (34 caracteres, incluindo o '\\n') para buffer, e ds_concat(s, buffer) realoca s para 35 bytes e concatena." },
+        { line: 14, vars: { texto: "“...line,\\ngrowing only as much as they need.\\n”" }, desc: "2ª iteração: fgets lê a segunda linha (35 caracteres). ds_concat realoca s para 35+35 = 70 bytes e concatena ao final." },
+        { line: 14, vars: { texto: "“...need.\\nNo wasted space, no fixed confine,\\n”" }, desc: "3ª iteração: a terceira linha (35 caracteres) é concatenada; s passa a ocupar 105 bytes." },
+        { line: 14, vars: { texto: "“...confine,\\njust memory that follows the deed.\\n”" }, desc: "4ª iteração: a quarta e última linha (35 caracteres) é concatenada; s chega a 140 bytes (139 caracteres + '\\0')." },
+        { line: 14, vars: {}, desc: "5ª tentativa: fgets encontra o fim do arquivo e devolve NULL. A condição do while é falsa, e o laço termina." },
+        { line: 17, vars: {}, desc: "fclose(f) fecha o arquivo." },
+        { line: 18, vars: {}, desc: "return s; — read_text devolve o ponteiro para a cadeia que acabou de montar." },
+        { line: 32, vars: {}, desc: "De volta em main: text recebe o ponteiro devolvido por read_text. text e s (de dentro da função) apontam para o mesmo objeto." },
+        { line: 33, vars: {}, desc: "printf(\"poem =\\n%s\", ds_get(text)) imprime o poema completo, com as quebras de linha originais de poem.txt preservadas." },
+        { line: 34, vars: { texto: "liberado" }, desc: "ds_free(text) libera o buffer de 140 bytes e a struct." },
+        { line: 36, vars: {}, desc: "return 0; — o programa termina." }
+      ]
+    }
+  };
+
+  function initStepper(root, config) {
+    var panel = root.closest("[data-panel]");
+    var steps = config.steps;
+    var varsOrder = config.vars;
+    var elDesc = root.querySelector("[data-desc]");
+    var elVars = root.querySelector("[data-vars]");
+    var elNow = root.querySelector(".step-now");
+    var elTotal = root.querySelector(".step-total");
+    var btnPrev = root.querySelector('[data-action="prev"]');
+    var btnNext = root.querySelector('[data-action="next"]');
+    var btnReset = root.querySelector('[data-action="reset"]');
+    var current = -1;
+
+    elTotal.textContent = steps.length;
+
+    function render() {
+      panel.querySelectorAll(".code-block .line.is-current").forEach(function (ln) {
+        ln.classList.remove("is-current");
+      });
+      if (current >= 0) {
+        var lineEl = panel.querySelector('.code-block .line[data-line="' + steps[current].line + '"]');
+        if (lineEl) {
+          lineEl.classList.add("is-current");
+          lineEl.scrollIntoView({ block: "nearest" });
+        }
+      }
+
+      var state = {};
+      for (var j = 0; j <= current; j++) {
+        var v = steps[j].vars || {};
+        for (var key in v) state[key] = v[key];
+      }
+      elVars.innerHTML = varsOrder
+        .map(function (name) {
+          var val = state.hasOwnProperty(name) ? state[name] : "—";
+          return '<span class="var-chip"><span class="var-name">' + name + '</span><span class="var-val">' + val + "</span></span>";
+        })
+        .join("");
+
+      elDesc.textContent = current < 0 ? "Clique em “Próximo” para começar a simulação." : steps[current].desc;
+
+      elNow.textContent = current < 0 ? 0 : current + 1;
+      btnPrev.disabled = current < 0;
+      btnNext.disabled = current >= steps.length - 1;
+    }
+
+    btnNext.addEventListener("click", function () {
+      if (current < steps.length - 1) {
+        current++;
+        render();
+      }
+    });
+    btnPrev.addEventListener("click", function () {
+      if (current > -1) {
+        current--;
+        render();
+      }
+    });
+    btnReset.addEventListener("click", function () {
+      current = -1;
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll("[data-stepper]").forEach(function (root) {
+    var config = STEPS[root.getAttribute("data-stepper")];
+    if (config) initStepper(root, config);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest(".check-option");
+    if (!opt) return;
+    var question = opt.closest(".check-question");
+    if (!question || question.classList.contains("answered")) return;
+    question.classList.add("answered");
+
+    var correct = parseInt(question.getAttribute("data-correct"), 10);
+    var chosen = parseInt(opt.getAttribute("data-idx"), 10);
+
+    question.querySelectorAll(".check-option").forEach(function (o) {
+      var idx = parseInt(o.getAttribute("data-idx"), 10);
+      if (idx === correct) o.classList.add("correct");
+      else if (o === opt) o.classList.add("incorrect");
+    });
+
+    var isCorrect = chosen === correct;
+    var feedback = question.querySelector(".check-feedback");
+    feedback.classList.add("show", isCorrect ? "state-correct" : "state-incorrect");
+    var msg = question.querySelector(isCorrect ? ".feedback-correct" : ".feedback-incorrect");
+    if (msg) msg.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>

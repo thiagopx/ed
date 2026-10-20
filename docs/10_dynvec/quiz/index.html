@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Vetores dinâmicos</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #8E3B8F;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(142, 59, 143, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #8E3B8F;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #8E3B8F;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #8E3B8F;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #8E3B8F;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #8E3B8F;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .fn   { color: #ffeaa7; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .num  { color: #d6a2e8; }
+  pre.code-block .pp   { color: #fab1a0; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #8E3B8F;
+    background-color: #f7edf7;
+  }
+
+  .option.selected {
+    border-color: #8E3B8F;
+    background-color: #f1dcf1;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #8E3B8F;
+    background-color: #8E3B8F;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #8E3B8F;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #d3b3d3;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #8E3B8F;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>Quiz — Vetores dinâmicos</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de vetores dinâmicos!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Por que realocar",
+    text: "A alocação dinâmica comum, com malloc(n * sizeof(float)), já permite que n venha de um valor lido em tempo de execução. Por que isso ainda não resolve o problema de ler um arquivo sem saber de antemão quantos valores ele tem?",
+    options: [
+      "Porque malloc só aceita tamanhos que sejam potências de dois",
+      "Porque todo vetor alocado dinamicamente fica limitado a, no máximo, 1000 elementos",
+      "Porque alguém ainda precisa escolher o tamanho do vetor antes de começar a inserir elementos — a diferença é que essa escolha agora pode ocorrer em tempo de execução, não em tempo de compilação",
+      "Porque malloc jamais permite alterar o tamanho de um bloco já alocado"
+    ],
+    correctIndex: 2,
+    explainCorrect: "Isso mesmo. malloc(n * sizeof(float)) adia a escolha de n para a execução, mas a escolha continua existindo: alguém ainda precisa decidir um tamanho antes de inserir elementos. É exatamente esse problema que a realocação de memória resolve.",
+    explainIncorrect: "A resposta correta é: alguém ainda precisa escolher o tamanho do vetor antes das inserções, só que agora em tempo de execução em vez de tempo de compilação. malloc não exige potências de dois, blocos podem ser redimensionados com realloc, e não há limite fixo de 1000 elementos."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "O que realloc faz",
+    text: "O que a linha abaixo faz, supondo que vet já apontava para um bloco alocado anteriormente?",
+    code: `vet = <span class="fn">realloc</span>(vet, m * <span class="kw">sizeof</span>(<span class="type">float</span>));`,
+    options: [
+      "Libera o bloco antigo e aloca um novo, sem nenhuma relação com o conteúdo anterior de vet",
+      "Altera o tipo de vet, de float* para outro tipo compatível com o novo tamanho",
+      "Zera todo o conteúdo do bloco antes de redimensioná-lo",
+      "Redimensiona o bloco apontado por vet para caber m valores, preservando os elementos que já estavam armazenados"
+    ],
+    correctIndex: 3,
+    explainCorrect: "realloc redimensiona o bloco existente (estendendo-o no lugar, se houver espaço livre depois dele, ou copiando os dados para um novo endereço, se não houver), sempre preservando o menor entre o tamanho antigo e o novo.",
+    explainIncorrect: "A resposta correta é: realloc redimensiona o bloco apontado por vet para caber m valores, preservando os elementos que já estavam armazenados. Não é um malloc novo e desconectado do conteúdo anterior, nem zera nada, nem altera o tipo do ponteiro."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Reatribuir o ponteiro",
+    text: "Por que todo código que chama realloc precisa escrever vet = realloc(vet, novo_tamanho); — reatribuindo o ponteiro ao valor devolvido — em vez de só chamar realloc(vet, novo_tamanho); e descartar o retorno?",
+    options: [
+      "Porque, quando não há espaço livre para estender o bloco no mesmo lugar, realloc copia os dados para um novo endereço e libera o antigo — sem reatribuir, vet ficaria apontando para memória inválida",
+      "Porque realloc nunca reaproveita o endereço original, sempre move os dados para outro lugar",
+      "Porque, sem essa atribuição, o código não compila",
+      "É só uma convenção de estilo, sem nenhum efeito sobre a execução do programa"
+    ],
+    correctIndex: 0,
+    explainCorrect: "realloc pode, ou não, mover o bloco para um novo endereço — depende de haver espaço livre contíguo. Como o chamador não sabe qual dos dois casos vai ocorrer, só a reatribuição garante que vet sempre aponte para o endereço válido e atual.",
+    explainIncorrect: "A resposta correta é: quando não há espaço livre para estender o bloco no lugar, realloc copia os dados e libera o bloco antigo — sem reatribuir, vet apontaria para memória já liberada. O código compila sem a atribuição; o problema é em tempo de execução, não de compilação."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Dobrar a capacidade",
+    text: "Por que dobrar a capacidade sempre que ela se esgota é a estratégia de crescimento mais usada na prática, em vez de chamar realloc para crescer de um elemento por vez a cada inserção?",
+    options: [
+      "Porque dobrar a capacidade nunca deixa memória alocada e ainda vazia",
+      "Porque realloc só aceita, como novo tamanho, uma potência de dois",
+      "Porque garante que o vetor nunca mais vai precisar de outra realocação depois da primeira",
+      "Porque mantém baixo (logarítmico) o número de realocações ao longo de n inserções, ainda que isso custe, em algum momento, memória alocada e ainda vazia"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Dobrar a capacidade faz o número de realocações crescer apenas logaritmicamente com n, em vez de linearmente — o preço é que, em algum momento, até metade do vetor pode estar alocada e ainda sem uso.",
+    explainIncorrect: "A resposta correta é: a estratégia mantém baixo o número de realocações ao longo de n inserções, ao custo de, em algum momento, memória alocada e ainda vazia. realloc aceita qualquer tamanho, não só potências de dois, e novas realocações continuam ocorrendo depois da primeira."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Função auxiliar static",
+    text: "No trecho abaixo, de dynvec.c, por que reallocate é declarada com a palavra-chave static?",
+    code: `<span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynVec</span> *dv)
+{
+   dv-&gt;n_max *= <span class="num">2</span>;
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v, dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+}`,
+    options: [
+      "Porque static é exigido por toda função que chama realloc",
+      "Porque static faz a função ser executada uma única vez durante todo o programa",
+      "Porque static confina essa função a dynvec.c, tornando-a invisível para main.c e qualquer outro arquivo que só inclua dynvec.h",
+      "Porque static evita que a função receba um ponteiro como argumento"
+    ],
+    correctIndex: 2,
+    explainCorrect: "static dá a reallocate ligação interna: ela só pode ser chamada de dentro de dynvec.c. O cliente, que só vê dynvec.h, nunca toma conhecimento dela — só das operações exportadas, como dv_insert.",
+    explainIncorrect: "A resposta correta é: static confina a função a dynvec.c, invisível para main.c e qualquer arquivo que só inclua dynvec.h. static não é exigido por quem chama realloc, não limita a função a uma única execução, e não impede receber ponteiros."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Traçando n e n_max",
+    text: "Um DynVec é criado com dv_create() (n=0, n_max=4) e recebe 5 chamadas seguidas de dv_insert. Logo depois da 5ª chamada, quais são os valores de n e n_max?",
+    code: `<span class="kw">void</span> <span class="fn">dv_insert</span>(<span class="type">DynVec</span> *dv, <span class="kw">float</span> x)
+{
+   <span class="kw">if</span> (dv-&gt;n == dv-&gt;n_max)
+      <span class="fn">reallocate</span>(dv);
+
+   dv-&gt;v[dv-&gt;n++] = x;
+}
+
+<span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynVec</span> *dv)
+{
+   dv-&gt;n_max *= <span class="num">2</span>;
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v, dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>));
+}`,
+    options: [
+      "n=5, n_max=4",
+      "n=5, n_max=8",
+      "n=4, n_max=8",
+      "n=5, n_max=10"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Nas 4 primeiras inserções n_max=4 ainda comporta tudo (n vai de 0 a 4, sem igualar n_max antes de inserir). Na 5ª chamada, n(4) == n_max(4) antes de inserir, então reallocate dobra n_max para 8; em seguida o 5º valor é gravado e n passa a 5. Resultado: n=5, n_max=8.",
+    explainIncorrect: "A resposta correta é n=5, n_max=8. A condição if (dv->n == dv->n_max) só é verdadeira na 5ª chamada (n chega a valer 4, igual a n_max), disparando a única realocação da sequência, que dobra n_max de 4 para 8."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Lendo um arquivo sem contar antes",
+    text: "Por que dv_create_from_file consegue ler um arquivo inteiro de valores sem percorrê-lo duas vezes — uma para contar quantos valores existem, outra para realmente lê-los?",
+    options: [
+      "Porque cada valor lido é inserido com dv_insert, que realoca automaticamente o vetor sempre que a capacidade se esgota — não é preciso saber o total de valores de antemão",
+      "Porque fscanf conta os valores do arquivo antes de começar a lê-los",
+      "Porque o arquivo sempre tem exatamente 6 valores, por convenção do projeto",
+      "Porque dv_create já aloca, por padrão, um vetor grande o suficiente para qualquer arquivo"
+    ],
+    correctIndex: 0,
+    explainCorrect: "dv_create_from_file só chama dv_insert um valor por vez, dentro de um laço que lê até o fim do arquivo. A realocação automática dentro de dv_insert é o que dispensa saber, de antemão, quantos valores existem.",
+    explainIncorrect: "A resposta correta é: cada valor lido é inserido com dv_insert, que realoca automaticamente o vetor sempre que a capacidade se esgota. fscanf não conta valores antes de ler, o número de valores no arquivo não é fixo, e dv_create sempre começa com n_max=4, não com um tamanho grande."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "O +1 no DynStr",
+    text: "No trecho abaixo, de dynstr.c, por que essa função sempre realoca para n + 1 bytes, nunca apenas n?",
+    code: `<span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynStr</span> *ds, <span class="kw">int</span> n) {
+    ds-&gt;v = (<span class="kw">char</span> *)<span class="fn">realloc</span>(ds-&gt;v, n + <span class="num">1</span>);
+}`,
+    options: [
+      "Porque char ocupa 1 byte e int ocupa 4 bytes, e é preciso compensar essa diferença",
+      "Porque realloc sempre arredonda para cima o tamanho pedido",
+      "Porque n representa o número de blocos de memória, não o número de caracteres",
+      "Porque é preciso reservar espaço extra para o caractere terminador '\\0', que marca o fim da cadeia"
+    ],
+    correctIndex: 3,
+    explainCorrect: "n é o número de caracteres “úteis” da cadeia (sem contar o terminador). O buffer precisa de mais 1 byte para guardar '\\0', senão funções como strcpy e strcat escreveriam fora dos limites do bloco alocado.",
+    explainIncorrect: "A resposta correta é: é preciso reservar espaço extra para o terminador '\\0'. Não tem relação com o tamanho de char versus int, realloc não arredonda nada por conta própria, e n já é, de fato, uma contagem de caracteres."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "ds_assign × ds_concat",
+    text: "Com base no código abaixo, qual alternativa descreve corretamente o que cada função faz ao conteúdo armazenado em ds?",
+    code: `<span class="kw">void</span> <span class="fn">ds_assign</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(s));
+    <span class="fn">strcpy</span>(ds-&gt;v, s);
+}
+
+<span class="kw">void</span> <span class="fn">ds_concat</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
+    <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(ds-&gt;v) + <span class="fn">strlen</span>(s));
+    <span class="fn">strcat</span>(ds-&gt;v, s);
+}`,
+    options: [
+      "ds_assign anexa s ao final do conteúdo atual; ds_concat substitui o conteúdo atual por uma cópia de s",
+      "ds_assign substitui o conteúdo atual por uma cópia de s; ds_concat anexa s ao final do conteúdo atual",
+      "As duas fazem exatamente a mesma coisa, só com nomes diferentes",
+      "ds_assign só funciona se s for menor que o conteúdo atual; ds_concat só funciona se for maior"
+    ],
+    correctIndex: 1,
+    explainCorrect: "ds_assign realoca só para strlen(s) e usa strcpy, que sobrescreve o conteúdo anterior — uma reatribuição. ds_concat realoca para o tamanho atual mais o de s e usa strcat, que preserva o que já havia e anexa s ao final.",
+    explainIncorrect: "A resposta correta é: ds_assign substitui o conteúdo atual por uma cópia de s (reallocate para strlen(s) + strcpy); ds_concat anexa s ao final do conteúdo atual (reallocate para o tamanho somado + strcat). Não são a mesma função, e nenhuma das duas depende do tamanho relativo de s."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Encapsulamento em DynStr",
+    text: "ds_get tem a assinatura abaixo. Qual das linhas a seguir NÃO compila, por tentar escrever através do valor devolvido?",
+    code: `<span class="kw">const</span> <span class="kw">char</span>* <span class="fn">ds_get</span>(<span class="type">DynStr</span> *ds);`,
+    options: [
+      `<span class="fn">printf</span>(<span class="str">"%s\\n"</span>, <span class="fn">ds_get</span>(city));`,
+      `<span class="kw">const</span> <span class="kw">char</span> *s = <span class="fn">ds_get</span>(city);`,
+      `<span class="fn">ds_get</span>(city)[<span class="num">0</span>] = <span class="str">'X'</span>;`,
+      `<span class="type">DynStr</span> *copy = <span class="fn">ds_create_copy</span>(<span class="fn">ds_get</span>(city));`
+    ],
+    correctIndex: 2,
+    explainCorrect: "ds_get devolve const char *: o compilador proíbe escrever através desse ponteiro. ds_get(city)[0] = 'X'; tenta exatamente isso, e por isso não compila. As outras três apenas leem o valor devolvido, o que é permitido.",
+    explainIncorrect: "A resposta correta é ds_get(city)[0] = 'X';. Ela tenta modificar, através do retorno const char *, um byte do buffer interno de ds — algo que o qualificador const proíbe o compilador de aceitar. Ler o valor (com printf, atribuindo a const char *, ou passando para outra função) é permitido."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${q.code ? `<pre class="code-block">${q.code}</pre>` : ''}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você domina realocação de memória, vetor dinâmico e cadeia dinâmica.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou, principalmente as de rastreamento de n e n_max.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale revisar quando exatamente dv_insert e reallocate disparam uma realocação.';
+  else msg = '🔁 Releia as notas sobre realocação de memória e os dois TADs e tente novamente.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
