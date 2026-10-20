@@ -1,34 +1,45 @@
 #include "team.h"
 #include <stdlib.h>
+#include <string.h>
 
-// TODO: defina aqui os campos de "struct teamvec" -- pense no que o TAD
-// precisa guardar para saber quantos times tem e quanto espaço ainda sobra
-// struct teamvec {
+// TODO: defina aqui os campos de "struct team"
+// struct team {
 //     ...
 // };
 
-// TODO: implemente tv_create -- aloca o TAD e um vetor inicial pequeno (ex.: 4 times)
-TeamVec *tv_create(void) {
+Team *team_create(int id, const char *name, int wins, int draws, int losses,
+                   int goals_scored, int goals_conceded) {
 
 }
 
-// TODO: implemente tv_insert -- se o vetor estiver cheio, dobre a capacidade
-// (realloc) antes de inserir o novo time
-void tv_insert(TeamVec *tv, Team t) {
+int team_id(Team *t) {
 
 }
 
-// TODO: implemente tv_size -- retorna o número de times atualmente guardados
-int tv_size(TeamVec *tv) {
+const char *team_name(Team *t) {
 
 }
 
-// TODO: implemente tv_get -- retorna o time na posição i
-Team tv_get(TeamVec *tv, int i) {
+int team_wins(Team *t) {
 
 }
 
-// TODO: implemente tv_free -- libera o vetor interno e depois o TAD
-void tv_free(TeamVec *tv) {
+int team_draws(Team *t) {
+
+}
+
+int team_losses(Team *t) {
+
+}
+
+int team_goals_scored(Team *t) {
+
+}
+
+int team_goals_conceded(Team *t) {
+
+}
+
+void team_free(Team *t) {
 
 }
