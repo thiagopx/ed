@@ -8,15 +8,17 @@
       31 de Outubro</span>
   </div>
   <p><strong>O Cenário:</strong> Este EP é o primeiro passo rumo ao Trabalho
-    Prático "Campeonato Computacional de Futebol" — aqui você só monta a
-    estrutura que guarda os times inscritos, sem ainda processar nenhuma
-    partida. Cada time tem um registro com nome, vitórias (V), empates (E),
-    derrotas (D), gols marcados (GM) e gols sofridos (GS). O problema é que
-    você não sabe, de antemão, quantos times existem no arquivo de
-    entrada — por isso, em vez de um vetor de tamanho fixo, você vai usar a
-    mesma técnica de <strong>vetor dinâmico</strong> deste módulo, agora
-    aplicada a um registro inteiro (<code>struct</code>), e não a um
-    <code>float</code> isolado.</p>
+    Prático "Campeonato Computacional de Futebol" — aqui você só cadastra os
+    times inscritos, sem processar nenhuma partida ainda. Cada time tem um
+    registro com <code>id</code>, nome, e cinco estatísticas (vitórias,
+    empates, derrotas, gols marcados, gols sofridos) que começam
+    <strong>zeradas</strong> — elas só serão atualizadas quando o campeonato
+    processar resultados de partidas, assunto de um módulo futuro (a partir de
+    novembro). O problema é que você não sabe, de antemão, quantos times
+    existem no arquivo de entrada — por isso, em vez de um vetor de tamanho
+    fixo, você vai usar a mesma técnica de <strong>vetor dinâmico</strong>
+    deste módulo, agora aplicada a um registro (<code>struct</code>), e não a
+    um <code>float</code> isolado.</p>
   <h3
     style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
     ⚽ Como se Calcula a Classificação</h3>
@@ -30,6 +32,10 @@
       <strong>Pontos Ganhos (PG)</strong><br><small><code>PG = 3V + E</code> —
         também calculado, nunca armazenado no registro</small></div>
   </div>
+  <p style="font-size: 0.9em; color: #777; margin-top: -10px;">Neste EP, V, E,
+    D, GM e GS de todo time começam em 0 — então S e PG também saem 0 na
+    tabela. As fórmulas acima já são as mesmas que valerão quando as
+    estatísticas passarem a ser atualizadas, em módulo futuro.</p>
   <h3
     style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
     📋 Requisitos Técnicos</h3>
@@ -41,10 +47,11 @@
         (string), <code>wins</code>, <code>draws</code>, <code>losses</code>,
         <code>goals_scored</code> e <code>goals_conceded</code> (todos int).
         Saldo e pontos não entram no registro — são calculados a partir dos
-        outros campos. Implemente <code>team_create</code> (aloca e retorna
-        um <code>Team *</code>), um acesso por campo e <code>team_free</code>
-        — os campos em si só existem dentro de <code>team.c</code>, nunca em
-        <code>team.h</code>.</li>
+        outros campos. <code>team_create</code> recebe só <code>id</code> e
+        <code>name</code> — as 5 estatísticas <strong>começam zeradas</strong>,
+        e são atualizadas apenas em módulos futuros. Implemente também um
+        acesso por campo e <code>team_free</code> — os campos em si só existem
+        dentro de <code>team.c</code>, nunca em <code>team.h</code>.</li>
       <li style="margin-bottom: 10px;"><strong>TAD <code>TeamVec</code>:</strong>
         implemente <code>tv_create</code>, <code>tv_insert</code>,
         <code>tv_size</code>, <code>tv_get</code> e <code>tv_free</code> para
@@ -54,9 +61,10 @@
         a capacidade quando o vetor enche.</li>
       <li style="margin-bottom: 10px;"><strong>Leitura:</strong> leia os times
         de um arquivo texto <code>teams.csv</code>, uma linha por time, no
-        formato <code>id,nome,V,E,D,GM,GS</code>, sem assumir nenhum número
-        fixo de times — insira cada time lido com <code>tv_insert</code> até o
-        arquivo acabar.</li>
+        formato <code>id,nome</code> — sem estatísticas, elas são zeradas por
+        <code>team_create</code> — sem assumir nenhum número fixo de times —
+        insira cada time lido com <code>tv_insert</code> até o arquivo
+        acabar.</li>
       <li style="margin-bottom: 10px;"><strong>Saída:</strong> imprima a
         tabela de classificação (ID, Time, V, E, D, GM, GS, Saldo, Pontos) na
         <strong>mesma ordem</strong> em que os times foram lidos do arquivo —
@@ -70,10 +78,10 @@
     style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">$ gcc main.c -o main
 $ ./main
 ID  Time            V   E   D   GM  GS  S   PG
-0   JAVAlis         10  0   0   45  0   45  30
-1   ESCorpioes      5   0   5   21  22  -1  15
-2   SemCTRL         7   2   1   33  6   27  23
-3   PYthons         8   2   8   47  40  7   26</pre>
+0   JAVAlis         0   0   0   0   0   0   0
+1   ESCorpioes      0   0   0   0   0   0   0
+2   SemCTRL         0   0   0   0   0   0   0
+3   PYthons         0   0   0   0   0   0   0</pre>
   <h3
     style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
     🧩 Código Base</h3>
@@ -93,7 +101,7 @@ ID  Time            V   E   D   GM  GS  S   PG
   <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
     <p style="margin: 0 0 8px 0;"><strong>Arquivos fornecidos:</strong></p>
     <ul style="margin: 0; padding-left: 20px;">
-      <li><code>team.h</code> — tipo opaco <code>Team</code>, com as assinaturas do construtor, dos 7 acessos (um por campo) e do destrutor.</li>
+      <li><code>team.h</code> — tipo opaco <code>Team</code>, com as assinaturas do construtor (<code>team_create(id, name)</code>, zera as 5 estatísticas), dos 7 acessos (um por campo) e do destrutor.</li>
       <li><code>team.c</code> — onde você implementa: a definição de <code>struct team</code> e o corpo dessas funções. <strong>Os campos só existem aqui — nunca em <code>team.h</code> nem em <code>main.c</code></strong>.</li>
       <li><code>teamvec.h</code> — tipo opaco <code>TeamVec</code> (vetor dinâmico de <code>Team *</code>), com as assinaturas das 5 funções do TAD.</li>
       <li><code>teamvec.c</code> — onde você implementa: a definição de <code>struct teamvec</code> e o corpo das 5 funções. <strong>Estrutura interna do TAD só aqui — nunca em <code>teamvec.h</code> nem em <code>main.c</code></strong>, mesma regra do exemplo de vetor dinâmico visto em aula.</li>
@@ -112,6 +120,7 @@ ID  Time            V   E   D   GM  GS  S   PG
     ponteiro: confere se o número atual já alcançou a capacidade e, se sim,
     dobra a capacidade com <code>realloc</code>. Já <code>team_create</code>
     é mais simples: aloca um único <code>Team</code> com <code>malloc</code>,
-    preenche os campos e retorna o ponteiro — sem realocação, porque um time
-    não cresce depois de criado.</div>
+    copia <code>id</code> e <code>name</code>, zera as 5 estatísticas e
+    retorna o ponteiro — sem realocação, porque um time não cresce depois de
+    criado.</div>
 </div>
