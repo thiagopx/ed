@@ -1,0 +1,4 @@
+Structures of data, line by line,
+growing only as much as they need.
+No wasted space, no fixed confine,
+just memory that follows the deed.
