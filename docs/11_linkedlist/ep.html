@@ -1,0 +1,186 @@
+<div
+  style="font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; border: 1px solid #dfe6e9; border-radius: 10px; background-color: #ffffff; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+  <div
+    style="border-bottom: 2px solid #8e44ad; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: #2c3e50; margin: 0;">🏆 EP 10: Coleção de times: o retorno (1 ponto)</h2>
+    <span
+      style="background-color: #8e44ad; color: white; padding: 5px 15px; font-size: 0.85em; font-weight: bold; border-radius: 5px;">Entrega:
+      06 de Novembro</span>
+  </div>
+  <p><strong>O Cenário:</strong> No EP 09 você guardou os times do Campeonato
+    Computacional de Futebol num <strong>vetor dinâmico</strong>. Agora que
+    você conhece a <strong>lista duplamente encadeada</strong>, surge a
+    pergunta: qual das duas estruturas o campeonato deve usar? Em vez de
+    reescrever o programa a cada mudança de ideia, você vai aplicar
+    <strong>abstração</strong>: um único TAD <code>TeamList</code>, com uma
+    única interface (<code>teamlist.h</code>), e <strong>duas
+    implementações</strong> intercambiáveis — uma com vetor dinâmico, outra
+    com lista duplamente encadeada. Qual delas entra no programa é decidido
+    numa linha do arquivo de configuração <code>config.mk</code>, e o
+    <code>main.c</code> nem fica sabendo: trocar a implementação e rodar
+    <code>make</code> tem que produzir exatamente a mesma saída, sem alterar
+    uma única linha do <code>main.c</code>. Continuam sendo só os times (sem
+    partidas), com as estatísticas zeradas, como no EP 09.</p>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    🔀 Uma Interface, Duas Implementações</h3>
+  <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+    <div
+      style="flex: 1; background: #f4ecf7; padding: 10px; border-radius: 5px; border-left: 4px solid #8e44ad;">
+      <strong><code>IMPL = dynvec</code></strong><br><small>compila
+        <code>teamlist_dynvec.c</code> — vetor de <code>Team *</code> que
+        dobra de capacidade com <code>realloc</code> (a ideia do
+        <code>TeamVec</code> do EP 09)</small></div>
+    <div
+      style="flex: 1; background: #f4ecf7; padding: 10px; border-radius: 5px; border-left: 4px solid #8e44ad;">
+      <strong><code>IMPL = dlist</code></strong><br><small>compila
+        <code>teamlist_dlist.c</code> — nós com um <code>Team *</code> e os
+        ponteiros <code>next</code> e <code>prev</code>; a lista guarda
+        primeiro nó, último nó e quantidade</small></div>
+  </div>
+  <p style="font-size: 0.9em; color: #777; margin-top: -10px;">O
+    <code>Makefile</code> lê <code>config.mk</code> e compila
+    <code>main.c</code>, <code>team.c</code> e
+    <code>teamlist_$(IMPL).c</code>. Como as duas implementações definem as
+    mesmas funções de <code>teamlist.h</code>, apenas uma delas pode entrar
+    em cada compilação.</p>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px;">
+    📋 Requisitos Técnicos</h3>
+  <div
+    style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <ul style="margin: 0; padding-left: 20px;">
+      <li style="margin-bottom: 10px;"><strong>TAD <code>Team</code>:</strong>
+        o mesmo do EP 09 — tipo opaco com <code>id</code>, <code>name</code> e
+        as 5 estatísticas (<code>wins</code>, <code>draws</code>,
+        <code>losses</code>, <code>goals_scored</code>,
+        <code>goals_conceded</code>), zeradas por <code>team_create</code>.
+        Pode (e deve) reaproveitar o seu <code>team.c</code> do EP 09.</li>
+      <li style="margin-bottom: 10px;"><strong>TAD <code>TeamList</code> com
+          vetor dinâmico:</strong> em <code>teamlist_dynvec.c</code>, defina
+        <code>struct teamlist</code> e implemente <code>tl_create</code>,
+        <code>tl_append</code>, <code>tl_size</code>, <code>tl_get</code> e
+        <code>tl_free</code>, com realocação automática que dobra a
+        capacidade quando o vetor enche.</li>
+      <li style="margin-bottom: 10px;"><strong>TAD <code>TeamList</code> com
+          lista duplamente encadeada:</strong> em
+        <code>teamlist_dlist.c</code>, defina a struct do nó (um
+        <code>Team *</code>, <code>next</code> e <code>prev</code>) e
+        <code>struct teamlist</code> (primeiro nó, último nó e quantidade), e
+        implemente as <strong>mesmas 5 funções</strong>.
+        <code>tl_append</code> insere no fim, e <code>tl_get(tl, i)</code>
+        devolve o time da posição <code>i</code> na ordem de inserção.</li>
+      <li style="margin-bottom: 10px;"><strong>Liberação:</strong> nas duas
+        implementações, <code>tl_free</code> libera a coleção
+        <strong>e todos os times guardados nela</strong>, conforme
+        <code>teamlist.h</code>.</li>
+      <li style="margin-bottom: 10px;"><strong><code>main.c</code>
+          transparente:</strong> inclui só <code>team.h</code> e
+        <code>teamlist.h</code>, e não pode depender da implementação
+        escolhida. Ele mesmo faz a <strong>leitura</strong> de
+        <code>teams.csv</code> (uma linha por time, formato
+        <code>id,nome</code>, sem assumir número fixo de times), criando cada
+        time com <code>team_create</code> e inserindo com
+        <code>tl_append</code>.</li>
+      <li style="margin-bottom: 10px;"><strong>Saída:</strong> o
+        <code>main.c</code> imprime a tabela (ID, Time, V, E, D, GM, GS, S,
+        PG), com <code>S = GM − GS</code> e <code>PG = 3V + E</code>
+        calculados na hora, na <strong>mesma ordem</strong> da leitura e
+        usando só <code>tl_size</code> e <code>tl_get</code>.</li>
+      <li style="margin-bottom: 10px;"><strong>Prova de abstração:</strong>
+        com <code>IMPL = dynvec</code> e com <code>IMPL = dlist</code>, o
+        programa tem que compilar e imprimir <strong>exatamente a mesma
+        saída</strong>, sem nenhuma alteração em <code>main.c</code>.</li>
+    </ul>
+  </div>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    💻 Exemplo de Execução</h3>
+  <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">Primeiro com
+    o vetor dinâmico; depois, só a linha <code>IMPL</code> de
+    <code>config.mk</code> é trocada para <code>dlist</code> e o
+    <code>make</code> roda de novo. Repare que, na segunda vez, o
+    <code>main.c</code> nem é recompilado (só a nova implementação), e a
+    tabela sai idêntica.</p>
+  <pre
+    style="background-color: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">$ grep ^IMPL config.mk
+IMPL = dynvec
+$ make
+gcc -Wall -c main.c -o main.o
+gcc -Wall -c team.c -o team.o
+gcc -Wall -c teamlist_dynvec.c -o teamlist_dynvec.o
+gcc -Wall -o team_ep main.o team.o teamlist_dynvec.o
+./team_ep
+ID  Time            V   E   D   GM  GS  S   PG
+0   JAVAlis         0   0   0   0   0   0   0  
+1   ESCorpiões      0   0   0   0   0   0   0  
+2   SemCTRL         0   0   0   0   0   0   0  
+3   GOrilas         0   0   0   0   0   0   0  
+4   PYthons         0   0   0   0   0   0   0  
+5   SeQueLas        0   0   0   0   0   0   0  
+6   NETunos         0   0   0   0   0   0   0  
+7   LOOPardos       0   0   0   0   0   0   0  
+8   RUSTicos        0   0   0   0   0   0   0  
+9   REACTivos       0   0   0   0   0   0   0  
+$ grep ^IMPL config.mk
+IMPL = dlist
+$ make
+gcc -Wall -c teamlist_dlist.c -o teamlist_dlist.o
+gcc -Wall -o team_ep main.o team.o teamlist_dlist.o
+./team_ep
+ID  Time            V   E   D   GM  GS  S   PG
+0   JAVAlis         0   0   0   0   0   0   0  
+1   ESCorpiões      0   0   0   0   0   0   0  
+2   SemCTRL         0   0   0   0   0   0   0  
+3   GOrilas         0   0   0   0   0   0   0  
+4   PYthons         0   0   0   0   0   0   0  
+5   SeQueLas        0   0   0   0   0   0   0  
+6   NETunos         0   0   0   0   0   0   0  
+7   LOOPardos       0   0   0   0   0   0   0  
+8   RUSTicos        0   0   0   0   0   0   0  
+9   REACTivos       0   0   0   0   0   0   0  </pre>
+  <h3
+    style="color: #8e44ad; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px;">
+    🧩 Código Base</h3>
+  <p style="font-size: 0.95em; color: #555; margin-bottom: 10px;">As
+    interfaces, o <code>Makefile</code>, o <code>config.mk</code> e os dados
+    já vêm prontos. Nos arquivos marcados como TODO, só as assinaturas estão
+    lá: a definição das structs e o corpo de cada função são o exercício.
+    Desta vez, a leitura do arquivo e a impressão da tabela no
+    <code>main.c</code> também ficam por sua conta.</p>
+  <div style="margin: 20px 0;">
+    <a style="text-decoration: none; background: #8e44ad; color: white; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; display: block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+      href="https://github.com/thiagopx/ed/tree/master/11_linkedlist/07_team_ep" target="_blank" rel="noopener noreferrer">
+      📂 Acessar Código Base no GitHub (11_linkedlist/07_team_ep)
+    </a>
+  </div>
+  <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+    <p style="margin: 0 0 8px 0;"><strong>Os 9 arquivos de envio:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li><code>team.h</code> (pronto): tipo opaco <code>Team</code>, com as assinaturas do construtor, dos 7 acessos e do destrutor (igual ao EP 09).</li>
+      <li><code>team.c</code> (<strong>TODO</strong>): a <code>struct team</code> e o corpo das funções. Reaproveite o do EP 09.</li>
+      <li><code>teamlist.h</code> (pronto): tipo opaco <code>TeamList</code> e as assinaturas das 5 funções. É a <strong>única</strong> coisa que o <code>main.c</code> conhece da coleção.</li>
+      <li><code>teamlist_dynvec.c</code> (<strong>TODO</strong>): implementação com vetor dinâmico.</li>
+      <li><code>teamlist_dlist.c</code> (<strong>TODO</strong>): implementação com lista duplamente encadeada.</li>
+      <li><code>main.c</code> (<strong>TODO</strong>): lê <code>teams.csv</code> e imprime a tabela, usando só <code>team.h</code> e <code>teamlist.h</code>.</li>
+      <li><code>Makefile</code> (pronto): inclui <code>config.mk</code> e compila <code>main.c</code>, <code>team.c</code> e <code>teamlist_$(IMPL).c</code> (<code>make</code> compila e executa).</li>
+      <li><code>config.mk</code> (pronto): a linha <code>IMPL = dynvec</code> ou <code>IMPL = dlist</code>, que escolhe a implementação. Teste as duas antes de enviar.</li>
+      <li><code>teams.csv</code> (pronto): os 10 times do Campeonato Computacional de Futebol, no formato <code>id,nome</code>, usados no "Exemplo de Execução" acima.</li>
+    </ul>
+  </div>
+  <div
+    style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffcc00; border-radius: 4px; font-size: 0.9em;">
+    <strong>Dica:</strong> para o <code>teamlist_dynvec.c</code>, seu
+    <code>teamvec.c</code> do EP 09 já faz quase tudo; basta adaptá-lo aos
+    nomes de <code>teamlist.h</code>. Na lista duplamente encadeada,
+    guardar o último nó torna o <code>tl_append</code> imediato, sem
+    percorrer a lista. Já o <code>tl_get(tl, i)</code> não tem como pular
+    direto para a posição <code>i</code>: ele caminha pelos
+    <code>next</code> a partir do primeiro nó. No <code>tl_free</code>,
+    guarde o próximo nó <strong>antes</strong> de liberar o atual. Por fim,
+    sobre o alinhamento: <code>%-15s</code> conta <strong>bytes</strong>, não
+    letras, e o <code>õ</code> de <code>ESCorpiões</code> ocupa 2 bytes em
+    UTF-8. Por isso, essa linha sai com uma coluna a menos. Para compensar,
+    basta imprimir um espaço extra para cada byte de continuação do nome
+    (bytes no formato <code>10xxxxxx</code> em binário).</div>
+</div>

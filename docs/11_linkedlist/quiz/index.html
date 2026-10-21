@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Listas encadeadas</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #5F7A1B;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(95, 122, 27, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #5F7A1B;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #5F7A1B;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #5F7A1B;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #5F7A1B;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #5F7A1B;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .fn   { color: #ffeaa7; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .num  { color: #d6a2e8; }
+  pre.code-block .pp   { color: #fab1a0; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #5F7A1B;
+    background-color: #F3F7E7;
+  }
+
+  .option.selected {
+    border-color: #5F7A1B;
+    background-color: #E6EDCF;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #5F7A1B;
+    background-color: #5F7A1B;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #5F7A1B;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #BFCC9C;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #5F7A1B;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>Quiz — Listas encadeadas</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de listas encadeadas!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Vetor × lista encadeada",
+    text: "Em comparação com um vetor — mesmo um vetor dinâmico, que cresce com realloc —, o que uma lista encadeada ganha e o que ela perde?",
+    options: [
+      "Ganha acesso direto a qualquer elemento por índice; perde a possibilidade de crescer durante a execução",
+      "Ganha crescimento e encolhimento um elemento por vez, sem realocar nem copiar os demais; perde o acesso direto por índice, pois os nós não ficam contíguos na memória",
+      "Ganha contiguidade na memória, o que dispensa os ponteiros entre os elementos; perde a capacidade de guardar inteiros",
+      "Não ganha nem perde nada: lista encadeada é só outro nome para vetor dinâmico"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Cada inserção aloca memória só para o novo nó, e cada remoção libera só a dele: o espaço fica proporcional ao número de elementos, sem reserva ociosa e sem realocações. Como os nós são alocados separadamente, não há garantia de contiguidade — para chegar ao k-ésimo elemento é preciso seguir os next desde o primeiro.",
+    explainIncorrect: "A resposta correta é: a lista cresce e encolhe um elemento por vez, sem realocar nem copiar os demais, mas perde o acesso direto por índice, porque os nós não ficam contíguos na memória. Acesso direto e contiguidade são características do vetor, não da lista; e a lista pode guardar qualquer tipo de informação, inclusive inteiros."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Inserção no início",
+    text: "Usando o TAD do projeto 01_linkedlist, em que ll_insert insere o novo elemento no início da lista, qual é a saída do trecho abaixo?",
+    code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">4</span>; i++)
+    <span class="fn">ll_insert</span>(l, i * <span class="num">10</span>);
+<span class="fn">ll_print</span>(l);`,
+    options: [
+      "10 20 30 40",
+      "10",
+      "40 30 20 10",
+      "40"
+    ],
+    correctIndex: 2,
+    explainCorrect: "ll_insert faz o novo nó apontar para o antigo primeiro e só então atualiza first: cada valor inserido passa à frente dos anteriores. Por isso a lista fica na ordem inversa à de inserção — 40 30 20 10 —, e cada inserção custa sempre o mesmo, qualquer que seja o tamanho da lista. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 40 30 20 10. A inserção no início não substitui nada nem coloca o valor no fim: o novo nó aponta para o antigo primeiro e vira o novo first, então o último valor inserido (40) é o primeiro a ser impresso."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Lista ordenada",
+    text: "ll_insert_sorted, do projeto 01_linkedlist, procura a posição do novo valor com o laço abaixo e insere o novo nó logo depois de prev (ou no início, se prev continuar NULL). Qual é a saída do trecho?",
+    code: `<span class="cmt">// inside ll_insert_sorted(l, v)</span>
+<span class="kw">while</span> (p != NULL &amp;&amp; p-&gt;info &lt; v)
+{
+    prev = p;
+    p = p-&gt;next;
+}
+
+<span class="cmt">// client code</span>
+<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
+<span class="fn">ll_insert_sorted</span>(l, <span class="num">5</span>);
+<span class="fn">ll_insert_sorted</span>(l, <span class="num">1</span>);
+<span class="fn">ll_insert_sorted</span>(l, <span class="num">3</span>);
+<span class="fn">ll_insert</span>(l, <span class="num">4</span>);
+<span class="fn">ll_insert_sorted</span>(l, <span class="num">2</span>);
+<span class="fn">ll_print</span>(l);`,
+    options: [
+      "2 4 1 3 5",
+      "1 2 3 4 5",
+      "4 1 2 3 5",
+      "1 2 3 5 4"
+    ],
+    correctIndex: 0,
+    explainCorrect: "Depois das três primeiras chamadas a lista é 1 3 5. ll_insert coloca o 4 no início, sem olhar a ordem: 4 1 3 5. Ao inserir o 2, o laço testa o primeiro nó, 4 &lt; 2 é falso, e ele para logo, com prev ainda NULL — então o 2 vai para o início: 2 4 1 3 5. ll_insert_sorted só mantém a ordem se a lista já estiver ordenada. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 2 4 1 3 5. ll_insert(l, 4) põe o 4 no início e quebra a ordem (4 1 3 5). Na inserção do 2, a condição p-&gt;info &lt; v já falha no primeiro nó (4 &lt; 2 é falso), prev continua NULL e o 2 é inserido no início. A função não reordena a lista: só procura o primeiro nó cujo valor não é menor que v."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Liberando a lista",
+    text: "A versão de ll_free abaixo é mais curta que a do projeto 01_linkedlist. Qual é o problema dela?",
+    code: `<span class="kw">void</span> <span class="fn">ll_free</span>(<span class="type">LinkedList</span> *l)
+{
+    <span class="kw">for</span> (<span class="type">ListNode</span> *p = l-&gt;first; p != NULL; p = p-&gt;next)
+        <span class="fn">free</span>(p);
+    <span class="fn">free</span>(l);
+}`,
+    options: [
+      "Nenhum: ela libera todos os nós e depois a estrutura da lista, exatamente como a do módulo",
+      "Ela libera só o primeiro nó, porque free(p) faz p valer NULL e o laço termina",
+      "Ela deveria liberar a estrutura da lista antes de liberar os nós",
+      "Depois de free(p), o incremento p = p-&gt;next lê um campo de um nó já liberado — acesso a memória que não pertence mais ao programa"
+    ],
+    correctIndex: 3,
+    explainCorrect: "free(p) devolve o bloco do nó, mas p continua guardando o mesmo endereço; ler p-&gt;next em seguida é usar memória já liberada — comportamento indefinido, que às vezes até parece funcionar (o gcc com -Wall chega a avisar: “pointer ‘p’ used after ‘free’”). Por isso a versão do módulo guarda o próximo em t = p-&gt;next antes do free(p). Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é: depois de free(p), o p = p-&gt;next do for lê memória já liberada. free não altera o valor de p, e a estrutura da lista precisa ser liberada por último, pois é por ela que se chega aos nós. A correção é guardar o próximo antes de liberar: ListNode *t = p-&gt;next; free(p); p = t;."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Recursão sobre o encadeamento",
+    text: "Acrescente ao projeto 02_linkedlist-recursive a auxiliar abaixo, que mistura _ll_print e _ll_print_reversed. Se a lista foi criada com ll_insert(l, 1), ll_insert(l, 2) e ll_insert(l, 3), nessa ordem, o que _ll_mystery(l-&gt;first) imprime?",
+    code: `<span class="kw">static</span> <span class="kw">void</span> <span class="fn">_ll_mystery</span>(<span class="type">ListNode</span> *p)
+{
+   <span class="kw">if</span> (p != NULL)
+   {
+      <span class="fn">printf</span>(<span class="str">"%d "</span>, p-&gt;info);
+      <span class="fn">_ll_mystery</span>(p-&gt;next);
+      <span class="fn">printf</span>(<span class="str">"%d "</span>, p-&gt;info);
+   }
+}`,
+    options: [
+      "1 2 3 3 2 1",
+      "3 2 1",
+      "3 2 1 1 2 3",
+      "3 3 2 2 1 1"
+    ],
+    correctIndex: 2,
+    explainCorrect: "A lista é 3 2 1. O primeiro printf executa na ida da recursão, como em _ll_print: 3 2 1. O segundo só executa depois que a chamada para o subencadeamento termina — na volta, do último nó para o primeiro, como em _ll_print_reversed: 1 2 3. Juntos: 3 2 1 1 2 3.",
+    explainIncorrect: "A resposta correta é 3 2 1 1 2 3. Inseridos no início, os valores ficam 3 2 1. O printf antes da chamada recursiva imprime na ida (3 2 1); o printf depois dela imprime na volta, em ordem inversa (1 2 3). O 1 aparece duas vezes seguidas porque, no último nó, a chamada recursiva recebe NULL e retorna sem imprimir nada."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Comparação recursiva",
+    text: "Na auxiliar abaixo, que compara dois encadeamentos, falta a primeira linha. Qual delas faz ll_equals devolver 1 para duas listas com os mesmos elementos na mesma ordem (e 0 nos demais casos)?",
+    code: `<span class="kw">static</span> <span class="kw">int</span> <span class="fn">_ll_equals</span>(<span class="type">ListNode</span> *p1, <span class="type">ListNode</span> *p2)
+{
+   <span class="cmt">/* ??? */</span>
+   <span class="kw">if</span> (p1 == NULL || p2 == NULL) <span class="cmt">// Only one ended: different sizes.</span>
+      <span class="kw">return</span> <span class="num">0</span>;
+   <span class="kw">return</span> p1-&gt;info == p2-&gt;info &amp;&amp; <span class="fn">_ll_equals</span>(p1-&gt;next, p2-&gt;next);
+}`,
+    options: [
+      `<span class="kw">if</span> (p1 == NULL &amp;&amp; p2 == NULL) <span class="kw">return</span> <span class="num">0</span>;`,
+      `<span class="kw">if</span> (p1 == NULL &amp;&amp; p2 == NULL) <span class="kw">return</span> <span class="num">1</span>;`,
+      `<span class="kw">if</span> (p1-&gt;info != p2-&gt;info) <span class="kw">return</span> <span class="num">1</span>;`,
+      `<span class="kw">if</span> (p1 == p2) <span class="kw">return</span> <span class="num">0</span>;`
+    ],
+    correctIndex: 1,
+    explainCorrect: "É o caso base: dois encadeamentos vazios são iguais. Toda comparação de listas iguais termina nele — os dois ponteiros chegam a NULL juntos —, e é esse 1 que sobe pela cadeia de &amp;&amp;. Com return 0 nessa linha, ll_equals devolveria 0 até para duas listas idênticas. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é if (p1 == NULL &amp;&amp; p2 == NULL) return 1;: dois encadeamentos vazios são iguais. Com return 0, o resultado seria 0 mesmo para listas idênticas, pois toda comparação bem-sucedida termina nesse caso; testar p1-&gt;info antes de saber se p1 é NULL desreferenciaria NULL no fim das listas; e if (p1 == p2) return 0; também devolveria 0 quando os dois chegam a NULL."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Lista circular",
+    text: "No projeto 03_circular-linkedlist, ll_insert insere no início e fecha o ciclo, ll_rotate avança o ponto de partida um nó e ll_print percorre o ciclo com do-while, a partir de first, até voltar a ele. Qual é a saída do trecho abaixo?",
+    code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">4</span>; i++)
+    <span class="fn">ll_insert</span>(l, i);
+<span class="fn">ll_rotate</span>(l);
+<span class="fn">ll_rotate</span>(l);
+<span class="fn">ll_print</span>(l);`,
+    options: [
+      "2 1 4 3",
+      "4 3 2 1",
+      "2 1",
+      "3 4 1 2"
+    ],
+    correctIndex: 0,
+    explainCorrect: "Os quatro ll_insert produzem 4 3 2 1, com o next do 1 voltando para o 4. Cada ll_rotate só faz l-&gt;first = l-&gt;first-&gt;next: depois de duas, o ponto de partida é o 2. Como não há NULL, o do-while segue o ciclo até voltar ao 2: 2 1 4 3 — nenhum nó foi criado, removido ou religado.",
+    explainIncorrect: "A resposta correta é 2 1 4 3. A lista começa como 4 3 2 1 (com o ciclo fechado do 1 para o 4); duas rotações deixam first no 2, e ll_print visita todos os nós a partir dele até voltar ao 2. Nada se perde: a rotação muda só o ponto de partida, não os encadeamentos, e ela avança no sentido dos next, não no contrário."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Lista duplamente encadeada",
+    text: "No projeto 04_doubly-linkedlist, a lista guarda first, last e count, e cada nó guarda next e prev. Qual é a saída do trecho abaixo?",
+    code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">5</span>; i++)
+   <span class="fn">ll_insert</span>(l, i);          <span class="cmt">// 4 3 2 1 0</span>
+<span class="fn">ll_remove</span>(l, <span class="num">4</span>);
+<span class="fn">ll_remove</span>(l, <span class="num">0</span>);
+<span class="fn">ll_remove</span>(l, <span class="num">7</span>);
+<span class="fn">ll_print_reversed</span>(l);
+<span class="fn">printf</span>(<span class="str">"%d\\n"</span>, <span class="fn">ll_size</span>(l));`,
+    options: [
+      "3 2 1 e, na linha seguinte, 3",
+      "1 2 3 e, na linha seguinte, 2",
+      "Nada: ll_remove(l, 7) encerra o programa com falha de segmentação, porque o 7 não está na lista",
+      "1 2 3 e, na linha seguinte, 3"
+    ],
+    correctIndex: 3,
+    explainCorrect: "Remover o 4 (o primeiro) atualiza first e o prev do 3; remover o 0 (o último) atualiza last para o 1 e o next do 1. ll_remove(l, 7) não encontra o valor — _search devolve NULL — e retorna sem mexer em nada. ll_print_reversed parte de last e segue os prev: 1 2 3; e count só foi decrementado nas duas remoções bem-sucedidas: 3. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 1 2 3 e, na linha seguinte, 3. Restam 3 2 1; ll_print_reversed começa em last (o 1, atualizado quando o 0 foi removido) e segue os prev. A remoção do 7 é inofensiva: _search devolve NULL e ll_remove retorna antes de mexer em ponteiros ou em count."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Lista de tipos estruturados",
+    text: "No projeto 05_linkedlist-struct, cada nó guarda um Student * criado por st_create; ll_insert insere no início e ll_append, no final. Em que ordem os nomes aparecem na saída do trecho abaixo?",
+    code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
+<span class="fn">ll_append</span>(l, <span class="str">"Ana"</span>, <span class="str">"11122233344"</span>);
+<span class="fn">ll_insert</span>(l, <span class="str">"Bia"</span>, <span class="str">"55566677788"</span>);
+<span class="fn">ll_append</span>(l, <span class="str">"Caio"</span>, <span class="str">"99988877766"</span>);
+<span class="fn">ll_print</span>(l);`,
+    options: [
+      "Ana, Bia, Caio",
+      "Bia, Ana, Caio",
+      "Caio, Bia, Ana",
+      "Bia, Caio — o primeiro ll_append não faz nada, porque a lista ainda está vazia"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Com a lista vazia, ll_append simplesmente delega para ll_insert, e Ana vira o único nó (first e last ao mesmo tempo). Bia entra no início; Caio é pendurado depois de last, sem percorrer a lista. Saída: Bia, Ana, Caio. Cada nó tem duas alocações — o nó e o aluno —, e por isso ll_free faz free(p-&gt;info) antes de free(p).",
+    explainIncorrect: "A resposta correta é Bia, Ana, Caio. ll_append numa lista vazia não é ignorado: ele chama ll_insert, e Ana passa a ser o primeiro e o último nó. Bia é inserida antes dela, e Caio é anexado depois de last."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Lista heterogênea",
+    text: "No projeto 06_linkedlist-generic, a mesma lista guarda alunos e professores, e cada nó guarda a informação como void *info. Qual condição deve preencher a lacuna de ll_print para que cada nó seja impresso pela função certa?",
+    code: `<span class="kw">void</span> <span class="fn">ll_print</span>(<span class="type">LinkedList</span> *l)
+{
+    <span class="kw">for</span> (<span class="type">ListNode</span> *p = l-&gt;first; p != NULL; p = p-&gt;next)
+    {
+        <span class="kw">if</span> (<span class="cmt">/* ??? */</span>)
+            <span class="fn">st_print</span>(p-&gt;info);
+        <span class="kw">else</span>
+            <span class="fn">pr_print</span>(p-&gt;info);
+    }
+    <span class="fn">printf</span>(<span class="str">"\\n"</span>);
+}`,
+    options: [
+      `p-&gt;info != NULL`,
+      `<span class="kw">sizeof</span>(*p-&gt;info) == <span class="kw">sizeof</span>(<span class="type">Student</span>)`,
+      `p-&gt;type == TYPE_STUDENT`,
+      `p-&gt;info == TYPE_STUDENT`
+    ],
+    correctIndex: 2,
+    explainCorrect: "Um void * é só um endereço: ele não carrega o tipo do objeto apontado, e o compilador não tem como saber o que há lá. Por isso cada nó guarda também o campo type (um NodeType), gravado por ll_insert, e é ele que ll_print consulta para escolher entre st_print e pr_print. Se type estiver errado, nada avisa — a memória é interpretada com o formato errado.",
+    explainIncorrect: "A resposta correta é p-&gt;type == TYPE_STUDENT. O void * não diz para que tipo aponta, nem por sizeof; testar p-&gt;info contra NULL ou contra TYPE_STUDENT compara o endereço guardado, não o tipo do objeto. A única fonte de verdade é o campo type que ll_insert grava em cada nó."
+  }
+];
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${q.code ? `<pre class="code-block">${q.code}</pre>` : ''}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você domina listas encadeadas e suas variações: recursiva, circular, dupla, de tipos estruturados e heterogênea.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou, principalmente as que pedem para rastrear first, prev e next.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale desenhar os nós e as setas de cada operação antes de prever a saída.';
+  else msg = '🔁 Releia as notas sobre listas encadeadas e os seis exemplos e tente novamente.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
