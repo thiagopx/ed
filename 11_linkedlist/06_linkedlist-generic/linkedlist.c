@@ -50,6 +50,7 @@ void ll_insert(LinkedList *l, void *info, NodeType type)
     node->type = type;
     node->info = info;
     node->next = l->first;
+    node->prev = NULL;
 
     if (!ll_is_empty(l))
         l->first->prev = node;

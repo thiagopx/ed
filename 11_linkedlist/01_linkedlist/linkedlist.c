@@ -40,6 +40,34 @@ void ll_insert(LinkedList *l, int v)
     l->first = node;                                       // Update the 'first' pointer to point to the new node.
 }
 
+// Function to insert an element while keeping the list in ascending order.
+void ll_insert_sorted(LinkedList *l, int v)
+{
+    ListNode *prev = NULL;  // Node that will precede the new one.
+    ListNode *p = l->first; // Node used to walk the list.
+
+    // Find the insertion point: first node whose value is not smaller than v.
+    while (p != NULL && p->info < v)
+    {
+        prev = p;
+        p = p->next;
+    }
+
+    ListNode *node = (ListNode *)malloc(sizeof(ListNode)); // Allocate memory for a new node.
+    node->info = v;
+
+    if (prev == NULL) // Insert at the beginning (empty list or v is the smallest).
+    {
+        node->next = l->first;
+        l->first = node;
+    }
+    else // Insert in the middle or at the end, right after 'prev'.
+    {
+        node->next = prev->next;
+        prev->next = node;
+    }
+}
+
 // Function to get the size (number of elements) of the linked list.
 int ll_size(LinkedList *l)
 {

@@ -48,4 +48,10 @@ void ll_free(LinkedList *l);
 // Display all elements of the linked list
 void ll_print(LinkedList *l);
 
+// Display the elements from the last to the first
+void ll_print_reversed(LinkedList *l);
+
+// Check whether two lists have the same elements in the same order
+int ll_equals(LinkedList *l1, LinkedList *l2);
+
 #endif

@@ -155,3 +155,34 @@ void ll_print(LinkedList *l)
    _ll_print(l->first);
    printf("\n");
 }
+
+static void _ll_print_reversed(ListNode *p)
+{
+   if (p != NULL)
+   {
+      _ll_print_reversed(p->next); // First print the rest of the list...
+      printf("%d ", p->info);      // ...and only then this node.
+   }
+}
+
+// Function to display the elements from the last to the first.
+void ll_print_reversed(LinkedList *l)
+{
+   _ll_print_reversed(l->first);
+   printf("\n");
+}
+
+static int _ll_equals(ListNode *p1, ListNode *p2)
+{
+   if (p1 == NULL && p2 == NULL) // Both ended together: equal.
+      return 1;
+   if (p1 == NULL || p2 == NULL) // Only one ended: different sizes.
+      return 0;
+   return p1->info == p2->info && _ll_equals(p1->next, p2->next);
+}
+
+// Function to check whether two lists have the same elements in the same order.
+int ll_equals(LinkedList *l1, LinkedList *l2)
+{
+   return _ll_equals(l1->first, l2->first);
+}

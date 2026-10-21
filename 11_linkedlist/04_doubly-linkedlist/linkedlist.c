@@ -122,3 +122,13 @@ void ll_print(LinkedList *l)
     }
     printf("\n"); // Print a newline character to separate the output.
 }
+
+// Display all elements from the last to the first, following the 'prev' pointers.
+void ll_print_reversed(LinkedList *l)
+{
+    for (ListNode *p = l->last; p != NULL; p = p->prev)
+    {
+        printf("%d ", p->info);
+    }
+    printf("\n");
+}

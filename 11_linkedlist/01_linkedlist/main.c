@@ -25,7 +25,7 @@ int main(void)
     for (int i = 0; i < 5; i++)
         ll_insert(l, 1); // Insert five occurrences of '1' into the list using ll_insert.
     ll_print(l);         // Show the elements of the updated list using ll_print.
-    ll_remove_all(l, 1); // Remove all occurrences of '1' from the list using ll_remove.
+    ll_remove_all(l, 1); // Remove all occurrences of '1' from the list using ll_remove_all.
     ll_print(l);         // Show the elements of the updated list using ll_print.
     printf("------------\n\n");
 
@@ -38,8 +38,21 @@ int main(void)
         else
             printf("%d is NOT in the list.\n", values[i]); // Print if the value is not in the list.
 
-    // Free the memory used by the list
+    printf("------------\n\n");
+
+    // Keep a second list in ascending order
+    printf("Inserting 7 3 9 1 5 in sorted order\n");
+    LinkedList *sorted = ll_create();
+    int unordered[5] = {7, 3, 9, 1, 5};
+    for (int i = 0; i < 5; i++)
+    {
+        ll_insert_sorted(sorted, unordered[i]); // Each value goes straight to its place.
+        ll_print(sorted);
+    }
+
+    // Free the memory used by the lists
     ll_free(l); // Free the memory allocated for the list and its nodes using ll_free.
+    ll_free(sorted);
 
     return 0; // Return 0 to indicate successful program execution.
 }

@@ -21,25 +21,36 @@ int main(void)
    printf("------------\n\n");
 
    // Add and remove 1's
-   printf("Adding ones and removing ones\n");
+   printf("Adding ones\n");
    for (int i = 0; i < 5; i++)
       ll_insert(l, 1); // Insert five occurrences of '1' into the list using ll_insert.
    ll_print(l);        // Show the elements of the updated list using ll_print.
-   // ll_remove_all(l, 1); // Remove all occurrences of '1' from the list using ll_remove.
-   // ll_print(l);            // Show the elements of the updated list using ll_print.
+
+   printf("Sum\n");
+   int sum = ll_sum(l);
+   printf("sum=%d\n", sum);
    printf("------------\n\n");
 
-   // // Checking whether 4 and 10 are in the list
-   // printf("Checking whether 4 and 10 are in the list\n");
-   // int values[5] = {-1, 0, 4, 5, 10}; // Array of values to check in the list.
-   // for (int i = 0; i < 5; i++)
-   //    if (ll_is_in(l, values[i]))                   // Check if each value is in the list using ll_is_in.
-   //       printf("%d is in the list.\n", values[i]); // Print if the value is in the list.
-   //    else
-   //       printf("%d is NOT in the list.\n", values[i]); // Print if the value is not in the list.
+   printf("Printing in reverse order\n");
+   ll_print_reversed(l);
+   printf("------------\n\n");
 
-   // Free the memory used by the list
+   printf("Comparing lists\n");
+   LinkedList *a = ll_create();
+   LinkedList *b = ll_create();
+   for (int i = 0; i < 3; i++)
+   {
+      ll_insert(a, i);
+      ll_insert(b, i);
+   }
+   printf("a and b equal? %d\n", ll_equals(a, b));
+   ll_insert(b, 99);
+   printf("after inserting 99 in b: %d\n", ll_equals(a, b));
+
+   // Free the memory used by the lists
    ll_free(l); // Free the memory allocated for the list and its nodes using ll_free.
+   ll_free(a);
+   ll_free(b);
 
    return 0; // Return 0 to indicate successful program execution.
 }
