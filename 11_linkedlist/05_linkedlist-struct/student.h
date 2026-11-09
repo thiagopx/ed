@@ -20,4 +20,8 @@ Student *st_create(const char *name, const char *cpf);
  */
 void st_print(Student *s);
 
+// Read-only access to the fields of a Student (the struct itself stays hidden).
+const char *st_name(Student *s);
+const char *st_cpf(Student *s);
+
 #endif

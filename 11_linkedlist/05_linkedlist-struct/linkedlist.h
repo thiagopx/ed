@@ -1,6 +1,8 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
+#include "student.h" // The list stores pointers to Student records.
+
 // Define the LinkedList and ListNode data structures
 typedef struct list LinkedList;    // Represents a linked list
 typedef struct list_node ListNode; // Represents a node in the linked list
@@ -39,6 +41,9 @@ LinkedList *ll_reversed(LinkedList *l);
 
 // Concatenate two linked lists, placing l2 after l1
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
+
+// Return the student whose name comes first in alphabetical order (NULL if empty)
+Student *ll_first_by_name(LinkedList *l);
 
 // Free the memory used by the linked list
 void ll_free(LinkedList *l);

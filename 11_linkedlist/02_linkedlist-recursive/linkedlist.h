@@ -13,34 +13,38 @@ LinkedList *ll_create();
 // Insert an element at the beginning of the linked list
 void ll_insert(LinkedList *l, int v);
 
-// // Internal recursive function used by insert_sorted_into_the_list
-// static void _insert_sorted(LinkedList *l, int v);
+// Insert an element into the linked list while keeping it sorted (recursive)
+void ll_insert_sorted(LinkedList *l, int v);
 
-// // Insert an element into the linked list while keeping it sorted
-// void ll_insert_sorted(LinkedList *l, int v);
+// Append an element to the end of the linked list (recursive)
+void ll_append(LinkedList *l, int v);
 
-// // Append an element to the end of the linked list
-// void ll_append(LinkedList *l, int v);
-
+// Remove the first occurrence of val (recursive)
 void ll_remove(LinkedList *l, int val);
 
+// Remove every occurrence of val (recursive)
 void ll_remove_all(LinkedList *l, int val);
 
-// Get the size (number of elements) of the linked list
+// Get the size (number of elements) of the linked list (recursive)
 int ll_size(LinkedList *l);
 
-// // Check whether a specific element is in the linked list
-// int ll_is_in(LinkedList *l, int v);
+// Check whether a specific element is in the linked list (recursive)
+int ll_is_in(LinkedList *l, int v);
 
 // Check whether the linked list is empty
 int ll_is_empty(LinkedList *l);
 
+// Sum of all elements (recursive)
 int ll_sum(LinkedList *l);
-// // Return a new linked list with the elements reversed
-// LinkedList *ll_reversed(LinkedList *l);
 
-// // Concatenate two linked lists, placing l2 after l1
-// LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
+// Count the even elements and store their sum in *sum, in a single pass (recursive)
+int ll_count_even(LinkedList *l, int *sum);
+
+// Return a new linked list with the elements reversed (recursive)
+LinkedList *ll_reversed(LinkedList *l);
+
+// Return a new linked list with the elements of l1 followed by those of l2 (recursive)
+LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
 // Free the memory used by the linked list
 void ll_free(LinkedList *l);

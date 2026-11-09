@@ -72,11 +72,6 @@ static int _ll_is_in(ListNode *p, int val)
    if (p == NULL)
       return 0;
 
-   // if (p->info != val)
-   //    return _ll_is_in(p->next, val);
-
-   // return 1;
-
    if (p->info == val)
       return 1;
 
@@ -89,15 +84,67 @@ int ll_is_in(LinkedList *l, int val)
    return _ll_is_in(l->first, val);
 }
 
-//    ListNode *p = l->first;
-//    while (p != NULL)
-//    {
-//       if (p->info == val)
-//          return 1;
-//       p = p->next;
-//    }
-//    return 0;
-// }
+
+// Recursive helper: returns the (possibly new) first node of the chain starting at p.
+static ListNode *_ll_insert_sorted(ListNode *p, int v)
+{
+   if (p == NULL || p->info >= v) // Base case: the new node goes right here.
+   {
+      ListNode *node = (ListNode *)malloc(sizeof(ListNode));
+      node->info = v;
+      node->next = p; // The rest of the chain (possibly empty) comes after it.
+      return node;
+   }
+   p->next = _ll_insert_sorted(p->next, v); // Insert into the subchain and relink.
+   return p;
+}
+
+// Function to insert an element while keeping the list in ascending order.
+void ll_insert_sorted(LinkedList *l, int v)
+{
+   l->first = _ll_insert_sorted(l->first, v);
+}
+
+// Recursive helper: appending to a chain is appending to its subchain.
+static ListNode *_ll_append(ListNode *p, int v)
+{
+   if (p == NULL) // Base case: empty chain; the new node is the whole chain.
+   {
+      ListNode *node = (ListNode *)malloc(sizeof(ListNode));
+      node->info = v;
+      node->next = NULL;
+      return node;
+   }
+   p->next = _ll_append(p->next, v);
+   return p;
+}
+
+// Function to append an element to the end of the linked list.
+void ll_append(LinkedList *l, int v)
+{
+   l->first = _ll_append(l->first, v);
+}
+
+// Recursive helper: counts the even values of the chain and accumulates their sum in *sum.
+static int _ll_count_even(ListNode *p, int *sum)
+{
+   if (p == NULL) // Base case: an empty chain has no even values.
+      return 0;
+   int count = _ll_count_even(p->next, sum); // Solve the subchain first...
+   if (p->info % 2 == 0)                     // ...then add this node, if it is even.
+   {
+      *sum += p->info;
+      count++;
+   }
+   return count;
+}
+
+// Function to count the even elements and compute their sum in a single pass.
+int ll_count_even(LinkedList *l, int *sum)
+{
+   *sum = 0;
+   return _ll_count_even(l->first, sum);
+}
 
 static ListNode *_ll_remove(ListNode *p, int val)
 {
@@ -122,6 +169,27 @@ static ListNode *_ll_remove(ListNode *p, int val)
 void ll_remove(LinkedList *l, int val)
 {
    l->first = _ll_remove(l->first, val);
+}
+
+// Recursive helper: removes every node whose value is val.
+static ListNode *_ll_remove_all(ListNode *p, int val)
+{
+   if (p == NULL) // Base case: nothing to remove in an empty chain.
+      return NULL;
+   p->next = _ll_remove_all(p->next, val); // Clean the subchain first.
+   if (p->info == val)                     // Then decide about this node.
+   {
+      ListNode *rest = p->next;
+      free(p);
+      return rest;
+   }
+   return p;
+}
+
+// Function to remove every occurrence of val.
+void ll_remove_all(LinkedList *l, int val)
+{
+   l->first = _ll_remove_all(l->first, val);
 }
 
 static void _ll_free(ListNode *p)

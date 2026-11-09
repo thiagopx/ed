@@ -28,4 +28,7 @@ Professor *pr_create(const char *name, const char *cpf, Department dept);
  */
 void pr_print(Professor *p);
 
+// Read-only access to the CPF (the struct itself stays hidden).
+const char *pr_cpf(Professor *x);
+
 #endif

@@ -46,3 +46,9 @@ void pr_print(Professor *p)
    // Print the professor's name and formatted CPF.
    printf("Name: %-20s CPF: %s.%s.%s-%-20s Dept: %s\n", p->name, cpf_block1, cpf_block2, cpf_block3, cpf_block4, dept);
 }
+
+// Return the CPF (read-only).
+const char *pr_cpf(Professor *x)
+{
+   return x->cpf;
+}

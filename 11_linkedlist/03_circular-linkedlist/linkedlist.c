@@ -73,6 +73,35 @@ void ll_rotate(LinkedList *l)
         l->first = l->first->next;
 }
 
+// Function to solve the Josephus problem on the list.
+// Combines two operations of the circular list: moving forward around the cycle and
+// removing a node knowing the one before it. Counting never "falls off" the end.
+int ll_josephus(LinkedList *l, int k)
+{
+    // prev starts at the last node (the one before first), so that prev->next is the first.
+    ListNode *prev = l->first;
+    while (prev->next != l->first)
+        prev = prev->next;
+
+    while (prev->next != prev) // More than one node left.
+    {
+        for (int i = 1; i < k; i++) // Move k-1 nodes: prev->next becomes the k-th node.
+            prev = prev->next;
+
+        ListNode *victim = prev->next;
+        prev->next = victim->next; // Unlink the victim; the cycle stays closed.
+        if (victim == l->first)    // Never leave first pointing to freed memory.
+            l->first = victim->next;
+        printf("%d ", victim->info);
+        free(victim);
+        // Counting restarts at the node after the victim: prev stays where it is.
+    }
+    printf("\n");
+
+    l->first = prev; // The survivor is the only node; it points to itself.
+    return prev->info;
+}
+
 // Function to free the memory used by the list.
 void ll_free(LinkedList *l)
 {

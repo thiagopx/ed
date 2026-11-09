@@ -47,10 +47,32 @@ int main(void)
    ll_insert(b, 99);
    printf("after inserting 99 in b: %d\n", ll_equals(a, b));
 
+   printf("------------\n\n");
+
+   printf("Sorted insertion, append, remove all\n");
+   LinkedList *s = ll_create();
+   int vals[6] = {5, 2, 8, 2, 9, 2};
+   for (int i = 0; i < 6; i++)
+      ll_insert_sorted(s, vals[i]);
+   ll_print(s);
+   ll_append(s, 1); // Goes to the end, even if it breaks the order.
+   ll_print(s);
+   ll_remove_all(s, 2);
+   ll_print(s);
+   printf("is 8 in the list? %d; is 2? %d\n", ll_is_in(s, 8), ll_is_in(s, 2));
+   printf("------------\n\n");
+
+   printf("Even values in a single pass\n");
+   int even_sum;
+   int even_count = ll_count_even(l, &even_sum);
+   printf("%d even values, sum = %d\n", even_count, even_sum);
+   printf("------------\n\n");
+
    // Free the memory used by the lists
    ll_free(l); // Free the memory allocated for the list and its nodes using ll_free.
    ll_free(a);
    ll_free(b);
+   ll_free(s);
 
    return 0; // Return 0 to indicate successful program execution.
 }

@@ -131,6 +131,70 @@ void ll_remove_all(LinkedList *l, int v)
         ;
 }
 
+// Function to append an element to the end of the linked list.
+// Without a pointer to the last node, the whole list must be walked: cost grows with n.
+void ll_append(LinkedList *l, int v)
+{
+    ListNode *node = (ListNode *)malloc(sizeof(ListNode)); // Allocate memory for a new node.
+    node->info = v;
+    node->next = NULL; // The new node will be the last one.
+
+    if (l->first == NULL) // Empty list: the new node is also the first one.
+    {
+        l->first = node;
+        return;
+    }
+
+    ListNode *p = l->first;
+    while (p->next != NULL) // Stop at the current last node.
+        p = p->next;
+    p->next = node; // Link the old last node to the new one.
+}
+
+// Function to build a new list with the n values of array v, in the same order.
+LinkedList *ll_from_array(int v[], int n)
+{
+    LinkedList *l = ll_create();
+    ListNode *last = NULL; // Last node built so far: appending after it costs O(1).
+    for (int i = 0; i < n; i++)
+    {
+        ListNode *node = (ListNode *)malloc(sizeof(ListNode));
+        node->info = v[i];
+        node->next = NULL;
+        if (last == NULL)
+            l->first = node; // The first value starts the list.
+        else
+            last->next = node;
+        last = node;
+    }
+    return l;
+}
+
+// Function to remove repeated values, keeping only the first occurrence of each one.
+// For each node, a second walk (q, with its own prev) removes the later copies of the same value.
+void ll_remove_duplicates(LinkedList *l)
+{
+    for (ListNode *p = l->first; p != NULL; p = p->next)
+    {
+        ListNode *prev = p;    // The node before q; starts at p itself.
+        ListNode *q = p->next; // Walks the rest of the list looking for copies of p->info.
+        while (q != NULL)
+        {
+            if (q->info == p->info)
+            {
+                prev->next = q->next; // Skip the copy...
+                free(q);              // ...and free it.
+                q = prev->next;       // prev stays where it is.
+            }
+            else
+            {
+                prev = q;
+                q = q->next;
+            }
+        }
+    }
+}
+
 // Function to free the memory used by the linked list.
 void ll_free(LinkedList *l)
 {

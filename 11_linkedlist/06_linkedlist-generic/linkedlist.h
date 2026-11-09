@@ -100,7 +100,7 @@ void *ll_get(LinkedList *l, int pos);
  * Return a new linked list with the elements reversed.
  *
  * @param l - A pointer to the linked list to be reversed.
- * @return  - A new linked list with the elements in reverse order.
+ * @return  - A new list pointing to the SAME records, in reverse order (free with ll_free_nodes).
  */
 LinkedList *ll_reversed(LinkedList *l);
 
@@ -109,12 +109,31 @@ LinkedList *ll_reversed(LinkedList *l);
  *
  * @param l1 - A pointer to the first linked list.
  * @param l2 - A pointer to the second linked list to be concatenated.
- * @return   - A new linked list containing elements from both l1 and l2.
+ * @return   - A new list pointing to the SAME records of l1 and l2 (free with ll_free_nodes).
  */
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
 /**
- * Free the memory used by the linked list.
+ * Return the type of the element at a given position (0-based). ll_get returns void *,
+ * so the caller needs this to know how to use the pointer. Position must be valid.
+ */
+NodeType ll_type_at(LinkedList *l, int pos);
+
+/**
+ * Build a new list that points to the SAME professor records of l (shallow copy),
+ * in the same order. Free it with ll_free_nodes, never with ll_free.
+ */
+LinkedList *ll_professors(LinkedList *l);
+
+/**
+ * Free only the nodes and the list structure, not the records they point to.
+ * Use it for lists that do not own their records (ll_reversed, ll_concatenate, ll_professors).
+ */
+void ll_free_nodes(LinkedList *l);
+
+/**
+ * Free the memory used by the linked list: nodes, structure AND the records
+ * (the list owns the records it receives in ll_insert/ll_append).
  *
  * @param l - A pointer to the linked list to be freed.
  */

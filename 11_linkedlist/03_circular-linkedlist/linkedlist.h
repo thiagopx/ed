@@ -22,6 +22,10 @@ int ll_size(LinkedList *l);
 // Move the start of the list one node forward
 void ll_rotate(LinkedList *l);
 
+// Josephus problem: starting at the first node, remove every k-th node (printing each
+// removed value) until a single node remains; return its value. The list must not be empty.
+int ll_josephus(LinkedList *l, int k);
+
 // Free the memory used by the list
 void ll_free(LinkedList *l);
 

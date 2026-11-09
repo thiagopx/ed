@@ -46,3 +46,9 @@ void st_print(Student *s)
    // Print the student's name, formatted CPF, and course.
    printf("Name: %-20s CPF: %s.%s.%s-%-20s Course: %s\n", s->name, cpf_block1, cpf_block2, cpf_block3, cpf_block4, course);
 }
+
+// Return the CPF (read-only).
+const char *st_cpf(Student *x)
+{
+   return x->cpf;
+}

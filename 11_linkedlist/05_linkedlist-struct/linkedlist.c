@@ -78,6 +78,87 @@ void ll_append(LinkedList *l, const char *name, const char *cpf)
     }
 }
 
+// Search for the node of the student with a given CPF (NULL if absent).
+static ListNode *_search(LinkedList *l, const char *cpf)
+{
+    ListNode *p = l->first;
+    while (p != NULL && strcmp(st_cpf(p->info), cpf) != 0) // Compare strings, not pointers.
+        p = p->next;
+    return p;
+}
+
+// Check whether a student with this CPF is in the list.
+int ll_is_in(LinkedList *l, const char *cpf)
+{
+    return _search(l, cpf) != NULL;
+}
+
+// Unlink node p from the list and free it together with the student it owns.
+static void _unlink_and_free(LinkedList *l, ListNode *p)
+{
+    if (p == l->first)
+        l->first = p->next;
+    else
+        p->prev->next = p->next;
+
+    if (p == l->last)
+        l->last = p->prev;
+    else
+        p->next->prev = p->prev;
+
+    free(p->info); // The list owns the student: it was created by ll_insert/ll_append.
+    free(p);
+    l->count--;
+}
+
+// Remove the first student with this CPF.
+void ll_remove(LinkedList *l, const char *cpf)
+{
+    ListNode *p = _search(l, cpf);
+    if (p != NULL)
+        _unlink_and_free(l, p);
+}
+
+// Remove every student with this CPF, in a single pass.
+void ll_remove_all(LinkedList *l, const char *cpf)
+{
+    ListNode *p = l->first;
+    while (p != NULL)
+    {
+        ListNode *next = p->next; // Save it: p may be freed.
+        if (strcmp(st_cpf(p->info), cpf) == 0)
+            _unlink_and_free(l, p);
+        p = next;
+    }
+}
+
+// Remove all students, keeping the (now empty) list structure.
+void ll_clear(LinkedList *l)
+{
+    while (l->first != NULL)
+        _unlink_and_free(l, l->first);
+}
+
+// Return the NODE of the student whose name comes first alphabetically (NULL if empty).
+// Returning the node (not the student) lets the caller keep walking or unlink from there.
+static ListNode *_first_by_name(LinkedList *l)
+{
+    if (l->first == NULL)
+        return NULL;
+    ListNode *best = l->first; // Best candidate so far.
+    for (ListNode *p = l->first->next; p != NULL; p = p->next)
+        if (strcmp(st_name(p->info), st_name(best->info)) < 0)
+            best = p;
+    return best;
+}
+
+// Return the student whose name comes first alphabetically (NULL if the list is empty).
+Student *ll_first_by_name(LinkedList *l)
+{
+    ListNode *node = _first_by_name(l);
+    return node == NULL ? NULL : node->info;
+}
+
 // Free the memory used by the linked list and its nodes.
 void ll_free(LinkedList *l)
 {

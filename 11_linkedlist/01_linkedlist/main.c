@@ -50,9 +50,27 @@ int main(void)
         ll_print(sorted);
     }
 
+    printf("------------\n\n");
+
+    // Append to the end
+    printf("Appending 100 to the end of the first list\n");
+    ll_append(l, 100); // Walks the whole list to find the last node.
+    ll_print(l);
+    printf("------------\n\n");
+
+    // Build from an array and remove repeated values
+    printf("Building a list from an array and removing repeated values\n");
+    int data[8] = {4, 2, 4, 7, 2, 2, 9, 4};
+    LinkedList *rep = ll_from_array(data, 8); // Same order as the array.
+    ll_print(rep);
+    ll_remove_duplicates(rep); // Keeps the first occurrence of each value.
+    ll_print(rep);
+    printf("------------\n\n");
+
     // Free the memory used by the lists
     ll_free(l); // Free the memory allocated for the list and its nodes using ll_free.
     ll_free(sorted);
+    ll_free(rep);
 
     return 0; // Return 0 to indicate successful program execution.
 }

@@ -40,6 +40,13 @@ LinkedList *ll_reversed(LinkedList *l);
 // Concatenate two linked lists, placing l2 after l1
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
+// Reverse the list in place, only swapping pointers (no node is allocated)
+void ll_reverse_in_place(LinkedList *l);
+
+// Keep the first k nodes in l and move the remaining ones, in order, to a new list,
+// only adjusting pointers; return the new list (empty if l has k nodes or fewer)
+LinkedList *ll_split_at(LinkedList *l, int k);
+
 // Free the memory used by the linked list
 void ll_free(LinkedList *l);
 

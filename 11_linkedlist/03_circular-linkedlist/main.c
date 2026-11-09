@@ -29,8 +29,22 @@ int main(void)
     ll_rotate(one);
     ll_print(one);
 
+    printf("------------\n\n");
+
+    // Josephus: remove every 3rd node until one is left
+    printf("Josephus with 7 people, removing every 3rd\n");
+    LinkedList *circle = ll_create();
+    for (int i = 7; i >= 1; i--)
+        ll_insert(circle, i); // Inserting at the start in reverse gives 1 2 3 4 5 6 7.
+    ll_print(circle);
+    printf("Removed in this order: ");
+    int survivor = ll_josephus(circle, 3);
+    printf("Survivor: %d\n", survivor);
+    ll_print(circle);
+
     ll_free(l);
     ll_free(one);
+    ll_free(circle);
 
     return 0;
 }

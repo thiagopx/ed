@@ -28,4 +28,7 @@ Student *st_create(const char *name, const char *cpf, Course course);
  */
 void st_print(Student *s);
 
+// Read-only access to the CPF (the struct itself stays hidden).
+const char *st_cpf(Student *x);
+
 #endif

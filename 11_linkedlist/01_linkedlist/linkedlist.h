@@ -43,6 +43,12 @@ LinkedList *ll_reversed(LinkedList *l);
 // Concatenate two linked lists, placing l2 after l1
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
+// Build a new linked list with the n values of array v, in the same order
+LinkedList *ll_from_array(int v[], int n);
+
+// Remove repeated values, keeping only the first occurrence of each one
+void ll_remove_duplicates(LinkedList *l);
+
 // Free the memory used by the linked list
 void ll_free(LinkedList *l);
 
