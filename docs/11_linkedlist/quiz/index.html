@@ -544,6 +544,126 @@ const questions = [
     correctIndex: 2,
     explainCorrect: "Um void * é só um endereço: ele não carrega o tipo do objeto apontado, e o compilador não tem como saber o que há lá. Por isso cada nó guarda também o campo type (um NodeType), gravado por ll_insert, e é ele que ll_print consulta para escolher entre st_print e pr_print. Se type estiver errado, nada avisa — a memória é interpretada com o formato errado.",
     explainIncorrect: "A resposta correta é p-&gt;type == TYPE_STUDENT. O void * não diz para que tipo aponta, nem por sizeof; testar p-&gt;info contra NULL ou contra TYPE_STUDENT compara o endereço guardado, não o tipo do objeto. A única fonte de verdade é o campo type que ll_insert grava em cada nó."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Custo de anexar",
+    text: "Numa lista simplesmente encadeada que guarda só first, quantos nós ll_append visita para anexar um valor a uma lista com n elementos? E numa lista que também guarda last?",
+    options: [
+      "n e n: anexar sempre exige percorrer a lista",
+      "n e nenhum: com last, o nó novo é ligado direto depois do último",
+      "Nenhum e nenhum: anexar é sempre O(1)",
+      "1 e 1: só o último nó é visitado"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Sem last, ll_append parte de first e anda até o nó cujo next é NULL: n visitas, O(n). Guardando last, basta fazer last->next = node e atualizar last: O(1).",
+    explainIncorrect: "A resposta correta é: n sem last e nenhum com last. A lista que só conhece first precisa procurar o último a cada anexação; com last, o último já é conhecido."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Acesso por posição",
+    text: "Por que obter o elemento da posição i (como faz _at, na lista heterogênea) custa O(i) numa lista encadeada, enquanto v[i] custa O(1) num vetor?",
+    options: [
+      "Porque a lista guarda os elementos ordenados",
+      "Porque os nós não são contíguos: para chegar ao i-ésimo, é preciso seguir next a partir do primeiro",
+      "Porque a função de acesso faz uma cópia do elemento",
+      "Porque o vetor é sempre menor que a lista"
+    ],
+    correctIndex: 1,
+    explainCorrect: "No vetor, o endereço de v[i] é calculado com uma conta, porque os elementos estão lado a lado. Na lista, cada nó foi alocado separadamente, e o único caminho até o i-ésimo é seguir next i vezes.",
+    explainIncorrect: "A resposta correta é: os nós não são contíguos. Não há conta que dê o endereço do i-ésimo nó; é preciso percorrer a cadeia desde o primeiro."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Remover o último na dupla",
+    text: "Na lista duplamente encadeada, ll_remove retira o nó p, que é o último da lista (com mais de um nó). Quais campos precisam mudar?",
+    options: [
+      "Só l->last",
+      "O next do anterior de p (que vira NULL) e l->last (que passa a ser o anterior); count diminui",
+      "O prev do primeiro nó e l->first",
+      "Nenhum: free(p) ajusta os vizinhos"
+    ],
+    correctIndex: 1,
+    explainCorrect: "p não é o primeiro, então p->prev->next = p->next (NULL); p é o último, então l->last = p->prev. Não existe p->next para atualizar, e count é decrementado.",
+    explainIncorrect: "A resposta correta é: o next do anterior vira NULL e last recua para o anterior. Esquecer last deixaria a lista apontando para um nó liberado."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Lista circular vazia",
+    text: "Ao inserir o primeiro nó numa lista circular vazia, para onde aponta o next desse nó?",
+    options: [
+      "Para NULL",
+      "Para ele mesmo",
+      "Para l->first, que ainda é NULL",
+      "Para um nó sentinela criado por ll_create"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Numa lista circular, o next do último aponta para o primeiro. Com um nó só, ele é o primeiro e o último ao mesmo tempo: aponta para si mesmo.",
+    explainIncorrect: "A resposta correta é: para ele mesmo. Uma lista circular não tem NULL no fim; com um nó, o ciclo tem tamanho 1."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Pilha da recursão",
+    text: "Quantas chamadas de _ll_size ficam ativas ao mesmo tempo, no máximo, para uma lista com n nós?",
+    options: [
+      "1",
+      "log n",
+      "n + 1: uma por nó, mais a do caso base (NULL)",
+      "2n"
+    ],
+    correctIndex: 2,
+    explainCorrect: "Cada chamada só termina depois que a chamada para o resto termina. Com n nós, empilham-se n chamadas e mais uma para o NULL: a memória da pilha cresce com n, ao contrário da versão iterativa.",
+    explainIncorrect: "A resposta correta é: n + 1. A recursão desce até o caso base antes de começar a voltar, então todas as chamadas ficam ativas ao mesmo tempo."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Cópia rasa e profunda",
+    text: "Na lista de alunos (05), ll_free libera também os Student, porque a lista é dona deles. Suponha uma função que monte uma lista nova apenas copiando os ponteiros para os mesmos Student de uma lista original. O que aconteceria se, no fim, as duas listas fossem liberadas com ll_free?",
+    options: [
+      "Nada: cada lista libera seus próprios nós",
+      "Cada Student seria liberado duas vezes, um erro de execução",
+      "Os Student nunca seriam liberados",
+      "O programa não compilaria"
+    ],
+    correctIndex: 1,
+    explainCorrect: "ll_free libera o Student de cada nó, porque a lista é dona dele. Se as duas listas apontassem para os mesmos registros, cada um receberia dois free — comportamento indefinido.",
+    explainIncorrect: "A resposta correta é: liberação dupla. Com cópia rasa, as duas listas apontam para os mesmos registros, e ll_free de cada uma tenta liberá-los."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "void * na lista heterogênea",
+    text: "Na lista heterogênea, o que o compilador deixa de verificar por causa de void *info?",
+    options: [
+      "Se o nó foi alocado com malloc",
+      "Se o dado guardado é mesmo do tipo indicado por NodeType e se a conversão para Student * ou Professor * está certa",
+      "Se a lista está vazia",
+      "Se os nomes têm até 50 caracteres"
+    ],
+    correctIndex: 1,
+    explainCorrect: "void * aceita o endereço de qualquer coisa; a conversão para Student * ou Professor * é feita pelo programador, guiado por NodeType. Um tipo marcado errado compila sem aviso e só falha na execução.",
+    explainIncorrect: "A resposta correta é: a correspondência entre o dado e o tipo indicado. O compilador não tem como saber o que está do outro lado de um void *."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Escolha da estrutura",
+    text: "Um programa mantém uma fila de atendimento: os pedidos chegam sempre no fim e são atendidos sempre pelo início, e o tamanho varia muito. Qual estrutura atende as duas operações em O(1)?",
+    options: [
+      "Lista simples com só first",
+      "Lista simples com first e last",
+      "Lista circular sem ponteiro para o último",
+      "Vetor estático"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Com first, retirar do início é O(1); com last, anexar no fim também. A lista simples com só first anexaria em O(n), e o vetor estático não cresce.",
+    explainIncorrect: "A resposta correta é: lista simples com first e last. Retira-se pelo first e anexa-se pelo last, ambos sem percorrer a lista."
   }
 ];
 
@@ -705,5 +825,6 @@ restartBtn.addEventListener('click', () => {
 renderQuestion();
 </script>
 
+<p style="text-align:center;font-size:0.8rem;opacity:0.7;margin:1.5rem 0">Material v2026.2</p>
 </body>
 </html>
