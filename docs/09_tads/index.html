@@ -908,67 +908,75 @@ Concatenated string: Hello, World!
 str1 is less than str2 (result = -1)</pre>
 
         <h3>Outros arquivos do projeto</h3>
-<p class="file-label"><code>01_modules/my_string.h</code></p><pre class="code-block"><code><span class="pp">#ifndef _MY_STRING_H</span>
+<p class="file-label"><code>01_modules/my_string.h</code></p><pre class="code-block"><code><span class="cmt">// Hand-written versions of four functions of string.h, split into their own module.</span>
+
+<span class="pp">#ifndef _MY_STRING_H</span>
 <span class="pp">#define _MY_STRING_H</span>
 
-<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
+<span class="cmt">// Returns the length of str, not counting the &#x27;\0&#x27; (analogous to strlen).</span>
+<span class="cmt">// Cost: O(n).</span>
 <span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str);
-<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
+
+<span class="cmt">// Copies src, &#x27;\0&#x27; included, into dest (analogous to strcpy).</span>
+<span class="cmt">// Requires: dest has room for my_strlen(src) + 1 characters.</span>
+<span class="cmt">// Cost: O(n).</span>
 <span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src);
-<span class="cmt">// Function to concatenate two strings (analogous to strcat)</span>
+
+<span class="cmt">// Appends src to the end of dest (analogous to strcat).</span>
+<span class="cmt">// Requires: dest has room for my_strlen(dest) + my_strlen(src) + 1 characters.</span>
+<span class="cmt">// Cost: O(n).</span>
 <span class="kw">void</span> <span class="fn">my_strcat</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src);
-<span class="cmt">// Function to compare two strings (analogous to strcmp)</span>
+
+<span class="cmt">// Compares str1 and str2; returns 0 if equal, a negative value if str1 comes first, a positive</span>
+<span class="cmt">//   value otherwise (analogous to strcmp).</span>
+<span class="cmt">// Cost: O(n).</span>
 <span class="kw">int</span> <span class="fn">my_strcmp</span>(<span class="kw">const</span> <span class="kw">char</span> *str1, <span class="kw">const</span> <span class="kw">char</span> *str2);
 
-<span class="pp">#endif // _MY_STRING_H</span></code></pre>
-<p class="file-label"><code>01_modules/my_string.c</code></p><pre class="code-block"><code><span class="pp">#include "my_string.h"</span>
+<span class="pp">#endif</span> <span class="cmt">// _MY_STRING_H</span></code></pre>
+<p class="file-label"><code>01_modules/my_string.c</code></p><pre class="code-block"><code><span class="pp">#include &quot;my_string.h&quot;</span>
 
-<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
 <span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str)
 {
     <span class="kw">int</span> length = <span class="num">0</span>;
 
-    <span class="kw">while</span> (str[length] != <span class="str">'\0'</span>)
+    <span class="kw">while</span> (str[length] != <span class="str">&#x27;\0&#x27;</span>)
         length++;
 
     <span class="kw">return</span> length;
 }
 
-<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
 <span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src)
 {
     <span class="kw">int</span> i = <span class="num">0</span>;
 
-    <span class="kw">while</span> (src[i] != <span class="str">'\0'</span>)
+    <span class="kw">while</span> (src[i] != <span class="str">&#x27;\0&#x27;</span>)
     {
         dest[i] = src[i];
         i++;
     }
 
-    dest[i] = <span class="str">'\0'</span>; <span class="cmt">// Null-terminate the destination string</span>
+    dest[i] = <span class="str">&#x27;\0&#x27;</span>; <span class="cmt">// Null-terminate the destination string</span>
 }
 
-<span class="cmt">// Function to concatenate two strings (analogous to strcat)</span>
 <span class="kw">void</span> <span class="fn">my_strcat</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src)
 {
     <span class="kw">int</span> dest_len = <span class="fn">my_strlen</span>(dest);
     <span class="kw">int</span> i = <span class="num">0</span>;
 
-    <span class="kw">while</span> (src[i] != <span class="str">'\0'</span>)
+    <span class="kw">while</span> (src[i] != <span class="str">&#x27;\0&#x27;</span>)
     {
         dest[dest_len + i] = src[i];
         i++;
     }
 
-    dest[dest_len + i] = <span class="str">'\0'</span>; <span class="cmt">// Null-terminate the concatenated string</span>
+    dest[dest_len + i] = <span class="str">&#x27;\0&#x27;</span>; <span class="cmt">// Null-terminate the concatenated string</span>
 }
 
-<span class="cmt">// Function to compare two strings (analogous to strcmp)</span>
 <span class="kw">int</span> <span class="fn">my_strcmp</span>(<span class="kw">const</span> <span class="kw">char</span> *str1, <span class="kw">const</span> <span class="kw">char</span> *str2)
 {
     <span class="kw">int</span> i;
 
-    <span class="kw">for</span> (i = <span class="num">0</span>; str1[i] != <span class="str">'\0'</span> &amp;&amp; str2[i] != <span class="str">'\0'</span>; ++i)
+    <span class="kw">for</span> (i = <span class="num">0</span>; str1[i] != <span class="str">&#x27;\0&#x27;</span> &amp;&amp; str2[i] != <span class="str">&#x27;\0&#x27;</span>; ++i)
     {
         <span class="kw">int</span> d = str1[i] - str2[i];
 
@@ -1101,58 +1109,68 @@ Point: (6.0, 0.0)
 The point is outside the circle.</pre>
 
         <h3>Outros arquivos do projeto</h3>
-<p class="file-label"><code>02_circle/include/point2d.h</code></p><pre class="code-block"><code><span class="pp">#ifndef POINT2D</span>
+<p class="file-label"><code>02_circle/include/point2d.h</code></p><pre class="code-block"><code><span class="cmt">// A point in the plane, with coordinates x and y.</span>
+
+<span class="pp">#ifndef POINT2D</span>
 <span class="pp">#define POINT2D</span>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> point2d <span class="type">Point2D</span>;
 
-<span class="cmt">// Function to create a new Point2D</span>
+<span class="cmt">// Returns a new point with coordinates x and y.</span>
+<span class="cmt">// Ownership: the caller frees it with free_point.</span>
 <span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);
-<span class="cmt">// Function to calculate the Euclidean distance between two points</span>
+
+<span class="cmt">// Returns the Euclidean distance between point1 and point2.</span>
 <span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2);
-<span class="cmt">// Function to read the coordinates of a Point2D</span>
+
+<span class="cmt">// Stores the coordinates of point in *x and *y.</span>
 <span class="kw">void</span> <span class="fn">get_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> *x, <span class="kw">double</span> *y);
-<span class="cmt">// Function to set the coordinates of a Point2D</span>
+
+<span class="cmt">// Sets the coordinates of point to x and y.</span>
 <span class="kw">void</span> <span class="fn">set_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> x, <span class="kw">double</span> y);
+
+<span class="cmt">// Frees point.</span>
 <span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point);
 <span class="pp">#endif</span></code></pre>
-<p class="file-label"><code>02_circle/include/circle.h</code></p><pre class="code-block"><code><span class="pp">#ifndef CIRCLE</span>
+<p class="file-label"><code>02_circle/include/circle.h</code></p><pre class="code-block"><code><span class="cmt">// A circle in the plane, given by its center (a Point2D) and its radius.</span>
+
+<span class="pp">#ifndef CIRCLE</span>
 <span class="pp">#define CIRCLE</span>
 
-<span class="pp">#include "point2d.h"</span>
+<span class="pp">#include &quot;point2d.h&quot;</span>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> circle <span class="type">Circle</span>;
 
-<span class="cmt">// Function to create a new Circle</span>
+<span class="cmt">// Returns a new circle with center (center_x, center_y) and the given radius.</span>
+<span class="cmt">// Ownership: the caller frees it with free_circle.</span>
 <span class="type">Circle</span> *<span class="fn">create_circle</span>(<span class="kw">double</span> center_x, <span class="kw">double</span> center_y, <span class="kw">double</span> radius);
-<span class="cmt">// Function to check if a point is inside a circle</span>
+
+<span class="cmt">// Checks whether point is inside circle; returns 1 if it is, 0 otherwise.</span>
 <span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle);
-<span class="cmt">// Function to deallocate a Circle</span>
+
+<span class="cmt">// Frees circle and its center.</span>
 <span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle);
 <span class="pp">#endif</span></code></pre>
-<p class="file-label"><code>02_circle/src/point2d.c</code></p><pre class="code-block"><code><span class="pp">#include "point2d.h"</span>
+<p class="file-label"><code>02_circle/src/point2d.c</code></p><pre class="code-block"><code><span class="pp">#include &quot;point2d.h&quot;</span>
 <span class="pp">#include &lt;math.h&gt;</span>
 <span class="pp">#include &lt;stdio.h&gt;</span>
 <span class="pp">#include &lt;stdlib.h&gt;</span>
 
-<span class="cmt">// Define a Point2D structure</span>
 <span class="kw">struct</span> point2d {
   <span class="kw">double</span> x;
   <span class="kw">double</span> y;
 };
 
-<span class="cmt">// Function to calculate the Euclidean distance between two points</span>
 <span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2) {
   <span class="kw">double</span> dx = point1-&gt;x - point2-&gt;x;
   <span class="kw">double</span> dy = point1-&gt;y - point2-&gt;y;
   <span class="kw">return</span> <span class="fn">sqrt</span>(dx * dx + dy * dy);
 }
 
-<span class="cmt">// Function to create a new Point2D</span>
 <span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y) {
   <span class="type">Point2D</span> *new_point = (<span class="type">Point2D</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Point2D</span>));
   <span class="kw">if</span> (new_point == NULL) {
-    <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Point2D"</span>);
+    <span class="fn">perror</span>(<span class="str">&quot;Failed to allocate memory for Point2D&quot;</span>);
     <span class="fn">exit</span>(EXIT_FAILURE);
   }
   new_point-&gt;x = x;
@@ -1160,24 +1178,21 @@ The point is outside the circle.</pre>
   <span class="kw">return</span> new_point;
 }
 
-<span class="cmt">// Function to read the coordinates of a Point2D</span>
 <span class="kw">void</span> <span class="fn">get_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> *x, <span class="kw">double</span> *y) {
   *x = point-&gt;x;
   *y = point-&gt;y;
 }
 
-<span class="cmt">// Function to set the coordinates of a Point2D</span>
 <span class="kw">void</span> <span class="fn">set_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> x, <span class="kw">double</span> y) {
   point-&gt;x = x;
   point-&gt;y = y;
 }
 
-<span class="cmt">// Function to deallocate a Point2D</span>
 <span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point)
 {
     <span class="fn">free</span>(point);
 }</code></pre>
-<p class="file-label"><code>02_circle/src/circle.c</code></p><pre class="code-block"><code><span class="pp">#include "circle.h"</span>
+<p class="file-label"><code>02_circle/src/circle.c</code></p><pre class="code-block"><code><span class="pp">#include &quot;circle.h&quot;</span>
 <span class="pp">#include &lt;stdio.h&gt;</span>
 <span class="pp">#include &lt;stdlib.h&gt;</span>
 
@@ -1187,13 +1202,12 @@ The point is outside the circle.</pre>
     <span class="kw">double</span> radius;
 };
 
-<span class="cmt">// Function to create a new Circle</span>
 <span class="type">Circle</span> *<span class="fn">create_circle</span>(<span class="kw">double</span> center_x, <span class="kw">double</span> center_y, <span class="kw">double</span> radius)
 {
     <span class="type">Circle</span> *new_circle = (<span class="type">Circle</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Circle</span>));
     <span class="kw">if</span> (new_circle == NULL)
     {
-        <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Circle"</span>);
+        <span class="fn">perror</span>(<span class="str">&quot;Failed to allocate memory for Circle&quot;</span>);
         <span class="fn">exit</span>(EXIT_FAILURE);
     }
     new_circle-&gt;center = <span class="fn">create_point</span>(center_x, center_y);
@@ -1201,7 +1215,6 @@ The point is outside the circle.</pre>
     <span class="kw">return</span> new_circle;
 }
 
-<span class="cmt">// Function to check if a point is inside a circle</span>
 <span class="kw">int</span> <span class="fn">is_point_inside_circle</span>(<span class="type">Point2D</span> *point, <span class="type">Circle</span> *circle)
 {
     <span class="kw">double</span> distance = <span class="fn">euclidean_distance</span>(point, circle-&gt;center);
@@ -1209,15 +1222,14 @@ The point is outside the circle.</pre>
     <span class="cmt">// If the distance is less than the radius, the point is inside the circle</span>
     <span class="kw">if</span> (distance &lt; circle-&gt;radius)
     {
-        <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Inside</span>
+        <span class="kw">return</span> <span class="num">1</span>;
     }
     <span class="kw">else</span>
     {
-        <span class="kw">return</span> <span class="num">0</span>; <span class="cmt">// Outside</span>
+        <span class="kw">return</span> <span class="num">0</span>;
     }
 }
 
-<span class="cmt">// Function to deallocate a Circle</span>
 <span class="kw">void</span> <span class="fn">free_circle</span>(<span class="type">Circle</span> *circle)
 {
     <span class="fn">free_point</span>(circle-&gt;center);
@@ -1320,29 +1332,30 @@ Matrix 3 x 4:
  20.0  21.0  22.0  23.0 </pre>
 
         <h3>Outros arquivos do projeto</h3>
-<p class="file-label"><code>03_matrix/include/matrix.h</code></p><pre class="code-block"><code><span class="pp">#ifndef MATRIX_H</span>
-<span class="pp">#define MATRIX_H</span>
+<p class="file-label"><code>03_matrix/include/matrix.h</code></p><pre class="code-block"><code><span class="cmt">// An m-by-n matrix of floats, dynamically allocated.</span>
 
-<span class="cmt">// ADT: m-by-n matrix, dynamically allocated</span>
+<span class="pp">#ifndef MATRIX_H</span>
+<span class="pp">#define MATRIX_H</span>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> matrix <span class="type">Matrix</span>;
 
-<span class="cmt">// Creates and returns an m-by-n matrix with all elements set to 0</span>
+<span class="cmt">// Returns a new m-by-n matrix with all elements set to 0.</span>
+<span class="cmt">// Cost: O(m * n).</span>
 <span class="type">Matrix</span> *<span class="fn">matrix_create</span>(<span class="kw">int</span> m, <span class="kw">int</span> n);
 
-<span class="cmt">// Frees the memory allocated for the matrix</span>
+<span class="cmt">// Frees mat.</span>
 <span class="kw">void</span> <span class="fn">matrix_free</span>(<span class="type">Matrix</span> *mat);
 
-<span class="cmt">// Returns the element at row i and column j</span>
+<span class="cmt">// Returns the element of mat at row i and column j.</span>
 <span class="kw">float</span> <span class="fn">matrix_get</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j);
 
-<span class="cmt">// Sets the element at row i and column j to v</span>
+<span class="cmt">// Sets the element of mat at row i and column j to v.</span>
 <span class="kw">void</span> <span class="fn">matrix_set</span>(<span class="type">Matrix</span> *mat, <span class="kw">int</span> i, <span class="kw">int</span> j, <span class="kw">float</span> v);
 
-<span class="cmt">// Returns the number of rows</span>
+<span class="cmt">// Returns the number of rows of mat.</span>
 <span class="kw">int</span> <span class="fn">matrix_rows</span>(<span class="type">Matrix</span> *mat);
 
-<span class="cmt">// Returns the number of columns</span>
+<span class="cmt">// Returns the number of columns of mat.</span>
 <span class="kw">int</span> <span class="fn">matrix_cols</span>(<span class="type">Matrix</span> *mat);
 
 <span class="pp">#endif</span></code></pre>

@@ -622,12 +622,10 @@
 <pre><code><span class="pp">#ifndef _MY_STRING_H</span>
 <span class="pp">#define _MY_STRING_H</span>
 
-<span class="cmt">// Function to calculate the length of a string (analogous to strlen)</span>
 <span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const</span> <span class="kw">char</span> *str);
-<span class="cmt">// Function to copy one string to another (analogous to strcpy)</span>
 <span class="kw">void</span> <span class="fn">my_strcpy</span>(<span class="kw">char</span> *dest, <span class="kw">const</span> <span class="kw">char</span> *src);
 
-<span class="pp">#endif // _MY_STRING_H</span></code></pre>
+<span class="pp">#endif</span></code></pre>
           </div>
         </div>
       </div>
@@ -767,7 +765,7 @@ str1 is less than str2 (result = -1)</div>
 {
     <span class="kw">int</span> length = <span class="num">0</span>;
 
-    <span class="kw">while</span> (str[length] != <span class="str">'\0'</span>)
+    <span class="kw">while</span> (str[length] != <span class="str">&#x27;\0&#x27;</span>)
         length++;
 
     <span class="kw">return</span> length;
@@ -904,13 +902,9 @@ str1 is less than str2 (result = -1)</div>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> point2d <span class="type">Point2D</span>;
 
-<span class="cmt">// Function to create a new Point2D</span>
 <span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y);
-<span class="cmt">// Function to calculate the Euclidean distance between two points</span>
 <span class="kw">double</span> <span class="fn">euclidean_distance</span>(<span class="type">Point2D</span> *point1, <span class="type">Point2D</span> *point2);
-<span class="cmt">// Function to read the coordinates of a Point2D</span>
 <span class="kw">void</span> <span class="fn">get_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> *x, <span class="kw">double</span> *y);
-<span class="cmt">// Function to set the coordinates of a Point2D</span>
 <span class="kw">void</span> <span class="fn">set_point</span>(<span class="type">Point2D</span> *point, <span class="kw">double</span> x, <span class="kw">double</span> y);
 <span class="kw">void</span> <span class="fn">free_point</span>(<span class="type">Point2D</span> *point);
 <span class="pp">#endif</span></code></pre>
@@ -941,7 +935,7 @@ str1 is less than str2 (result = -1)</div>
 <pre><code><span class="type">Point2D</span> *<span class="fn">create_point</span>(<span class="kw">double</span> x, <span class="kw">double</span> y) {
   <span class="type">Point2D</span> *new_point = (<span class="type">Point2D</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">Point2D</span>));
   <span class="kw">if</span> (new_point == NULL) {
-    <span class="fn">perror</span>(<span class="str">"Failed to allocate memory for Point2D"</span>);
+    <span class="fn">perror</span>(<span class="str">&quot;Failed to allocate memory for Point2D&quot;</span>);
     <span class="fn">exit</span>(EXIT_FAILURE);
   }
   new_point-&gt;x = x;
@@ -1008,7 +1002,7 @@ str1 is less than str2 (result = -1)</div>
 <pre><code><span class="pp">#ifndef CIRCLE</span>
 <span class="pp">#define CIRCLE</span>
 
-<span class="pp">#include "point2d.h"</span>
+<span class="pp">#include &quot;point2d.h&quot;</span>
 
 <span class="kw">typedef</span> <span class="kw">struct</span> circle <span class="type">Circle</span>;</code></pre>
           </div>
@@ -1041,7 +1035,7 @@ str1 is less than str2 (result = -1)</div>
 
     <span class="kw">if</span> (distance &lt; circle-&gt;radius)
     {
-        <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// Inside</span></code></pre>
+        <span class="kw">return</span> <span class="num">1</span>;</code></pre>
           </div>
         </div>
       </div>
