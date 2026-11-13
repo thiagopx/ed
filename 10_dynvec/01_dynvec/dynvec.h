@@ -1,52 +1,60 @@
+// A dynamic vector of floats: an array that doubles its capacity when it is full.
+
 #ifndef DYNVEC_H
 #define DYNVEC_H
 
-// Define a forward declaration for a structure called 'dynvec.'
 typedef struct dynvec DynVec;
 
-// Function prototypes.
-
-// Create a new dynamic vector and return a pointer to it.
+// Returns a new empty vector, with room for 4 elements.
 DynVec *dv_create();
 
-// Create a new dynamic vector from a file and return a pointer to it.
+// Returns a new vector with the values read from the file filename (NULL if the file cannot
+//   be opened).
+// Cost: O(n).
 DynVec *dv_create_from_file(const char *filename);
 
-// Insert a float value into the dynamic vector.
+// Inserts x at the end of dv, doubling the capacity first if dv is full (amortized O(1)).
 void dv_insert(DynVec *dv, float x);
 
-// Verify if a value is in the dynamic vector.
+// Checks whether x is in dv; returns 1 if it is, 0 otherwise.
+// Cost: O(n).
 int dv_is_in(DynVec *dv, float x);
 
-// Get the value at a specific index 'i' in the dynamic vector.
+// Returns the value at index i of dv.
+// Requires: 0 <= i < dv_size(dv).
 float dv_get(DynVec *dv, int i);
 
-// Get the current size (number of elements) of the dynamic vector.
+// Returns the number of elements of dv.
 int dv_size(DynVec *dv);
 
-// Get the current capacity (maximum number of elements without resizing) of the dynamic vector.
+// Returns the capacity of dv: how many elements fit before the next resize.
 int dv_capacity(DynVec *dv);
 
-// Free the memory associated with the dynamic vector.
+// Frees dv.
 void dv_free(DynVec *dv);
 
-// Print the values of the dynamic vector.
+// Prints the values of dv.
+// Cost: O(n).
 void dv_print_values(DynVec *dv);
 
-// Write the contents of the dynamic vector to a file.
+// Writes the values of dv to the file filename.
+// Cost: O(n).
 void dv_write_to_file(DynVec *dv, const char *filename);
 
-// Concatenate two dynamic vectors and return a new dynamic vector.
+// Returns a new vector with the values of dv1 followed by those of dv2.
+// Cost: O(n1 + n2).
 DynVec *dv_concatenate(DynVec *dv1, DynVec *dv2);
 
-// Find the union of two dynamic vectors and return a new dynamic vector.
+// Returns a new vector with the union of the values of dv1 and dv2.
+// Cost: O((n1 + n2)^2).
 DynVec *dv_union(DynVec *dv1, DynVec *dv2);
 
-// Find the intersection of two dynamic vectors and return a new dynamic vector.
+// Returns a new vector with the values that are both in dv1 and in dv2.
+// Cost: O(n1 * n2).
 DynVec *dv_intersection(DynVec *dv1, DynVec *dv2);
 
-// Return a new dynamic vector with a unique ocurrence or each element
+// Returns a new vector with a single occurrence of each value of dv.
+// Cost: O(n^2).
 DynVec *dv_unique(DynVec *dv);
 
-// End of the conditional compilation directives.
 #endif

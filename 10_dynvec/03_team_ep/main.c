@@ -2,10 +2,9 @@
 #include "teamvec.h"
 #include <stdio.h>
 
-// %-15s preenche até 15 bytes, não 15 colunas visuais -- um nome com acento
-// (ex.: "ESCorpiões") usa 2 bytes para "õ", então sai uma coluna mais curto.
-// Esta função conta os bytes de continuação UTF-8 (sempre no formato 10xxxxxx)
-// para saber quantas colunas extras compensar depois do nome.
+// %-15s pads to 15 bytes, not 15 visual columns: a name with an accent (e.g., "ESCorpiões")
+// uses 2 bytes for "õ", so it comes out one column short. Returns how many UTF-8
+// continuation bytes (always 10xxxxxx) s has, i.e., how many extra columns to pad.
 static int utf8_continuation_bytes(const char *s) {
     int n = 0;
     for (const unsigned char *p = (const unsigned char *)s; *p; p++)
