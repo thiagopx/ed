@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Pilhas e filas</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+  }
+
+  .quiz-card {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #1F6F8B;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(31, 111, 139, 0.08);
+    padding: 30px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .quiz-header {
+    border-bottom: 2px solid #1F6F8B;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quiz-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25em;
+  }
+
+  .quiz-tag {
+    background-color: #1F6F8B;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-track {
+    width: 100%;
+    height: 6px;
+    background-color: #eef2f5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: #1F6F8B;
+    width: 5%;
+    transition: width 0.25s ease;
+  }
+
+  .question-block {
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #1F6F8B;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    transition: border-left-color 0.2s ease;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .q-label {
+    display: inline-block;
+    background: #1F6F8B;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+  }
+
+  .diff-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+  }
+  .diff-basico        { background: #d4efdf; color: #1e8449; }
+  .diff-intermediario { background: #fdebd0; color: #b9770e; }
+  .diff-avancado      { background: #fadbd8; color: #a93226; }
+
+  .q-text {
+    font-size: 1em;
+    color: #2c3e50;
+    margin: 6px 0 14px 0;
+  }
+
+  pre.code-block {
+    background-color: #2d3436;
+    color: #dfe6e9;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
+    margin: 10px 0 4px 0;
+  }
+  pre.code-block .kw   { color: #74b9ff; }
+  pre.code-block .type { color: #55efc4; }
+  pre.code-block .fn   { color: #ffeaa7; }
+  pre.code-block .str  { color: #ffeaa7; }
+  pre.code-block .num  { color: #d6a2e8; }
+  pre.code-block .pp   { color: #fab1a0; }
+  pre.code-block .cmt  { color: #95a5a6; font-style: italic; }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c3e50;
+    background-color: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .option:hover {
+    border-color: #1F6F8B;
+    background-color: #EEF6FA;
+  }
+
+  .option.selected {
+    border-color: #1F6F8B;
+    background-color: #D6EAF2;
+  }
+
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 1px solid #b2bec3;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #636e72;
+  }
+
+  .option.selected .letter {
+    border-color: #1F6F8B;
+    background-color: #1F6F8B;
+    color: #fff;
+  }
+
+  .option.correct {
+    border-color: #00b894;
+    background-color: #e8f8f5;
+  }
+  .option.correct .letter {
+    border-color: #00b894;
+    background-color: #00b894;
+    color: #fff;
+  }
+
+  .option.incorrect {
+    border-color: #d63031;
+    background-color: #fdecea;
+  }
+  .option.incorrect .letter {
+    border-color: #d63031;
+    background-color: #d63031;
+    color: #fff;
+  }
+
+  .option.disabled {
+    cursor: default;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary {
+    background-color: #1F6F8B;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background-color: #9FC3D1;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #f1f2f6;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 0.92em;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.correct-box {
+    background-color: #e8f8f5;
+    border: 1px solid #a3e4d7;
+    color: #117a65;
+  }
+
+  .feedback.incorrect-box {
+    background-color: #fdecea;
+    border: 1px solid #f5b7b1;
+    color: #922b21;
+  }
+
+  .feedback strong.title {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.02em;
+  }
+
+  .feedback .explain {
+    color: #2c3e50;
+  }
+
+  .progress-text {
+    font-size: 0.85em;
+    color: #636e72;
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .result-screen.show { display: block; }
+  .result-score {
+    font-size: 2.6em;
+    font-weight: bold;
+    color: #1F6F8B;
+    margin: 6px 0;
+  }
+  .result-msg {
+    font-size: 1em;
+    color: #2c3e50;
+    margin-bottom: 24px;
+  }
+
+  figure.q-fig {
+    margin: 10px 0 4px 0;
+    text-align: center;
+  }
+  figure.q-fig img {
+    max-width: 100%;
+    height: auto;
+  }
+  figure.q-fig figcaption {
+    font-size: 0.8em;
+    color: #636e72;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+
+  <div class="quiz-header">
+    <h2>Quiz — Pilhas e filas</h2>
+    <span class="quiz-tag" id="quiz-tag">Pergunta 1 de 10</span>
+  </div>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="result-screen" id="result-screen">
+    <div style="font-size:0.95em; color:#636e72;">Você concluiu o quiz de pilhas e filas!</div>
+    <div class="result-score" id="result-score">0 / 10</div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-primary" id="restart-btn">Refazer o quiz</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "LIFO",
+    text: "Usando o TAD pilha do módulo (qualquer uma das duas implementações), qual é a saída do trecho abaixo?",
+    code: `<span class="type">Stack</span> *s = <span class="fn">s_create</span>();
+<span class="fn">s_push</span>(s, <span class="num">1</span>);
+<span class="fn">s_push</span>(s, <span class="num">2</span>);
+<span class="fn">s_push</span>(s, <span class="num">3</span>);
+<span class="fn">s_pop</span>(s);
+<span class="fn">s_push</span>(s, <span class="num">4</span>);
+<span class="kw">while</span> (!<span class="fn">s_is_empty</span>(s))
+    <span class="fn">printf</span>(<span class="str">"%.0f "</span>, <span class="fn">s_pop</span>(s));`,
+    options: [
+      "1 2 4",
+      "4 3 2 1",
+      "4 2 1",
+      "1 2 3 4"
+    ],
+    correctIndex: 2,
+    explainCorrect: "Depois dos três push, o topo é o 3; o s_pop retira justamente ele, o último a entrar. O 4 vai para o topo, sobre o 2 e o 1. O laço desempilha até esvaziar, sempre pelo topo: 4 2 1. Saída conferida com as duas implementações, 01_stack-array e 02_stack.",
+    explainIncorrect: "A resposta correta é 4 2 1. Na pilha só o topo é acessível: o s_pop do meio retira o 3 (o último que entrou), e o laço final desempilha do topo para a base, na ordem inversa à de chegada. O 3 não aparece porque já tinha saído."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Reconhecer a estrutura",
+    text: "O teclado de um computador guarda as teclas pressionadas num buffer enquanto o programa está ocupado, e o programa as processa depois, uma por vez. Para que o texto saia certo, qual estrutura o buffer deve ser?",
+    options: [
+      "Uma fila: a tecla pressionada há mais tempo é a primeira a ser processada",
+      "Uma pilha: a tecla mais recente é a primeira a ser processada",
+      "Uma pilha, porque só uma ponta do buffer é usada",
+      "Tanto faz: a ordem de saída não muda o texto"
+    ],
+    correctIndex: 0,
+    explainCorrect: "A pergunta que decide é quem precisa sair primeiro. Aqui é a tecla mais antiga, porque o texto tem de sair na ordem em que foi digitado: é a regra FIFO da fila. Cada tecla nova entra no fim (q_enqueue) e o programa retira do início (q_dequeue).",
+    explainIncorrect: "A resposta correta é a fila. As teclas devem ser processadas na ordem em que chegaram (FIFO). Uma pilha devolveria primeiro a última tecla, e \"abc\" sairia como \"cba\". O buffer usa as duas pontas: insere no fim e retira do início."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Pilha com vetor",
+    text: "Na pilha com vetor (01_stack-array), s_create reserva 4 posições, s_push grava em v[n++] e s_pop devolve v[--n]. Depois do trecho abaixo, o que há nas posições v[0] a v[3] do vetor?",
+    code: `<span class="type">Stack</span> *s = <span class="fn">s_create</span>();
+<span class="fn">s_push</span>(s, <span class="num">1</span>);
+<span class="fn">s_push</span>(s, <span class="num">2</span>);
+<span class="fn">s_push</span>(s, <span class="num">3</span>);
+<span class="fn">s_pop</span>(s);
+<span class="fn">s_pop</span>(s);
+<span class="fn">s_push</span>(s, <span class="num">9</span>);`,
+    options: [
+      "1, 9 e as posições v[2] e v[3] zeradas, porque o s_pop apaga o valor retirado",
+      "1, 9, 3 e, em v[3], um valor indeterminado, que nunca foi escrito",
+      "9, 1, 3 e um valor indeterminado: o topo fica em v[0]",
+      "1, 2, 3, 9: o push grava depois do último valor que já foi escrito"
+    ],
+    correctIndex: 1,
+    explainCorrect: "O s_pop só decrementa n: o 3 e o 2 continuam no vetor, fora da parte ocupada. Com n = 1, o s_push(s, 9) grava em v[1], por cima do 2, e o 3 continua em v[2]. A posição v[3] nunca foi escrita, e o malloc não inicializa a memória. A execução real com o AddressSanitizer mostrou Memory: 1.00 9.00 3.00 -0.37, e esse -0.37 é só lixo. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 1, 9, 3 e um valor indeterminado em v[3]. Desempilhar não apaga nada: só diminui n. O push seguinte grava em v[n], ou seja, em v[1], por cima do 2. O 3 fica em v[2] como cópia velha, e v[3] nunca foi escrito. A base fica em v[0] e o topo em v[n-1]."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Pilha com lista",
+    text: "Esta versão de s_pop, para a pilha com lista (02_stack), dispensa a variável auxiliar p. Qual é o problema dela?",
+    code: `<span class="kw">float</span> <span class="fn">s_pop</span>(<span class="type">Stack</span> *s)
+{
+    <span class="fn">assert</span>(!<span class="fn">s_is_empty</span>(s));
+    <span class="kw">float</span> v = s-&gt;top-&gt;info;
+    <span class="fn">free</span>(s-&gt;top);
+    s-&gt;top = s-&gt;top-&gt;next;
+    <span class="kw">return</span> v;
+}`,
+    options: [
+      "Nenhum: o valor já foi guardado em v antes do free",
+      "Ela vaza memória, porque o nó retirado nunca é liberado",
+      "Ela falha só quando a pilha tem um único elemento",
+      "Depois de free(s-&gt;top), a leitura de s-&gt;top-&gt;next acessa um nó já liberado"
+    ],
+    correctIndex: 3,
+    explainCorrect: "free devolve o bloco do nó, mas s-&gt;top continua com o mesmo endereço, e ler s-&gt;top-&gt;next em seguida é usar memória liberada. É comportamento indefinido: compilada e executada aqui, a versão abortou com falha de segmentação, e o AddressSanitizer acusa heap-use-after-free. Por isso a versão do módulo guarda o nó em p, avança top e só depois faz free(p). Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é: s-&gt;top-&gt;next é lido depois de free(s-&gt;top), um acesso a memória já liberada. Guardar o valor em v não resolve, porque o problema é o next. O nó é liberado, então não há vazamento, e o erro acontece com qualquer número de elementos. A ordem certa é guardar o nó, avançar top e só então liberar."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Calculadora pós-fixada",
+    text: "O programa 05_postfix-calc imprime o topo da pilha depois de cada símbolo, com o formato \"%.2f\\n\". Qual é a última linha impressa para a entrada abaixo?",
+    code: `9 4 - 2 * q`,
+    options: [
+      "10.00",
+      "-10.00",
+      "5.00",
+      "2.00"
+    ],
+    correctIndex: 0,
+    explainCorrect: "Empilham-se 9 e 4. O - desempilha primeiro o 4 (v2, o topo) e depois o 9 (v1) e calcula v1 - v2 = 5. Empilha-se o 2, e o * calcula 5 * 2 = 10. A execução real imprime 9.00, 4.00, 5.00, 2.00 e 10.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 10.00. O primeiro valor desempilhado é o operando da direita: em 9 4 -, sai primeiro o 4, e a conta é 9 - 4 = 5, não 4 - 9. Depois, 5 2 * dá 10. O -10.00 vem de inverter os operandos do -, e 5.00 e 2.00 são linhas intermediárias da saída."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Operando que falta",
+    text: "Em calc_operator, um operando que falta vale zero: float v2 = s_is_empty(c-&gt;s) ? 0.0f : s_pop(c-&gt;s); e o mesmo para v1. O que a calculadora imprime para a entrada abaixo?",
+    code: `5 - q`,
+    options: [
+      "5.00 e, na linha seguinte, 5.00",
+      "Só 5.00: o programa aborta no assert de s_pop",
+      "5.00 e, na linha seguinte, -5.00",
+      "5.00 e depois Reading error"
+    ],
+    correctIndex: 2,
+    explainCorrect: "O 5 é empilhado e impresso. No -, v2 recebe o 5, o topo, e a pilha fica vazia. Para v1, o teste s_is_empty dá verdadeiro e v1 vale 0.0f, sem chamar s_pop. O resultado é v1 - v2 = 0 - 5 = -5. A execução real imprime 5.00 e -5.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 5.00 e depois -5.00. O assert não dispara, porque o teste s_is_empty vem antes de cada s_pop e faz o operando que falta valer 0. O 5 sai primeiro e é o v2, o operando da direita, então a conta é 0 - 5. O - é um operador válido, e o Reading error só aparece quando a leitura de um número falha."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Incremento circular",
+    text: "A figura mostra uma fila do projeto 03_queue-array com head = n_max - 2 e quatro elementos. Suponha n_max = 8 e execute, nessa ordem, q_dequeue(q), q_dequeue(q) e q_enqueue(q, 30.0). Quais valores a linha Head/Tail de q_print mostra depois disso?",
+    figure: { src: "fig15-4", alt: "Vetor circular com índices 0, 1, 2, …, n_max-2, n_max-1. A fila 20.0, 22.8, 21.2, 24.3 ocupa as posições n_max-2, n_max-1, 0 e 1; head indica n_max-2 e tail a posição 2." },
+    options: [
+      "Head: 6 e Tail: 3",
+      "Head: 0 e Tail: 3",
+      "Head: 8 e Tail: 3",
+      "Head: 0 e Tail: 2"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Cada q_dequeue faz head = (head + 1) % n_max: de 6 vai a 7 e de 7 volta a 0, porque 8 % 8 = 0. Restam 21.2 e 24.3, com n = 2. O q_enqueue grava em tail = (0 + 2) % 8 = 2, e n passa a 3, então a nova próxima posição livre é 3. A execução real, montada com esse estado, imprime Head: 0 e Tail: 3, com Data: 21.20 24.30 30.00. Figura adaptada de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é Head: 0 e Tail: 3. head avança circularmente, de 6 para 7 e de 7 para 0 (o % faz a posição 8 voltar a 0; ela não existe num vetor de 8). O 30.0 entra na posição 2, a antiga tail, e tail é recalculado como (head + n) % n_max = (0 + 3) % 8 = 3."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Fila vazia com head ≠ 0",
+    text: "Na fila com vetor (03_queue-array, n_max inicial 4), em que posição do vetor o 7 é gravado?",
+    code: `<span class="type">Queue</span> *q = <span class="fn">q_create</span>();
+<span class="fn">q_enqueue</span>(q, <span class="num">1</span>);
+<span class="fn">q_enqueue</span>(q, <span class="num">2</span>);
+<span class="fn">q_enqueue</span>(q, <span class="num">3</span>);
+<span class="fn">q_dequeue</span>(q);
+<span class="fn">q_dequeue</span>(q);
+<span class="fn">q_dequeue</span>(q);   <span class="cmt">// the queue is empty now</span>
+<span class="fn">q_enqueue</span>(q, <span class="num">7</span>);`,
+    options: [
+      "Na posição 0, porque a fila vazia volta ao começo do vetor",
+      "Na posição 4, logo depois do 3",
+      "Em nenhuma: o vetor realoca antes, porque tail passou do fim",
+      "Na posição 3"
+    ],
+    correctIndex: 3,
+    explainCorrect: "As três retiradas avançam head de 0 até 3 e deixam n = 0: é uma fila vazia válida, com head ≠ 0. O q_enqueue grava em tail = (head + n) % n_max = (3 + 0) % 4 = 3. A execução real imprime Head: 3 e Tail: 0, com Data: 7.00. Não há realocação, porque n = 1 &lt; n_max.",
+    explainIncorrect: "A resposta correta é a posição 3. Nenhuma função reposiciona head quando a fila esvazia: depois das três retiradas, head = 3 e n = 0. A posição 4 não existe num vetor de 4 posições, e a realocação só acontece quando n == n_max."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Realocação da fila circular",
+    text: "No projeto 03_queue-array, a fila abaixo está cheia (n = n_max = 4) e dando a volta: head = 3, e o vetor é v = [5, 6, 7, 4]. O que a linha Head/Tail de q_print mostra depois do q_enqueue(q, 8)?",
+    code: `<span class="cmt">// before: n = 4, n_max = 4, head = 3</span>
+<span class="cmt">// v = [5, 6, 7, 4]    queue (head to tail): 4 5 6 7</span>
+<span class="fn">q_enqueue</span>(q, <span class="num">8</span>);
+<span class="fn">q_print</span>(q);`,
+    options: [
+      "Head: 7 e Tail: 4",
+      "Head: 3 e Tail: 7",
+      "Head: 0 e Tail: 5",
+      "Head: 4 e Tail: 1"
+    ],
+    correctIndex: 0,
+    explainCorrect: "O vetor está cheio, e reallocate dobra n_max para 8. Como head ≠ 0, o trecho de head até o fim antigo (só o 4, n - head = 1 elemento) é movido com memmove para o fim do vetor novo, na posição n_max - n + head = 8 - 4 + 3 = 7, e head passa a 7. O 8 entra em (7 + 4) % 8 = 3, e com n = 5 a próxima posição livre é (7 + 5) % 8 = 4. A execução real imprime Head: 7 e Tail: 4, com Data: 4.00 5.00 6.00 7.00 8.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é Head: 7 e Tail: 4. Ao dobrar o vetor, o realloc mantém cada valor no mesmo índice, e o 4 ficaria em v[3], separado do 5 por posições novas vazias. Por isso o trecho que começa em head vai para o fim do vetor novo (posição 8 - 4 + 3 = 7) e head é atualizado. O 8 vai para a posição 3, depois do 7, e tail = (7 + 5) % 8 = 4."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Retirar o último da fila",
+    text: "Na fila com lista (04_queue), q_dequeue é chamada numa fila que tem um único nó. Como ficam head e tail depois da chamada?",
+    options: [
+      "head vira NULL, e tail continua apontando para o nó, que é reaproveitado na próxima inserção",
+      "head recebe o next do nó (NULL), e tail não precisa mudar",
+      "Os dois viram NULL, e só então o nó é liberado",
+      "Os dois continuam apontando para o nó, porque uma fila nunca fica sem nó"
+    ],
+    correctIndex: 2,
+    explainCorrect: "Com um nó só, head == tail, e q_dequeue cai no else: q-&gt;head = q-&gt;tail = NULL. Depois o nó, guardado em p, é liberado. Assim a fila vazia fica com os dois ponteiros nulos, que é a situação que q_is_empty e q_enqueue esperam. Se tail continuasse com o endereço antigo, ele apontaria para um nó já liberado, um ponteiro pendente. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é: head e tail viram NULL, e o nó é liberado. Esse é o caso especial da retirada: quando head == tail, avançar só head deixaria tail com o endereço de um nó liberado. O nó retirado nunca é reaproveitado, porque q_enqueue sempre aloca um nó novo."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Decremento circular",
+    text: "Na fila dupla com vetor, dq_push_front grava o novo elemento na posição anterior a head. O que o trecho abaixo imprime?",
+    code: `<span class="kw">int</span> head = <span class="num">0</span>, n_max = <span class="num">4</span>;
+<span class="fn">printf</span>(<span class="str">"%d\\n"</span>, (head - <span class="num">1</span>) % n_max);
+<span class="fn">printf</span>(<span class="str">"%d\\n"</span>, (head - <span class="num">1</span> + n_max) % n_max);`,
+    options: [
+      "3 e, na linha seguinte, 3",
+      "-1 e, na linha seguinte, 3",
+      "3 e, na linha seguinte, -1",
+      "-1 e, na linha seguinte, -1"
+    ],
+    correctIndex: 1,
+    explainCorrect: "Em C, o resto tem o sinal do dividendo: -1 % 4 vale -1, e não 3. Com esse índice, dq_push_front gravaria em v[-1], fora do vetor. Somar n_max antes deixa o dividendo sempre não negativo: (0 - 1 + 4) % 4 = 3, a última posição. É a conta que o 06_deque-array usa. Saída conferida pela execução: -1 e 3.",
+    explainIncorrect: "A resposta correta é -1 e 3. O % de C não dá o resto \"matemático\" para dividendo negativo: -1 % 4 é -1. Por isso o decremento circular do projeto soma n_max antes de tirar o resto, (head - 1 + n_max) % n_max, que vale 3."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Retirada do fim no vetor",
+    text: "Uma fila dupla do projeto 06_deque-array tem n_max = 8, head = 6 e n = 3, com os elementos 10, 20 e 30 (do início para o fim). Em que posição do vetor está o valor que dq_pop_back devolve, e quanto vale head depois da chamada?",
+    options: [
+      "Na posição 8, e head continua 6",
+      "Na posição 6, e head passa a 7",
+      "Na posição 1, e head continua 6",
+      "Na posição 0, e head continua 6"
+    ],
+    correctIndex: 3,
+    explainCorrect: "O último elemento está em (head + n - 1) % n_max = (6 + 3 - 1) % 8 = 0: a fila ocupa as posições 6, 7 e 0. dq_pop_back só decrementa n e devolve v[0], o 30; head não muda. A execução real, montada com esse estado, devolve 30.00 e imprime Head: 6, com Data: 10.00 20.00.",
+    explainIncorrect: "A resposta correta é a posição 0, com head continuando 6. Os elementos estão em 6, 7 e, dando a volta, 0. A posição 1 é tail, a próxima posição livre, e não o último elemento. Retirar do fim não mexe em head: só n diminui."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Fila e pilha juntas",
+    text: "A função reverse_first_k, das notas, inverte os k primeiros elementos de uma fila de n usando uma pilha. Com a fila 10 20 30 40 50 (do início para o fim) e k = 2, como está a fila no ponto marcado no comentário?",
+    code: `<span class="kw">void</span> <span class="fn">reverse_first_k</span>(<span class="type">Queue</span> *q, <span class="kw">int</span> n, <span class="kw">int</span> k)
+{
+    <span class="type">Stack</span> *s = <span class="fn">s_create</span>();
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; k; i++)
+        <span class="fn">s_push</span>(s, <span class="fn">q_dequeue</span>(q));
+    <span class="kw">while</span> (!<span class="fn">s_is_empty</span>(s))
+        <span class="fn">q_enqueue</span>(q, <span class="fn">s_pop</span>(s));
+    <span class="cmt">// &lt;-- here</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n - k; i++)
+        <span class="fn">q_enqueue</span>(q, <span class="fn">q_dequeue</span>(q));
+    <span class="fn">s_free</span>(s);
+}`,
+    options: [
+      "20 10 30 40 50",
+      "30 40 50 10 20",
+      "30 40 50 20 10",
+      "10 20 30 40 50"
+    ],
+    correctIndex: 2,
+    explainCorrect: "O 10 e o 20 saem do início da fila, na ordem, e são empilhados; o topo é o 20. Ao desempilhar, o 20 sai primeiro e entra no fim da fila, depois o 10: 30 40 50 20 10. O último laço ainda vai levar o 30, o 40 e o 50 para o fim, e a fila termina como 20 10 30 40 50. A execução real, com as quatro combinações de pilha e fila, mostra esses dois estados.",
+    explainIncorrect: "A resposta correta é 30 40 50 20 10. Os dois primeiros saem pelo início e voltam pelo fim, invertidos pela pilha, mas os três que não foram mexidos ainda estão na frente. 20 10 30 40 50 é o resultado só depois do último laço, que leva o 30, o 40 e o 50 para trás. 30 40 50 10 20 seria o resultado de uma fila auxiliar no lugar da pilha."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Decidir pelo topo",
+    text: "A função cancel_pairs, das notas, lê os valores da esquerda para a direita: se o valor é igual ao topo, desempilha (os dois somem); senão, empilha. No fim, imprime o que sobrou, do topo para a base. Qual é a saída para a sequência 4 1 1 4 4 2?",
+    code: `<span class="kw">if</span> (!<span class="fn">s_is_empty</span>(s) &amp;&amp; <span class="fn">s_top</span>(s) == v[i])
+    <span class="fn">s_pop</span>(s);
+<span class="kw">else</span>
+    <span class="fn">s_push</span>(s, v[i]);`,
+    options: [
+      "2 4 (2 left)",
+      "2 (1 left)",
+      "4 2 (2 left)",
+      "(0 left)"
+    ],
+    correctIndex: 0,
+    explainCorrect: "A pilha evolui assim (topo à direita): 4; 4 1; o segundo 1 cancela o topo e fica 4; o 4 seguinte cancela o topo e a pilha esvazia; o próximo 4 encontra a pilha vazia e é empilhado; o 2 é diferente e também. Sobram 4 2, impressos do topo para a base: 2 4 (2 left). Saída conferida com as duas implementações de pilha.",
+    explainIncorrect: "A resposta correta é 2 4 (2 left). Depois de 4 1 1 4 a pilha está vazia, então o terceiro 4 não tem com quem se cancelar: o teste !s_is_empty(s) falha e ele é empilhado. O 2 entra sobre ele. A impressão começa pelo topo, por isso o 2 sai antes do 4."
+  },
+  {
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Custo de liberar",
+    text: "Quanto custa s_free numa pilha com n elementos, na implementação com vetor (01_stack-array) e na com lista (02_stack)?",
+    options: [
+      "O(n) nas duas: é preciso visitar cada elemento para liberá-lo",
+      "O(1) com vetor e O(n) com lista",
+      "O(n) com vetor e O(1) com lista",
+      "O(1) nas duas: free libera tudo de uma vez"
+    ],
+    correctIndex: 1,
+    explainCorrect: "A pilha com vetor tem só duas alocações, o vetor e a estrutura, e s_free faz dois free, qualquer que seja n. Na pilha com lista, cada push alocou um nó separado, e cada nó precisa do seu próprio free: s_free percorre os n nós guardando o próximo antes de liberar o atual. A tabela comparativa das notas mostra o mesmo para a fila e para a fila dupla.",
+    explainIncorrect: "A resposta correta é O(1) com vetor e O(n) com lista. Com vetor, todos os elementos estão num bloco só, liberado por um único free(s-&gt;v). Com lista, há um bloco por nó, e free(s) não libera os nós: é preciso um free para cada um."
+  },
+  {
+    difficulty: "avancado",
+    diffLabel: "Avançado",
+    tag: "Escolha da estrutura",
+    text: "Um servidor recebe pedidos. Os normais vão para o fim da espera, e os urgentes passam à frente de todos; o atendimento é sempre pelo início. O número de pedidos varia muito, e cada operação deve custar O(1) sempre, sem as pausas de uma realocação. Qual implementação do módulo atende a esses requisitos?",
+    options: [
+      "Fila com vetor circular (03_queue-array)",
+      "Pilha com lista (02_stack)",
+      "Fila dupla com vetor (06_deque-array)",
+      "Fila dupla com lista (07_deque)"
+    ],
+    correctIndex: 3,
+    explainCorrect: "O pedido normal é dq_push_back, o urgente é dq_push_front, e o atendimento é dq_pop_front. São duas pontas de inserção, então a estrutura é uma fila dupla. Entre as duas implementações, a com lista tem as quatro operações em O(1) sempre. A com vetor também é O(1), mas a inserção que encontra o vetor cheio realoca e custa O(n).",
+    explainIncorrect: "A resposta correta é a fila dupla com lista. A fila só insere no fim, e a pilha só atende o mais recente, então nenhuma das duas trata o pedido urgente sem quebrar a ordem dos demais. A fila dupla com vetor dá conta das operações, mas a inserção com o vetor cheio realoca e custa O(n)."
+  },
+  {
+    difficulty: "basico",
+    diffLabel: "Básico",
+    tag: "Caso de borda: o zero",
+    text: "A função print_binary, das notas, empilha os restos das divisões por 2 num laço do-while. Nesta versão o laço foi trocado por um while. O que ela imprime para x = 0?",
+    code: `<span class="type">Stack</span> *s = <span class="fn">s_create</span>();
+<span class="kw">while</span> (x &gt; <span class="num">0</span>)
+{
+    <span class="fn">s_push</span>(s, x % <span class="num">2</span>);
+    x = x / <span class="num">2</span>;
+}
+<span class="kw">while</span> (!<span class="fn">s_is_empty</span>(s))
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, (<span class="kw">int</span>)<span class="fn">s_pop</span>(s));
+<span class="fn">printf</span>(<span class="str">"\\n"</span>);
+<span class="fn">s_free</span>(s);`,
+    options: [
+      "0",
+      "Nada: o programa aborta no assert de s_pop",
+      "Uma linha vazia, sem nenhum dígito",
+      "00"
+    ],
+    correctIndex: 2,
+    explainCorrect: "Com x = 0, a condição x &gt; 0 já é falsa na entrada: nada é empilhado. O segundo laço testa s_is_empty antes de cada s_pop, encontra a pilha vazia e não imprime nada; sobra só a quebra de linha. Executada, a versão imprime 110 para 6 e uma linha vazia para 0. É por isso que a função das notas usa do-while: o corpo roda pelo menos uma vez, e o 0 produz o dígito 0.",
+    explainIncorrect: "A resposta correta é uma linha vazia. O while testa antes de entrar, e com x = 0 o corpo nunca executa, então a pilha fica vazia. Não há assert, porque o laço de impressão só chama s_pop depois de conferir s_is_empty. O do-while da versão das notas garante pelo menos um dígito."
+  }
+];
+
+const FIGS = {
+  "fig15-4": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2OTAgMjAwIiB3aWR0aD0iNjkwIiBoZWlnaHQ9IjIwMCIgcm9sZT0iaW1nIiBmb250LWZhbWlseT0iJ0RlamFWdSBTYW5zIE1vbm8nLCBDb25zb2xhcywgTWVubG8sIG1vbm9zcGFjZSI+PHRpdGxlPkZpbGEgY29tIGluY3JlbWVudG8gY2lyY3VsYXI8L3RpdGxlPjxkZWZzPjxtYXJrZXIgaWQ9ImEiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjExIiBtYXJrZXJIZWlnaHQ9IjExIiBtYXJrZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMTIxODIxIi8+PC9tYXJrZXI+PG1hcmtlciBpZD0iZyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTEiIG1hcmtlckhlaWdodD0iMTEiIG1hcmtlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9IiMxRjZGOEIiLz48L21hcmtlcj48bWFya2VyIGlkPSJ4IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMSIgbWFya2VySGVpZ2h0PSIxMSIgbWFya2VyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzlBQTVCMSIvPjwvbWFya2VyPjwvZGVmcz48dGV4dCB4PSI3MC4wIiB5PSIyMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+MDwvdGV4dD48cmVjdCB4PSIxNSIgeT0iNDIiIHdpZHRoPSIxMTAiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNzAuMCIgeT0iNjIuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+MjEuMjwvdGV4dD48dGV4dCB4PSIxODAuMCIgeT0iMjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjE8L3RleHQ+PHJlY3QgeD0iMTI1IiB5PSI0MiIgd2lkdGg9IjExMCIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIxODAuMCIgeT0iNjIuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+MjQuMzwvdGV4dD48dGV4dCB4PSIyOTAuMCIgeT0iMjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjI8L3RleHQ+PHJlY3QgeD0iMjM1IiB5PSI0MiIgd2lkdGg9IjExMCIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyOTAuMCIgeT0iNjIuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+PC90ZXh0Pjx0ZXh0IHg9IjQwMC4wIiB5PSIyMCIgZmlsbD0iIzlBQTVCMSIgZm9udC1zaXplPSIxNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+4oCmPC90ZXh0Pjx0ZXh0IHg9IjQwMC4wIiB5PSI2MiIgZmlsbD0iIzlBQTVCMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+4oCmPC90ZXh0Pjx0ZXh0IHg9IjUxMC4wIiB5PSIyMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+bl9tYXgtMjwvdGV4dD48cmVjdCB4PSI0NTUiIHk9IjQyIiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjUxMC4wIiB5PSI2Mi4wIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0ibm9ybWFsIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj4yMC4wPC90ZXh0Pjx0ZXh0IHg9IjYyMC4wIiB5PSIyMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+bl9tYXgtMTwvdGV4dD48cmVjdCB4PSI1NjUiIHk9IjQyIiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjYyMC4wIiB5PSI2Mi4wIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0ibm9ybWFsIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj4yMi44PC90ZXh0PjxwYXRoIGQ9Ik0yOTAuMCwxNDAgTDI5MC4wLDg2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PHJlY3QgeD0iMjQ1LjAiIHk9IjE0MiIgd2lkdGg9IjkwIiBoZWlnaHQ9IjM2IiBmaWxsPSIjMTIxODIxIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjI5MC4wIiB5PSIxNjAuMCIgZmlsbD0iI2ZmZiIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+dGFpbDwvdGV4dD48cGF0aCBkPSJNNTEwLjAsMTQwIEw1MTAuMCw4NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxyZWN0IHg9IjQ2NS4wIiB5PSIxNDIiIHdpZHRoPSI5MCIgaGVpZ2h0PSIzNiIgZmlsbD0iIzEyMTgyMSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI1MTAuMCIgeT0iMTYwLjAiIGZpbGw9IiNmZmYiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmhlYWQ8L3RleHQ+PC9zdmc+"
+};
+
+let current = 0;
+let selectedIndex = null;
+let answered = false;
+let score = 0;
+const userAnswers = new Array(questions.length).fill(null);
+
+const container = document.getElementById('question-container');
+const quizTag = document.getElementById('quiz-tag');
+const progressFill = document.getElementById('progress-bar-fill');
+const resultScreen = document.getElementById('result-screen');
+const resultScore = document.getElementById('result-score');
+const resultMsg = document.getElementById('result-msg');
+const restartBtn = document.getElementById('restart-btn');
+
+function diffClass(d) {
+  if (d === 'basico') return 'diff-basico';
+  if (d === 'intermediario') return 'diff-intermediario';
+  return 'diff-avancado';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  quizTag.textContent = `Pergunta ${current + 1} de ${questions.length}`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  const alreadyAnswered = userAnswers[current] !== null;
+  selectedIndex = alreadyAnswered ? userAnswers[current].selected : null;
+  answered = alreadyAnswered;
+
+  let optionsHtml = q.options.map((opt, i) => {
+    let cls = 'option';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correctIndex) cls += ' correct';
+      else if (i === selectedIndex) cls += ' incorrect';
+    } else if (i === selectedIndex) {
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65 + i);
+    return `<li class="${cls}" data-index="${i}">
+      <span class="letter">${letter}</span>
+      <span>${opt}</span>
+    </li>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (answered) {
+    const wasCorrect = userAnswers[current].correct;
+    feedbackHtml = `<div class="feedback show ${wasCorrect ? 'correct-box' : 'incorrect-box'}">
+      <strong class="title">${wasCorrect ? '✅ Correto!' : '❌ Incorreto'}</strong>
+      <span class="explain">${wasCorrect ? q.explainCorrect : q.explainIncorrect}</span>
+    </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="question-block">
+      <div class="badges">
+        <span class="q-label">${q.tag}</span>
+        <span class="diff-label ${diffClass(q.difficulty)}">${q.diffLabel}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      ${q.figure ? `<figure class="q-fig"><img src="${FIGS[q.figure.src]}" alt="${q.figure.alt}"><figcaption>Adaptado de: Celes, W. <em>Estrutura de Dados</em>.</figcaption></figure>` : ''}
+      ${q.code ? `<pre class="code-block">${q.code}</pre>` : ''}
+      <ul class="options" id="options">${optionsHtml}</ul>
+      ${feedbackHtml}
+      <div class="actions">
+        <span class="progress-text" id="progress-text">${answered ? (userAnswers[current].correct ? 'Resposta correta' : 'Resposta incorreta — veja a explicação') : 'Selecione uma alternativa'}</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="prev-btn" ${current === 0 ? 'disabled' : ''}>Anterior</button>
+          <button class="btn btn-primary" id="check-btn" ${answered ? 'style="display:none;"' : ''} disabled>Verificar resposta</button>
+          <button class="btn btn-primary" id="next-btn" ${answered ? '' : 'style="display:none;"'}>${current === questions.length - 1 ? 'Ver resultado' : 'Próxima pergunta'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachHandlers();
+}
+
+function attachHandlers() {
+  const optionEls = document.querySelectorAll('.option');
+  const checkBtn = document.getElementById('check-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+  const progressText = document.getElementById('progress-text');
+
+  optionEls.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (answered) return;
+      optionEls.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIndex = parseInt(opt.dataset.index, 10);
+      checkBtn.disabled = false;
+      progressText.textContent = 'Alternativa ' + String.fromCharCode(65 + selectedIndex) + ' selecionada';
+    });
+  });
+
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectedIndex === null) return;
+      const q = questions[current];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (userAnswers[current] === null) {
+        if (isCorrect) score++;
+      }
+      userAnswers[current] = { selected: selectedIndex, correct: isCorrect };
+      answered = true;
+      renderQuestion();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current === questions.length - 1) {
+        showResult();
+      } else {
+        current++;
+        renderQuestion();
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    });
+  }
+}
+
+function showResult() {
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'none';
+  container.style.display = 'none';
+  quizTag.textContent = 'Concluído';
+  resultScreen.classList.add('show');
+  resultScore.textContent = `${score} / ${questions.length}`;
+  let msg;
+  if (score === questions.length) msg = '🎉 Excelente! Você domina pilhas, filas e filas duplas, nas versões com vetor e com lista.';
+  else if (score >= questions.length * 0.7) msg = '👏 Muito bom! Revise as questões que errou, principalmente as que pedem para acompanhar head, tail e n no vetor circular.';
+  else if (score >= questions.length * 0.4) msg = '📚 Bom começo — vale desenhar o vetor ou os nós e marcar o topo, o início e o fim a cada operação antes de prever a saída.';
+  else msg = '🔁 Releia as notas sobre pilhas e filas e os sete exemplos e tente novamente.';
+  resultMsg.textContent = msg;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  userAnswers.fill(null);
+  resultScreen.classList.remove('show');
+  container.style.display = 'block';
+  container.parentElement.querySelector('.progress-bar-track').style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+<p style="text-align:center;font-size:0.8rem;opacity:0.7;margin:1.5rem 0">Material v2026.2</p>
+</body>
+</html>
