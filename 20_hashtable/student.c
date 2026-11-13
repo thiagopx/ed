@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "student.h"
 
-// Student
 struct student
 {
    int id;
@@ -44,4 +43,9 @@ char st_get_class(Student *student)
 void st_print(Student *student)
 {
    printf("%-10s %-20s (%d) - %c\n", student->name, student->email, student->id, student->class);
+}
+
+void st_free(Student *student)
+{
+   free(student); // No field of Student is allocated separately: one free releases it.
 }
