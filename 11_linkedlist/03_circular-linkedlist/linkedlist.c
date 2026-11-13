@@ -2,20 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Define a structure for the circular list.
 struct list
 {
     ListNode *first; // Any node of the cycle; NULL when the list is empty.
 };
 
-// Define a structure for a node in the list.
 struct list_node
 {
-    int info;       // An integer value stored in the node.
+    int info;
     ListNode *next; // The next node; the last node points back to the first.
 };
 
-// Function to create an empty circular list and return a pointer to it.
 LinkedList *ll_create()
 {
     LinkedList *l = (LinkedList *)malloc(sizeof(LinkedList));
@@ -23,13 +20,11 @@ LinkedList *ll_create()
     return l;
 }
 
-// Function to check whether the list is empty.
 int ll_is_empty(LinkedList *l)
 {
     return l->first == NULL;
 }
 
-// Function to insert an element at the beginning of the list.
 void ll_insert(LinkedList *l, int v)
 {
     ListNode *node = (ListNode *)malloc(sizeof(ListNode));
@@ -52,7 +47,6 @@ void ll_insert(LinkedList *l, int v)
     l->first = node;
 }
 
-// Function to get the number of elements in the list.
 int ll_size(LinkedList *l)
 {
     int cnt = 0;
@@ -66,18 +60,16 @@ int ll_size(LinkedList *l)
     return cnt;
 }
 
-// Function to move the start of the list one node forward.
 void ll_rotate(LinkedList *l)
 {
     if (l->first != NULL)
         l->first = l->first->next;
 }
 
-// Function to solve the Josephus problem on the list.
-// Combines two operations of the circular list: moving forward around the cycle and
-// removing a node knowing the one before it. Counting never "falls off" the end.
 int ll_josephus(LinkedList *l, int k)
 {
+    // Combines two operations of the circular list: moving forward around the cycle and
+    // removing a node knowing the one before it. Counting never "falls off" the end.
     // prev starts at the last node (the one before first), so that prev->next is the first.
     ListNode *prev = l->first;
     while (prev->next != l->first)
@@ -102,7 +94,6 @@ int ll_josephus(LinkedList *l, int k)
     return prev->info;
 }
 
-// Function to free the memory used by the list.
 void ll_free(LinkedList *l)
 {
     if (l->first != NULL)
@@ -112,7 +103,7 @@ void ll_free(LinkedList *l)
         l->first->next = NULL;
         while (p != NULL)
         {
-            ListNode *t = p->next; // Store a reference to the next node.
+            ListNode *t = p->next; // Saved before free(p): p->next cannot be read afterwards.
             free(p);
             p = t;
         }
@@ -120,7 +111,6 @@ void ll_free(LinkedList *l)
     free(l);
 }
 
-// Function to display all elements, starting from the first.
 void ll_print(LinkedList *l)
 {
     ListNode *p = l->first;

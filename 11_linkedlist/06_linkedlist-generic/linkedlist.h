@@ -1,156 +1,94 @@
+// A heterogeneous doubly linked list: each node holds a void * to a record and the record's type.
+
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-// Define an enumeration for different node types (e.g., Student or Professor).
 typedef enum
 {
-    TYPE_STUDENT,  // Indicates a node containing student data
-    TYPE_PROFESSOR // Indicates a node containing professor data
+    TYPE_STUDENT,  // The record is a Student *.
+    TYPE_PROFESSOR // The record is a Professor *.
 } NodeType;
 
-// Define the LinkedList and ListNode data structures
-typedef struct list LinkedList;    // Represents a linked list
-typedef struct list_node ListNode; // Represents a node in the linked list
+typedef struct list LinkedList;
+typedef struct list_node ListNode;
 
-// Operations on the linked list
-
-/**
- * Create an empty linked list and return a pointer to it.
- *
- * @return - A pointer to the newly created linked list.
- */
+// Returns a new empty list.
 LinkedList *ll_create();
 
-/**
- * Insert an element at the beginning of the linked list.
- *
- * @param l    - A pointer to the linked list.
- * @param data - A pointer to the data to be inserted.
- * @param type - The type of the data node (Student or Professor).
- */
+// Inserts, at the beginning of l, the record data, whose type is type.
+// Ownership: l becomes the owner of data (see ll_free).
 void ll_insert(LinkedList *l, void *data, NodeType type);
 
-/**
- * Append an element to the end of the linked list.
- *
- * @param l    - A pointer to the linked list.
- * @param data - A pointer to the data to be appended.
- * @param type - The type of the data node (Student or Professor).
- */
+// Appends, to the end of l, the record data, whose type is type.
+// Ownership: l becomes the owner of data (see ll_free).
 void ll_append(LinkedList *l, void *data, NodeType type);
 
-/**
- * Remove the first occurrence of a specific element from the linked list.
- *
- * @param l   - A pointer to the linked list.
- * @param cpf - The CPF of the element to be removed.
- */
+// Removes (and frees) the first record of l whose CPF is cpf.
+// Cost: O(n).
 void ll_remove(LinkedList *l, const char *cpf);
 
-/**
- * Remove all elements that match a specific value from the linked list.
- *
- * @param l   - A pointer to the linked list.
- * @param cpf - The CPF to match and remove.
- */
+// Removes (and frees) every record of l whose CPF is cpf, in a single pass.
+// Cost: O(n).
 void ll_remove_all(LinkedList *l, const char *cpf);
 
-/**
- * Remove all elements from the linked list.
- *
- * @param l - A pointer to the linked list to be cleared.
- */
+// Removes (and frees) all the records of l, keeping l as an empty list.
+// Cost: O(n).
 void ll_clear(LinkedList *l);
 
-/**
- * Get the size (number of elements) of the linked list.
- *
- * @param l - A pointer to the linked list.
- * @return  - The number of elements in the linked list.
- */
+// Returns the number of records of l.
 int ll_size(LinkedList *l);
 
-/**
- * Check whether a specific element is in the linked list.
- *
- * @param l   - A pointer to the linked list.
- * @param cpf - The CPF to check for.
- * @return    - 1 if the element is in the linked list, 0 otherwise.
- */
+// Checks whether a record whose CPF is cpf is in l; returns 1 if it is, 0 otherwise.
+// Cost: O(n).
 int ll_is_in(LinkedList *l, const char *cpf);
 
-/**
- * Check whether the linked list is empty.
- *
- * @param l - A pointer to the linked list.
- * @return  - 1 if the linked list is empty, 0 otherwise.
- */
+// Checks whether l is empty; returns 1 if it is, 0 otherwise.
 int ll_is_empty(LinkedList *l);
 
-/**
- * Get the data at a specific position in the linked list.
- *
- * @param l   - A pointer to the linked list.
- * @param pos - The position of the element to retrieve.
- * @return    - A pointer to the data at the specified position.
- */
+// Returns the record at position pos (0-based) of l, as a void *; use ll_type_at to know
+//   how to convert it.
+// Requires: 0 <= pos < ll_size(l).
+// Ownership: the record still belongs to l.
+// Cost: O(pos).
 void *ll_get(LinkedList *l, int pos);
 
-/**
- * Return a new linked list with the elements reversed.
- *
- * @param l - A pointer to the linked list to be reversed.
- * @return  - A new list pointing to the SAME records, in reverse order (free with ll_free_nodes).
- */
+// Returns a new list pointing to the SAME records of l, in reverse order.
+// Ownership: the records still belong to l; free the result with ll_free_nodes.
+// Cost: O(n).
 LinkedList *ll_reversed(LinkedList *l);
 
-/**
- * Concatenate two linked lists, placing l2 after l1.
- *
- * @param l1 - A pointer to the first linked list.
- * @param l2 - A pointer to the second linked list to be concatenated.
- * @return   - A new list pointing to the SAME records of l1 and l2 (free with ll_free_nodes).
- */
+// Returns a new list pointing to the SAME records of l1 followed by those of l2.
+// Ownership: the records still belong to l1 and l2; free the result with ll_free_nodes.
+// Cost: O(n1 + n2).
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
-/**
- * Return the type of the element at a given position (0-based). ll_get returns void *,
- * so the caller needs this to know how to use the pointer. Position must be valid.
- */
+// Returns the type of the record at position pos (0-based) of l. ll_get returns void *, so
+//   the caller needs this to know how to use the pointer.
+// Requires: 0 <= pos < ll_size(l).
+// Cost: O(pos).
 NodeType ll_type_at(LinkedList *l, int pos);
 
-/**
- * Build a new list that points to the SAME professor records of l (shallow copy),
- * in the same order. Free it with ll_free_nodes, never with ll_free.
- */
+// Returns a new list pointing to the SAME professor records of l, in the same order
+//   (domain operation).
+// Ownership: the records still belong to l; free the result with ll_free_nodes, never ll_free.
+// Cost: O(n).
 LinkedList *ll_professors(LinkedList *l);
 
-/**
- * Free only the nodes and the list structure, not the records they point to.
- * Use it for lists that do not own their records (ll_reversed, ll_concatenate, ll_professors).
- */
+// Frees only the nodes and the structure of l, not the records they point to. Use it for
+//   lists that do not own their records (ll_reversed, ll_concatenate, ll_professors).
+// Cost: O(n).
 void ll_free_nodes(LinkedList *l);
 
-/**
- * Free the memory used by the linked list: nodes, structure AND the records
- * (the list owns the records it receives in ll_insert/ll_append).
- *
- * @param l - A pointer to the linked list to be freed.
- */
+// Frees l, its nodes AND the records (l owns the records it receives in ll_insert/ll_append).
+// Cost: O(n).
 void ll_free(LinkedList *l);
 
-/**
- * Display all elements of the linked list.
- *
- * @param l - A pointer to the linked list to be printed.
- */
+// Prints the records of l, from the first to the last.
+// Cost: O(n).
 void ll_print(LinkedList *l);
 
-/**
- * Display all elements of the linked list in reverse order.
- *
- * @param l - A pointer to the linked list to be printed in reverse order.
- */
+// Prints the records of l, from the last to the first.
+// Cost: O(n).
 void ll_print_reversed(LinkedList *l);
 
 #endif

@@ -1,34 +1,27 @@
+// A student record (name, CPF and course); the struct stays hidden behind the functions below.
+
 #ifndef STUDENT_H
 #define STUDENT_H
 
-// Define an enumeration for different course types.
 typedef enum
 {
     COURSE_BSI,
     COURSE_ECA,
 } Course;
 
-// Define a custom data type "Student" to represent student information.
 typedef struct student Student;
 
-/**
- * Create a new Student instance and initialize its name, CPF, and course.
- *
- * @param name  - The name of the student.
- * @param cpf   - The CPF (Brazilian identification number) of the student.
- * @param course - The course in which the student is enrolled (e.g., COURSE_BSI or COURSE_ECA).
- * @return      - A pointer to the newly created Student instance.
- */
+// Returns a new student with the given name, cpf (11 digits, no punctuation) and course.
+// Ownership: the caller (or the list that stores it) frees it with st_free.
 Student *st_create(const char *name, const char *cpf, Course course);
 
-/**
- * Print the student's name and formatted CPF.
- *
- * @param s - A pointer to the Student whose information should be printed.
- */
+// Prints the name, the formatted CPF and the course of s.
 void st_print(Student *s);
 
-// Read-only access to the CPF (the struct itself stays hidden).
+// Returns the CPF of x (read-only).
 const char *st_cpf(Student *x);
+
+// Frees the student x.
+void st_free(Student *x);
 
 #endif

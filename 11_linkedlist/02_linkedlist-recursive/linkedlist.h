@@ -1,61 +1,76 @@
+// A singly linked list of integers whose operations are written recursively, node by node.
+
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-// Define the LinkedList and ListNode data structures
-typedef struct list LinkedList;    // Represents a linked list
-typedef struct list_node ListNode; // Represents a node in the linked list
+typedef struct list LinkedList;
+typedef struct list_node ListNode;
 
-// Operations on the linked list
-
-// Create an empty linked list and return a pointer to it
+// Returns a new empty list.
 LinkedList *ll_create();
 
-// Insert an element at the beginning of the linked list
+// Inserts v at the beginning of l.
 void ll_insert(LinkedList *l, int v);
 
-// Insert an element into the linked list while keeping it sorted (recursive)
+// Inserts v into l, keeping l in ascending order (recursive).
+// Requires: l is in ascending order.
+// Cost: O(n).
 void ll_insert_sorted(LinkedList *l, int v);
 
-// Append an element to the end of the linked list (recursive)
+// Appends v to the end of l (recursive).
+// Cost: O(n).
 void ll_append(LinkedList *l, int v);
 
-// Remove the first occurrence of val (recursive)
+// Removes the first occurrence of val from l (recursive).
+// Cost: O(n).
 void ll_remove(LinkedList *l, int val);
 
-// Remove every occurrence of val (recursive)
+// Removes every occurrence of val from l (recursive).
+// Cost: O(n).
 void ll_remove_all(LinkedList *l, int val);
 
-// Get the size (number of elements) of the linked list (recursive)
+// Returns the number of elements of l (recursive).
+// Cost: O(n).
 int ll_size(LinkedList *l);
 
-// Check whether a specific element is in the linked list (recursive)
+// Checks whether v is in l (recursive); returns 1 if it is, 0 otherwise.
+// Cost: O(n).
 int ll_is_in(LinkedList *l, int v);
 
-// Check whether the linked list is empty
+// Checks whether l is empty; returns 1 if it is, 0 otherwise.
 int ll_is_empty(LinkedList *l);
 
-// Sum of all elements (recursive)
+// Returns the sum of the elements of l (recursive).
+// Cost: O(n).
 int ll_sum(LinkedList *l);
 
-// Count the even elements and store their sum in *sum, in a single pass (recursive)
+// Returns how many elements of l are even and stores their sum in *sum, in a single pass
+//   (recursive).
+// Cost: O(n).
 int ll_count_even(LinkedList *l, int *sum);
 
-// Return a new linked list with the elements reversed (recursive)
+// Returns a new list with the elements of l in reverse order (recursive).
+// Cost: O(n).
 LinkedList *ll_reversed(LinkedList *l);
 
-// Return a new linked list with the elements of l1 followed by those of l2 (recursive)
+// Returns a new list with the elements of l1 followed by those of l2 (recursive).
+// Cost: O(n1 + n2).
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
-// Free the memory used by the linked list
+// Frees l and all its nodes.
+// Cost: O(n).
 void ll_free(LinkedList *l);
 
-// Display all elements of the linked list
+// Prints the elements of l, from the first to the last.
+// Cost: O(n).
 void ll_print(LinkedList *l);
 
-// Display the elements from the last to the first
+// Prints the elements of l, from the last to the first.
+// Cost: O(n).
 void ll_print_reversed(LinkedList *l);
 
-// Check whether two lists have the same elements in the same order
+// Checks whether l1 and l2 have the same elements in the same order; returns 1 if they do.
+// Cost: O(n).
 int ll_equals(LinkedList *l1, LinkedList *l2);
 
 #endif

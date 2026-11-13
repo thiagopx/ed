@@ -9,7 +9,6 @@ struct student
    char cpf[12];
 };
 
-// Create a new Student instance and initialize its name and CPF.
 Student *st_create(const char *name, const char *cpf)
 {
    Student *s = (Student *)malloc(sizeof(Student));
@@ -19,33 +18,33 @@ Student *st_create(const char *name, const char *cpf)
    return s;
 }
 
-// Print the student's name and formatted CPF.
 void st_print(Student *s)
 {
-   // Divide the CPF into four blocks for better readability.
+   // The CPF is stored as 11 digits and printed as ddd.ddd.ddd-dd.
    char cpf_block1[4];
    char cpf_block2[4];
    char cpf_block3[4];
    char cpf_block4[3];
 
-   // Parse the CPF into four blocks.
    sscanf(s->cpf, "%3s", cpf_block1);
    sscanf(s->cpf + 3, "%3s", cpf_block2);
    sscanf(s->cpf + 6, "%3s", cpf_block3);
    sscanf(s->cpf + 9, "%2s", cpf_block4);
 
-   // Print the student's name and formatted CPF.
    printf("Name: %s \t\t CPF: %s.%s.%s-%s\n", s->name, cpf_block1, cpf_block2, cpf_block3, cpf_block4);
 }
 
-// Return the student's name (read-only).
 const char *st_name(Student *s)
 {
    return s->name;
 }
 
-// Return the student's CPF (read-only).
 const char *st_cpf(Student *s)
 {
    return s->cpf;
+}
+
+void st_free(Student *s)
+{
+   free(s); // No field of Student is allocated separately: one free releases it.
 }

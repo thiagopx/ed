@@ -1,27 +1,24 @@
+// A student record (name and CPF); the struct stays hidden behind the functions below.
+
 #ifndef STUDENT_H
 #define STUDENT_H
 
-// Define a custom data type "Student" to represent student information.
 typedef struct student Student;
 
-/**
- * Create a new Student instance and initialize its name and CPF.
- *
- * @param name - The name of the student.
- * @param cpf  - The CPF (Brazilian identification number) of the student.
- * @return     - A pointer to the newly created Student instance.
- */
+// Returns a new student with the given name and cpf (11 digits, no punctuation).
+// Ownership: the caller (or the list that stores it) frees it with st_free.
 Student *st_create(const char *name, const char *cpf);
 
-/**
- * Print the student's name and formatted CPF.
- *
- * @param s - A pointer to the Student whose information should be printed.
- */
+// Prints the name and the formatted CPF of s.
 void st_print(Student *s);
 
-// Read-only access to the fields of a Student (the struct itself stays hidden).
+// Returns the name of s (read-only).
 const char *st_name(Student *s);
+
+// Returns the CPF of s (read-only).
 const char *st_cpf(Student *s);
+
+// Frees the student s.
+void st_free(Student *s);
 
 #endif

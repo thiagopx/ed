@@ -5,18 +5,16 @@
 // The list keeps both ends: 'first' to start walking, 'last' to append without walking.
 struct list
 {
-    ListNode *first; // A pointer to the first node (NULL if the list is empty).
-    ListNode *last;  // A pointer to the last node (NULL if the list is empty).
+    ListNode *first; // NULL if the list is empty.
+    ListNode *last;  // NULL if the list is empty.
 };
 
-// Define a structure for a node in the linked list.
 struct list_node
 {
-    int info;       // An integer value stored in the node.
-    ListNode *next; // A pointer to the next node in the linked list.
+    int info;
+    ListNode *next;
 };
 
-// Function to create an empty linked list: both ends are NULL.
 LinkedList *ll_create()
 {
     LinkedList *l = (LinkedList *)malloc(sizeof(LinkedList));
@@ -25,13 +23,11 @@ LinkedList *ll_create()
     return l;
 }
 
-// Function to check whether the linked list is empty.
 int ll_is_empty(LinkedList *l)
 {
     return l->first == NULL;
 }
 
-// Function to insert an element at the beginning of the linked list.
 void ll_insert(LinkedList *l, int v)
 {
     ListNode *node = (ListNode *)malloc(sizeof(ListNode));
@@ -42,7 +38,6 @@ void ll_insert(LinkedList *l, int v)
     l->first = node;
 }
 
-// Function to append an element to the end: no walk, thanks to 'last'.
 void ll_append(LinkedList *l, int v)
 {
     ListNode *node = (ListNode *)malloc(sizeof(ListNode));
@@ -55,10 +50,9 @@ void ll_append(LinkedList *l, int v)
     l->last = node;
 }
 
-// Function to remove the first occurrence of v.
-// Same walk as in 01_linkedlist, plus one extra care: removing the last node moves 'last'.
 int ll_remove(LinkedList *l, int v)
 {
+    // Same walk as in 01_linkedlist, plus one extra care: removing the last node moves 'last'.
     ListNode *prev = NULL;
     ListNode *p = l->first;
     while (p != NULL && p->info != v)
@@ -81,7 +75,6 @@ int ll_remove(LinkedList *l, int v)
     return 1;
 }
 
-// Function to move every node of l2 to the end of l1, only adjusting pointers.
 void ll_join(LinkedList *l1, LinkedList *l2)
 {
     if (l2->first == NULL) // Nothing to move.
@@ -96,7 +89,6 @@ void ll_join(LinkedList *l1, LinkedList *l2)
     l2->first = l2->last = NULL; // l2 no longer owns those nodes.
 }
 
-// Function to merge two ascending lists into a new one, moving their nodes.
 LinkedList *ll_merge_sorted(LinkedList *a, LinkedList *b)
 {
     LinkedList *r = ll_create();
@@ -123,20 +115,18 @@ LinkedList *ll_merge_sorted(LinkedList *a, LinkedList *b)
     return r;
 }
 
-// Function to free the memory used by the linked list.
 void ll_free(LinkedList *l)
 {
     ListNode *p = l->first;
     while (p != NULL)
     {
-        ListNode *t = p->next; // Store a reference to the next node.
+        ListNode *t = p->next; // Saved before free(p): p->next cannot be read afterwards.
         free(p);
         p = t;
     }
     free(l);
 }
 
-// Function to display all elements of the linked list.
 void ll_print(LinkedList *l)
 {
     for (ListNode *p = l->first; p != NULL; p = p->next)

@@ -1,59 +1,69 @@
+// A doubly linked list of integers, with pointers to the first and last nodes and a count.
+
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-// Define the LinkedList and ListNode data structures
-typedef struct list LinkedList;    // Represents a linked list
-typedef struct list_node ListNode; // Represents a node in the linked list
+typedef struct list LinkedList;
+typedef struct list_node ListNode;
 
-// Operations on the linked list
-
-// Create an empty linked list and return a pointer to it
+// Returns a new empty list.
 LinkedList *ll_create();
 
-// Insert an element at the beginning of the linked list
+// Inserts v at the beginning of l.
 void ll_insert(LinkedList *l, int v);
 
-// Append an element to the end of the linked list
+// Appends v to the end of l; with the pointer to the last node, no walk is needed.
 void ll_append(LinkedList *l, int v);
 
-// Remove the first occurrence of a specific element from the linked list
+// Removes the first occurrence of val from l.
+// Cost: O(n): the search walks the list; unlinking the node found costs O(1).
 void ll_remove(LinkedList *l, int val);
 
-// Remove all elements that match a specific value from the linked list
+// Removes every occurrence of val from l, in a single pass.
+// Cost: O(n).
 void ll_remove_all(LinkedList *l, int val);
 
-// Remove all elements from the linked list
+// Removes all the elements of l, keeping l as an empty list.
+// Cost: O(n).
 void ll_clear(LinkedList *l);
 
-// Get the size (number of elements) of the linked list
+// Returns the number of elements of l.
 int ll_size(LinkedList *l);
 
-// Check whether a specific element is in the linked list
+// Checks whether v is in l; returns 1 if it is, 0 otherwise.
+// Cost: O(n).
 int ll_is_in(LinkedList *l, int v);
 
-// Check whether the linked list is empty
+// Checks whether l is empty; returns 1 if it is, 0 otherwise.
 int ll_is_empty(LinkedList *l);
 
-// Return a new linked list with the elements reversed
+// Returns a new list with the elements of l in reverse order.
+// Cost: O(n).
 LinkedList *ll_reversed(LinkedList *l);
 
-// Concatenate two linked lists, placing l2 after l1
+// Returns a new list with the elements of l1 followed by those of l2.
+// Cost: O(n1 + n2).
 LinkedList *ll_concatenate(LinkedList *l1, LinkedList *l2);
 
-// Reverse the list in place, only swapping pointers (no node is allocated)
+// Reverses l in place, only swapping pointers (no node is allocated).
+// Cost: O(n).
 void ll_reverse_in_place(LinkedList *l);
 
-// Keep the first k nodes in l and move the remaining ones, in order, to a new list,
-// only adjusting pointers; return the new list (empty if l has k nodes or fewer)
+// Keeps the first k nodes in l and moves the remaining ones, in order, to a new list, only
+//   adjusting pointers; returns the new list (empty if l has k nodes or fewer).
+// Cost: O(k).
 LinkedList *ll_split_at(LinkedList *l, int k);
 
-// Free the memory used by the linked list
+// Frees l and all its nodes.
+// Cost: O(n).
 void ll_free(LinkedList *l);
 
-// Display all elements of the linked list
+// Prints the elements of l, from the first to the last.
+// Cost: O(n).
 void ll_print(LinkedList *l);
 
-// Display all elements of the linked list in reverse order
+// Prints the elements of l, from the last to the first, following the prev pointers.
+// Cost: O(n).
 void ll_print_reversed(LinkedList *l);
 
 #endif

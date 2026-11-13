@@ -5,24 +5,49 @@
 #include <string.h>
 #include <stdlib.h>
 
-// Define a structure for the linked list.
 struct list
 {
-    int count;       // Number of elements in the linked list.
-    ListNode *first; // A pointer to the first node in the linked list.
-    ListNode *last;  // A pointer to the last node in the linked list.
+    int count;
+    ListNode *first;
+    ListNode *last;
 };
 
-// Define a structure for a node in the linked list.
 struct list_node
 {
-    NodeType type;
-    void *info;     // Data associated with the node (generic pointer).
-    ListNode *prev; // A pointer to the previous node in the linked list.
-    ListNode *next; // A pointer to the next node in the linked list.
+    NodeType type; // Says how to read info.
+    void *info;    // The record: a Student * or a Professor *.
+    ListNode *prev;
+    ListNode *next;
 };
 
-// Create an empty linked list and return a pointer to it.
+// Only these three helpers know the types stored in the list.
+
+// Prints the record of p according to its type.
+static void _print(ListNode *p)
+{
+    if (p->type == TYPE_STUDENT)
+        st_print((Student *)p->info);
+    else
+        pr_print((Professor *)p->info);
+}
+
+// Returns the CPF of the record of p: the type decides how to read the void *.
+static const char *_cpf(ListNode *p)
+{
+    if (p->type == TYPE_STUDENT)
+        return st_cpf((Student *)p->info);
+    return pr_cpf((Professor *)p->info);
+}
+
+// Frees the record of p with the function of its own TAD.
+static void _free_record(ListNode *p)
+{
+    if (p->type == TYPE_STUDENT)
+        st_free((Student *)p->info);
+    else
+        pr_free((Professor *)p->info);
+}
+
 LinkedList *ll_create()
 {
     LinkedList *l = (LinkedList *)malloc(sizeof(LinkedList));
@@ -32,19 +57,16 @@ LinkedList *ll_create()
     return l;
 }
 
-// Get the number of elements in the linked list.
 int ll_size(LinkedList *l)
 {
     return l->count;
 }
 
-// Check whether the linked list is empty.
 int ll_is_empty(LinkedList *l)
 {
     return ll_size(l) == 0;
 }
 
-// Insert an element at the beginning of the linked list.
 void ll_insert(LinkedList *l, void *info, NodeType type)
 {
     ListNode *node = (ListNode *)malloc(sizeof(ListNode));
@@ -62,20 +84,13 @@ void ll_insert(LinkedList *l, void *info, NodeType type)
     l->count++;
 }
 
-// Display all elements of the linked list.
 void ll_print(LinkedList *l)
 {
     for (ListNode *p = l->first; p != NULL; p = p->next)
-    {
-        if (p->type == TYPE_STUDENT)
-            st_print(p->info); // Print the information of each Student structure.
-        else
-            pr_print(p->info); // Print the information of each Professor structure.
-    }
-    printf("\n"); // Print a newline character to separate the output.
+        _print(p);
+    printf("\n");
 }
 
-// Append an element to the end of the linked list (O(1) with 'last').
 void ll_append(LinkedList *l, void *info, NodeType type)
 {
     ListNode *node = (ListNode *)malloc(sizeof(ListNode));
@@ -93,15 +108,7 @@ void ll_append(LinkedList *l, void *info, NodeType type)
     l->count++;
 }
 
-// The CPF of a record depends on its type: the tag decides how to read the void *.
-static const char *_cpf(ListNode *p)
-{
-    if (p->type == TYPE_STUDENT)
-        return st_cpf((Student *)p->info);
-    return pr_cpf((Professor *)p->info);
-}
-
-// Search for the node whose record has this CPF (NULL if absent).
+// Returns the node whose record has this cpf (NULL if there is none).
 static ListNode *_search(LinkedList *l, const char *cpf)
 {
     ListNode *p = l->first;
@@ -110,13 +117,12 @@ static ListNode *_search(LinkedList *l, const char *cpf)
     return p;
 }
 
-// Check whether a record with this CPF is in the list.
 int ll_is_in(LinkedList *l, const char *cpf)
 {
     return _search(l, cpf) != NULL;
 }
 
-// Unlink node p; if free_record is set, also free the record it points to.
+// Unlinks node p from l; if free_record is set, also frees the record it points to.
 static void _unlink(LinkedList *l, ListNode *p, int free_record)
 {
     if (p == l->first)
@@ -130,12 +136,11 @@ static void _unlink(LinkedList *l, ListNode *p, int free_record)
         p->next->prev = p->prev;
 
     if (free_record)
-        free(p->info); // Records are flat structs: a single free releases each one.
+        _free_record(p);
     free(p);
     l->count--;
 }
 
-// Remove (and free) the first record with this CPF.
 void ll_remove(LinkedList *l, const char *cpf)
 {
     ListNode *p = _search(l, cpf);
@@ -143,7 +148,6 @@ void ll_remove(LinkedList *l, const char *cpf)
         _unlink(l, p, 1);
 }
 
-// Remove (and free) every record with this CPF, in a single pass.
 void ll_remove_all(LinkedList *l, const char *cpf)
 {
     ListNode *p = l->first;
@@ -156,14 +160,14 @@ void ll_remove_all(LinkedList *l, const char *cpf)
     }
 }
 
-// Remove (and free) every record, keeping the empty list structure.
 void ll_clear(LinkedList *l)
 {
     while (l->first != NULL)
         _unlink(l, l->first, 1);
 }
 
-// Walk to position pos (0-based). Accessing by position costs O(pos): there is no index.
+// Returns the node at position pos (0-based), or NULL if pos is out of range.
+// Cost: O(pos): there is no index.
 static ListNode *_at(LinkedList *l, int pos)
 {
     if (pos < 0 || pos >= l->count)
@@ -174,14 +178,11 @@ static ListNode *_at(LinkedList *l, int pos)
     return p;
 }
 
-// Return the type of the record at position pos (pos must be valid).
 NodeType ll_type_at(LinkedList *l, int pos)
 {
     return _at(l, pos)->type;
 }
 
-// New list with only the professors, pointing to the SAME records, in the same order.
-// The result is never NULL: with no professor, it is an empty list.
 LinkedList *ll_professors(LinkedList *l)
 {
     LinkedList *r = ll_create();
@@ -191,7 +192,6 @@ LinkedList *ll_professors(LinkedList *l)
     return r;
 }
 
-// Free the nodes and the structure, but not the records (for lists that do not own them).
 void ll_free_nodes(LinkedList *l)
 {
     while (l->first != NULL)
@@ -199,7 +199,6 @@ void ll_free_nodes(LinkedList *l)
     free(l);
 }
 
-// Free nodes, structure and records (the list owns its records).
 void ll_free(LinkedList *l)
 {
     ll_clear(l);

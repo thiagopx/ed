@@ -1,10 +1,10 @@
 #include "teamlist.h"
 #include <stdlib.h>
 
-// Implementação do TAD TeamList com VETOR DINÂMICO.
+// TeamList implemented with a DYNAMIC VECTOR.
 
-// TODO: defina aqui os campos de "struct teamlist" -- a mesma ideia do
-// TeamVec do EP 09: um vetor de Team* que dobra de capacidade com realloc
+// TODO: define the fields of "struct teamlist" here -- the same idea as the TeamVec of EP 09:
+// an array of Team* that doubles its capacity with realloc
 // struct teamlist {
 //     ...
 // };

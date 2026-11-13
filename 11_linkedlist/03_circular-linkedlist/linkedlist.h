@@ -1,35 +1,40 @@
+// A circular singly linked list of integers: the last node points back to the first.
+
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-// Define the LinkedList and ListNode data structures
-typedef struct list LinkedList;    // Represents a circular linked list
-typedef struct list_node ListNode; // Represents a node in the list
+typedef struct list LinkedList;
+typedef struct list_node ListNode;
 
-// Operations on the circular linked list
-
-// Create an empty circular list and return a pointer to it
+// Returns a new empty list.
 LinkedList *ll_create();
 
-// Check whether the list is empty
+// Checks whether l is empty; returns 1 if it is, 0 otherwise.
 int ll_is_empty(LinkedList *l);
 
-// Insert an element at the beginning of the list (it becomes the new first)
+// Inserts v at the beginning of l; v becomes the new first.
+// Cost: O(n): the last node must be found to close the cycle.
 void ll_insert(LinkedList *l, int v);
 
-// Get the number of elements in the list
+// Returns the number of elements of l.
+// Cost: O(n).
 int ll_size(LinkedList *l);
 
-// Move the start of the list one node forward
+// Moves the start of l one node forward.
 void ll_rotate(LinkedList *l);
 
-// Josephus problem: starting at the first node, remove every k-th node (printing each
-// removed value) until a single node remains; return its value. The list must not be empty.
+// Solves the Josephus problem on l: starting at the first node, removes every k-th node
+//   (printing each removed value) until a single node remains, and returns its value.
+// Requires: l is not empty and k >= 1.
+// Cost: O(n * k).
 int ll_josephus(LinkedList *l, int k);
 
-// Free the memory used by the list
+// Frees l and all its nodes.
+// Cost: O(n).
 void ll_free(LinkedList *l);
 
-// Display all elements, starting from the first
+// Prints the elements of l, starting from the first.
+// Cost: O(n).
 void ll_print(LinkedList *l);
 
 #endif
