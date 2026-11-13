@@ -839,135 +839,131 @@ size=6 capacity=8
 1.000000 3.000000 6.000000 10.000000 20.000000 </pre>
 
         <h3>Outros arquivos do projeto</h3>
-<p class="file-label"><code>01_dynvec/dynvec.h</code></p><pre class="code-block"><code><span class="pp">#ifndef DYNVEC_H</span>
+<p class="file-label"><code>01_dynvec/dynvec.h</code></p><pre class="code-block"><code><span class="cmt">// A dynamic vector of floats: an array that doubles its capacity when it is full.</span>
+
+<span class="pp">#ifndef DYNVEC_H</span>
 <span class="pp">#define DYNVEC_H</span>
 
-<span class="cmt">// Define a forward declaration for a structure called 'dynvec.'</span>
 <span class="kw">typedef</span> <span class="kw">struct</span> dynvec <span class="type">DynVec</span>;
 
-<span class="cmt">// Create a new dynamic vector and return a pointer to it.</span>
+<span class="cmt">// Returns a new empty vector, with room for 4 elements.</span>
 <span class="type">DynVec</span> *<span class="fn">dv_create</span>();
 
-<span class="cmt">// Create a new dynamic vector from a file and return a pointer to it.</span>
+<span class="cmt">// Returns a new vector with the values read from the file filename (NULL if the file cannot</span>
+<span class="cmt">//   be opened).</span>
+<span class="cmt">// Cost: O(n).</span>
 <span class="type">DynVec</span> *<span class="fn">dv_create_from_file</span>(<span class="kw">const</span> <span class="kw">char</span> *filename);
 
-<span class="cmt">// Insert a float value into the dynamic vector.</span>
+<span class="cmt">// Inserts x at the end of dv, doubling the capacity first if dv is full (amortized O(1)).</span>
 <span class="kw">void</span> <span class="fn">dv_insert</span>(<span class="type">DynVec</span> *dv, <span class="kw">float</span> x);
 
-<span class="cmt">// Get the value at a specific index 'i' in the dynamic vector.</span>
+<span class="cmt">// Returns the value at index i of dv.</span>
+<span class="cmt">// Requires: 0 &lt;= i &lt; dv_size(dv).</span>
 <span class="kw">float</span> <span class="fn">dv_get</span>(<span class="type">DynVec</span> *dv, <span class="kw">int</span> i);
 
-<span class="cmt">// Get the current size (number of elements) of the dynamic vector.</span>
+<span class="cmt">// Returns the number of elements of dv.</span>
 <span class="kw">int</span> <span class="fn">dv_size</span>(<span class="type">DynVec</span> *dv);
 
-<span class="cmt">// Get the current capacity (maximum number of elements without resizing) of the dynamic vector.</span>
+<span class="cmt">// Returns the capacity of dv: how many elements fit before the next resize.</span>
 <span class="kw">int</span> <span class="fn">dv_capacity</span>(<span class="type">DynVec</span> *dv);
 
-<span class="cmt">// Free the memory associated with the dynamic vector.</span>
+<span class="cmt">// Frees dv.</span>
 <span class="kw">void</span> <span class="fn">dv_free</span>(<span class="type">DynVec</span> *dv);
 
-<span class="cmt">// Print the values of the dynamic vector.</span>
+<span class="cmt">// Prints the values of dv.</span>
+<span class="cmt">// Cost: O(n).</span>
 <span class="kw">void</span> <span class="fn">dv_print_values</span>(<span class="type">DynVec</span> *dv);
 
-<span class="cmt">// Concatenate two dynamic vectors and return a new dynamic vector.</span>
+<span class="cmt">// Returns a new vector with the values of dv1 followed by those of dv2.</span>
+<span class="cmt">// Cost: O(n1 + n2).</span>
 <span class="type">DynVec</span> *<span class="fn">dv_concatenate</span>(<span class="type">DynVec</span> *dv1, <span class="type">DynVec</span> *dv2);
 
 <span class="cmt">// ... (o cabeçalho real também declara dv_is_in, dv_write_to_file, dv_union,</span>
 <span class="cmt">// dv_intersection e dv_unique -- operações propostas como exercício, ver no GitHub)</span>
 
 <span class="pp">#endif</span></code></pre>
-<p class="file-label"><code>01_dynvec/dynvec.c</code></p><pre class="code-block"><code><span class="pp">#include "dynvec.h"</span>
+<p class="file-label"><code>01_dynvec/dynvec.c</code></p><pre class="code-block"><code><span class="pp">#include &quot;dynvec.h&quot;</span>
 <span class="pp">#include &lt;assert.h&gt;</span>
 <span class="pp">#include &lt;stdio.h&gt;</span>
 <span class="pp">#include &lt;stdlib.h&gt;</span>
 
-<span class="cmt">// Define the structure for the dynamic vector</span>
 <span class="kw">struct</span> dynvec
 {
-   <span class="kw">int</span> n;     <span class="cmt">// number of elements</span>
-   <span class="kw">int</span> n_max; <span class="cmt">// vector capacity</span>
-   <span class="kw">float</span> *v;  <span class="cmt">// vector data</span>
+   <span class="kw">int</span> n;
+   <span class="kw">int</span> n_max; <span class="cmt">// Capacity of v.</span>
+   <span class="kw">float</span> *v;
 };
 
-<span class="cmt">// Function to create a new dynamic vector</span>
 <span class="type">DynVec</span> *<span class="fn">dv_create</span>()
 {
-   <span class="type">DynVec</span> *dv = (<span class="type">DynVec</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DynVec</span>)); <span class="cmt">// Allocate memory for the DynVec structure</span>
+   <span class="type">DynVec</span> *dv = (<span class="type">DynVec</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DynVec</span>));
 
-   dv-&gt;n = <span class="num">0</span>;                                          <span class="cmt">// Initialize the number of elements to 0</span>
-   dv-&gt;n_max = <span class="num">4</span>;                                      <span class="cmt">// Allocate initially space for 4 elements</span>
-   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">malloc</span>(dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>)); <span class="cmt">// Allocate memory for the vector data</span>
+   dv-&gt;n = <span class="num">0</span>;
+   dv-&gt;n_max = <span class="num">4</span>;
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">malloc</span>(dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>));
 
-   <span class="kw">return</span> dv; <span class="cmt">// Return a pointer to the created dynamic vector</span>
+   <span class="kw">return</span> dv;
 }
 
-<span class="cmt">// Function to create a new dynamic vector from a file</span>
 <span class="type">DynVec</span> *<span class="fn">dv_create_from_file</span>(<span class="kw">const</span> <span class="kw">char</span> *filename)
 {
-   <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">"rt"</span>); <span class="cmt">// Open the file for reading</span>
+   <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">&quot;rt&quot;</span>);
    <span class="kw">if</span> (f == NULL)
-      <span class="kw">return</span> NULL; <span class="cmt">// Return NULL if the file cannot be opened</span>
+      <span class="kw">return</span> NULL;
 
-   <span class="cmt">// Create a new dynamic vector</span>
    <span class="type">DynVec</span> *dv = <span class="fn">dv_create</span>();
    <span class="kw">float</span> x;
-   <span class="kw">while</span> (<span class="fn">fscanf</span>(f, <span class="str">"%f"</span>, &amp;x) == <span class="num">1</span>) <span class="cmt">// Read and insert values from the file into the dynamic vector</span>
+   <span class="kw">while</span> (<span class="fn">fscanf</span>(f, <span class="str">&quot;%f&quot;</span>, &amp;x) == <span class="num">1</span>)
       <span class="fn">dv_insert</span>(dv, x);
 
-   <span class="fn">fclose</span>(f); <span class="cmt">// Close the file</span>
-   <span class="kw">return</span> dv; <span class="cmt">// Return a pointer to the created dynamic vector</span>
+   <span class="fn">fclose</span>(f);
+   <span class="kw">return</span> dv;
 }
 
-<span class="cmt">// Helper function to reallocate memory for the dynamic vector</span>
+<span class="cmt">// Doubles the capacity of dv.</span>
+<span class="cmt">// Cost: O(n): realloc may copy the elements to a new block.</span>
 <span class="kw">static</span> <span class="kw">void</span> <span class="fn">reallocate</span>(<span class="type">DynVec</span> *dv)
 {
-   dv-&gt;n_max *= <span class="num">2</span>;                                             <span class="cmt">// Double the capacity</span>
-   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v, dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>)); <span class="cmt">// Reallocate memory for the vector data</span>
+   dv-&gt;n_max *= <span class="num">2</span>;
+   dv-&gt;v = (<span class="kw">float</span> *)<span class="fn">realloc</span>(dv-&gt;v, dv-&gt;n_max * <span class="kw">sizeof</span>(<span class="kw">float</span>));
 }
 
-<span class="cmt">// Function to insert a float value into the dynamic vector</span>
 <span class="kw">void</span> <span class="fn">dv_insert</span>(<span class="type">DynVec</span> *dv, <span class="kw">float</span> x)
 {
-   <span class="cmt">// Check if the capacity is enough, and if not, reallocate memory</span>
    <span class="kw">if</span> (dv-&gt;n == dv-&gt;n_max)
       <span class="fn">reallocate</span>(dv);
 
-   dv-&gt;v[dv-&gt;n++] = x; <span class="cmt">// Insert the value and increment the size</span>
+   dv-&gt;v[dv-&gt;n++] = x;
 }
 
-<span class="cmt">// Function to get the current size (number of elements) of the dynamic vector</span>
 <span class="kw">int</span> <span class="fn">dv_size</span>(<span class="type">DynVec</span> *dv)
 {
    <span class="kw">return</span> dv-&gt;n;
 }
 
-<span class="cmt">// Function to get the current capacity (maximum number of elements without resizing) of the dynamic vector</span>
 <span class="kw">int</span> <span class="fn">dv_capacity</span>(<span class="type">DynVec</span> *dv)
 {
    <span class="kw">return</span> dv-&gt;n_max;
 }
 
-<span class="cmt">// Function to get the value at a specific index 'i' in the dynamic vector</span>
 <span class="kw">float</span> <span class="fn">dv_get</span>(<span class="type">DynVec</span> *dv, <span class="kw">int</span> i)
 {
-   <span class="fn">assert</span>(i &gt;= <span class="num">0</span> &amp;&amp; i &lt; dv-&gt;n); <span class="cmt">// Runtime assertion to ensure 'i' is within valid bounds</span>
+   <span class="fn">assert</span>(i &gt;= <span class="num">0</span> &amp;&amp; i &lt; dv-&gt;n);
 
    <span class="kw">return</span> dv-&gt;v[i];
 }
 
-<span class="cmt">// Function to free the memory associated with the dynamic vector</span>
 <span class="kw">void</span> <span class="fn">dv_free</span>(<span class="type">DynVec</span> *dv)
 {
-   <span class="fn">free</span>(dv-&gt;v); <span class="cmt">// Free the data vector</span>
-   <span class="fn">free</span>(dv);    <span class="cmt">// Free the ADT</span>
+   <span class="fn">free</span>(dv-&gt;v);
+   <span class="fn">free</span>(dv);
 }
 
-<span class="cmt">// Function to print the values of the dynamic vector</span>
 <span class="kw">void</span> <span class="fn">dv_print_values</span>(<span class="type">DynVec</span> *dv)
 {
-   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">dv_size</span>(dv); i++) <span class="cmt">// Iterate through the elements of the dynamic vector</span>
-      <span class="fn">printf</span>(<span class="str">"%f "</span>, <span class="fn">dv_get</span>(dv, i));
-   <span class="fn">printf</span>(<span class="str">"\n"</span>);
+   <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="fn">dv_size</span>(dv); i++)
+      <span class="fn">printf</span>(<span class="str">&quot;%f &quot;</span>, <span class="fn">dv_get</span>(dv, i));
+   <span class="fn">printf</span>(<span class="str">&quot;\n&quot;</span>);
 }
 
 <span class="type">DynVec</span> *<span class="fn">dv_concatenate</span>(<span class="type">DynVec</span> *dv1, <span class="type">DynVec</span> *dv2)
@@ -1101,39 +1097,42 @@ No wasted space, no fixed confine,
 just memory that follows the deed.</pre>
 
         <h3>Outros arquivos do projeto</h3>
-<p class="file-label"><code>02_strdin/dynstr.h</code></p><pre class="code-block"><code><span class="pp">#ifndef DYNSTR_H</span>
+<p class="file-label"><code>02_strdin/dynstr.h</code></p><pre class="code-block"><code><span class="cmt">// A dynamic string: always holds exactly the memory needed for its current value, growing or</span>
+<span class="cmt">// shrinking as needed via realloc.</span>
+
+<span class="pp">#ifndef DYNSTR_H</span>
 <span class="pp">#define DYNSTR_H</span>
 
-<span class="cmt">// Opaque dynamic string type: always holds exactly the memory needed for</span>
-<span class="cmt">// its current value, growing or shrinking as needed via realloc.</span>
 <span class="kw">typedef</span> <span class="kw">struct</span> dynstr <span class="type">DynStr</span>;
 
-<span class="cmt">// Create a new dynamic string, initially empty.</span>
+<span class="cmt">// Returns a new empty dynamic string.</span>
 <span class="type">DynStr</span>* <span class="fn">ds_create_empty</span>(<span class="kw">void</span>);
 
-<span class="cmt">// Create a new dynamic string initialized with a copy of s.</span>
+<span class="cmt">// Returns a new dynamic string with a copy of s.</span>
+<span class="cmt">// Cost: O(len(s)).</span>
 <span class="type">DynStr</span>* <span class="fn">ds_create_copy</span>(<span class="kw">const</span> <span class="kw">char</span> *s);
 
-<span class="cmt">// Reassign the value of an existing dynamic string to a copy of s.</span>
+<span class="cmt">// Replaces the value of ds by a copy of s.</span>
+<span class="cmt">// Cost: O(len(s)).</span>
 <span class="kw">void</span> <span class="fn">ds_assign</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s);
 
-<span class="cmt">// Append s to the end of the current value of ds.</span>
+<span class="cmt">// Appends s to the end of the value of ds.</span>
+<span class="cmt">// Cost: O(len(ds) + len(s)): realloc may copy the current value to a new block.</span>
 <span class="kw">void</span> <span class="fn">ds_concat</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s);
 
-<span class="cmt">// Return the string currently stored (read-only: the caller must not</span>
-<span class="cmt">// modify it directly, only through ds_assign/ds_concat).</span>
+<span class="cmt">// Returns the string stored in ds (read-only: change it only through ds_assign/ds_concat).</span>
 <span class="kw">const</span> <span class="kw">char</span>* <span class="fn">ds_get</span>(<span class="type">DynStr</span> *ds);
 
-<span class="cmt">// Free the memory associated with the dynamic string.</span>
+<span class="cmt">// Frees ds.</span>
 <span class="kw">void</span> <span class="fn">ds_free</span>(<span class="type">DynStr</span> *ds);
 
 <span class="pp">#endif</span></code></pre>
-<p class="file-label"><code>02_strdin/dynstr.c</code></p><pre class="code-block"><code><span class="pp">#include "dynstr.h"</span>
+<p class="file-label"><code>02_strdin/dynstr.c</code></p><pre class="code-block"><code><span class="pp">#include &quot;dynstr.h&quot;</span>
 <span class="pp">#include &lt;stdlib.h&gt;</span>
 <span class="pp">#include &lt;string.h&gt;</span>
 
 <span class="cmt">// Implementation of the type: the dynamic string only ever keeps a buffer</span>
-<span class="cmt">// exactly as large as it needs to hold the current value plus '\0'.</span>
+<span class="cmt">// exactly as large as it needs to hold the current value plus &#x27;\0&#x27;.</span>
 <span class="kw">struct</span> dynstr {
     <span class="kw">char</span> *v;
 };
@@ -1143,7 +1142,6 @@ just memory that follows the deed.</pre>
     ds-&gt;v = (<span class="kw">char</span> *)<span class="fn">realloc</span>(ds-&gt;v, n + <span class="num">1</span>);
 }
 
-<span class="cmt">// Create a new dynamic string initialized with a copy of s.</span>
 <span class="type">DynStr</span>* <span class="fn">ds_create_copy</span>(<span class="kw">const</span> <span class="kw">char</span> *s) {
     <span class="type">DynStr</span> *ds = (<span class="type">DynStr</span> *)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DynStr</span>));
 
@@ -1153,29 +1151,24 @@ just memory that follows the deed.</pre>
     <span class="kw">return</span> ds;
 }
 
-<span class="cmt">// Create a new dynamic string, initially empty.</span>
 <span class="type">DynStr</span>* <span class="fn">ds_create_empty</span>(<span class="kw">void</span>) {
-    <span class="kw">return</span> <span class="fn">ds_create_copy</span>(<span class="str">""</span>);
+    <span class="kw">return</span> <span class="fn">ds_create_copy</span>(<span class="str">&quot;&quot;</span>);
 }
 
-<span class="cmt">// Reassign the value of an existing dynamic string to a copy of s.</span>
 <span class="kw">void</span> <span class="fn">ds_assign</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
     <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(s));
     <span class="fn">strcpy</span>(ds-&gt;v, s);
 }
 
-<span class="cmt">// Append s to the end of the current value of ds.</span>
 <span class="kw">void</span> <span class="fn">ds_concat</span>(<span class="type">DynStr</span> *ds, <span class="kw">const</span> <span class="kw">char</span> *s) {
     <span class="fn">reallocate</span>(ds, <span class="fn">strlen</span>(ds-&gt;v) + <span class="fn">strlen</span>(s));
     <span class="fn">strcat</span>(ds-&gt;v, s);
 }
 
-<span class="cmt">// Return the string currently stored.</span>
 <span class="kw">const</span> <span class="kw">char</span>* <span class="fn">ds_get</span>(<span class="type">DynStr</span> *ds) {
     <span class="kw">return</span> ds-&gt;v;
 }
 
-<span class="cmt">// Free the memory associated with the dynamic string.</span>
 <span class="kw">void</span> <span class="fn">ds_free</span>(<span class="type">DynStr</span> *ds) {
     <span class="fn">free</span>(ds-&gt;v);
     <span class="fn">free</span>(ds);

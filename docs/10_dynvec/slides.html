@@ -633,9 +633,9 @@
             <div class="file-tag">10_dynvec/01_dynvec/dynvec.c</div>
 <pre><code><span class="kw">struct</span> dynvec
 {
-   <span class="kw">int</span> n;     <span class="cmt">// number of elements</span>
-   <span class="kw">int</span> n_max; <span class="cmt">// vector capacity</span>
-   <span class="kw">float</span> *v;  <span class="cmt">// vector data</span>
+   <span class="kw">int</span> n;
+   <span class="kw">int</span> n_max;
+   <span class="kw">float</span> *v;
 };</code></pre>
           </div>
         </div>
@@ -703,13 +703,13 @@ size=6 capacity=8
             <div class="file-tag">10_dynvec/01_dynvec/dynvec.c</div>
 <pre><code><span class="type">DynVec</span> *<span class="fn">dv_create_from_file</span>(<span class="kw">const</span> <span class="kw">char</span> *filename)
 {
-   <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">"rt"</span>);
+   <span class="type">FILE</span> *f = <span class="fn">fopen</span>(filename, <span class="str">&quot;rt&quot;</span>);
    <span class="kw">if</span> (f == NULL)
       <span class="kw">return</span> NULL;
 
    <span class="type">DynVec</span> *dv = <span class="fn">dv_create</span>();
    <span class="kw">float</span> x;
-   <span class="kw">while</span> (<span class="fn">fscanf</span>(f, <span class="str">"%f"</span>, &amp;x) == <span class="num">1</span>)
+   <span class="kw">while</span> (<span class="fn">fscanf</span>(f, <span class="str">&quot;%f&quot;</span>, &amp;x) == <span class="num">1</span>)
       <span class="fn">dv_insert</span>(dv, x);
 
    <span class="fn">fclose</span>(f);
