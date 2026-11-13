@@ -523,17 +523,13 @@ const questions = [
     difficulty: "avancado",
     diffLabel: "Avançado",
     tag: "Lista heterogênea",
-    text: "No projeto 06_linkedlist-generic, a mesma lista guarda alunos e professores, e cada nó guarda a informação como void *info. Qual condição deve preencher a lacuna de ll_print para que cada nó seja impresso pela função certa?",
-    code: `<span class="kw">void</span> <span class="fn">ll_print</span>(<span class="type">LinkedList</span> *l)
+    text: "No projeto 06_linkedlist-generic, a mesma lista guarda alunos e professores, e cada nó guarda a informação como void *info. Para cada nó, ll_print chama a auxiliar _print abaixo. Qual condição deve preencher a lacuna para que cada nó seja impresso pela função certa?",
+    code: `<span class="kw">static</span> <span class="kw">void</span> <span class="fn">_print</span>(<span class="type">ListNode</span> *p)
 {
-    <span class="kw">for</span> (<span class="type">ListNode</span> *p = l-&gt;first; p != NULL; p = p-&gt;next)
-    {
-        <span class="kw">if</span> (<span class="cmt">/* ??? */</span>)
-            <span class="fn">st_print</span>(p-&gt;info);
-        <span class="kw">else</span>
-            <span class="fn">pr_print</span>(p-&gt;info);
-    }
-    <span class="fn">printf</span>(<span class="str">"\\n"</span>);
+    <span class="kw">if</span> (<span class="cmt">/* ??? */</span>)
+        <span class="fn">st_print</span>((<span class="type">Student</span> *)p-&gt;info);
+    <span class="kw">else</span>
+        <span class="fn">pr_print</span>((<span class="type">Professor</span> *)p-&gt;info);
 }`,
     options: [
       `p-&gt;info != NULL`,
@@ -542,7 +538,7 @@ const questions = [
       `p-&gt;info == TYPE_STUDENT`
     ],
     correctIndex: 2,
-    explainCorrect: "Um void * é só um endereço: ele não carrega o tipo do objeto apontado, e o compilador não tem como saber o que há lá. Por isso cada nó guarda também o campo type (um NodeType), gravado por ll_insert, e é ele que ll_print consulta para escolher entre st_print e pr_print. Se type estiver errado, nada avisa — a memória é interpretada com o formato errado.",
+    explainCorrect: "Um void * é só um endereço: ele não carrega o tipo do objeto apontado, e o compilador não tem como saber o que há lá. Por isso cada nó guarda também o campo type (um NodeType), gravado por ll_insert, e é ele que _print consulta para escolher o cast (Student * ou Professor *) e a função de impressão. Se type estiver errado, o cast também estará, e nada avisa — a memória é interpretada com o formato errado.",
     explainIncorrect: "A resposta correta é p-&gt;type == TYPE_STUDENT. O void * não diz para que tipo aponta, nem por sizeof; testar p-&gt;info contra NULL ou contra TYPE_STUDENT compara o endereço guardado, não o tipo do objeto. A única fonte de verdade é o campo type que ll_insert grava em cada nó."
   },
   {
