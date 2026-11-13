@@ -8,7 +8,6 @@ struct circle
     double radius;
 };
 
-// Function to create a new Circle
 Circle *create_circle(double center_x, double center_y, double radius)
 {
     Circle *new_circle = (Circle *)malloc(sizeof(Circle));
@@ -22,7 +21,6 @@ Circle *create_circle(double center_x, double center_y, double radius)
     return new_circle;
 }
 
-// Function to check if a point is inside a circle
 int is_point_inside_circle(Point2D *point, Circle *circle)
 {
     double distance = euclidean_distance(point, circle->center);
@@ -30,15 +28,14 @@ int is_point_inside_circle(Point2D *point, Circle *circle)
     // If the distance is less than the radius, the point is inside the circle
     if (distance < circle->radius)
     {
-        return 1; // Inside
+        return 1;
     }
     else
     {
-        return 0; // Outside
+        return 0;
     }
 }
 
-// Function to deallocate a Circle
 void free_circle(Circle *circle)
 {
     free_point(circle->center);

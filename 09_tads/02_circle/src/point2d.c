@@ -3,20 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Define a Point2D structure
 struct point2d {
   double x;
   double y;
 };
 
-// Function to calculate the Euclidean distance between two points
 double euclidean_distance(Point2D *point1, Point2D *point2) {
   double dx = point1->x - point2->x;
   double dy = point1->y - point2->y;
   return sqrt(dx * dx + dy * dy);
 }
 
-// Function to create a new Point2D
 Point2D *create_point(double x, double y) {
   Point2D *new_point = (Point2D *)malloc(sizeof(Point2D));
   if (new_point == NULL) {
@@ -28,19 +25,16 @@ Point2D *create_point(double x, double y) {
   return new_point;
 }
 
-// Function to read the coordinates of a Point2D
 void get_point(Point2D *point, double *x, double *y) {
   *x = point->x;
   *y = point->y;
 }
 
-// Function to set the coordinates of a Point2D
 void set_point(Point2D *point, double x, double y) {
   point->x = x;
   point->y = y;
 }
 
-// Function to deallocate a Point2D
 void free_point(Point2D *point)
 {
     free(point);

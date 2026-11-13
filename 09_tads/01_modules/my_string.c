@@ -1,6 +1,5 @@
 #include "my_string.h"
 
-// Function to calculate the length of a string (analogous to strlen)
 int my_strlen(const char *str)
 {
     int length = 0;
@@ -11,7 +10,6 @@ int my_strlen(const char *str)
     return length;
 }
 
-// Function to copy one string to another (analogous to strcpy)
 void my_strcpy(char *dest, const char *src)
 {
     int i = 0;
@@ -25,7 +23,6 @@ void my_strcpy(char *dest, const char *src)
     dest[i] = '\0'; // Null-terminate the destination string
 }
 
-// Function to concatenate two strings (analogous to strcat)
 void my_strcat(char *dest, const char *src)
 {
     int dest_len = my_strlen(dest);
@@ -40,7 +37,6 @@ void my_strcat(char *dest, const char *src)
     dest[dest_len + i] = '\0'; // Null-terminate the concatenated string
 }
 
-// Function to compare two strings (analogous to strcmp)
 int my_strcmp(const char *str1, const char *str2)
 {
     int i;
