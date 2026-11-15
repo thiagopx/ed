@@ -361,32 +361,25 @@ const questions = [
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
-    tag: "Lista ordenada",
-    text: "ll_insert_sorted, do projeto 01_linkedlist, procura a posição do novo valor com o laço abaixo e insere o novo nó logo depois de prev (ou no início, se prev continuar NULL). Qual é a saída do trecho?",
-    code: `<span class="cmt">// inside ll_insert_sorted(l, v)</span>
-<span class="kw">while</span> (p != NULL &amp;&amp; p-&gt;info &lt; v)
-{
-    prev = p;
-    p = p-&gt;next;
-}
-
-<span class="cmt">// client code</span>
-<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
-<span class="fn">ll_insert_sorted</span>(l, <span class="num">5</span>);
-<span class="fn">ll_insert_sorted</span>(l, <span class="num">1</span>);
-<span class="fn">ll_insert_sorted</span>(l, <span class="num">3</span>);
-<span class="fn">ll_insert</span>(l, <span class="num">4</span>);
-<span class="fn">ll_insert_sorted</span>(l, <span class="num">2</span>);
+    tag: "Retirar: busca e ajuste",
+    text: "No projeto 01_linkedlist, ll_remove primeiro busca o nó (guardando o anterior) e depois ajusta o encadeamento; devolve 1 se achou o valor e 0 se não achou. Qual é a saída do trecho abaixo?",
+    code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">4</span>; i++)
+    <span class="fn">ll_insert</span>(l, i); <span class="cmt">// 4 3 2 1</span>
+<span class="kw">int</span> a = <span class="fn">ll_remove</span>(l, <span class="num">4</span>);
+<span class="kw">int</span> b = <span class="fn">ll_remove</span>(l, <span class="num">9</span>);
+<span class="kw">int</span> c = <span class="fn">ll_remove</span>(l, <span class="num">2</span>);
+<span class="fn">printf</span>(<span class="str">&quot;%d %d %d\\n&quot;</span>, a, b, c);
 <span class="fn">ll_print</span>(l);`,
     options: [
-      "2 4 1 3 5",
-      "1 2 3 4 5",
-      "4 1 2 3 5",
-      "1 2 3 5 4"
+      "1 1 1 e, na linha seguinte, 3 1",
+      "1 0 1 e, na linha seguinte, 3 1",
+      "1 0 1 e, na linha seguinte, 4 3 1",
+      "0 0 1 e, na linha seguinte, 3 1"
     ],
-    correctIndex: 0,
-    explainCorrect: "Depois das três primeiras chamadas a lista é 1 3 5. ll_insert coloca o 4 no início, sem olhar a ordem: 4 1 3 5. Ao inserir o 2, o laço testa o primeiro nó, 4 &lt; 2 é falso, e ele para logo, com prev ainda NULL — então o 2 vai para o início: 2 4 1 3 5. ll_insert_sorted só mantém a ordem se a lista já estiver ordenada. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
-    explainIncorrect: "A resposta correta é 2 4 1 3 5. ll_insert(l, 4) põe o 4 no início e quebra a ordem (4 1 3 5). Na inserção do 2, a condição p-&gt;info &lt; v já falha no primeiro nó (4 &lt; 2 é falso), prev continua NULL e o 2 é inserido no início. A função não reordena a lista: só procura o primeiro nó cujo valor não é menor que v."
+    correctIndex: 1,
+    explainCorrect: "O 4 é o primeiro nó: a busca para logo, com prev == NULL, e o ajuste muda first para o 3 (devolve 1). O 9 não está na lista: a busca termina com p == NULL e nada muda (devolve 0). O 2 está no meio: o next do 3 passa a apontar para o 1 (devolve 1). Restam 3 1.",
+    explainIncorrect: "A resposta correta é 1 0 1 e, na linha seguinte, 3 1. ll_remove devolve 0 só quando a busca termina com p == NULL, como no 9; o 4 (primeiro) e o 2 (meio) são retirados."
   },
   {
     difficulty: "intermediario",
@@ -434,47 +427,46 @@ const questions = [
     explainIncorrect: "A resposta correta é 3 2 1 1 2 3. Inseridos no início, os valores ficam 3 2 1. O printf antes da chamada recursiva imprime na ida (3 2 1); o printf depois dela imprime na volta, em ordem inversa (1 2 3). O 1 aparece duas vezes seguidas porque, no último nó, a chamada recursiva recebe NULL e retorna sem imprimir nada."
   },
   {
-    difficulty: "avancado",
-    diffLabel: "Avançado",
-    tag: "Comparação recursiva",
-    text: "Na auxiliar abaixo, que compara dois encadeamentos, falta a primeira linha. Qual delas faz ll_equals devolver 1 para duas listas com os mesmos elementos na mesma ordem (e 0 nos demais casos)?",
-    code: `<span class="kw">static</span> <span class="kw">int</span> <span class="fn">_ll_equals</span>(<span class="type">ListNode</span> *p1, <span class="type">ListNode</span> *p2)
+    difficulty: "intermediario",
+    diffLabel: "Intermediário",
+    tag: "Recursão: liberar a lista",
+    text: "A auxiliar recursiva _ll_free, do projeto 02_linkedlist-recursive, libera primeiro o resto e só depois o nó atual. O que aconteceria se as duas linhas do corpo trocassem de lugar, como abaixo?",
+    code: `<span class="kw">static</span> <span class="kw">void</span> <span class="fn">_ll_free</span>(<span class="type">ListNode</span> *p)
 {
-   <span class="cmt">/* ??? */</span>
-   <span class="kw">if</span> (p1 == NULL || p2 == NULL) <span class="cmt">// Only one ended: different sizes.</span>
-      <span class="kw">return</span> <span class="num">0</span>;
-   <span class="kw">return</span> p1-&gt;info == p2-&gt;info &amp;&amp; <span class="fn">_ll_equals</span>(p1-&gt;next, p2-&gt;next);
+   <span class="kw">if</span> (p != NULL)
+   {
+      <span class="fn">free</span>(p);
+      <span class="fn">_ll_free</span>(p-&gt;next);
+   }
 }`,
     options: [
-      `<span class="kw">if</span> (p1 == NULL &amp;&amp; p2 == NULL) <span class="kw">return</span> <span class="num">0</span>;`,
-      `<span class="kw">if</span> (p1 == NULL &amp;&amp; p2 == NULL) <span class="kw">return</span> <span class="num">1</span>;`,
-      `<span class="kw">if</span> (p1-&gt;info != p2-&gt;info) <span class="kw">return</span> <span class="num">1</span>;`,
-      `<span class="kw">if</span> (p1 == p2) <span class="kw">return</span> <span class="num">0</span>;`
+      "Nada de diferente: a ordem das linhas não importa na recursão.",
+      "p->next seria lido depois de free(p), um acesso a memória já liberada: o comportamento é indefinido.",
+      "Só o primeiro nó seria liberado.",
+      "A lista seria liberada de trás para frente, sem erro."
     ],
     correctIndex: 1,
-    explainCorrect: "É o caso base: dois encadeamentos vazios são iguais. Toda comparação de listas iguais termina nele — os dois ponteiros chegam a NULL juntos —, e é esse 1 que sobe pela cadeia de &amp;&amp;. Com return 0 nessa linha, ll_equals devolveria 0 até para duas listas idênticas. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
-    explainIncorrect: "A resposta correta é if (p1 == NULL &amp;&amp; p2 == NULL) return 1;: dois encadeamentos vazios são iguais. Com return 0, o resultado seria 0 mesmo para listas idênticas, pois toda comparação bem-sucedida termina nesse caso; testar p1-&gt;info antes de saber se p1 é NULL desreferenciaria NULL no fim das listas; e if (p1 == p2) return 0; também devolveria 0 quando os dois chegam a NULL."
+    explainCorrect: "Depois de free(p), o nó não pertence mais ao programa, e ler p->next é acessar memória liberada. Pode até funcionar por acaso, mas o comportamento é indefinido. Liberar o resto antes (ou guardar o próximo antes do free, na versão iterativa) evita o problema.",
+    explainIncorrect: "A resposta é: p->next seria lido depois de free(p). A chamada para o resto usa p->next, que já está em memória liberada. Por isso _ll_free chama a si mesma para o resto antes de liberar o nó."
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
     tag: "Lista circular",
-    text: "No projeto 03_circular-linkedlist, ll_insert insere no início e fecha o ciclo, ll_rotate avança o ponto de partida um nó e ll_print percorre o ciclo com do-while, a partir de first, até voltar a ele. Qual é a saída do trecho abaixo?",
+    text: "No projeto 03_circular-linkedlist, ll_insert insere no início e fecha o ciclo: o último nó passa a apontar para o novo primeiro. Depois do trecho abaixo, para qual nó aponta o next do nó que guarda 1?",
     code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
-<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">4</span>; i++)
-    <span class="fn">ll_insert</span>(l, i);
-<span class="fn">ll_rotate</span>(l);
-<span class="fn">ll_rotate</span>(l);
-<span class="fn">ll_print</span>(l);`,
+<span class="fn">ll_insert</span>(l, <span class="num">1</span>);
+<span class="fn">ll_insert</span>(l, <span class="num">2</span>);
+<span class="fn">ll_insert</span>(l, <span class="num">3</span>); <span class="cmt">// 3 2 1</span>`,
     options: [
-      "2 1 4 3",
-      "4 3 2 1",
-      "2 1",
-      "3 4 1 2"
+      "Para NULL: o 1 é o último nó.",
+      "Para o nó do 2.",
+      "Para o nó do 3, o primeiro: na lista circular, o último aponta para o primeiro.",
+      "Para ele mesmo."
     ],
-    correctIndex: 0,
-    explainCorrect: "Os quatro ll_insert produzem 4 3 2 1, com o next do 1 voltando para o 4. Cada ll_rotate só faz l-&gt;first = l-&gt;first-&gt;next: depois de duas, o ponto de partida é o 2. Como não há NULL, o do-while segue o ciclo até voltar ao 2: 2 1 4 3 — nenhum nó foi criado, removido ou religado.",
-    explainIncorrect: "A resposta correta é 2 1 4 3. A lista começa como 4 3 2 1 (com o ciclo fechado do 1 para o 4); duas rotações deixam first no 2, e ll_print visita todos os nós a partir dele até voltar ao 2. Nada se perde: a rotação muda só o ponto de partida, não os encadeamentos, e ela avança no sentido dos next, não no contrário."
+    correctIndex: 2,
+    explainCorrect: "A lista é 3 2 1, e o 1 é o último. Na lista circular, o next do último aponta para o primeiro, que é o 3: a cada inserção no início, ll_insert acha o último e o faz apontar para o nó novo.",
+    explainIncorrect: "A resposta correta é: para o nó do 3. Na circular não há NULL no fim: o último (o 1) aponta para o primeiro, e é por isso que ll_insert precisa achar o último a cada inserção."
   },
   {
     difficulty: "avancado",
@@ -488,36 +480,37 @@ const questions = [
 <span class="fn">ll_remove</span>(l, <span class="num">0</span>);
 <span class="fn">ll_remove</span>(l, <span class="num">7</span>);
 <span class="fn">ll_print_reversed</span>(l);
-<span class="fn">printf</span>(<span class="str">"%d\\n"</span>, <span class="fn">ll_size</span>(l));`,
+<span class="fn">printf</span>(<span class="str">"%d\\n"</span>, <span class="fn">ll_is_empty</span>(l));`,
     options: [
-      "3 2 1 e, na linha seguinte, 3",
-      "1 2 3 e, na linha seguinte, 2",
+      "3 2 1 e, na linha seguinte, 0",
+      "1 2 3 e, na linha seguinte, 1",
       "Nada: ll_remove(l, 7) encerra o programa com falha de segmentação, porque o 7 não está na lista",
-      "1 2 3 e, na linha seguinte, 3"
+      "1 2 3 e, na linha seguinte, 0"
     ],
     correctIndex: 3,
-    explainCorrect: "Remover o 4 (o primeiro) atualiza first e o prev do 3; remover o 0 (o último) atualiza last para o 1 e o next do 1. ll_remove(l, 7) não encontra o valor — _search devolve NULL — e retorna sem mexer em nada. ll_print_reversed parte de last e segue os prev: 1 2 3; e count só foi decrementado nas duas remoções bem-sucedidas: 3. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
-    explainIncorrect: "A resposta correta é 1 2 3 e, na linha seguinte, 3. Restam 3 2 1; ll_print_reversed começa em last (o 1, atualizado quando o 0 foi removido) e segue os prev. A remoção do 7 é inofensiva: _search devolve NULL e ll_remove retorna antes de mexer em ponteiros ou em count."
+    explainCorrect: "Remover o 4 (o primeiro) atualiza first e o prev do 3; remover o 0 (o último) atualiza last para o 1 e o next do 1. ll_remove(l, 7) não encontra o valor — _search devolve NULL — e retorna sem mexer em nada. ll_print_reversed parte de last e segue os prev: 1 2 3; e a lista não está vazia: ll_is_empty devolve 0. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 1 2 3 e, na linha seguinte, 0. Restam 3 2 1; ll_print_reversed começa em last (o 1, atualizado quando o 0 foi removido) e segue os prev. A remoção do 7 é inofensiva: _search devolve NULL e ll_remove retorna antes de mexer em ponteiros ou em count."
   },
   {
     difficulty: "intermediario",
     diffLabel: "Intermediário",
     tag: "Lista de tipos estruturados",
-    text: "No projeto 05_linkedlist-struct, cada nó guarda um Student * criado por st_create; ll_insert insere no início e ll_append, no final. Em que ordem os nomes aparecem na saída do trecho abaixo?",
+    text: "No projeto 05_linkedlist-struct, cada nó guarda um Student * criado por st_create, e ll_insert insere no início. Quem aparece na saída do trecho abaixo, e em que ordem?",
     code: `<span class="type">LinkedList</span> *l = <span class="fn">ll_create</span>();
-<span class="fn">ll_append</span>(l, <span class="str">"Ana"</span>, <span class="str">"11122233344"</span>);
-<span class="fn">ll_insert</span>(l, <span class="str">"Bia"</span>, <span class="str">"55566677788"</span>);
-<span class="fn">ll_append</span>(l, <span class="str">"Caio"</span>, <span class="str">"99988877766"</span>);
+<span class="fn">ll_insert</span>(l, <span class="str">&quot;Ana&quot;</span>, <span class="str">&quot;11122233344&quot;</span>);
+<span class="fn">ll_insert</span>(l, <span class="str">&quot;Bia&quot;</span>, <span class="str">&quot;55566677788&quot;</span>);
+<span class="fn">ll_insert</span>(l, <span class="str">&quot;Caio&quot;</span>, <span class="str">&quot;99988877766&quot;</span>);
+<span class="fn">ll_remove</span>(l, <span class="str">&quot;55566677788&quot;</span>);
 <span class="fn">ll_print</span>(l);`,
     options: [
-      "Ana, Bia, Caio",
-      "Bia, Ana, Caio",
+      "Ana, Caio",
+      "Caio, Ana",
       "Caio, Bia, Ana",
-      "Bia, Caio — o primeiro ll_append não faz nada, porque a lista ainda está vazia"
+      "Ana, Bia, Caio"
     ],
     correctIndex: 1,
-    explainCorrect: "Com a lista vazia, ll_append simplesmente delega para ll_insert, e Ana vira o único nó (first e last ao mesmo tempo). Bia entra no início; Caio é pendurado depois de last, sem percorrer a lista. Saída: Bia, Ana, Caio. Cada nó tem duas alocações — o nó e o aluno —, e por isso ll_free faz free(p-&gt;info) antes de free(p).",
-    explainIncorrect: "A resposta correta é Bia, Ana, Caio. ll_append numa lista vazia não é ignorado: ele chama ll_insert, e Ana passa a ser o primeiro e o último nó. Bia é inserida antes dela, e Caio é anexado depois de last."
+    explainCorrect: "Inserindo sempre no início, a lista fica Caio, Bia, Ana. ll_remove compara os CPFs com strcmp, acha a Bia, libera o aluno com st_free e depois o nó. Restam Caio e Ana, nessa ordem.",
+    explainIncorrect: "A resposta correta é Caio, Ana. Cada inserção no início passa à frente das anteriores (Caio, Bia, Ana), e o CPF 55566677788 é o da Bia, que sai."
   },
   {
     difficulty: "avancado",
@@ -605,7 +598,7 @@ const questions = [
     difficulty: "avancado",
     diffLabel: "Avançado",
     tag: "Pilha da recursão",
-    text: "Quantas chamadas de _ll_size ficam ativas ao mesmo tempo, no máximo, para uma lista com n nós?",
+    text: "Quantas chamadas de _ll_print_reversed ficam ativas ao mesmo tempo, no máximo, para uma lista com n nós?",
     options: [
       "1",
       "log n",
