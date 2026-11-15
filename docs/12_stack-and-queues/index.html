@@ -647,8 +647,11 @@
 .sim-count { font-family: var(--font-mono, monospace); font-size: 0.85em; color: #4B5866; }
 .sim-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.8rem; align-items: start; }
 .sim-fig svg { width: 100%; height: auto; display: block; }
-.sim-code { max-height: 15.5rem; overflow-y: auto; position: relative; background: #1B222C; color: #E7ECF1; border-radius: 8px; padding: 0.6rem 0; font-family: var(--font-mono, monospace); font-size: 0.82em; line-height: 1.45; overflow-x: auto; }
-.sim-code .ln { display: block; padding: 0 0.8rem; white-space: pre; }
+/* Janela de código (feature 022): nunca rola para o lado — a linha longa quebra dentro da janela,
+   com recuo de continuação além da coluna do número; rola na vertical só se o trecho não couber,
+   e o renderizador mantém a linha em execução visível. */
+.sim-code { max-height: 15.5rem; overflow-y: auto; overflow-x: hidden; position: relative; background: #1B222C; color: #E7ECF1; border-radius: 8px; padding: 0.6rem 0; font-family: var(--font-mono, monospace); font-size: 0.82em; line-height: 1.45; }
+.sim-code .ln { display: block; padding: 0 0.8rem 0 calc(0.8rem + 2.2em + 2ch); text-indent: calc(-2.2em - 2ch); white-space: pre-wrap; overflow-wrap: anywhere; }
 .sim-code .ln.on { background: rgba(232, 193, 90, 0.22); box-shadow: inset 3px 0 0 #E8C15A; }
 .sim-code .num { display: inline-block; width: 2.2em; color: #8A96A3; user-select: none; }
 .sim-desc, .notes .sim p.sim-desc { margin: 0.6rem 0 0; color: #121821; }
@@ -901,9 +904,10 @@
     <span class="fn">free</span>(s);
 }</code></pre><p class="fig-credit">Adaptado de: Celes, W. <em>Estrutura de Dados</em>.</p>
 
-    <h5>Ficha: pilha com vetor</h5>
+    <h5>Resumo: pilha com vetor</h5>
     <div class="ficha">
       <div><h5>Vantagens</h5><ul>
+        <li>É um vetor dinâmico restrito: só o topo entra e sai, e o resto do vetor nunca é deslocado.</li>
         <li>Push, pop e top em O(1), com acesso direto a <code>v[n-1]</code>.</li>
         <li>Elementos contíguos: nenhum ponteiro extra por elemento, e o percurso aproveita bem a memória cache.</li>
         <li>Duas alocações no total (estrutura e vetor), em vez de uma por elemento.</li>
@@ -1057,9 +1061,10 @@
       esses zeros como resultado esperado.
     </div>
 
-    <h5>Ficha: pilha com lista</h5>
+    <h5>Resumo: pilha com lista</h5>
     <div class="ficha">
       <div><h5>Vantagens</h5><ul>
+        <li>Ao contrário do vetor dinâmico, nenhum push realoca ou copia os elementos já empilhados.</li>
         <li>Push, pop e top em O(1) sempre, sem a inserção cara da realocação.</li>
         <li>Memória proporcional ao número de elementos: a pilha cresce e encolhe um nó por vez.</li>
         <li>Nenhum elemento muda de endereço enquanto está na pilha.</li>
@@ -1510,9 +1515,10 @@
     <div class="sim" data-cenario="fv.deq.dois"></div>
     <div class="sim" data-cenario="fv.deq.volta"></div>
 
-    <h5>Ficha: fila com vetor circular</h5>
+    <h5>Resumo: fila com vetor circular</h5>
     <div class="ficha">
       <div><h5>Vantagens</h5><ul>
+        <li>Ao contrário de um vetor dinâmico usado como fila, retirar do início não desloca os demais: o início anda em círculo.</li>
         <li>Inserir e retirar em O(1), sem deslocar elementos, graças ao incremento circular.</li>
         <li>Sem ponteiros extras por elemento, e só duas alocações no total.</li>
         <li>As posições liberadas no início são reaproveitadas, sem realocar.</li>
@@ -1546,7 +1552,7 @@
       CLRS para cada representação.
     </p>
     <figure class="resumo-fig">
-      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjUwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1MCIgcm9sZT0iaW1nIiBmb250LWZhbWlseT0iJ0RlamFWdSBTYW5zIE1vbm8nLCBDb25zb2xhcywgTWVubG8sIG1vbm9zcGFjZSI+PHRpdGxlPkZpbGEgY29tIGxpc3RhIGVuY2FkZWFkYTwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTEiIG1hcmtlckhlaWdodD0iMTEiIG1hcmtlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9IiMxMjE4MjEiLz48L21hcmtlcj48bWFya2VyIGlkPSJnIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMSIgbWFya2VySGVpZ2h0PSIxMSIgbWFya2VyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzFGNkY4QiIvPjwvbWFya2VyPjxtYXJrZXIgaWQ9IngiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjExIiBtYXJrZXJIZWlnaHQ9IjExIiBtYXJrZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjOUFBNUIxIi8+PC9tYXJrZXI+PC9kZWZzPjxyZWN0IHg9IjMzMCIgeT0iMTUiIHdpZHRoPSIxNDAiIGhlaWdodD0iODQiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iMzQwIiB5PSIyMiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIzNCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0MDAuMCIgeT0iMzkuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aGVhZDwvdGV4dD48cmVjdCB4PSIzNDAiIHk9IjU4IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjM0IiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjQwMC4wIiB5PSI3NS4wIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0ibm9ybWFsIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj50YWlsPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI4OC4wIiB5PSIxODAuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aW5mbzwvdGV4dD48cmVjdCB4PSI0MCIgeT0iMjAwIiB3aWR0aD0iOTYiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iODguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHBhdGggZD0iTTEzNiwyMjAgTDIxOCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSIxMzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik0zMTYsMjIwIEwzOTgsMjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzE2IiBjeT0iMjIwIiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48cGF0aCBkPSJNNDk2LDIyMCBMNTc4LDIyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ5NiIgY3k9IjIyMCIgcj0iNS41IiBmaWxsPSIjMTIxODIxIi8+PHBhdGggZD0iTTY3NiwyMjAgTDcxMCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSI2NzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjx0ZXh0IHg9IjcxNiIgeT0iMjIwIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5OVUxMPC90ZXh0PjxwYXRoIGQ9Ik0zNDAsMzkgTDg4LjAsMTU4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzQwIiBjeT0iMzkiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik00NjAsNzUgTDYyOC4wLDE1OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ2MCIgY3k9Ijc1IiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48L3N2Zz4=" alt="Figura 15.5">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjUwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1MCIgcm9sZT0iaW1nIiBmb250LWZhbWlseT0iJ0RlamFWdSBTYW5zIE1vbm8nLCBDb25zb2xhcywgTWVubG8sIG1vbm9zcGFjZSI+PHRpdGxlPkZpbGEgY29tIGxpc3RhIGVuY2FkZWFkYTwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTEiIG1hcmtlckhlaWdodD0iMTEiIG1hcmtlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9IiMxMjE4MjEiLz48L21hcmtlcj48bWFya2VyIGlkPSJnIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMSIgbWFya2VySGVpZ2h0PSIxMSIgbWFya2VyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzFGNkY4QiIvPjwvbWFya2VyPjxtYXJrZXIgaWQ9IngiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjExIiBtYXJrZXJIZWlnaHQ9IjExIiBtYXJrZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjOUFBNUIxIi8+PC9tYXJrZXI+PC9kZWZzPjxyZWN0IHg9IjMzMiIgeT0iMzAiIHdpZHRoPSIxMzYiIGhlaWdodD0iODQiIHJ4PSI4IiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjI2MiIgeT0iNTQiIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyODAiIHk9IjQwIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+cTwvdGV4dD48cGF0aCBkPSJNMjgwLDcyIEwzMzAsNzIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSIyODAiIGN5PSI3MiIgcj0iNS41IiBmaWxsPSIjMTIxODIxIi8+PHJlY3QgeD0iMzQwIiB5PSIzOCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIzNCIgZmlsbD0iIzEyMTgyMSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0MDAuMCIgeT0iNTUuMCIgZmlsbD0iI2ZmZiIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aGVhZDwvdGV4dD48cmVjdCB4PSIzNDAiIHk9Ijc0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjM0IiBmaWxsPSIjMTIxODIxIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjQwMC4wIiB5PSI5MS4wIiBmaWxsPSIjZmZmIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0ibm9ybWFsIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj50YWlsPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI4OC4wIiB5PSIxODAuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aW5mbzwvdGV4dD48cmVjdCB4PSI0MCIgeT0iMjAwIiB3aWR0aD0iOTYiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iODguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHBhdGggZD0iTTEzNiwyMjAgTDIxOCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSIxMzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik0zMTYsMjIwIEwzOTgsMjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzE2IiBjeT0iMjIwIiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48cGF0aCBkPSJNNDk2LDIyMCBMNTc4LDIyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ5NiIgY3k9IjIyMCIgcj0iNS41IiBmaWxsPSIjMTIxODIxIi8+PHBhdGggZD0iTTY3NiwyMjAgTDcxMCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSI2NzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjx0ZXh0IHg9IjcxNiIgeT0iMjIwIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5OVUxMPC90ZXh0PjxwYXRoIGQ9Ik0zNDAsNTUgTDg4LjAsMTU4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzQwIiBjeT0iNTUiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik00NjAsOTEgTDYyOC4wLDE1OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ2MCIgY3k9IjkxIiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48L3N2Zz4=" alt="Figura 15.5">
       <figcaption>Fila com lista encadeada: <code>head</code> e <code>tail</code> apontam para o primeiro e o último de quatro nós; o <code>next</code> do último é <code>NULL</code>.</figcaption>
       <p class="fig-credit">Adaptado de: Celes, W. <em>Estrutura de Dados</em>.</p>
     </figure>
@@ -1710,9 +1716,10 @@
    <span class="kw">return</span> <span class="num">0</span>;
 }</code></pre>
 
-    <h5>Ficha: fila com lista</h5>
+    <h5>Resumo: fila com lista</h5>
     <div class="ficha">
       <div><h5>Vantagens</h5><ul>
+        <li>Ao contrário do vetor dinâmico, nenhuma inserção realoca: não há caso de vetor cheio.</li>
         <li>Inserir e retirar em O(1) sempre, sem realocação nem caso de "vetor cheio".</li>
         <li>Memória proporcional ao número de elementos.</li>
         <li>Código mais direto que o do vetor circular: não há índices dando a volta.</li>
@@ -1964,9 +1971,10 @@
     <div class="sim" data-cenario="dv.pb.um"></div>
     <div class="sim" data-cenario="dv.pb.dois"></div>
 
-    <h5>Ficha: fila dupla com vetor</h5>
+    <h5>Resumo: fila dupla com vetor</h5>
     <div class="ficha">
       <div><h5>Vantagens</h5><ul>
+        <li>Num vetor dinâmico comum, inserir no início desloca todos; aqui, o índice circular evita o deslocamento.</li>
         <li>As quatro operações nas pontas em O(1), a menos da realocação.</li>
         <li>Mesma economia de memória da fila com vetor: sem ponteiros por elemento.</li>
         <li>Uma estrutura só serve de pilha, de fila ou das duas coisas.</li>
@@ -2117,9 +2125,10 @@
     <div class="sim" data-cenario="dl.popb.dois"></div>
     <div class="sim" data-cenario="dl.popf.dois"></div>
 
-    <h5>Ficha: fila dupla com lista</h5>
+    <h5>Resumo: fila dupla com lista</h5>
     <div class="ficha">
       <div><h5>Vantagens</h5><ul>
+        <li>Ao contrário do vetor dinâmico, nenhuma inserção realoca, em nenhuma das pontas.</li>
         <li>As quatro operações em O(1) sempre, sem realocação.</li>
         <li>Memória proporcional ao número de elementos.</li>
       </ul></div>
@@ -4670,29 +4679,33 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
 /* Renderizador de cenários (feature 019): listas encadeadas, vetores e visão abstrata do TAD.
    Dados: window.SIM_CENARIOS = { id: { titulo, codigo: {linhas:[...], inicio}, cabecalho, passos:[...] } }
    Modo interativo: <div class="sim" data-cenario="id"></div>
-   Modo quadro:     <div class="sim-quadro" data-cenario="id" data-passo="k"></div>  (sem controles) */
+   Modo quadro:     <div class="sim-quadro" data-cenario="id" data-passo="k"></div>  (sem controles)
+   Modo figura:     <div class="sim-figura" data-figura='{"passo":…,"cab":[…],"nome":"l"}'></div>  (só o desenho) */
 (function () {
   "use strict";
   var INK = "#121821", ACC = "#1F6F8B", SOFT = "#D6EAF2", GRAY = "#9AA5B1";
-  var NW = 76, RH = 30, GAP = 54, X0 = 196, Y0 = 104, Y1 = 238;
+  var NW = 76, RH = 30, GAP = 54, X0 = 254, Y0 = 104, Y1 = 238;
+  var UID = 0; // marcadores com id único por SVG: ids repetidos apontam para o SVG de um slide oculto e a seta perde a cabeça
   var MONO = "'DejaVu Sans Mono', Consolas, Menlo, monospace";
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function key(l) { return l[0] + "|" + l[1] + "|" + l[2]; }
 
-  function layout(passo) {
+  function layout(passo, x0) {
     var pos = {}, col = 0;
     passo.nos.forEach(function (n) {
       var row = n.linha || 0;
-      var x = (n.col !== undefined) ? X0 + n.col * (NW + GAP) : X0 + (col++) * (NW + GAP);
+      var x = (n.col !== undefined) ? x0 + n.col * (NW + GAP) : x0 + (col++) * (NW + GAP);
       if (n.col === undefined && row !== 0) col--;
       pos[n.id] = { x: x, y: row === 0 ? Y0 : Y1, rows: passo.campos || ["info", "next"] };
     });
     return pos;
   }
 
-  function svg(passo, cab) {
-    var pos = layout(passo), out = [], maxx = 0;
+  // fig: modo figura (slides): recorta o espaço vazio acima e abaixo do desenho.
+  function svg(passo, cab, nome, fig) {
+    var temCab = (cab || []).length > 0, x0 = temCab ? X0 : 40;
+    var pos = layout(passo, x0), out = [], maxx = 0, uid = ++UID, topo0 = Y0 - 4;
     var campos = passo.campos || ["info", "next"];
     var hNo = campos.length * RH;
     var novas = {}, desf = {};
@@ -4704,7 +4717,7 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       var col = kind === "nova" ? ACC : kind === "desf" ? GRAY : INK;
       var sw = kind === "nova" ? 3 : 2.2, dash = kind === "desf" ? ' stroke-dasharray="6 5"' : "";
       var mk = kind === "nova" ? "g" : kind === "desf" ? "x" : "a";
-      out.push('<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"' + dash + ' marker-end="url(#m' + mk + ')"/>');
+      out.push('<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"' + dash + ' marker-end="url(#m' + mk + uid + ')"/>');
       if (dot) out.push('<circle cx="' + dot[0] + '" cy="' + dot[1] + '" r="4.5" fill="' + col + '"/>');
     }
     function text(x, y, t, opt) {
@@ -4761,31 +4774,49 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       var p = pos[n.id], st = n.estado || "normal";
       var bc = st === "novo" ? ACC : st === "saindo" ? GRAY : INK, sw = st === "novo" ? 3 : 2;
       var dash = st === "saindo" ? ' stroke-dasharray="6 5"' : "";
+      var cor = st === "saindo" ? GRAY : INK;
       campos.forEach(function (cp, i) {
-        var fill = i === 0 ? (st === "saindo" ? "#fff" : SOFT) : "#fff";
-        out.push('<rect x="' + p.x + '" y="' + (p.y + i * RH) + '" width="' + NW + '" height="' + RH + '" fill="' + fill + '" stroke="' + bc + '" stroke-width="' + sw + '"' + dash + "/>");
-        text(p.x + NW / 2, p.y + i * RH + RH / 2, i === 0 ? n.info : cp, { fill: st === "saindo" ? GRAY : INK, size: i === 0 ? 17 : 14, bold: i === 0 });
+        var valor = cp === "info" && !passo.registros;
+        var fill = valor && st !== "saindo" ? SOFT : "#fff", y = p.y + i * RH;
+        out.push('<rect x="' + p.x + '" y="' + y + '" width="' + NW + '" height="' + RH + '" fill="' + fill + '" stroke="' + bc + '" stroke-width="' + sw + '"' + dash + "/>");
+        if (valor) text(p.x + NW / 2, y + RH / 2, n.info, { fill: cor, size: 17, bold: true });
+        else if (cp === "type") text(p.x + NW / 2, y + RH / 2, n.tipo || "", { fill: cor, size: 13 });
+        else if (cp === "info") { // ponteiro para o registro (feature 022): o nó não contém o registro
+          var rx = p.x + NW / 2, ry = p.y + hNo + 26;
+          arrow("M" + rx + "," + (y + RH / 2) + " L" + rx + "," + (ry - 2), st === "saindo" ? "desf" : "normal", [rx, y + RH / 2]);
+          out.push('<rect x="' + (p.x - 4) + '" y="' + ry + '" width="' + (NW + 8) + '" height="' + RH + '" rx="5" fill="#F3F5F7" stroke="' + cor + '" stroke-width="1.6"' + dash + "/>");
+          text(rx, ry + RH / 2, n.info, { fill: cor, size: 15, bold: true });
+        }
+        else text(p.x + NW / 2, y + RH / 2, cp, { fill: cor, size: 14 });
       });
-      if (n.tipo) text(p.x + NW / 2, p.y + hNo + 13, n.tipo, { size: 12, fill: "#4B5866" }); // abaixo: acima ficam as variáveis
+      if (n.tipo && campos.indexOf("type") < 0) text(p.x + NW / 2, p.y + hNo + 13, n.tipo, { size: 12, fill: "#4B5866" }); // abaixo: acima ficam as variáveis
       maxx = Math.max(maxx, p.x + NW + 90);
     });
 
-    // cabeçalho da lista (first, last, count…)
+    // estrutura principal (feature 022, padrão único): a variável (l, s, q, d) é um ponteiro, numa
+    // célula própria com o nome acima, e a seta dela leva à caixa da estrutura com os campos
     var cy = Y0 + RH / 2;
+    if ((cab || []).length) {
+      var topo = Y0 - (cab.length - 1) * RH / 2;
+      out.push('<rect x="4" y="' + (cy - RH / 2) + '" width="34" height="' + RH + '" fill="#fff" stroke="' + INK + '" stroke-width="2"/>');
+      text(21, cy - RH / 2 - 12, nome || "l", { size: 15, bold: true });
+      arrow("M21," + cy + " L60," + cy, "normal", [21, cy]);
+      out.push('<rect x="62" y="' + (topo - 6) + '" width="108" height="' + (cab.length * RH + 12) + '" rx="7" fill="#fff" stroke="' + INK + '" stroke-width="1.6"/>');
+    }
     (cab || []).forEach(function (campo, i) {
       var y = Y0 - (cab.length - 1) * RH / 2 + i * RH, v = passo.ponteiros[campo];
-      out.push('<rect x="10" y="' + y + '" width="96" height="' + RH + '" fill="' + INK + '" stroke="' + INK + '"/>');
+      out.push('<rect x="68" y="' + y + '" width="96" height="' + RH + '" fill="' + INK + '" stroke="' + INK + '"/>');
       var label = campo === "count" ? "count " + v : campo;
-      text(58, y + RH / 2, label, { fill: "#fff", size: 15 });
+      text(116, y + RH / 2, label, { fill: "#fff", size: 15 });
       if (campo === "count") return;
       var cy2 = y + RH / 2, kind = (passo.ponteirosNovos || []).indexOf(campo) >= 0 ? "nova" : "normal";
-      if (v === null || v === undefined) { arrow("M106," + cy2 + " L128," + cy2, kind, [106, cy2]); text(132, cy2, "NULL", { anchor: "start", bold: true, size: 13 }); }
+      if (v === null || v === undefined) { arrow("M164," + cy2 + " L186," + cy2, kind, [164, cy2]); text(190, cy2, "NULL", { anchor: "start", bold: true, size: 13 }); }
       else {
-        var t = pos[v], ty = t.y + ((campo === "last" || campo === "tail") ? hNo - RH / 2 : RH / 2);
-        var tx = ((campo === "last" || campo === "tail")) ? t.x + NW / 2 : t.x - 2, tyy = ((campo === "last" || campo === "tail")) ? t.y + hNo + 2 : ty;
-        if ((campo === "last" || campo === "tail")) { tyy = t.y - 3; arrow("M106," + cy2 + " C150," + (Y0 - 70) + " " + tx + "," + (Y0 - 80) + " " + tx + "," + tyy, kind, [106, cy2]); }
-        else if (t.y === Y0 && t.x === X0) arrow("M106," + cy2 + " L" + tx + "," + (Y0 + RH / 2), kind, [106, cy2]);
-        else arrow("M106," + cy2 + " C" + (tx - 60) + "," + cy2 + " " + (tx - 40) + "," + (t.y + RH / 2) + " " + tx + "," + (t.y + RH / 2), kind, [106, cy2]);
+        var t = pos[v], ty = t.y + (((campo === "last" || campo === "tail") || campo === "tail") ? hNo - RH / 2 : RH / 2);
+        var tx = (((campo === "last" || campo === "tail") || campo === "tail")) ? t.x + NW / 2 : t.x - 2, tyy = (((campo === "last" || campo === "tail") || campo === "tail")) ? t.y + hNo + 2 : ty;
+        if (((campo === "last" || campo === "tail") || campo === "tail")) { tyy = t.y - 3; topo0 = Math.min(topo0, Y0 - 66); arrow("M164," + cy2 + " C208," + (Y0 - 70) + " " + tx + "," + (Y0 - 80) + " " + tx + "," + tyy, kind, [164, cy2]); }
+        else if (t.y === Y0 && t.x === X0) arrow("M164," + cy2 + " L" + tx + "," + (Y0 + RH / 2), kind, [164, cy2]);
+        else arrow("M164," + cy2 + " C" + (tx - 60) + "," + cy2 + " " + (tx - 40) + "," + (t.y + RH / 2) + " " + tx + "," + (t.y + RH / 2), kind, [164, cy2]);
       }
     });
 
@@ -4801,6 +4832,7 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
     Object.keys(grupos).forEach(function (alvo) {
       var vs = grupos[alvo], t = pos[alvo], acima = t.y === Y0;
       var lx = t.x + NW / 2, ly = acima ? t.y - 40 : t.y + hNo + 34;
+      if (acima) topo0 = Math.min(topo0, ly - 22 - (vs.length - 1) * 17);
       var nova = vs.some(function (v) { return (passo.ponteirosNovos || []).indexOf(v) >= 0; });
       var fill = vs.indexOf("node") >= 0 ? ACC : INK;
       vs.forEach(function (v, i) { // empilha os nomes, um por linha
@@ -4809,23 +4841,32 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       });
       arrow("M" + lx + "," + ly + " L" + lx + "," + (acima ? t.y - 3 : t.y + hNo + 3), nova ? "nova" : "normal", [lx, ly]);
     });
+    if (nulos.length) topo0 = 8;
     if (nulos.length) text(10, 22, nulos.map(function (v) { return v + " = NULL"; }).join("   "), { anchor: "start", size: 14, fill: "#4B5866" });
 
     var w = Math.max(maxx, 420), hasRow1 = passo.nos.some(function (n) { return n.linha === 1; });
-    var h = (hasRow1 ? Y1 + hNo + 90 : Y0 + hNo + 80);
+    var h = (hasRow1 ? Y1 + hNo + 90 : Y0 + hNo + 80) + (passo.registros ? RH + 20 : 0), y0v = 0;
+    if (fig) {
+      if (temCab) topo0 = Math.min(topo0, Y0 - (cab.length - 1) * RH / 2 - 12, cy - RH / 2 - 24);
+      var baixo = (hasRow1 ? Y1 : Y0) + hNo + (passo.registros ? RH + 26 : 0) + (passo.nos.some(function (n) { return n.tipo; }) && campos.indexOf("type") < 0 ? 22 : 0) + 10;
+      var volta = passo.ligacoes.some(function (l) { return l[1] === "next" && l[2] !== null && pos[l[2]] && pos[l[0]] && pos[l[2]].x <= pos[l[0]].x; });
+      if (volta) baixo += 34; // a seta que volta (circular) passa por baixo dos nós
+      y0v = topo0 - 4; h = baixo - y0v; w = Math.max(maxx - 16, temCab ? 236 : 0);
+    }
     var defs = "<defs>" + ["a:" + INK, "g:" + ACC, "x:" + GRAY].map(function (s) {
       var p = s.split(":");
-      return '<marker id="m' + p[0] + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + p[1] + '"/></marker>';
+      return '<marker id="m' + p[0] + uid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + p[1] + '"/></marker>';
     }).join("") + "</defs>";
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + " " + h + '" font-family="' + MONO + '" role="img">' + defs + out.join("") + "</svg>";
+    return '<svg xmlns="http://www.w3.org/2000/svg"' + (fig ? ' style="--fw: ' + w + '"' : "") + ' viewBox="0 ' + y0v + " " + w + " " + h + '" font-family="' + MONO + '" role="img">' + defs + out.join("") + "</svg>";
   }
 
   function num(x) { return String(Math.round(x * 1e6) / 1e6); }
   function numTad(x) { return Number.isInteger(x) ? String(x) : x.toFixed(2); } // como o %.2f da saída real
 
+  var UIDV = 0;
   // Vetor (pilha/fila/fila dupla com vetor): células v[0..n_max-1], campos da estrutura e marcas de índice.
   function svgVec(p) {
-    var W = 58, H = 40, X = 24, Y = 92, out = [];
+    var W = 58, H = 40, X = 24, Y = 92, out = [], uid = ++UIDV; // marcador com id único por SVG (feature 022)
     var w = Math.max(X * 2 + p.n_max * W, 520), h = Y + H + 56;
     function text(x, y, t, o) {
       o = o || {};
@@ -4851,12 +4892,12 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       var x = X + Number(i) * W + W / 2, nomes = grupos[i];
       var cor = nomes.some(function (m) { return m === "tail" || m === "last"; }) && nomes.length === 1 ? ACC : INK;
       text(x, Y - 36, nomes.join(", "), { bold: true, fill: cor, size: 14 });
-      out.push('<path d="M' + x + "," + (Y - 26) + " L" + x + "," + (Y - 4) + '" stroke="' + cor + '" stroke-width="2.2" marker-end="url(#mv' + (cor === ACC ? "g" : "a") + ')"/>');
+      out.push('<path d="M' + x + "," + (Y - 26) + " L" + x + "," + (Y - 4) + '" stroke="' + cor + '" stroke-width="2.2" marker-end="url(#mv' + (cor === ACC ? "g" : "a") + uid + ')"/>');
     });
     text(X, Y + H + 38, "tracejado: fora da estrutura · ?: nunca escrito", { anchor: "start", size: 12, fill: "#4B5866" });
     var defs = "<defs>" + ["a:" + INK, "g:" + ACC].map(function (s) {
       var q = s.split(":");
-      return '<marker id="mv' + q[0] + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + q[1] + '"/></marker>';
+      return '<marker id="mv' + q[0] + uid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + q[1] + '"/></marker>';
     }).join("") + "</defs>";
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + " " + h + '" font-family="' + MONO + '" role="img">' + defs + out.join("") + "</svg>";
   }
@@ -4897,16 +4938,31 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
   function figura(cen, p) {
     if (cen.tipo === "vetor") return svgVec(p);
     if (cen.tipo === "tad") return svgTad(p);
-    return svg(p, cen.cabecalho);
+    var cab = cen.cabecalho || [], nome = cab.indexOf("top") >= 0 ? "s" : /dq_/.test(cen.titulo || "") ? "d" : "q";
+    return svg(p, cab, nome); // nome da variável na moldura da estrutura principal (feature 022)
   }
 
   function code(cen, linha) {
     var html = "";
     cen.codigo.linhas.forEach(function (par) {
+      if (/^\s*\/\//.test(par[1]) && par[0] !== linha) return; // linha só de comentário: não ocupa a janela
       var n = par[0], t = par[1].replace(/\s*\/\/.*$/, "");
       html += '<span class="ln' + (n !== null && n === linha ? " on" : "") + '"><span class="num">' + (n === null ? "" : n) + "</span>" + esc(t) + "</span>";
     });
     return html;
+  }
+
+  // Mantém a linha em execução inteira na área visível da janela de código, sem rolar a página
+  // (feature 022). Só age em janela visível: um quadro de slide oculto é posicionado quando o
+  // slide é ativado (observador em init).
+  function posicionar(raiz) {
+    (raiz.querySelectorAll ? raiz.querySelectorAll(".sim-code") : []).forEach(function (cod) {
+      var on = cod.querySelector(".ln.on");
+      if (!on || !cod.clientHeight) return;
+      if (cod.scrollHeight <= cod.clientHeight) { cod.scrollTop = 0; return; }
+      var alvo = on.offsetTop - (cod.clientHeight - on.offsetHeight) / 2;
+      cod.scrollTop = Math.max(0, Math.min(alvo, cod.scrollHeight - cod.clientHeight));
+    });
   }
 
   function render(el, cen, k, controles) {
@@ -4916,8 +4972,8 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       '<div class="sim-body"><div class="sim-fig">' + figura(cen, p) + '</div><div class="sim-code">' + code(cen, p.linha) + "</div></div>" +
       '<p class="sim-desc">' + p.texto + "</p>" +
       (controles ? '<div class="sim-ctrl"><button data-d="-1"' + (k === 0 ? " disabled" : "") + '>◀ anterior</button><button data-d="1"' + (k === cen.passos.length - 1 ? " disabled" : "") + ">próximo ▶</button></div>" : "");
-    var cod = el.querySelector(".sim-code"), on = cod && cod.querySelector(".ln.on");
-    if (on) cod.scrollTop = on.offsetTop - cod.clientHeight / 2; // mostra a linha em destaque sem rolar a página
+    posicionar(el);
+    if (window.requestAnimationFrame) requestAnimationFrame(function () { posicionar(el); });
     if (controles) el.querySelectorAll("button").forEach(function (b) {
       b.addEventListener("click", function () { render(el, cen, k + Number(b.dataset.d), true); });
     });
@@ -4931,8 +4987,22 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
     document.querySelectorAll(".sim-quadro[data-cenario]").forEach(function (el) {
       var c = dados[el.dataset.cenario]; if (c) render(el, c, Number(el.dataset.passo || 0), false);
     });
+    // Modo figura (feature 022): só o desenho, para os slides; data-figura = {passo, cab, nome}.
+    document.querySelectorAll(".sim-figura[data-figura]").forEach(function (el) {
+      var f = JSON.parse(el.dataset.figura); el.innerHTML = svg(f.passo, f.cab || [], f.nome, true);
+    });
   }
-  window.SimListas = { svg: svg, init: init };
+  function observarSlides() {
+    if (!window.MutationObserver) return;
+    var obs = new MutationObserver(function (ms) {
+      ms.forEach(function (m) { if (m.target.classList && m.target.classList.contains("is-active")) posicionar(m.target); });
+    });
+    document.querySelectorAll("section.slide").forEach(function (s) {
+      if (s.querySelector(".sim-quadro")) obs.observe(s, { attributes: true, attributeFilter: ["class"] });
+    });
+  }
+  window.SimListas = { svg: svg, init: init, posicionar: posicionar };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", observarSlides); else observarSlides();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 </script>

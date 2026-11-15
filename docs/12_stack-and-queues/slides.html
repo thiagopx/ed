@@ -620,8 +620,11 @@
 .sim-count { font-family: var(--font-mono, monospace); font-size: 0.85em; color: #4B5866; }
 .sim-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.8rem; align-items: start; }
 .sim-fig svg { width: 100%; height: auto; display: block; }
-.sim-code { max-height: 15.5rem; overflow-y: auto; position: relative; background: #1B222C; color: #E7ECF1; border-radius: 8px; padding: 0.6rem 0; font-family: var(--font-mono, monospace); font-size: 0.82em; line-height: 1.45; overflow-x: auto; }
-.sim-code .ln { display: block; padding: 0 0.8rem; white-space: pre; }
+/* Janela de código (feature 022): nunca rola para o lado — a linha longa quebra dentro da janela,
+   com recuo de continuação além da coluna do número; rola na vertical só se o trecho não couber,
+   e o renderizador mantém a linha em execução visível. */
+.sim-code { max-height: 15.5rem; overflow-y: auto; overflow-x: hidden; position: relative; background: #1B222C; color: #E7ECF1; border-radius: 8px; padding: 0.6rem 0; font-family: var(--font-mono, monospace); font-size: 0.82em; line-height: 1.45; }
+.sim-code .ln { display: block; padding: 0 0.8rem 0 calc(0.8rem + 2.2em + 2ch); text-indent: calc(-2.2em - 2ch); white-space: pre-wrap; overflow-wrap: anywhere; }
 .sim-code .ln.on { background: rgba(232, 193, 90, 0.22); box-shadow: inset 3px 0 0 #E8C15A; }
 .sim-code .num { display: inline-block; width: 2.2em; color: #8A96A3; user-select: none; }
 .sim-desc, .notes .sim p.sim-desc { margin: 0.6rem 0 0; color: #121821; }
@@ -633,7 +636,7 @@
   .slide .sim { margin: 0; padding: 0.6rem 0.9rem 0.7rem; width: 100%; max-width: 88vw; box-sizing: border-box; }
   .slide .sim-head .sim-title { display: none; }
   .slide .sim-count { font-size: var(--fs-rotulo); }
-  .slide .sim-body { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .slide .sim-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .slide .sim-code { font-size: var(--fs-codigo); max-height: 46vh; }
   .slide .sim-fig svg { max-height: 46vh; }
   .slide .sim-desc, .slide .sim p.sim-desc { font-size: var(--fs-conteudo); }
@@ -642,6 +645,18 @@
   .tabela-custos { border-collapse: collapse; font-size: var(--fs-conteudo); background: #fff; }
   .tabela-custos th, .tabela-custos td { border: 1px solid var(--line); padding: 0.35rem 0.7rem; text-align: left; }
   .tabela-custos th { background: var(--accent-soft); }
+  /* estrutura principal da lista (feature 022) */
+  /* feature 022: desenho de lista no modo figura do sim.js (ponteiros como setas) */
+  .sim-figura { display: flex; justify-content: center; width: 100%; }
+  /* escala fixa: a mesma unidade do desenho vale o mesmo em todos os slides (um nó tem sempre o mesmo tamanho) */
+  .sim-figura svg { display: block; width: calc(var(--fw) * 0.085vw); height: auto; max-width: 100%; max-height: 40vh; }
+  .nodes .struct { display: inline-flex; flex-direction: column; align-items: stretch; gap: 0.15vw;
+    border: 2px solid var(--ink); border-radius: 0.5vw; padding: 0.25vw 0.35vw 0.35vw; background: var(--surface); }
+  .nodes .struct .nome { font-family: var(--font-mono); font-weight: 700; text-align: center; font-size: 1.25rem; color: var(--ink); }
+  .nodes .struct .campo { font-family: var(--font-mono); background: var(--ink); color: #fff; text-align: center;
+    font-size: 1.25rem; padding: 0.15vw 0.8vw; }
+  .nodes .ref { font-family: var(--font-mono); font-weight: 700; color: var(--ink); font-size: 1.25rem; }
+
   /* ---- componentes do módulo 12 ---- */
   .cap-row { display: flex; gap: 4vw; align-items: center; margin-top: 3vw; }
   .cap-strip.is-small { margin-top: 0; }
@@ -934,21 +949,21 @@
     <div class="footer"><span>Pilhas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA pilha-vetor 1/2 -->
+  <!-- RESUMO pilha-vetor 1/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="pilha" data-impl="pilha-vetor">
     <div class="kicker">Pilha com vetor</div>
-    <h1>Ficha: pilha com vetor</h1>
+    <h1>Resumo: pilha com vetor</h1>
     <p class="sub">Vantagens e desvantagens desta implementação.</p>
     <div class="body">
-      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>push, pop e top custam O(1): o topo está sempre em <code>v[n-1]</code>, com acesso direto.</li><li>Os elementos ficam contíguos, e o percurso aproveita a cache.</li><li>São só duas alocações no total, a estrutura e o vetor, em vez de uma por elemento.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>O push que encontra o vetor cheio custa O(n), porque o realloc pode copiar tudo.</li><li>Logo depois de dobrar, até metade do vetor fica reservada sem uso.</li><li>O vetor nunca encolhe: depois de um pico, a memória fica reservada até <code>s_free</code>.</li></ul></div></div>
+      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>push, pop e top custam O(1): o topo está sempre em <code>v[n-1]</code>, com acesso direto.</li><li>Os elementos ficam contíguos, e o percurso aproveita a cache.</li><li>É um vetor dinâmico com só três operações: duas alocações no total, em vez de uma por elemento.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>O push que encontra o vetor cheio custa O(n), porque o realloc pode copiar tudo.</li><li>Logo depois de dobrar, até metade do vetor fica reservada sem uso.</li><li>O vetor nunca encolhe: depois de um pico, a memória fica reservada até <code>s_free</code>.</li></ul></div></div>
     </div>
     <div class="footer"><span>Pilhas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA pilha-vetor 2/2 -->
+  <!-- RESUMO pilha-vetor 2/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="pilha" data-impl="pilha-vetor">
     <div class="kicker">Pilha com vetor</div>
-    <h1>Ficha: pilha com vetor</h1>
+    <h1>Resumo: pilha com vetor</h1>
     <p class="sub">O que a estrutura não permite, e o que a linguagem C impõe.</p>
     <div class="body">
       <div class="compare is-duas"><div class="col"><h3>limitações da estrutura</h3><ul><li>Só o topo é acessível: para ver o terceiro, é preciso desempilhar os dois de cima.</li><li>Retirar da pilha vazia aborta: o cliente testa antes com <code>s_is_empty</code>.</li></ul></div><div class="col"><h3>limitações de C</h3><ul><li>A pilha só guarda <code>float</code>; outro tipo exige outro TAD ou <code>void *</code>.</li><li>O realloc pode mover o vetor: um ponteiro antigo para <code>v[i]</code> fica pendente.</li><li>Não há coleta de lixo: quem cria a pilha precisa chamar <code>s_free</code>.</li></ul></div></div>
@@ -959,8 +974,8 @@
   <!-- PL TRANSICAO -->
   <section class="slide" data-slide data-tipo="transicao" data-estrutura="pilha" data-impl="pilha-lista">
     <div class="kicker">Pilha com lista</div>
-    <h1>E se o push nunca custasse O(n)?</h1>
-    <p class="sub">A pilha com lista troca o vetor por nós: cada push aloca só um nó, e nada é copiado.</p>
+    <h1>Pilha com lista</h1>
+    <p class="sub">E se o push nunca custasse O(n)? A pilha com lista troca o vetor por nós: cada push aloca só um nó, e nada é copiado.</p>
     <div class="body">
       <div class="qa-viz"><div class="cases"><div class="case"><span class="cond">com vetor</span><span class="arrow">→</span><span class="then">o push com o vetor cheio realoca e copia tudo: O(n)</span></div><div class="case is-accent"><span class="cond">com lista</span><span class="arrow">→</span><span class="then">todo push aloca um nó e liga ao topo: O(1)</span></div></div></div>
     </div>
@@ -984,7 +999,7 @@
     <h1>O topo é o primeiro nó</h1>
     <p class="sub">Cada nó guarda o valor e o elemento logo abaixo; a pilha vazia tem top = NULL.</p>
     <div class="body">
-      <div class="concept-split"><div class="visual-col"><div class="nodes is-small"><div class="ptr">top</div><span class="link">→</span><div class="node"><span class="v">7</span><span class="nx">next</span></div><span class="link">→</span><div class="node"><span class="v">5</span><span class="nx">next</span></div><span class="link">→</span><span class="null">NULL</span></div></div><div class="code-col"><div class="code-block"><div class="code-panel is-long"><div class="file-tag">12_stack-and-queues/02_stack/stack.c</div><pre><code><span class="kw">struct</span> stack
+      <div class="concept-split"><div class="visual-col"><div class="sim-figura" data-figura='{&quot;passo&quot;: {&quot;campos&quot;: [&quot;info&quot;, &quot;next&quot;], &quot;nos&quot;: [{&quot;id&quot;: &quot;n0&quot;, &quot;info&quot;: &quot;7&quot;}, {&quot;id&quot;: &quot;n1&quot;, &quot;info&quot;: &quot;5&quot;}], &quot;ligacoes&quot;: [[&quot;n0&quot;, &quot;next&quot;, &quot;n1&quot;], [&quot;n1&quot;, &quot;next&quot;, null]], &quot;novas&quot;: [], &quot;desfeitas&quot;: [], &quot;ponteiros&quot;: {&quot;top&quot;: &quot;n0&quot;}, &quot;ponteirosNovos&quot;: []}, &quot;cab&quot;: [&quot;top&quot;], &quot;nome&quot;: &quot;s&quot;}'></div></div><div class="code-col"><div class="code-block"><div class="code-panel is-long"><div class="file-tag">12_stack-and-queues/02_stack/stack.c</div><pre><code><span class="kw">struct</span> stack
 {
     <span class="type">StackNode</span> *top; <span class="cmt">// NULL when the stack is empty.</span>
 };
@@ -1124,7 +1139,7 @@
     <h1>Retirar o único nó: top precisa de cuidado especial?</h1>
     <p class="sub">A pilha é [5]. Depois de s_pop, o que fica em s-&gt;top?</p>
     <div class="body">
-      <div class="qa-viz"><div class="nodes is-small"><div class="ptr">top</div><span class="link">→</span><div class="node"><span class="v">5</span><span class="nx">next</span></div><span class="link">→</span><span class="null">NULL</span></div></div>
+      <div class="qa-viz"><div class="sim-figura" data-figura='{&quot;passo&quot;: {&quot;campos&quot;: [&quot;info&quot;, &quot;next&quot;], &quot;nos&quot;: [{&quot;id&quot;: &quot;n0&quot;, &quot;info&quot;: &quot;5&quot;}], &quot;ligacoes&quot;: [[&quot;n0&quot;, &quot;next&quot;, null]], &quot;novas&quot;: [], &quot;desfeitas&quot;: [], &quot;ponteiros&quot;: {&quot;top&quot;: &quot;n0&quot;}, &quot;ponteirosNovos&quot;: []}, &quot;cab&quot;: [&quot;top&quot;], &quot;nome&quot;: &quot;s&quot;}'></div></div>
     </div>
     <div class="footer"><span>Pilhas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
@@ -1161,21 +1176,21 @@
     <div class="footer"><span>Pilhas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA pilha-lista 1/2 -->
+  <!-- RESUMO pilha-lista 1/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="pilha" data-impl="pilha-lista">
     <div class="kicker">Pilha com lista</div>
-    <h1>Ficha: pilha com lista</h1>
+    <h1>Resumo: pilha com lista</h1>
     <p class="sub">Vantagens e desvantagens desta implementação.</p>
     <div class="body">
-      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>push, pop e top custam O(1) sempre: não existe a inserção cara da realocação.</li><li>A memória acompanha n: a pilha cresce e encolhe um nó por vez.</li><li>Nenhum elemento muda de endereço enquanto está na pilha.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Cada <code>float</code> de 4 bytes carrega um <code>next</code> de 8 bytes, e cada push faz uma alocação.</li><li>Liberar a pilha custa O(n), porque cada nó precisa do seu próprio free.</li><li>Os nós ficam espalhados pela memória, e o percurso fica mais lento que no vetor.</li></ul></div></div>
+      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>push, pop e top custam O(1) sempre: não existe a inserção cara da realocação do vetor dinâmico.</li><li>A memória acompanha n: a pilha cresce e encolhe um nó por vez.</li><li>Nenhum elemento muda de endereço enquanto está na pilha.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Cada <code>float</code> de 4 bytes carrega um <code>next</code> de 8 bytes, e cada push faz uma alocação.</li><li>Liberar a pilha custa O(n), porque cada nó precisa do seu próprio free.</li><li>Os nós ficam espalhados pela memória, e o percurso fica mais lento que no vetor.</li></ul></div></div>
     </div>
     <div class="footer"><span>Pilhas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA pilha-lista 2/2 -->
+  <!-- RESUMO pilha-lista 2/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="pilha" data-impl="pilha-lista">
     <div class="kicker">Pilha com lista</div>
-    <h1>Ficha: pilha com lista</h1>
+    <h1>Resumo: pilha com lista</h1>
     <p class="sub">O que a estrutura não permite, e o que a linguagem C impõe.</p>
     <div class="body">
       <div class="compare is-duas"><div class="col"><h3>limitações da estrutura</h3><ul><li>Como no vetor, só o topo é acessível para leitura e retirada.</li><li>Retirar da pilha vazia aborta pelo assert, como na versão com vetor.</li></ul></div><div class="col"><h3>limitações de C</h3><ul><li>Cada nó retirado precisa de free, e o ponteiro que sobra fica pendente.</li><li>A pilha só guarda <code>float</code>, como na versão com vetor.</li><li>O .h só declara o nome <code>StackNode</code>: os campos do nó ficam escondidos no .c.</li></ul></div></div>
@@ -1704,21 +1719,21 @@
     <div class="footer"><span>Filas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA fila-vetor 1/2 -->
+  <!-- RESUMO fila-vetor 1/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="fila" data-impl="fila-vetor">
     <div class="kicker">Fila com vetor</div>
-    <h1>Ficha: fila com vetor circular</h1>
+    <h1>Resumo: fila com vetor circular</h1>
     <p class="sub">Vantagens e desvantagens desta implementação.</p>
     <div class="body">
-      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>Inserir e retirar custam O(1), sem deslocar elementos, graças ao incremento circular.</li><li>Não há ponteiro por elemento, e são só duas alocações no total.</li><li>As posições liberadas no início do vetor são reaproveitadas sem realocar.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Inserir com o vetor cheio custa O(n): realoca e às vezes move um trecho.</li><li>O código é mais sutil: os índices dão a volta, e a realocação tem um caso especial.</li><li>O vetor nunca encolhe: depois de um pico, a memória fica reservada até <code>q_free</code>.</li></ul></div></div>
+      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>Inserir e retirar custam O(1), sem deslocar elementos, graças ao incremento circular.</li><li>Não há ponteiro por elemento, e são só duas alocações no total, como no vetor dinâmico.</li><li>As posições liberadas no início do vetor são reaproveitadas sem realocar.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Inserir com o vetor cheio custa O(n): realoca e às vezes move um trecho.</li><li>O código é mais sutil: os índices dão a volta, e a realocação tem um caso especial.</li><li>O vetor nunca encolhe: depois de um pico, a memória fica reservada até <code>q_free</code>.</li></ul></div></div>
     </div>
     <div class="footer"><span>Filas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA fila-vetor 2/2 -->
+  <!-- RESUMO fila-vetor 2/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="fila" data-impl="fila-vetor">
     <div class="kicker">Fila com vetor</div>
-    <h1>Ficha: fila com vetor circular</h1>
+    <h1>Resumo: fila com vetor circular</h1>
     <p class="sub">O que a estrutura não permite, e o que a linguagem C impõe.</p>
     <div class="body">
       <div class="compare is-duas"><div class="col"><h3>limitações da estrutura</h3><ul><li>Só o início pode ser lido e retirado, e só o fim recebe elementos novos.</li><li>Retirar de fila vazia aborta pelo assert, como na pilha.</li><li>Vazia e cheia têm tail == head: sem guardar n, os dois casos seriam indistinguíveis.</li></ul></div><div class="col"><h3>limitações de C</h3><ul><li>Em C, <code>-1 % 4</code> vale -1: decrementar circularmente exige somar n_max antes.</li><li>memmove conta bytes: sem o <code>sizeof</code>, move só um quarto do trecho.</li><li>A fila só guarda <code>float</code>; outro tipo exige outro TAD ou <code>void *</code>.</li></ul></div></div>
@@ -1729,8 +1744,8 @@
   <!-- FL TRANSICAO -->
   <section class="slide" data-slide data-tipo="transicao" data-estrutura="fila" data-impl="fila-lista">
     <div class="kicker">Fila com lista</div>
-    <h1>Sem vetor cheio, sem memmove</h1>
-    <p class="sub">Com nós encadeados, nenhuma inserção realoca nem move trecho: dois ponteiros, head e tail, fazem o papel dos índices.</p>
+    <h1>Fila com lista</h1>
+    <p class="sub">Sem vetor cheio, sem memmove. Com nós encadeados, nenhuma inserção realoca nem move trecho: dois ponteiros, head e tail, fazem o papel dos índices.</p>
     <div class="body">
       <div class="qa-viz"><div class="cases"><div class="case"><span class="cond">com vetor</span><span class="arrow">→</span><span class="then">vetor cheio dando a volta: realloc e memmove, O(n)</span></div><div class="case is-accent"><span class="cond">com lista</span><span class="arrow">→</span><span class="then">o nó novo entra depois de tail: O(1) sempre</span></div></div></div>
     </div>
@@ -1754,7 +1769,7 @@
     <h1>head no primeiro nó, tail no último</h1>
     <p class="sub">Retira-se do início e insere-se no fim; tail aqui aponta para o último nó, não para a posição livre.</p>
     <div class="body">
-      <figure class="figblock" style="margin:0; --fig-h: 46vh;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjUwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1MCIgcm9sZT0iaW1nIiBmb250LWZhbWlseT0iJ0RlamFWdSBTYW5zIE1vbm8nLCBDb25zb2xhcywgTWVubG8sIG1vbm9zcGFjZSI+PHRpdGxlPkZpbGEgY29tIGxpc3RhIGVuY2FkZWFkYTwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTEiIG1hcmtlckhlaWdodD0iMTEiIG1hcmtlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9IiMxMjE4MjEiLz48L21hcmtlcj48bWFya2VyIGlkPSJnIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMSIgbWFya2VySGVpZ2h0PSIxMSIgbWFya2VyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzFGNkY4QiIvPjwvbWFya2VyPjxtYXJrZXIgaWQ9IngiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjExIiBtYXJrZXJIZWlnaHQ9IjExIiBtYXJrZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjOUFBNUIxIi8+PC9tYXJrZXI+PC9kZWZzPjxyZWN0IHg9IjMzMCIgeT0iMTUiIHdpZHRoPSIxNDAiIGhlaWdodD0iODQiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iMzQwIiB5PSIyMiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIzNCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0MDAuMCIgeT0iMzkuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aGVhZDwvdGV4dD48cmVjdCB4PSIzNDAiIHk9IjU4IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjM0IiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjQwMC4wIiB5PSI3NS4wIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0ibm9ybWFsIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj50YWlsPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI4OC4wIiB5PSIxODAuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aW5mbzwvdGV4dD48cmVjdCB4PSI0MCIgeT0iMjAwIiB3aWR0aD0iOTYiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iODguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHBhdGggZD0iTTEzNiwyMjAgTDIxOCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSIxMzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik0zMTYsMjIwIEwzOTgsMjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzE2IiBjeT0iMjIwIiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48cGF0aCBkPSJNNDk2LDIyMCBMNTc4LDIyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ5NiIgY3k9IjIyMCIgcj0iNS41IiBmaWxsPSIjMTIxODIxIi8+PHBhdGggZD0iTTY3NiwyMjAgTDcxMCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSI2NzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjx0ZXh0IHg9IjcxNiIgeT0iMjIwIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5OVUxMPC90ZXh0PjxwYXRoIGQ9Ik0zNDAsMzkgTDg4LjAsMTU4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzQwIiBjeT0iMzkiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik00NjAsNzUgTDYyOC4wLDE1OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ2MCIgY3k9Ijc1IiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48L3N2Zz4=" alt="Fila com lista encadeada"><p class="fig-credit">Adaptado de: Celes, W. <em>Estrutura de Dados</em>.</p></figure>
+      <figure class="figblock" style="margin:0; --fig-h: 46vh;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgMjUwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjI1MCIgcm9sZT0iaW1nIiBmb250LWZhbWlseT0iJ0RlamFWdSBTYW5zIE1vbm8nLCBDb25zb2xhcywgTWVubG8sIG1vbm9zcGFjZSI+PHRpdGxlPkZpbGEgY29tIGxpc3RhIGVuY2FkZWFkYTwvdGl0bGU+PGRlZnM+PG1hcmtlciBpZD0iYSIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iMTEiIG1hcmtlckhlaWdodD0iMTEiIG1hcmtlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9IiMxMjE4MjEiLz48L21hcmtlcj48bWFya2VyIGlkPSJnIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIxMSIgbWFya2VySGVpZ2h0PSIxMSIgbWFya2VyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBvcmllbnQ9ImF1dG8iPjxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzFGNkY4QiIvPjwvbWFya2VyPjxtYXJrZXIgaWQ9IngiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjExIiBtYXJrZXJIZWlnaHQ9IjExIiBtYXJrZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjOUFBNUIxIi8+PC9tYXJrZXI+PC9kZWZzPjxyZWN0IHg9IjMzMiIgeT0iMzAiIHdpZHRoPSIxMzYiIGhlaWdodD0iODQiIHJ4PSI4IiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjI2MiIgeT0iNTQiIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyODAiIHk9IjQwIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+cTwvdGV4dD48cGF0aCBkPSJNMjgwLDcyIEwzMzAsNzIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSIyODAiIGN5PSI3MiIgcj0iNS41IiBmaWxsPSIjMTIxODIxIi8+PHJlY3QgeD0iMzQwIiB5PSIzOCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIzNCIgZmlsbD0iIzEyMTgyMSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0MDAuMCIgeT0iNTUuMCIgZmlsbD0iI2ZmZiIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aGVhZDwvdGV4dD48cmVjdCB4PSIzNDAiIHk9Ijc0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjM0IiBmaWxsPSIjMTIxODIxIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjQwMC4wIiB5PSI5MS4wIiBmaWxsPSIjZmZmIiBmb250LXNpemU9IjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0ibm9ybWFsIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj50YWlsPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI4OC4wIiB5PSIxODAuMCIgZmlsbD0iIzEyMTgyMSIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZm9udC1zdHlsZT0ibm9ybWFsIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+aW5mbzwvdGV4dD48cmVjdCB4PSI0MCIgeT0iMjAwIiB3aWR0aD0iOTYiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iODguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iMjIwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIyNjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNDAwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI0NDguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIxNjAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI0Q2RUFGMiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMTgwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPmluZm88L3RleHQ+PHJlY3QgeD0iNTgwIiB5PSIyMDAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI2MjguMCIgeT0iMjIwLjAiIGZpbGw9IiMxMjE4MjEiIGZvbnQtc2l6ZT0iMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPm5leHQ8L3RleHQ+PHBhdGggZD0iTTEzNiwyMjAgTDIxOCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSIxMzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik0zMTYsMjIwIEwzOTgsMjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzE2IiBjeT0iMjIwIiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48cGF0aCBkPSJNNDk2LDIyMCBMNTc4LDIyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ5NiIgY3k9IjIyMCIgcj0iNS41IiBmaWxsPSIjMTIxODIxIi8+PHBhdGggZD0iTTY3NiwyMjAgTDcxMCwyMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEyMTgyMSIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYSkiLz48Y2lyY2xlIGN4PSI2NzYiIGN5PSIyMjAiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjx0ZXh0IHg9IjcxNiIgeT0iMjIwIiBmaWxsPSIjMTIxODIxIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXN0eWxlPSJub3JtYWwiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5OVUxMPC90ZXh0PjxwYXRoIGQ9Ik0zNDAsNTUgTDg4LjAsMTU4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjE4MjEiIHN0cm9rZS13aWR0aD0iMi40IiBtYXJrZXItZW5kPSJ1cmwoI2EpIi8+PGNpcmNsZSBjeD0iMzQwIiBjeT0iNTUiIHI9IjUuNSIgZmlsbD0iIzEyMTgyMSIvPjxwYXRoIGQ9Ik00NjAsOTEgTDYyOC4wLDE1OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTIxODIxIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjQ2MCIgY3k9IjkxIiByPSI1LjUiIGZpbGw9IiMxMjE4MjEiLz48L3N2Zz4=" alt="Fila com lista encadeada"><p class="fig-credit">Adaptado de: Celes, W. <em>Estrutura de Dados</em>.</p></figure>
     </div>
     <div class="footer"><span>Filas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
@@ -1873,7 +1888,7 @@
     <h1>Retirar o único nó: basta avançar head?</h1>
     <p class="sub">A fila é [1.4], com head e tail no mesmo nó.</p>
     <div class="body">
-      <div class="qa-viz"><div class="nodes is-small"><div class="ptr">head</div><span class="link">→</span><div class="node"><span class="v">1.4</span><span class="nx">next</span></div><span class="link">→</span><span class="null">NULL</span><span class="link">←</span><div class="ptr">tail</div></div></div>
+      <div class="qa-viz"><div class="sim-figura" data-figura='{&quot;passo&quot;: {&quot;campos&quot;: [&quot;info&quot;, &quot;next&quot;], &quot;nos&quot;: [{&quot;id&quot;: &quot;n0&quot;, &quot;info&quot;: &quot;1.4&quot;}], &quot;ligacoes&quot;: [[&quot;n0&quot;, &quot;next&quot;, null]], &quot;novas&quot;: [], &quot;desfeitas&quot;: [], &quot;ponteiros&quot;: {&quot;head&quot;: &quot;n0&quot;, &quot;tail&quot;: &quot;n0&quot;}, &quot;ponteirosNovos&quot;: []}, &quot;cab&quot;: [&quot;head&quot;, &quot;tail&quot;], &quot;nome&quot;: &quot;q&quot;}'></div></div>
     </div>
     <div class="footer"><span>Filas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
@@ -1889,21 +1904,21 @@
     <div class="footer"><span>Filas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA fila-lista 1/2 -->
+  <!-- RESUMO fila-lista 1/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="fila" data-impl="fila-lista">
     <div class="kicker">Fila com lista</div>
-    <h1>Ficha: fila com lista</h1>
+    <h1>Resumo: fila com lista</h1>
     <p class="sub">Vantagens e desvantagens desta implementação.</p>
     <div class="body">
-      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>Inserir e retirar custam O(1) sempre, sem realocação nem caso de vetor cheio.</li><li>A memória acompanha o número de elementos que estão na fila.</li><li>O código é mais direto que o do vetor circular: nenhum índice dá a volta.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Cada elemento carrega um ponteiro <code>next</code>, e cada inserção faz uma alocação.</li><li>Liberar a fila custa O(n), porque cada nó precisa do seu próprio free.</li></ul></div></div>
+      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>Inserir e retirar custam O(1) sempre, sem a realocação do vetor dinâmico nem caso de vetor cheio.</li><li>A memória acompanha o número de elementos que estão na fila.</li><li>O código é mais direto que o do vetor circular: nenhum índice dá a volta.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Cada elemento carrega um ponteiro <code>next</code>, e cada inserção faz uma alocação.</li><li>Liberar a fila custa O(n), porque cada nó precisa do seu próprio free.</li></ul></div></div>
     </div>
     <div class="footer"><span>Filas</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA fila-lista 2/2 -->
+  <!-- RESUMO fila-lista 2/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="fila" data-impl="fila-lista">
     <div class="kicker">Fila com lista</div>
-    <h1>Ficha: fila com lista</h1>
+    <h1>Resumo: fila com lista</h1>
     <p class="sub">O que a estrutura não permite, e o que a linguagem C impõe.</p>
     <div class="body">
       <div class="compare is-duas"><div class="col"><h3>limitações da estrutura</h3><ul><li>Retirar do fim custaria O(n): o último nó não sabe quem vem antes dele.</li><li>Retirar de fila vazia aborta pelo assert, como na versão com vetor.</li></ul></div><div class="col"><h3>limitações de C</h3><ul><li>head e tail precisam concordar: sem zerar tail ao esvaziar, ele fica pendente.</li><li>Cada nó precisa de free, e a fila inteira precisa de <code>q_free</code> no fim.</li><li>A fila só guarda <code>float</code>; outro tipo exige outro TAD ou <code>void *</code>.</li></ul></div></div>
@@ -2102,21 +2117,21 @@
     <div class="footer"><span>Fila dupla</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA deque-vetor 1/2 -->
+  <!-- RESUMO deque-vetor 1/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="deque" data-impl="deque-vetor">
     <div class="kicker">Fila dupla com vetor</div>
-    <h1>Ficha: fila dupla com vetor</h1>
+    <h1>Resumo: fila dupla com vetor</h1>
     <p class="sub">Vantagens e desvantagens desta implementação.</p>
     <div class="body">
-      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>As quatro operações nas pontas custam O(1), a menos da realocação.</li><li>Não há ponteiro por elemento, como na fila com vetor.</li><li>A mesma estrutura serve de pilha, de fila ou das duas coisas ao mesmo tempo.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Inserir em qualquer ponta com o vetor cheio custa O(n), pela realocação.</li><li>Há duas contas circulares, e cada uma pode errar por um.</li></ul></div></div>
+      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>As quatro operações nas pontas custam O(1), a menos da realocação do vetor dinâmico.</li><li>Não há ponteiro por elemento, como na fila com vetor.</li><li>A mesma estrutura serve de pilha, de fila ou das duas coisas ao mesmo tempo.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Inserir em qualquer ponta com o vetor cheio custa O(n), pela realocação.</li><li>Há duas contas circulares, e cada uma pode errar por um.</li></ul></div></div>
     </div>
     <div class="footer"><span>Fila dupla</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA deque-vetor 2/2 -->
+  <!-- RESUMO deque-vetor 2/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="deque" data-impl="deque-vetor">
     <div class="kicker">Fila dupla com vetor</div>
-    <h1>Ficha: fila dupla com vetor</h1>
+    <h1>Resumo: fila dupla com vetor</h1>
     <p class="sub">O que a estrutura não permite, e o que a linguagem C impõe.</p>
     <div class="body">
       <div class="compare is-duas"><div class="col"><h3>limitações da estrutura</h3><ul><li>Só as pontas são acessíveis: não há inserção nem retirada no meio.</li><li>Retirar da fila dupla vazia, por qualquer ponta, aborta pelo assert.</li></ul></div><div class="col"><h3>limitações de C</h3><ul><li>O % de C dá resto negativo para dividendo negativo: o decremento soma n_max.</li><li>O vetor nunca encolhe, e as posições fora da fila guardam valores velhos.</li><li>A fila dupla só guarda <code>float</code>; outro tipo exige outro TAD.</li></ul></div></div>
@@ -2127,8 +2142,8 @@
   <!-- DL TRANSICAO -->
   <section class="slide" data-slide data-tipo="transicao" data-estrutura="deque" data-impl="deque-lista">
     <div class="kicker">Fila dupla com lista</div>
-    <h1>Retirar do fim sem realocar nem percorrer</h1>
-    <p class="sub">Uma lista simples com tail chega ao último, mas não ao penúltimo. O nó com prev resolve, e nenhuma inserção realoca.</p>
+    <h1>Fila dupla com lista</h1>
+    <p class="sub">Retirar do fim sem realocar nem percorrer. Uma lista simples com tail chega ao último, mas não ao penúltimo. O nó com prev resolve, e nenhuma inserção realoca.</p>
     <div class="body">
       <div class="qa-viz"><div class="cases"><div class="case"><span class="cond">com vetor</span><span class="arrow">→</span><span class="then">inserir com o vetor cheio: O(n)</span></div><div class="case"><span class="cond">lista simples</span><span class="arrow">→</span><span class="then">retirar do fim: O(n), percorre desde head</span></div><div class="case is-accent"><span class="cond">lista dupla</span><span class="arrow">→</span><span class="then">as quatro operações: O(1)</span></div></div></div>
     </div>
@@ -2152,7 +2167,7 @@
     <h1>Uma lista duplamente encadeada</h1>
     <p class="sub">head e tail nas pontas; cada nó conhece o anterior e o próximo.</p>
     <div class="body">
-      <div class="concept-split"><div class="visual-col"><div class="nodes is-small"><div class="ptr">head</div><span class="link">→</span><div class="node"><span class="nx">prev</span><span class="v">3</span><span class="nx">next</span></div><span class="link">⇄</span><div class="node is-accent"><span class="nx">prev</span><span class="v">1</span><span class="nx">next</span></div><span class="link">←</span><div class="ptr">tail</div></div></div><div class="code-col"><div class="code-block"><div class="code-panel"><div class="file-tag">12_stack-and-queues/07_deque/deque.c</div><pre><code><span class="kw">struct</span> deque_node
+      <div class="concept-split"><div class="visual-col"><div class="sim-figura" data-figura='{&quot;passo&quot;: {&quot;campos&quot;: [&quot;info&quot;, &quot;next&quot;, &quot;prev&quot;], &quot;nos&quot;: [{&quot;id&quot;: &quot;n0&quot;, &quot;info&quot;: &quot;3&quot;}, {&quot;id&quot;: &quot;n1&quot;, &quot;info&quot;: &quot;1&quot;, &quot;estado&quot;: &quot;novo&quot;}], &quot;ligacoes&quot;: [[&quot;n0&quot;, &quot;next&quot;, &quot;n1&quot;], [&quot;n1&quot;, &quot;next&quot;, null], [&quot;n0&quot;, &quot;prev&quot;, null], [&quot;n1&quot;, &quot;prev&quot;, &quot;n0&quot;]], &quot;novas&quot;: [], &quot;desfeitas&quot;: [], &quot;ponteiros&quot;: {&quot;head&quot;: &quot;n0&quot;, &quot;tail&quot;: &quot;n1&quot;}, &quot;ponteirosNovos&quot;: []}, &quot;cab&quot;: [&quot;head&quot;, &quot;tail&quot;], &quot;nome&quot;: &quot;d&quot;}'></div></div><div class="code-col"><div class="code-block"><div class="code-panel"><div class="file-tag">12_stack-and-queues/07_deque/deque.c</div><pre><code><span class="kw">struct</span> deque_node
 {
     <span class="kw">float</span> info;
     <span class="type">DequeNode</span> *prev;
@@ -2273,7 +2288,7 @@
     <h1>pop_back com um único elemento</h1>
     <p class="sub">A fila dupla é [1]. Depois de dq_pop_back, quem atualiza head?</p>
     <div class="body">
-      <div class="qa-viz"><div class="nodes is-small"><div class="ptr">head</div><span class="link">→</span><div class="node"><span class="nx">prev</span><span class="v">1</span><span class="nx">next</span></div><span class="link">←</span><div class="ptr">tail</div></div></div>
+      <div class="qa-viz"><div class="sim-figura" data-figura='{&quot;passo&quot;: {&quot;campos&quot;: [&quot;info&quot;, &quot;next&quot;, &quot;prev&quot;], &quot;nos&quot;: [{&quot;id&quot;: &quot;n0&quot;, &quot;info&quot;: &quot;1&quot;}], &quot;ligacoes&quot;: [[&quot;n0&quot;, &quot;next&quot;, null], [&quot;n0&quot;, &quot;prev&quot;, null]], &quot;novas&quot;: [], &quot;desfeitas&quot;: [], &quot;ponteiros&quot;: {&quot;head&quot;: &quot;n0&quot;, &quot;tail&quot;: &quot;n0&quot;}, &quot;ponteirosNovos&quot;: []}, &quot;cab&quot;: [&quot;head&quot;, &quot;tail&quot;], &quot;nome&quot;: &quot;d&quot;}'></div></div>
     </div>
     <div class="footer"><span>Fila dupla</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
@@ -2289,21 +2304,21 @@
     <div class="footer"><span>Fila dupla</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA deque-lista 1/2 -->
+  <!-- RESUMO deque-lista 1/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="deque" data-impl="deque-lista">
     <div class="kicker">Fila dupla com lista</div>
-    <h1>Ficha: fila dupla com lista</h1>
+    <h1>Resumo: fila dupla com lista</h1>
     <p class="sub">Vantagens e desvantagens desta implementação.</p>
     <div class="body">
-      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>As quatro operações custam O(1) sempre, sem realocação.</li><li>A memória acompanha o número de elementos na fila dupla.</li><li>Retirar do fim é O(1) porque prev dá o penúltimo sem percorrer.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Cada <code>float</code> de 4 bytes carrega dois ponteiros, prev e next, 16 bytes ao todo.</li><li>Cada operação ajusta mais ponteiros, e cada ajuste é uma chance de erro.</li><li>Liberar custa O(n), porque cada nó precisa do seu próprio free.</li></ul></div></div>
+      <div class="compare is-duas"><div class="col"><h3>vantagens</h3><ul><li>As quatro operações custam O(1) sempre, sem a realocação do vetor dinâmico.</li><li>A memória acompanha o número de elementos na fila dupla.</li><li>Retirar do fim é O(1) porque prev dá o penúltimo sem percorrer.</li></ul></div><div class="col"><h3>desvantagens</h3><ul><li>Cada <code>float</code> de 4 bytes carrega dois ponteiros, prev e next, 16 bytes ao todo.</li><li>Cada operação ajusta mais ponteiros, e cada ajuste é uma chance de erro.</li><li>Liberar custa O(n), porque cada nó precisa do seu próprio free.</li></ul></div></div>
     </div>
     <div class="footer"><span>Fila dupla</span><span>Estruturas de Dados · v2026.2</span></div>
   </section>
 
-  <!-- FICHA deque-lista 2/2 -->
+  <!-- RESUMO deque-lista 2/2 -->
   <section class="slide" data-slide data-tipo="discussao" data-estrutura="deque" data-impl="deque-lista">
     <div class="kicker">Fila dupla com lista</div>
-    <h1>Ficha: fila dupla com lista</h1>
+    <h1>Resumo: fila dupla com lista</h1>
     <p class="sub">O que a estrutura não permite, e o que a linguagem C impõe.</p>
     <div class="body">
       <div class="compare is-duas"><div class="col"><h3>limitações da estrutura</h3><ul><li>Só as pontas são acessíveis: não há inserção nem retirada no meio.</li><li>Retirar da fila dupla vazia aborta pelo assert, como na versão com vetor.</li></ul></div><div class="col"><h3>limitações de C</h3><ul><li>C não confere se next e prev concordam: o erro só aparece no percurso reverso.</li><li>Cada nó retirado precisa de free, depois de lido o seu valor.</li><li>A fila dupla só guarda <code>float</code>; outro tipo exige outro TAD.</li></ul></div></div>
@@ -2441,29 +2456,33 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
 /* Renderizador de cenários (feature 019): listas encadeadas, vetores e visão abstrata do TAD.
    Dados: window.SIM_CENARIOS = { id: { titulo, codigo: {linhas:[...], inicio}, cabecalho, passos:[...] } }
    Modo interativo: <div class="sim" data-cenario="id"></div>
-   Modo quadro:     <div class="sim-quadro" data-cenario="id" data-passo="k"></div>  (sem controles) */
+   Modo quadro:     <div class="sim-quadro" data-cenario="id" data-passo="k"></div>  (sem controles)
+   Modo figura:     <div class="sim-figura" data-figura='{"passo":…,"cab":[…],"nome":"l"}'></div>  (só o desenho) */
 (function () {
   "use strict";
   var INK = "#121821", ACC = "#1F6F8B", SOFT = "#D6EAF2", GRAY = "#9AA5B1";
-  var NW = 76, RH = 30, GAP = 54, X0 = 196, Y0 = 104, Y1 = 238;
+  var NW = 76, RH = 30, GAP = 54, X0 = 254, Y0 = 104, Y1 = 238;
+  var UID = 0; // marcadores com id único por SVG: ids repetidos apontam para o SVG de um slide oculto e a seta perde a cabeça
   var MONO = "'DejaVu Sans Mono', Consolas, Menlo, monospace";
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function key(l) { return l[0] + "|" + l[1] + "|" + l[2]; }
 
-  function layout(passo) {
+  function layout(passo, x0) {
     var pos = {}, col = 0;
     passo.nos.forEach(function (n) {
       var row = n.linha || 0;
-      var x = (n.col !== undefined) ? X0 + n.col * (NW + GAP) : X0 + (col++) * (NW + GAP);
+      var x = (n.col !== undefined) ? x0 + n.col * (NW + GAP) : x0 + (col++) * (NW + GAP);
       if (n.col === undefined && row !== 0) col--;
       pos[n.id] = { x: x, y: row === 0 ? Y0 : Y1, rows: passo.campos || ["info", "next"] };
     });
     return pos;
   }
 
-  function svg(passo, cab) {
-    var pos = layout(passo), out = [], maxx = 0;
+  // fig: modo figura (slides): recorta o espaço vazio acima e abaixo do desenho.
+  function svg(passo, cab, nome, fig) {
+    var temCab = (cab || []).length > 0, x0 = temCab ? X0 : 40;
+    var pos = layout(passo, x0), out = [], maxx = 0, uid = ++UID, topo0 = Y0 - 4;
     var campos = passo.campos || ["info", "next"];
     var hNo = campos.length * RH;
     var novas = {}, desf = {};
@@ -2475,7 +2494,7 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       var col = kind === "nova" ? ACC : kind === "desf" ? GRAY : INK;
       var sw = kind === "nova" ? 3 : 2.2, dash = kind === "desf" ? ' stroke-dasharray="6 5"' : "";
       var mk = kind === "nova" ? "g" : kind === "desf" ? "x" : "a";
-      out.push('<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"' + dash + ' marker-end="url(#m' + mk + ')"/>');
+      out.push('<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"' + dash + ' marker-end="url(#m' + mk + uid + ')"/>');
       if (dot) out.push('<circle cx="' + dot[0] + '" cy="' + dot[1] + '" r="4.5" fill="' + col + '"/>');
     }
     function text(x, y, t, opt) {
@@ -2532,31 +2551,49 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       var p = pos[n.id], st = n.estado || "normal";
       var bc = st === "novo" ? ACC : st === "saindo" ? GRAY : INK, sw = st === "novo" ? 3 : 2;
       var dash = st === "saindo" ? ' stroke-dasharray="6 5"' : "";
+      var cor = st === "saindo" ? GRAY : INK;
       campos.forEach(function (cp, i) {
-        var fill = i === 0 ? (st === "saindo" ? "#fff" : SOFT) : "#fff";
-        out.push('<rect x="' + p.x + '" y="' + (p.y + i * RH) + '" width="' + NW + '" height="' + RH + '" fill="' + fill + '" stroke="' + bc + '" stroke-width="' + sw + '"' + dash + "/>");
-        text(p.x + NW / 2, p.y + i * RH + RH / 2, i === 0 ? n.info : cp, { fill: st === "saindo" ? GRAY : INK, size: i === 0 ? 17 : 14, bold: i === 0 });
+        var valor = cp === "info" && !passo.registros;
+        var fill = valor && st !== "saindo" ? SOFT : "#fff", y = p.y + i * RH;
+        out.push('<rect x="' + p.x + '" y="' + y + '" width="' + NW + '" height="' + RH + '" fill="' + fill + '" stroke="' + bc + '" stroke-width="' + sw + '"' + dash + "/>");
+        if (valor) text(p.x + NW / 2, y + RH / 2, n.info, { fill: cor, size: 17, bold: true });
+        else if (cp === "type") text(p.x + NW / 2, y + RH / 2, n.tipo || "", { fill: cor, size: 13 });
+        else if (cp === "info") { // ponteiro para o registro (feature 022): o nó não contém o registro
+          var rx = p.x + NW / 2, ry = p.y + hNo + 26;
+          arrow("M" + rx + "," + (y + RH / 2) + " L" + rx + "," + (ry - 2), st === "saindo" ? "desf" : "normal", [rx, y + RH / 2]);
+          out.push('<rect x="' + (p.x - 4) + '" y="' + ry + '" width="' + (NW + 8) + '" height="' + RH + '" rx="5" fill="#F3F5F7" stroke="' + cor + '" stroke-width="1.6"' + dash + "/>");
+          text(rx, ry + RH / 2, n.info, { fill: cor, size: 15, bold: true });
+        }
+        else text(p.x + NW / 2, y + RH / 2, cp, { fill: cor, size: 14 });
       });
-      if (n.tipo) text(p.x + NW / 2, p.y + hNo + 13, n.tipo, { size: 12, fill: "#4B5866" }); // abaixo: acima ficam as variáveis
+      if (n.tipo && campos.indexOf("type") < 0) text(p.x + NW / 2, p.y + hNo + 13, n.tipo, { size: 12, fill: "#4B5866" }); // abaixo: acima ficam as variáveis
       maxx = Math.max(maxx, p.x + NW + 90);
     });
 
-    // cabeçalho da lista (first, last, count…)
+    // estrutura principal (feature 022, padrão único): a variável (l, s, q, d) é um ponteiro, numa
+    // célula própria com o nome acima, e a seta dela leva à caixa da estrutura com os campos
     var cy = Y0 + RH / 2;
+    if ((cab || []).length) {
+      var topo = Y0 - (cab.length - 1) * RH / 2;
+      out.push('<rect x="4" y="' + (cy - RH / 2) + '" width="34" height="' + RH + '" fill="#fff" stroke="' + INK + '" stroke-width="2"/>');
+      text(21, cy - RH / 2 - 12, nome || "l", { size: 15, bold: true });
+      arrow("M21," + cy + " L60," + cy, "normal", [21, cy]);
+      out.push('<rect x="62" y="' + (topo - 6) + '" width="108" height="' + (cab.length * RH + 12) + '" rx="7" fill="#fff" stroke="' + INK + '" stroke-width="1.6"/>');
+    }
     (cab || []).forEach(function (campo, i) {
       var y = Y0 - (cab.length - 1) * RH / 2 + i * RH, v = passo.ponteiros[campo];
-      out.push('<rect x="10" y="' + y + '" width="96" height="' + RH + '" fill="' + INK + '" stroke="' + INK + '"/>');
+      out.push('<rect x="68" y="' + y + '" width="96" height="' + RH + '" fill="' + INK + '" stroke="' + INK + '"/>');
       var label = campo === "count" ? "count " + v : campo;
-      text(58, y + RH / 2, label, { fill: "#fff", size: 15 });
+      text(116, y + RH / 2, label, { fill: "#fff", size: 15 });
       if (campo === "count") return;
       var cy2 = y + RH / 2, kind = (passo.ponteirosNovos || []).indexOf(campo) >= 0 ? "nova" : "normal";
-      if (v === null || v === undefined) { arrow("M106," + cy2 + " L128," + cy2, kind, [106, cy2]); text(132, cy2, "NULL", { anchor: "start", bold: true, size: 13 }); }
+      if (v === null || v === undefined) { arrow("M164," + cy2 + " L186," + cy2, kind, [164, cy2]); text(190, cy2, "NULL", { anchor: "start", bold: true, size: 13 }); }
       else {
-        var t = pos[v], ty = t.y + ((campo === "last" || campo === "tail") ? hNo - RH / 2 : RH / 2);
-        var tx = ((campo === "last" || campo === "tail")) ? t.x + NW / 2 : t.x - 2, tyy = ((campo === "last" || campo === "tail")) ? t.y + hNo + 2 : ty;
-        if ((campo === "last" || campo === "tail")) { tyy = t.y - 3; arrow("M106," + cy2 + " C150," + (Y0 - 70) + " " + tx + "," + (Y0 - 80) + " " + tx + "," + tyy, kind, [106, cy2]); }
-        else if (t.y === Y0 && t.x === X0) arrow("M106," + cy2 + " L" + tx + "," + (Y0 + RH / 2), kind, [106, cy2]);
-        else arrow("M106," + cy2 + " C" + (tx - 60) + "," + cy2 + " " + (tx - 40) + "," + (t.y + RH / 2) + " " + tx + "," + (t.y + RH / 2), kind, [106, cy2]);
+        var t = pos[v], ty = t.y + (((campo === "last" || campo === "tail") || campo === "tail") ? hNo - RH / 2 : RH / 2);
+        var tx = (((campo === "last" || campo === "tail") || campo === "tail")) ? t.x + NW / 2 : t.x - 2, tyy = (((campo === "last" || campo === "tail") || campo === "tail")) ? t.y + hNo + 2 : ty;
+        if (((campo === "last" || campo === "tail") || campo === "tail")) { tyy = t.y - 3; topo0 = Math.min(topo0, Y0 - 66); arrow("M164," + cy2 + " C208," + (Y0 - 70) + " " + tx + "," + (Y0 - 80) + " " + tx + "," + tyy, kind, [164, cy2]); }
+        else if (t.y === Y0 && t.x === X0) arrow("M164," + cy2 + " L" + tx + "," + (Y0 + RH / 2), kind, [164, cy2]);
+        else arrow("M164," + cy2 + " C" + (tx - 60) + "," + cy2 + " " + (tx - 40) + "," + (t.y + RH / 2) + " " + tx + "," + (t.y + RH / 2), kind, [164, cy2]);
       }
     });
 
@@ -2572,6 +2609,7 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
     Object.keys(grupos).forEach(function (alvo) {
       var vs = grupos[alvo], t = pos[alvo], acima = t.y === Y0;
       var lx = t.x + NW / 2, ly = acima ? t.y - 40 : t.y + hNo + 34;
+      if (acima) topo0 = Math.min(topo0, ly - 22 - (vs.length - 1) * 17);
       var nova = vs.some(function (v) { return (passo.ponteirosNovos || []).indexOf(v) >= 0; });
       var fill = vs.indexOf("node") >= 0 ? ACC : INK;
       vs.forEach(function (v, i) { // empilha os nomes, um por linha
@@ -2580,23 +2618,32 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       });
       arrow("M" + lx + "," + ly + " L" + lx + "," + (acima ? t.y - 3 : t.y + hNo + 3), nova ? "nova" : "normal", [lx, ly]);
     });
+    if (nulos.length) topo0 = 8;
     if (nulos.length) text(10, 22, nulos.map(function (v) { return v + " = NULL"; }).join("   "), { anchor: "start", size: 14, fill: "#4B5866" });
 
     var w = Math.max(maxx, 420), hasRow1 = passo.nos.some(function (n) { return n.linha === 1; });
-    var h = (hasRow1 ? Y1 + hNo + 90 : Y0 + hNo + 80);
+    var h = (hasRow1 ? Y1 + hNo + 90 : Y0 + hNo + 80) + (passo.registros ? RH + 20 : 0), y0v = 0;
+    if (fig) {
+      if (temCab) topo0 = Math.min(topo0, Y0 - (cab.length - 1) * RH / 2 - 12, cy - RH / 2 - 24);
+      var baixo = (hasRow1 ? Y1 : Y0) + hNo + (passo.registros ? RH + 26 : 0) + (passo.nos.some(function (n) { return n.tipo; }) && campos.indexOf("type") < 0 ? 22 : 0) + 10;
+      var volta = passo.ligacoes.some(function (l) { return l[1] === "next" && l[2] !== null && pos[l[2]] && pos[l[0]] && pos[l[2]].x <= pos[l[0]].x; });
+      if (volta) baixo += 34; // a seta que volta (circular) passa por baixo dos nós
+      y0v = topo0 - 4; h = baixo - y0v; w = Math.max(maxx - 16, temCab ? 236 : 0);
+    }
     var defs = "<defs>" + ["a:" + INK, "g:" + ACC, "x:" + GRAY].map(function (s) {
       var p = s.split(":");
-      return '<marker id="m' + p[0] + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + p[1] + '"/></marker>';
+      return '<marker id="m' + p[0] + uid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + p[1] + '"/></marker>';
     }).join("") + "</defs>";
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + " " + h + '" font-family="' + MONO + '" role="img">' + defs + out.join("") + "</svg>";
+    return '<svg xmlns="http://www.w3.org/2000/svg"' + (fig ? ' style="--fw: ' + w + '"' : "") + ' viewBox="0 ' + y0v + " " + w + " " + h + '" font-family="' + MONO + '" role="img">' + defs + out.join("") + "</svg>";
   }
 
   function num(x) { return String(Math.round(x * 1e6) / 1e6); }
   function numTad(x) { return Number.isInteger(x) ? String(x) : x.toFixed(2); } // como o %.2f da saída real
 
+  var UIDV = 0;
   // Vetor (pilha/fila/fila dupla com vetor): células v[0..n_max-1], campos da estrutura e marcas de índice.
   function svgVec(p) {
-    var W = 58, H = 40, X = 24, Y = 92, out = [];
+    var W = 58, H = 40, X = 24, Y = 92, out = [], uid = ++UIDV; // marcador com id único por SVG (feature 022)
     var w = Math.max(X * 2 + p.n_max * W, 520), h = Y + H + 56;
     function text(x, y, t, o) {
       o = o || {};
@@ -2622,12 +2669,12 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       var x = X + Number(i) * W + W / 2, nomes = grupos[i];
       var cor = nomes.some(function (m) { return m === "tail" || m === "last"; }) && nomes.length === 1 ? ACC : INK;
       text(x, Y - 36, nomes.join(", "), { bold: true, fill: cor, size: 14 });
-      out.push('<path d="M' + x + "," + (Y - 26) + " L" + x + "," + (Y - 4) + '" stroke="' + cor + '" stroke-width="2.2" marker-end="url(#mv' + (cor === ACC ? "g" : "a") + ')"/>');
+      out.push('<path d="M' + x + "," + (Y - 26) + " L" + x + "," + (Y - 4) + '" stroke="' + cor + '" stroke-width="2.2" marker-end="url(#mv' + (cor === ACC ? "g" : "a") + uid + ')"/>');
     });
     text(X, Y + H + 38, "tracejado: fora da estrutura · ?: nunca escrito", { anchor: "start", size: 12, fill: "#4B5866" });
     var defs = "<defs>" + ["a:" + INK, "g:" + ACC].map(function (s) {
       var q = s.split(":");
-      return '<marker id="mv' + q[0] + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + q[1] + '"/></marker>';
+      return '<marker id="mv' + q[0] + uid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="' + q[1] + '"/></marker>';
     }).join("") + "</defs>";
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + " " + h + '" font-family="' + MONO + '" role="img">' + defs + out.join("") + "</svg>";
   }
@@ -2668,16 +2715,31 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
   function figura(cen, p) {
     if (cen.tipo === "vetor") return svgVec(p);
     if (cen.tipo === "tad") return svgTad(p);
-    return svg(p, cen.cabecalho);
+    var cab = cen.cabecalho || [], nome = cab.indexOf("top") >= 0 ? "s" : /dq_/.test(cen.titulo || "") ? "d" : "q";
+    return svg(p, cab, nome); // nome da variável na moldura da estrutura principal (feature 022)
   }
 
   function code(cen, linha) {
     var html = "";
     cen.codigo.linhas.forEach(function (par) {
+      if (/^\s*\/\//.test(par[1]) && par[0] !== linha) return; // linha só de comentário: não ocupa a janela
       var n = par[0], t = par[1].replace(/\s*\/\/.*$/, "");
       html += '<span class="ln' + (n !== null && n === linha ? " on" : "") + '"><span class="num">' + (n === null ? "" : n) + "</span>" + esc(t) + "</span>";
     });
     return html;
+  }
+
+  // Mantém a linha em execução inteira na área visível da janela de código, sem rolar a página
+  // (feature 022). Só age em janela visível: um quadro de slide oculto é posicionado quando o
+  // slide é ativado (observador em init).
+  function posicionar(raiz) {
+    (raiz.querySelectorAll ? raiz.querySelectorAll(".sim-code") : []).forEach(function (cod) {
+      var on = cod.querySelector(".ln.on");
+      if (!on || !cod.clientHeight) return;
+      if (cod.scrollHeight <= cod.clientHeight) { cod.scrollTop = 0; return; }
+      var alvo = on.offsetTop - (cod.clientHeight - on.offsetHeight) / 2;
+      cod.scrollTop = Math.max(0, Math.min(alvo, cod.scrollHeight - cod.clientHeight));
+    });
   }
 
   function render(el, cen, k, controles) {
@@ -2687,8 +2749,8 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
       '<div class="sim-body"><div class="sim-fig">' + figura(cen, p) + '</div><div class="sim-code">' + code(cen, p.linha) + "</div></div>" +
       '<p class="sim-desc">' + p.texto + "</p>" +
       (controles ? '<div class="sim-ctrl"><button data-d="-1"' + (k === 0 ? " disabled" : "") + '>◀ anterior</button><button data-d="1"' + (k === cen.passos.length - 1 ? " disabled" : "") + ">próximo ▶</button></div>" : "");
-    var cod = el.querySelector(".sim-code"), on = cod && cod.querySelector(".ln.on");
-    if (on) cod.scrollTop = on.offsetTop - cod.clientHeight / 2; // mostra a linha em destaque sem rolar a página
+    posicionar(el);
+    if (window.requestAnimationFrame) requestAnimationFrame(function () { posicionar(el); });
     if (controles) el.querySelectorAll("button").forEach(function (b) {
       b.addEventListener("click", function () { render(el, cen, k + Number(b.dataset.d), true); });
     });
@@ -2702,8 +2764,22 @@ window.SIM_CENARIOS = {"pv.push.vazia": {"tipo": "vetor", "titulo": "s_push(s, 5
     document.querySelectorAll(".sim-quadro[data-cenario]").forEach(function (el) {
       var c = dados[el.dataset.cenario]; if (c) render(el, c, Number(el.dataset.passo || 0), false);
     });
+    // Modo figura (feature 022): só o desenho, para os slides; data-figura = {passo, cab, nome}.
+    document.querySelectorAll(".sim-figura[data-figura]").forEach(function (el) {
+      var f = JSON.parse(el.dataset.figura); el.innerHTML = svg(f.passo, f.cab || [], f.nome, true);
+    });
   }
-  window.SimListas = { svg: svg, init: init };
+  function observarSlides() {
+    if (!window.MutationObserver) return;
+    var obs = new MutationObserver(function (ms) {
+      ms.forEach(function (m) { if (m.target.classList && m.target.classList.contains("is-active")) posicionar(m.target); });
+    });
+    document.querySelectorAll("section.slide").forEach(function (s) {
+      if (s.querySelector(".sim-quadro")) obs.observe(s, { attributes: true, attributeFilter: ["class"] });
+    });
+  }
+  window.SimListas = { svg: svg, init: init, posicionar: posicionar };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", observarSlides); else observarSlides();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 </script>
