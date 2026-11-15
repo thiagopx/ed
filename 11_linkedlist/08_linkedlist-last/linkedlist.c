@@ -75,46 +75,6 @@ int ll_remove(LinkedList *l, int v)
     return 1;
 }
 
-void ll_join(LinkedList *l1, LinkedList *l2)
-{
-    if (l2->first == NULL) // Nothing to move.
-        return;
-
-    if (l1->first == NULL) // l1 empty: it simply takes l2's chain.
-        l1->first = l2->first;
-    else
-        l1->last->next = l2->first; // Hook l2's chain after l1's last node.
-    l1->last = l2->last;
-
-    l2->first = l2->last = NULL; // l2 no longer owns those nodes.
-}
-
-LinkedList *ll_merge_sorted(LinkedList *a, LinkedList *b)
-{
-    LinkedList *r = ll_create();
-    while (a->first != NULL || b->first != NULL)
-    {
-        LinkedList *from; // The list whose first node is the smallest.
-        if (b->first == NULL || (a->first != NULL && a->first->info <= b->first->info))
-            from = a;
-        else
-            from = b;
-
-        ListNode *node = from->first; // Unlink the first node of 'from'...
-        from->first = node->next;
-        if (from->first == NULL)
-            from->last = NULL;
-
-        node->next = NULL; // ...and append it to r (O(1) with 'last').
-        if (r->last == NULL)
-            r->first = node;
-        else
-            r->last->next = node;
-        r->last = node;
-    }
-    return r;
-}
-
 void ll_free(LinkedList *l)
 {
     ListNode *p = l->first;

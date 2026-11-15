@@ -27,11 +27,6 @@ LinkedList *ll_create()
     return l;
 }
 
-int ll_size(LinkedList *l)
-{
-    return l->count;
-}
-
 int ll_is_empty(LinkedList *l)
 {
     return l->count == 0;
@@ -62,11 +57,6 @@ static ListNode *_search(LinkedList *l, int v)
         p = p->next;
 
     return p;
-}
-
-int ll_is_in(LinkedList *l, int v)
-{
-    return _search(l, v) != NULL;
 }
 
 void ll_remove(LinkedList *l, int v)
@@ -104,90 +94,6 @@ void ll_append(LinkedList *l, int v)
 
     l->last = node;
     l->count++;
-}
-
-void ll_remove_all(LinkedList *l, int v)
-{
-    ListNode *p = l->first;
-    while (p != NULL)
-    {
-        ListNode *next = p->next; // Save it: p may be freed below.
-        if (p->info == v)
-        {
-            if (p == l->first)
-                l->first = p->next;
-            else
-                p->prev->next = p->next;
-
-            if (p == l->last)
-                l->last = p->prev;
-            else
-                p->next->prev = p->prev;
-
-            free(p);
-            l->count--;
-        }
-        p = next;
-    }
-}
-
-void ll_clear(LinkedList *l)
-{
-    ListNode *p = l->first;
-    while (p != NULL)
-    {
-        ListNode *t = p->next; // Saved before free(p): p->next cannot be read afterwards.
-        free(p);
-        p = t;
-    }
-    l->first = l->last = NULL;
-    l->count = 0;
-}
-
-void ll_reverse_in_place(LinkedList *l)
-{
-    ListNode *p = l->first;
-    while (p != NULL)
-    {
-        ListNode *t = p->next; // Save the old next before overwriting it.
-        p->next = p->prev;
-        p->prev = t;
-        p = t; // Continue along the old direction.
-    }
-    ListNode *t = l->first; // The old first becomes the last, and vice versa.
-    l->first = l->last;
-    l->last = t;
-}
-
-LinkedList *ll_split_at(LinkedList *l, int k)
-{
-    LinkedList *r = ll_create();
-    if (k >= l->count) // Nothing to move.
-        return r;
-
-    if (k <= 0) // Everything moves: r takes all nodes and l becomes empty.
-    {
-        r->first = l->first;
-        r->last = l->last;
-        r->count = l->count;
-        l->first = l->last = NULL;
-        l->count = 0;
-        return r;
-    }
-
-    ListNode *p = l->first; // Walk to the k-th node: the new last node of l.
-    for (int i = 1; i < k; i++)
-        p = p->next;
-
-    r->first = p->next; // The new list starts right after p...
-    r->last = l->last;  // ...and ends where l used to end.
-    r->count = l->count - k;
-
-    r->first->prev = NULL; // Cut the link in both directions at the border.
-    p->next = NULL;
-    l->last = p;
-    l->count = k;
-    return r;
 }
 
 void ll_free(LinkedList *l)

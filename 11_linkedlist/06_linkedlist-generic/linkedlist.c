@@ -57,14 +57,9 @@ LinkedList *ll_create()
     return l;
 }
 
-int ll_size(LinkedList *l)
-{
-    return l->count;
-}
-
 int ll_is_empty(LinkedList *l)
 {
-    return ll_size(l) == 0;
+    return l->count == 0;
 }
 
 void ll_insert(LinkedList *l, void *info, NodeType type)
@@ -91,23 +86,6 @@ void ll_print(LinkedList *l)
     printf("\n");
 }
 
-void ll_append(LinkedList *l, void *info, NodeType type)
-{
-    ListNode *node = (ListNode *)malloc(sizeof(ListNode));
-    node->type = type;
-    node->info = info;
-    node->next = NULL;
-    node->prev = l->last;
-
-    if (l->last != NULL)
-        l->last->next = node;
-    else
-        l->first = node; // Empty list: the new node is also the first.
-
-    l->last = node;
-    l->count++;
-}
-
 // Returns the node whose record has this cpf (NULL if there is none).
 static ListNode *_search(LinkedList *l, const char *cpf)
 {
@@ -117,13 +95,8 @@ static ListNode *_search(LinkedList *l, const char *cpf)
     return p;
 }
 
-int ll_is_in(LinkedList *l, const char *cpf)
-{
-    return _search(l, cpf) != NULL;
-}
-
-// Unlinks node p from l; if free_record is set, also frees the record it points to.
-static void _unlink(LinkedList *l, ListNode *p, int free_record)
+// Unlinks node p from l and frees it together with the record it points to.
+static void _unlink(LinkedList *l, ListNode *p)
 {
     if (p == l->first)
         l->first = p->next;
@@ -135,8 +108,7 @@ static void _unlink(LinkedList *l, ListNode *p, int free_record)
     else
         p->next->prev = p->prev;
 
-    if (free_record)
-        _free_record(p);
+    _free_record(p);
     free(p);
     l->count--;
 }
@@ -145,62 +117,12 @@ void ll_remove(LinkedList *l, const char *cpf)
 {
     ListNode *p = _search(l, cpf);
     if (p != NULL)
-        _unlink(l, p, 1);
-}
-
-void ll_remove_all(LinkedList *l, const char *cpf)
-{
-    ListNode *p = l->first;
-    while (p != NULL)
-    {
-        ListNode *next = p->next;
-        if (strcmp(_cpf(p), cpf) == 0)
-            _unlink(l, p, 1);
-        p = next;
-    }
-}
-
-void ll_clear(LinkedList *l)
-{
-    while (l->first != NULL)
-        _unlink(l, l->first, 1);
-}
-
-// Returns the node at position pos (0-based), or NULL if pos is out of range.
-// Cost: O(pos): there is no index.
-static ListNode *_at(LinkedList *l, int pos)
-{
-    if (pos < 0 || pos >= l->count)
-        return NULL;
-    ListNode *p = l->first;
-    for (int i = 0; i < pos; i++)
-        p = p->next;
-    return p;
-}
-
-NodeType ll_type_at(LinkedList *l, int pos)
-{
-    return _at(l, pos)->type;
-}
-
-LinkedList *ll_professors(LinkedList *l)
-{
-    LinkedList *r = ll_create();
-    for (ListNode *p = l->first; p != NULL; p = p->next)
-        if (p->type == TYPE_PROFESSOR)
-            ll_append(r, p->info, p->type); // Same pointer: no record is copied.
-    return r;
-}
-
-void ll_free_nodes(LinkedList *l)
-{
-    while (l->first != NULL)
-        _unlink(l, l->first, 0);
-    free(l);
+        _unlink(l, p);
 }
 
 void ll_free(LinkedList *l)
 {
-    ll_clear(l);
+    while (l->first != NULL)
+        _unlink(l, l->first);
     free(l);
 }

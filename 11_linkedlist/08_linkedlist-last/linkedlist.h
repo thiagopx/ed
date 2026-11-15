@@ -23,6 +23,16 @@ int ll_remove(LinkedList *l, int v);
 // Checks whether l is empty; returns 1 if it is, 0 otherwise.
 int ll_is_empty(LinkedList *l);
 
+// Frees l and all its nodes.
+// Cost: O(n).
+void ll_free(LinkedList *l);
+
+// Prints the elements of l, from the first to the last.
+// Cost: O(n).
+void ll_print(LinkedList *l);
+
+// ---- Exercises: declared here, implemented by the student ----
+
 // Moves every node of l2 to the end of l1, only adjusting pointers.
 // Ownership: the nodes now belong to l1; l2 ends up empty but still allocated.
 void ll_join(LinkedList *l1, LinkedList *l2);
@@ -33,13 +43,5 @@ void ll_join(LinkedList *l1, LinkedList *l2);
 // Ownership: the nodes now belong to the new list; a and b end up empty but still allocated.
 // Cost: O(na + nb).
 LinkedList *ll_merge_sorted(LinkedList *a, LinkedList *b);
-
-// Frees l and all its nodes.
-// Cost: O(n).
-void ll_free(LinkedList *l);
-
-// Prints the elements of l, from the first to the last.
-// Cost: O(n).
-void ll_print(LinkedList *l);
 
 #endif
