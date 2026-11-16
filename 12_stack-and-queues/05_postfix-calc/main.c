@@ -1,34 +1,29 @@
 #include "calc.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
-// Reads a postfix expression from the keyboard; type q to quit.
+// Reads a postfix expression up to the end of the input and prints its value.
 int main()
 {
-    Calc *calc = calc_create("%.2f\n");
-    char c;
+    Calc *calc = calc_create();
+    char tok[32];
+    float v;
 
-    while (scanf(" %c", &c) == 1) // reads the next non-blank character
+    while (scanf("%31s", tok) == 1) // Reads the next symbol: everything up to a blank.
     {
-        if (c == '+' || c == '-' || c == '*' || c == '/')
-            calc_operator(calc, c);
-        else if (c == 'q')
-            break;
+        if (strlen(tok) == 1 && strchr("+-*/", tok[0]) != NULL)
+            calc_operator(calc, tok[0]);
+        else if (sscanf(tok, "%f", &v) == 1)
+            calc_operand(calc, v);
         else
         {
-            float v;
-            ungetc(c, stdin); // gives the character back and tries to read a number
-            if (scanf("%f", &v) == 1)
-                calc_operand(calc, v);
-            else
-            {
-                printf("Reading error\n");
-                calc_free(calc);
-                return 1;
-            }
+            printf("Invalid symbol: %s\n", tok);
+            calc_free(calc);
+            return 1;
         }
     }
 
+    printf("%.2f\n", calc_result(calc));
     calc_free(calc);
     return 0;
 }

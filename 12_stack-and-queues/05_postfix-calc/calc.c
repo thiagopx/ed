@@ -1,20 +1,15 @@
 #include "calc.h"
 #include "stack.h"
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 struct calc
 {
-    char fmt[21]; // Format used to print the top of the stack
-    Stack *s;     // Stack of operands (any Stack implementation works)
+    Stack *s; // Stack of operands (any Stack implementation works).
 };
 
-Calc *calc_create(const char *fmt)
+Calc *calc_create()
 {
     Calc *c = (Calc *)malloc(sizeof(Calc));
-    strncpy(c->fmt, fmt, 20);
-    c->fmt[20] = '\0';
     c->s = s_create();
     return c;
 }
@@ -22,7 +17,6 @@ Calc *calc_create(const char *fmt)
 void calc_operand(Calc *c, float v)
 {
     s_push(c->s, v);
-    printf(c->fmt, v);
 }
 
 void calc_operator(Calc *c, char op)
@@ -40,7 +34,11 @@ void calc_operator(Calc *c, char op)
     }
 
     s_push(c->s, v);
-    printf(c->fmt, v);
+}
+
+float calc_result(Calc *c)
+{
+    return s_is_empty(c->s) ? 0.0f : s_top(c->s);
 }
 
 void calc_free(Calc *c)

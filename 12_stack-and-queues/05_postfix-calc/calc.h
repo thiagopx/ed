@@ -6,15 +6,18 @@
 
 typedef struct calc Calc;
 
-// Returns a new calculator; fmt is the printf format used to show the top (e.g. "%.2f\n").
-Calc *calc_create(const char *fmt);
+// Returns a new calculator, with an empty stack of operands.
+Calc *calc_create();
 
-// Pushes the operand v onto c and prints the new top.
+// Pushes the operand v onto c.
 void calc_operand(Calc *c, float v);
 
-// Pops two operands of c, applies op (+, -, * or /), pushes the result and prints the new top;
-//   a missing operand counts as zero.
+// Pops two operands of c, applies op (+, -, * or /) and pushes the result; a missing operand
+//   counts as zero.
 void calc_operator(Calc *c, char op);
+
+// Returns the value on the top of c, the result of what was read so far (0 if c has no operand).
+float calc_result(Calc *c);
 
 // Frees c and its stack.
 void calc_free(Calc *c);
