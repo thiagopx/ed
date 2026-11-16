@@ -425,8 +425,8 @@ const questions = [
     difficulty: "intermediario",
     diffLabel: "Intermediário",
     tag: "Calculadora pós-fixada",
-    text: "O programa 05_postfix-calc imprime o topo da pilha depois de cada símbolo, com o formato \"%.2f\\n\". Qual é a última linha impressa para a entrada abaixo?",
-    code: `9 4 - 2 * q`,
+    text: "O programa 05_postfix-calc lê a expressão e, no fim da entrada, imprime o resultado com duas casas decimais. O que ele imprime para a entrada abaixo?",
+    code: `9 4 - 2 *`,
     options: [
       "10.00",
       "-10.00",
@@ -434,24 +434,24 @@ const questions = [
       "2.00"
     ],
     correctIndex: 0,
-    explainCorrect: "Empilham-se 9 e 4. O - desempilha primeiro o 4 (v2, o topo) e depois o 9 (v1) e calcula v1 - v2 = 5. Empilha-se o 2, e o * calcula 5 * 2 = 10. A execução real imprime 9.00, 4.00, 5.00, 2.00 e 10.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
-    explainIncorrect: "A resposta correta é 10.00. O primeiro valor desempilhado é o operando da direita: em 9 4 -, sai primeiro o 4, e a conta é 9 - 4 = 5, não 4 - 9. Depois, 5 2 * dá 10. O -10.00 vem de inverter os operandos do -, e 5.00 e 2.00 são linhas intermediárias da saída."
+    explainCorrect: "Empilham-se 9 e 4. O - desempilha primeiro o 4 (v2, o topo) e depois o 9 (v1) e calcula v1 - v2 = 5. Empilha-se o 2, e o * calcula 5 * 2 = 10. A execução real imprime só 10.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é 10.00. O primeiro valor desempilhado é o operando da direita: em 9 4 -, sai primeiro o 4, e a conta é 9 - 4 = 5, não 4 - 9. Depois, 5 2 * dá 10. O -10.00 vem de inverter os operandos do -, e 5.00 e 2.00 são valores intermediários da pilha, que não são impressos."
   },
   {
     difficulty: "avancado",
     diffLabel: "Avançado",
     tag: "Operando que falta",
     text: "Em calc_operator, um operando que falta vale zero: float v2 = s_is_empty(c-&gt;s) ? 0.0f : s_pop(c-&gt;s); e o mesmo para v1. O que a calculadora imprime para a entrada abaixo?",
-    code: `5 - q`,
+    code: `5 -`,
     options: [
-      "5.00 e, na linha seguinte, 5.00",
-      "Só 5.00: o programa aborta no assert de s_pop",
-      "5.00 e, na linha seguinte, -5.00",
-      "5.00 e depois Reading error"
+      "5.00: sem o segundo operando, o - é ignorado",
+      "Nada: o programa aborta no assert de s_pop",
+      "-5.00",
+      "Invalid symbol: -"
     ],
     correctIndex: 2,
-    explainCorrect: "O 5 é empilhado e impresso. No -, v2 recebe o 5, o topo, e a pilha fica vazia. Para v1, o teste s_is_empty dá verdadeiro e v1 vale 0.0f, sem chamar s_pop. O resultado é v1 - v2 = 0 - 5 = -5. A execução real imprime 5.00 e -5.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
-    explainIncorrect: "A resposta correta é 5.00 e depois -5.00. O assert não dispara, porque o teste s_is_empty vem antes de cada s_pop e faz o operando que falta valer 0. O 5 sai primeiro e é o v2, o operando da direita, então a conta é 0 - 5. O - é um operador válido, e o Reading error só aparece quando a leitura de um número falha."
+    explainCorrect: "O 5 é empilhado. No -, v2 recebe o 5, o topo, e a pilha fica vazia. Para v1, o teste s_is_empty dá verdadeiro e v1 vale 0.0f, sem chamar s_pop. O resultado é v1 - v2 = 0 - 5 = -5, e é o que sobra no topo. A execução real imprime -5.00. Adaptado de: Celes, W. <em>Estrutura de Dados</em>.",
+    explainIncorrect: "A resposta correta é -5.00. O assert não dispara, porque o teste s_is_empty vem antes de cada s_pop e faz o operando que falta valer 0. O 5 sai primeiro e é o v2, o operando da direita, então a conta é 0 - 5. O - sozinho é um operador válido; a mensagem Invalid symbol só aparece para um símbolo que não é operador nem número."
   },
   {
     difficulty: "intermediario",
