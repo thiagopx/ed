@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+typedef struct deque_node DequeNode; // Only deque.c uses the node: it is not in deque.h.
 struct deque
 {
     DequeNode *head;

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+typedef struct stacknode StackNode; // Only stack.c uses the node: it is not in stack.h.
 struct stack
 {
     StackNode *top; // NULL when the stack is empty.

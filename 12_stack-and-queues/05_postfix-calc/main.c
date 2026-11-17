@@ -1,23 +1,25 @@
 #include "calc.h"
 #include <stdio.h>
-#include <string.h>
 
-// Reads a postfix expression up to the end of the input and prints its value.
-int main()
+// Evaluates the postfix expression given as arguments, one symbol per
+//   argument, and prints its value. Example: ./calc 1 2 - 4 5 + x
+int main(int argc, char *argv[])
 {
     Calc *calc = calc_create();
-    char tok[32];
     float v;
+    int i;
 
-    while (scanf("%31s", tok) == 1) // Reads the next symbol: everything up to a blank.
+    for (i = 1; i < argc; i++)
     {
-        if (strlen(tok) == 1 && strchr("+-*/", tok[0]) != NULL)
-            calc_operator(calc, tok[0]);
-        else if (sscanf(tok, "%f", &v) == 1)
-            calc_operand(calc, v);
+        char *t = argv[i]; // "12", "-5", "+", ...
+        char c = t[0];
+        if (t[1] == '\0' && (c == '+' || c == '-' || c == 'x' || c == '/'))
+            calc_operator(calc, c); // A one-character operator.
+        else if (sscanf(t, "%f", &v) == 1)
+            calc_operand(calc, v); // Anything read as a number.
         else
         {
-            printf("Invalid symbol: %s\n", tok);
+            printf("Invalid symbol: %s\n", t);
             calc_free(calc);
             return 1;
         }

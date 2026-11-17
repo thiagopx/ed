@@ -29,7 +29,7 @@ void calc_operator(Calc *c, char op)
     {
     case '+': v = v1 + v2; break;
     case '-': v = v1 - v2; break;
-    case '*': v = v1 * v2; break;
+    case 'x': v = v1 * v2; break;
     case '/': v = v1 / v2; break;
     }
 

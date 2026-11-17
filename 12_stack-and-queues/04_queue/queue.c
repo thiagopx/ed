@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+typedef struct queue_node QueueNode; // Only queue.c uses the node: it is not in queue.h.
 struct queue
 {
    QueueNode *head;

@@ -4,7 +4,6 @@
 #define QUEUE_H
 
 typedef struct queue Queue;
-typedef struct queue_node QueueNode;
 
 // Returns a new empty queue.
 Queue *q_create();

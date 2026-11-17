@@ -4,7 +4,6 @@
 #define STACK_H
 
 typedef struct stack Stack;
-typedef struct stacknode StackNode;
 
 // Returns a new empty stack.
 Stack *s_create();

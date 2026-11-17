@@ -4,7 +4,6 @@
 #define DEQUE_H
 
 typedef struct deque Deque;
-typedef struct deque_node DequeNode;
 
 // Returns a new empty deque.
 Deque *dq_create();

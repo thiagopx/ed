@@ -12,7 +12,7 @@ Calc *calc_create();
 // Pushes the operand v onto c.
 void calc_operand(Calc *c, float v);
 
-// Pops two operands of c, applies op (+, -, * or /) and pushes the result; a missing operand
+// Pops two operands of c, applies op (+, -, x or /) and pushes the result; a missing operand
 //   counts as zero.
 void calc_operator(Calc *c, char op);
 
